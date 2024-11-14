@@ -17,7 +17,7 @@ install: &install
             "ddoe/*": "source"
           },
           "require": {
-            "oxid-esales/twig-component": "{{ .Data.global.composer.dev_ref }}",
+            "oxid-esales/twig-component": "dev-b-8.0.x-resolve-conflicts",
             "oxid-esales/twig-admin-theme": "{{ .Data.global.composer.dev_ref }}",
             "oxid-esales/apex-theme": "{{ .Data.global.composer.dev_ref }}"
           }
