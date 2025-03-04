@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration;
 
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\EshopCommunity\Internal\Framework\Cache\ShopCacheCleanerInterface;
 use OxidEsales\EshopCommunity\Tests\ContainerTrait;
 use OxidEsales\EshopCommunity\Tests\DatabaseTrait;
 use OxidEsales\EshopCommunity\Tests\FilesystemTrait;
@@ -24,14 +26,12 @@ class IntegrationTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->backupVarDirectory();
         $this->beginTransaction();
     }
 
     public function tearDown(): void
     {
         $this->rollBackTransaction();
-        $this->restoreVarDirectory();
 
         parent::tearDown();
     }

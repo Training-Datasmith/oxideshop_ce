@@ -16,30 +16,20 @@ use Symfony\Component\Filesystem\Path;
 trait FilesystemTrait
 {
     private Filesystem $filesystem;
-    private string $varPath = '';
-    private string $varBackupPath = '';
+    private string $varTestPath = '';
 
-    public function backupVarDirectory(): void
-    {
-        $this->init();
-        $this->filesystem->mirror($this->varPath, $this->varBackupPath);
-    }
-
-    public function restoreVarDirectory(): void
-    {
-        $this->filesystem->remove($this->varPath);
-        $this->filesystem->mirror($this->varBackupPath, $this->varPath);
-        $this->filesystem->remove($this->varBackupPath);
-    }
-
-    private function init(): void
+    public function createTestVarDirectory(): void
     {
         $shopRootPath = (new ProjectRootLocator())->getProjectRoot();
         $this->filesystem = new Filesystem();
-        $this->varPath = Path::join($shopRootPath, 'var');
-        $this->varBackupPath = Path::join(
-            $shopRootPath,
-            uniqid('var.backup.', true)
-        );
+        $varPath = Path::join($shopRootPath, 'var');
+        $this->varTestPath = Path::join($shopRootPath, getenv('OXID_VAR_DIRECTORY'));
+
+        $this->filesystem->mirror($varPath, $this->varTestPath);
+    }
+
+    public function deleteTestVarDirectory(): void
+    {
+        $this->filesystem->remove($this->varTestPath);
     }
 }

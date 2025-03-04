@@ -43,7 +43,7 @@ function init() {
         fi
     fi
 
-    BOOTSTRAP="/var/www/source/bootstrap.php"
+    BOOTSTRAP="/var/www/tests/bootstrap.php"
     if [ ! -f "${BOOTSTRAP}" ]; then
         BOOTSTRAP="/var/www/vendor/oxid-esales/oxideshop-ce/tests/bootstrap.php"
         if [ ! -f "${BOOTSTRAP}" ]; then

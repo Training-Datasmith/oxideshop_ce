@@ -67,7 +67,7 @@ modules:
                   - Mailpit
               deleteEmailsAfterTest: false
         - OxidEsales\Codeception\Module\ProjectConfiguration:
-              config_path: '%PROJECT_ROOT%/var/configuration'
+              config_path: '%PROJECT_ROOT%/var-test/configuration'
               parameters: []
               services: []
 step_decorators:

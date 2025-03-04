@@ -36,7 +36,11 @@ class BasicContext implements BasicContextInterface
 
     public function getGeneratedServicesFilePath(): string
     {
-        return Path::join($this->getShopRootPath(), 'var', 'generated', 'generated_services.yaml');
+        return Path::join(
+            $this->getVarDirectory(),
+            'generated',
+            'generated_services.yaml'
+        );
     }
 
     public function getActiveModuleServicesFilePath(int $shopId): string
@@ -86,7 +90,10 @@ class BasicContext implements BasicContextInterface
 
     public function getProjectConfigurationDirectory(): string
     {
-        return Path::join($this->getShopRootPath(), 'var', 'configuration');
+        return Path::join(
+            $this->getVarDirectory(),
+            'configuration'
+        );
     }
 
     public function getShopConfigurationDirectory(int $shopId): string
@@ -142,5 +149,13 @@ class BasicContext implements BasicContextInterface
     public function getShopBaseUrl(): string
     {
         return getenv('OXID_SHOP_BASE_URL');
+    }
+
+    private function getVarDirectory(): string
+    {
+        return Path::join(
+            $this->getShopRootPath(),
+            getenv('OXID_VAR_DIRECTORY') ?: 'var'
+        );
     }
 }

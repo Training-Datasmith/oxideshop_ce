@@ -2,6 +2,8 @@ namespace: OxidEsales\EshopCommunity\Tests\Codeception
 support_namespace: Support
 params:
     - Codeception/Config/params.php
+    - env: OXID_VAR_DIRECTORY
+      value: var-test
 paths:
     tests: Codeception
     output: Codeception/_output

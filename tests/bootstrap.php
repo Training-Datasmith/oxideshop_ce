@@ -11,6 +11,7 @@ use OxidEsales\EshopCommunity\Core\Autoload\BackwardsCompatibilityAutoload;
 use OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload;
 use OxidEsales\EshopCommunity\Internal\Framework\Env\DotenvLoader;
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\ProjectRootLocator;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 define('INSTALLATION_ROOT_PATH', (new ProjectRootLocator())->getProjectRoot());
@@ -25,3 +26,10 @@ require_once Path::join(OX_BASE_PATH, 'oxfunctions.php');
 require_once Path::join(OX_BASE_PATH, 'overridablefunctions.php');
 
 (new DotenvLoader(INSTALLATION_ROOT_PATH))->loadEnvironmentVariables();
+
+$filesystem = new Filesystem();
+$varPath = Path::join(INSTALLATION_ROOT_PATH, 'var');
+$varTestPath = Path::join(INSTALLATION_ROOT_PATH, 'var-test');
+
+$filesystem->remove($varTestPath);
+$filesystem->mirror($varPath, $varTestPath);
