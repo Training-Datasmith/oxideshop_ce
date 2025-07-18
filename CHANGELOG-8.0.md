@@ -7,6 +7,7 @@
 - ClearShopCacheEvent
 - Validation for country VAT number prefix in the admin area
 - Upgrade to Symfony version 7.3
+- Log unfinished injected services for `ModuleAutoload` at the `critical` log level
 
 ### Fixed
 
@@ -21,6 +22,7 @@
 - Database adapter fetcher methods now return associative results by default
 - Method `getLastInsertId` of `DatabaseInterface` Adapter will throw `DatabaseErrorException` if no insert ID is available.
 - The `DatabaseConfiguration` namespace has been renamed for consistency, and the `getScheme` method has been replaced with `getDriver`
+- `ModuleAutoload` will now skip loading dependency injection (DI) services
 
 ### Removed
 

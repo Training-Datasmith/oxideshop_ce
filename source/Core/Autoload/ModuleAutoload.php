@@ -8,8 +8,11 @@
 namespace OxidEsales\EshopCommunity\Core\Autoload;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\Eshop\Core\ShopIdCalculator;
+use OxidEsales\Eshop\Core\UtilsServer;
+use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\ContainerBuilder;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
 
 /**
  * Autoloader for module classes and extensions.
@@ -54,20 +57,20 @@ class ModuleAutoload
     public static function autoload($class)
     {
         /**
-         * Classes from unified namespace cannot be loaded by this auto loader.
-         * Do not try to load them in order to avoid strange errors in edge cases.
+         * This autoloader cannot load classes from unified namespace or DI Services.
+         * Do not try to load them to avoid strange errors in edge cases.
          */
-        if (false !== strpos($class, 'OxidEsales\Eshop\\')) {
+        if (preg_match('/^OxidEsales\\\\Eshop(?:\\\\|[A-Za-z]+\\\\Internal\\\\)/', $class)) {
             return false;
         }
 
         $instance = static::getInstance();
-        $class = strtolower(basename($class));
-        $class = preg_replace('/_parent$/i', '', $class);
+        $processedClassName = strtolower(basename($class));
+        $processedClassName = preg_replace('/_parent$/i', '', $processedClassName);
 
-        if (!in_array($class, $instance->triedClasses)) {
-            $instance->triedClasses[] = $class;
-            $instance->createExtensionClassChain($class);
+        if (!in_array($processedClassName, $instance->triedClasses)) {
+            $instance->triedClasses[] = $processedClassName;
+            $instance->createExtensionClassChain($processedClassName);
         }
     }
 
@@ -93,7 +96,10 @@ class ModuleAutoload
      */
     protected function createExtensionClassChain($class)
     {
-        $extensions = ContainerFacade::get(ActiveModulesDataProviderBridgeInterface::class)->getClassExtensions();
+        $container = (new ContainerBuilder(new BasicContext(), (new ShopIdCalculator(new UtilsServer()))->getShopId()))
+            ->getContainer();
+        $container->compile(true);
+        $extensions = $container->get(ActiveModulesDataProviderBridgeInterface::class)->getClassExtensions();
 
         if (is_array($extensions)) {
             $class = preg_quote($class, '/');
