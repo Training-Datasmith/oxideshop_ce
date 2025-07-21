@@ -11,7 +11,11 @@ use OxidEsales\Eshop\Core\FileCache;
 use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopIdCalculator;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Core\SubShopSpecificFileCache;
+use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\ContainerBuilder;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
 
 /**
  * Autoloader for module classes and extensions.
@@ -95,8 +99,9 @@ class ModuleAutoload
      */
     protected function createExtensionClassChain($class)
     {
-        $extensions = $this->getModuleVariablesLocator()
-            ->getModuleVariable('aModules');
+        $container = (new ContainerBuilder(new BasicContext()))->getContainer();
+        $container->compile(true);
+        $extensions = $container->get(ActiveModulesDataProviderBridgeInterface::class)->getClassExtensions();
 
         if (is_array($extensions)) {
             $class = preg_quote($class, '/');
