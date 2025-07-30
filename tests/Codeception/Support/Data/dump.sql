@@ -56,23 +56,23 @@ REPLACE INTO `oxobject2group` (`OXID`,                       `OXSHOPID`,   `OXOB
 
 # createBasketUserAccountWithoutRegistration
 #adding states for germany
-REPLACE INTO `oxstates` (`OXID`, `OXCOUNTRYID`, `OXTITLE`, `OXISOALPHA2`, `OXTITLE_1`, `OXTITLE_2`, `OXTITLE_3`) VALUES
-('BB', 'testcountry_de', 'Brandenburg', 'BB', 'Brandenburg', '', ''),
-('BE', 'testcountry_de', 'Berlin', 'BE', 'Berlin', '', ''),
-('BW', 'testcountry_de', 'Baden-Württemberg', 'BW', 'Baden-Wurttemberg', '', ''),
-('BY', 'testcountry_de', 'Bayern', 'BY', 'Bavaria', '', ''),
-('HB', 'testcountry_de', 'Bremen', 'HB', 'Bremen', '', ''),
-('HE', 'testcountry_de', 'Hessen', 'HE', 'Hesse', '', ''),
-('HH', 'testcountry_de', 'Hamburg', 'HH', 'Hamburg', '', ''),
-('MV', 'testcountry_de', 'Mecklenburg-Vorpommern', 'MV', 'Mecklenburg-Western Pomerania', '', ''),
-('NI', 'testcountry_de', 'Niedersachsen', 'NI', 'Lower Saxony', '', ''),
-('NW', 'testcountry_de', 'Nordrhein-Westfalen', 'NW', 'North Rhine-Westphalia', '', ''),
-('RP', 'testcountry_de', 'Rheinland-Pfalz', 'RP', 'Rhineland-Palatinate', '', ''),
-('SH', 'testcountry_de', 'Schleswig-Holstein', 'SH', 'Schleswig-Holstein', '', ''),
-('SL', 'testcountry_de', 'Saarland', 'SL', 'Saarland', '', ''),
-('SN', 'testcountry_de', 'Sachsen', 'SN', 'Saxony', '', ''),
-('ST', 'testcountry_de', 'Sachsen-Anhalt', 'ST', 'Saxony-Anhalt', '', ''),
-('TH', 'testcountry_de', 'Thüringen', 'TH', 'Thuringia', '', '');
+REPLACE INTO `oxstates` (`OXID`, `OXCOUNTRYID`, `OXTITLE`, `OXTITLE_1`, `OXTITLE_2`, `OXTITLE_3`) VALUES
+('BB', 'testcountry_de', 'Brandenburg', 'Brandenburg', '', ''),
+('BE', 'testcountry_de', 'Berlin', 'Berlin', '', ''),
+('BW', 'testcountry_de', 'Baden-Württemberg', 'Baden-Wurttemberg', '', ''),
+('BY', 'testcountry_de', 'Bayern', 'Bavaria', '', ''),
+('HB', 'testcountry_de', 'Bremen', 'Bremen', '', ''),
+('HE', 'testcountry_de', 'Hessen', 'Hesse', '', ''),
+('HH', 'testcountry_de', 'Hamburg', 'Hamburg', '', ''),
+('MV', 'testcountry_de', 'Mecklenburg-Vorpommern', 'Mecklenburg-Western Pomerania', '', ''),
+('NI', 'testcountry_de', 'Niedersachsen', 'Lower Saxony', '', ''),
+('NW', 'testcountry_de', 'Nordrhein-Westfalen', 'North Rhine-Westphalia', '', ''),
+('RP', 'testcountry_de', 'Rheinland-Pfalz', 'Rhineland-Palatinate', '', ''),
+('SH', 'testcountry_de', 'Schleswig-Holstein', 'Schleswig-Holstein', '', ''),
+('SL', 'testcountry_de', 'Saarland', 'Saarland', '', ''),
+('SN', 'testcountry_de', 'Sachsen', 'Saxony', '', ''),
+('ST', 'testcountry_de', 'Sachsen-Anhalt', 'Saxony-Anhalt', '', ''),
+('TH', 'testcountry_de', 'Thüringen', 'Thuringia', '', '');
 
 
 # createBasketUserAccountWithoutRegistration

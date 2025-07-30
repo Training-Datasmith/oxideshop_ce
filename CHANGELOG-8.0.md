@@ -21,6 +21,7 @@
 - Database adapter fetcher methods now return associative results by default
 - Method `getLastInsertId` of `DatabaseInterface` Adapter will throw `DatabaseErrorException` if no insert ID is available.
 - The `DatabaseConfiguration` namespace has been renamed for consistency, and the `getScheme` method has been replaced with `getDriver`
+- Updated ISO codes for canada Provinces in `oxstates` table
 
 ### Removed
 
@@ -33,6 +34,7 @@
 - Redundant shop state and configuration classes and services: `ShopStateService`, `ShopStateServiceInterface`, `ProjectConfigurationDao`, `ProjectConfigurationDaoInterface`, `ProjectConfiguration`
 - A deprecated partner-related method `getBelboonParam()` of class `BaseController` [0006140](https://bugs.oxid-esales.com/view.php?id=6140)
 - `ContainerBuilderFactory`
+- Deprecated `OXISOALPHA2` column from `oxstates` table
 
 ## v8.0.0-alpha.1 - 2025-02-03
 

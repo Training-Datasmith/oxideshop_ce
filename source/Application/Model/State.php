@@ -8,6 +8,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -32,44 +33,41 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     }
 
     /**
-     * Returns country id by code
+     * Returns state id by code
      *
-     * @param string $sCode      country code
-     * @param string $sCountryId country id
+     * @param string $code      state code
+     * @param string $countryId country id
      *
      * @return string
      */
-    public function getIdByCode($sCode, $sCountryId)
+    public function getIdByCode($code, $countryId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $params = [
-            'oxisoalpha2' => $sCode,
-            'oxcountryid' => $sCountryId
-        ];
-
-        return $oDb->getOne("SELECT oxid FROM oxstates 
-            WHERE oxisoalpha2 = :oxisoalpha2 
-              AND oxcountryid = :oxcountryid", $params);
+        return DatabaseProvider::getDb()->getOne(
+            "SELECT oxid FROM oxstates WHERE oxid = :oxid AND oxcountryid = :oxcountryid",
+            [
+                'oxid' => $code,
+                'oxcountryid' => $countryId
+            ]
+        );
     }
 
     /**
      * Get state title by id
      *
-     * @param integer|string $iStateId
+     * @param string $stateId
      *
      * @return string
      */
-    public function getTitleById($iStateId)
+    public function getTitleById($stateId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sQ = "SELECT oxtitle FROM " . $tableViewNameGenerator->getViewName("oxstates") . " 
+        $query = "SELECT oxtitle FROM " . $tableViewNameGenerator->getViewName("oxstates") . " 
             WHERE oxid = :oxid";
 
-        $sStateTitle = $oDb->getOne($sQ, [
-            'oxid' => $iStateId
+        $stateTitle = DatabaseProvider::getDb()->getOne($query, [
+            'oxid' => $stateId
         ]);
 
-        return (string) $sStateTitle;
+        return (string) $stateTitle;
     }
 }

@@ -1447,14 +1447,13 @@ CREATE TABLE `oxstates` (
   `OXID` char(32) character set latin1 collate latin1_general_ci NOT NULL default '' COMMENT 'State id',
   `OXCOUNTRYID` char(32) character set latin1 collate latin1_general_ci NOT NULL default '' COMMENT 'Country id (oxcountry)',
   `OXTITLE` char(128) NOT NULL default '' COMMENT 'Title (multilanguage)',
-  `OXISOALPHA2` char(2) character set latin1 collate latin1_general_ci NOT NULL default '' COMMENT 'SEO short name',
   `OXTITLE_1` char(128) NOT NULL default '',
   `OXTITLE_2` char(128) NOT NULL default '',
   `OXTITLE_3` char(128) NOT NULL default '',
   `OXTIMESTAMP` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'Timestamp',
   PRIMARY KEY  (`OXID`, `OXCOUNTRYID`),
   KEY(`OXCOUNTRYID`)
-) ENGINE = InnoDB COMMENT 'US States list';
+) ENGINE = InnoDB COMMENT 'States/Provinces/Regions assigned to countries';
 
 #
 # Table structure for table `oxtplblocks`
