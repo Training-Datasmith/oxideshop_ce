@@ -8,15 +8,27 @@
 declare(strict_types=1);
 
 use OxidEsales\Eshop\Core\ConfigFile;
+use OxidEsales\EshopCommunity\Core\Autoload\BackwardsCompatibilityAutoload;
 use OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload;
 use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Api\Api;
 use OxidEsales\EshopCommunity\Internal\Framework\Api\ExceptionHandler;
 use OxidEsales\EshopCommunity\Internal\Framework\Env\DotenvLoader;
+use OxidEsales\Facts\Facts;
 use Symfony\Component\ErrorHandler\Debug;
 
 define('INSTALLATION_ROOT_PATH', dirname(__DIR__));
 define('OX_BASE_PATH', INSTALLATION_ROOT_PATH . DIRECTORY_SEPARATOR . 'source' . DIRECTORY_SEPARATOR);
+define('VENDOR_PATH', INSTALLATION_ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR);
+
+require_once VENDOR_PATH . 'autoload.php';
+
+/*
+ * Register the backwards compatibility autoloader.
+ * This autoloader will load classes for reasons of backwards compatibility like 'oxArticle'.
+ */
+require_once (new Facts())->getCommunityEditionSourcePath() . '/Core/Autoload/BackwardsCompatibilityAutoload.php';
+spl_autoload_register([BackwardsCompatibilityAutoload::class, 'autoload']);
 
 require_once INSTALLATION_ROOT_PATH . '/vendor/autoload.php';
 spl_autoload_register([ModuleAutoload::class, 'autoload']);
