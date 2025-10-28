@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Api;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -26,12 +26,16 @@ class Api
         $container = ContainerFactory::getInstance()->getContainer();
         $request = Request::createFromGlobals();
 
-        $matcher = new CompiledUrlMatcher($container->getParameter('oxid.routes'), new RequestContext());
+        $context = new RequestContext();
+        $context->fromRequest($request);
+        $matcher = new CompiledUrlMatcher($container->getParameter('oxid.routes'), $context);
         $parameters = $matcher->matchRequest($request);
         $request->attributes->add($parameters);
 
+        $dispatcher = $container->get(EventDispatcherInterface::class);
+
         $kernel = new HttpKernel(
-            new EventDispatcher(),
+            $dispatcher,
             new ContainerControllerResolver($container),
             new RequestStack(),
             new ArgumentResolver()
