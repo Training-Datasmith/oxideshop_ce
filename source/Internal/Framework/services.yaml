@@ -12,6 +12,7 @@ imports:
   - { resource: Migration/services.yaml }
   - { resource: Module/services.yaml }
   - { resource: Request/services.yaml }
+  - { resource: Search/services.yaml }
   - { resource: Session/services.yaml }
   - { resource: SystemRequirements/services.yaml }
   - { resource: Templating/services.yaml }

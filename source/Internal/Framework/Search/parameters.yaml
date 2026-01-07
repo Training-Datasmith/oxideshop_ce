@@ -1,0 +1,2 @@
+parameters:
+  oxid_esales.search.use_custom_search: false

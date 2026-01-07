@@ -7,7 +7,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchRequestFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchServiceInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Search\Sorting;
+use Psr\Log\LoggerInterface;
 
 /**
  * Articles searching class.
@@ -175,7 +181,50 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
             $initialSearchManufacturer = null;
         }
 
-        // searching ..
+        $searchLimit = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
+        $searchLimit = $searchLimit ?: 10;
+
+        $searchService = $this->getSearchService();
+        $searchRequestFactory = $this->getSearchRequestFactory();
+        if ($searchService !== null && $searchRequestFactory !== null) {
+            try {
+                $searchRequest = $searchRequestFactory->create();
+                $searchRequest->setLimit($searchLimit);
+
+                $sortField = $this->getSortingSql($this->getSortIdent());
+                if ($sortField) {
+                    $searchRequest->addSorting(new Sorting($sortField));
+                }
+
+                if ($searchParamForQuery) {
+                    $searchRequest->setSearchQuery($searchParamForQuery);
+                }
+                if ($initialSearchCat) {
+                    $searchRequest->addFilter('categoryId', $initialSearchCat);
+                }
+                if ($initialSearchVendor) {
+                    $searchRequest->addFilter('vendorId', $initialSearchVendor);
+                }
+                if ($initialSearchManufacturer) {
+                    $searchRequest->addFilter('manufacturerId', $initialSearchManufacturer);
+                }
+
+                $searchResult = $searchService->search($searchRequest);
+
+                $this->_aArticleList = $this->loadArticlesByIds($searchResult->getProducts());
+                $this->_iAllArtCnt = $searchResult->getTotalResults();
+                $this->_iCntPages = ceil($this->_iAllArtCnt / $searchLimit);
+
+                return null;
+            } catch (\Throwable $exception) {
+                ContainerFacade::get(LoggerInterface::class)
+                    ->error(
+                        'Custom search failed, falling back to legacy search',
+                        ['exception' => $exception->getMessage()]
+                    );
+            }
+        }
+
         /** @var \OxidEsales\Eshop\Application\Model\Search $oSearchHandler */
         $oSearchHandler = oxNew(\OxidEsales\Eshop\Application\Model\Search::class);
         $oSearchList = $oSearchHandler->getSearchArticles(
@@ -200,9 +249,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
             );
         }
 
-        $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
-        $iNrofCatArticles = $iNrofCatArticles ?: 1;
-        $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
+        $this->_iCntPages = ceil($this->_iAllArtCnt / $searchLimit);
     }
 
     /**
@@ -504,5 +551,36 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         $sTitle .= ' "' . $this->getSearchParamForHtml() . '"';
 
         return $sTitle;
+    }
+
+    private function loadArticlesByIds(array $articleIds): ArticleList
+    {
+        $articleList = oxNew(ArticleList::class);
+
+        if (empty($articleIds)) {
+            return $articleList;
+        }
+
+        $articleList->loadIds($articleIds);
+
+        return $articleList;
+    }
+
+    private function getSearchService(): ?ProductSearchServiceInterface
+    {
+        if (ContainerFacade::has(ProductSearchServiceInterface::class)) {
+            return ContainerFacade::get(ProductSearchServiceInterface::class);
+        }
+
+        return null;
+    }
+
+    private function getSearchRequestFactory(): ?ProductSearchRequestFactoryInterface
+    {
+        if (ContainerFacade::has(ProductSearchRequestFactoryInterface::class)) {
+            return ContainerFacade::get(ProductSearchRequestFactoryInterface::class);
+        }
+
+        return null;
     }
 }
