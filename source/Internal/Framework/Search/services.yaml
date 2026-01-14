@@ -1,2 +1,23 @@
 imports:
   - { resource: parameters.yaml }
+
+services:
+  _defaults:
+    autowire: true
+
+  OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchRequestFactory:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchRequestFactory
+
+  OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchRequestFactoryInterface:
+    alias: OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchRequestFactory
+    public: true
+
+  OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchService:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchService
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface'
+      - '@Symfony\Component\EventDispatcher\EventDispatcherInterface'
+
+  OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchServiceInterface:
+    alias: OxidEsales\EshopCommunity\Internal\Framework\Search\ProductSearchService
+    public: true

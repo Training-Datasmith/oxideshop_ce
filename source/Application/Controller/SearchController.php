@@ -184,72 +184,38 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         $searchLimit = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
         $searchLimit = $searchLimit ?: 10;
 
-        $searchService = $this->getSearchService();
-        $searchRequestFactory = $this->getSearchRequestFactory();
-        if ($searchService !== null && $searchRequestFactory !== null) {
-            try {
-                $searchRequest = $searchRequestFactory->create();
-                $searchRequest->setLimit($searchLimit);
+        $pageNumber = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
+        $pageNumber = max(0, $pageNumber);
 
-                $sortField = $this->getSortingSql($this->getSortIdent());
-                if ($sortField) {
-                    $searchRequest->addSorting(new Sorting($sortField));
-                }
+        $searchRequest = ContainerFacade::get(ProductSearchRequestFactoryInterface::class)->create();
+        $searchRequest->setLimit($searchLimit);
+        $searchRequest->setOffset($pageNumber * $searchLimit);
 
-                if ($searchParamForQuery) {
-                    $searchRequest->setSearchQuery($searchParamForQuery);
-                }
-                if ($initialSearchCat) {
-                    $searchRequest->addFilter('categoryId', $initialSearchCat);
-                }
-                if ($initialSearchVendor) {
-                    $searchRequest->addFilter('vendorId', $initialSearchVendor);
-                }
-                if ($initialSearchManufacturer) {
-                    $searchRequest->addFilter('manufacturerId', $initialSearchManufacturer);
-                }
-
-                $searchResult = $searchService->search($searchRequest);
-
-                $this->_aArticleList = $this->loadArticlesByIds($searchResult->getProducts());
-                $this->_iAllArtCnt = $searchResult->getTotalResults();
-                $this->_iCntPages = ceil($this->_iAllArtCnt / $searchLimit);
-
-                return null;
-            } catch (\Throwable $exception) {
-                ContainerFacade::get(LoggerInterface::class)
-                    ->error(
-                        'Custom search failed, falling back to legacy search',
-                        ['exception' => $exception->getMessage()]
-                    );
-            }
+        $sortField = $this->getSortingSql($this->getSortIdent());
+        if ($sortField) {
+            $searchRequest->addSorting(new Sorting($sortField));
         }
 
-        /** @var \OxidEsales\Eshop\Application\Model\Search $oSearchHandler */
-        $oSearchHandler = oxNew(\OxidEsales\Eshop\Application\Model\Search::class);
-        $oSearchList = $oSearchHandler->getSearchArticles(
-            $searchParamForQuery,
-            $initialSearchCat,
-            $initialSearchVendor,
-            $initialSearchManufacturer,
-            $this->getSortingSql($this->getSortIdent())
-        );
-
-        // list of found articles
-        $this->_aArticleList = $oSearchList;
-        $this->_iAllArtCnt = 0;
-
-        // skip count calculation if no articles in list found
-        if ($oSearchList->count()) {
-            $this->_iAllArtCnt = $oSearchHandler->getSearchArticleCount(
-                $searchParamForQuery,
-                $initialSearchCat,
-                $initialSearchVendor,
-                $initialSearchManufacturer
-            );
+        if ($searchParamForQuery) {
+            $searchRequest->setSearchQuery($searchParamForQuery);
+        }
+        if ($initialSearchCat) {
+            $searchRequest->addFilter('categoryId', $initialSearchCat);
+        }
+        if ($initialSearchVendor) {
+            $searchRequest->addFilter('vendorId', $initialSearchVendor);
+        }
+        if ($initialSearchManufacturer) {
+            $searchRequest->addFilter('manufacturerId', $initialSearchManufacturer);
         }
 
+        $searchResult = ContainerFacade::get(ProductSearchServiceInterface::class)->search($searchRequest);
+
+        $this->_aArticleList = $this->loadArticlesByIds($searchResult->getProducts());
+        $this->_iAllArtCnt = $searchResult->getTotalResults();
         $this->_iCntPages = ceil($this->_iAllArtCnt / $searchLimit);
+
+        return null;
     }
 
     /**
@@ -564,23 +530,5 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         $articleList->loadIds($articleIds);
 
         return $articleList;
-    }
-
-    private function getSearchService(): ?ProductSearchServiceInterface
-    {
-        if (ContainerFacade::has(ProductSearchServiceInterface::class)) {
-            return ContainerFacade::get(ProductSearchServiceInterface::class);
-        }
-
-        return null;
-    }
-
-    private function getSearchRequestFactory(): ?ProductSearchRequestFactoryInterface
-    {
-        if (ContainerFacade::has(ProductSearchRequestFactoryInterface::class)) {
-            return ContainerFacade::get(ProductSearchRequestFactoryInterface::class);
-        }
-
-        return null;
     }
 }
