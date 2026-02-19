@@ -9,6 +9,7 @@
 - API rate limiter
 - Alternative email transport integration
 - PHP v8.5 support
+- Cache `BasicContext` results to improve performance
 
 ### Changed
 - Filter unsafe HTML elements and attributes from CMS content in the admin area
