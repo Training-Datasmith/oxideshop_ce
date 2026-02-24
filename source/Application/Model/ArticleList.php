@@ -647,28 +647,40 @@ class ArticleList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Load the list by article ids
      *
      * @param array $aIds Article ID array
-     *
-     * @return null
      */
     public function loadIds($aIds)
     {
-        if (!count($aIds)) {
+        $this->loadIdsBySelect($aIds);
+    }
+
+    public function loadOrderedIds(array $ids): void
+    {
+        $this->loadIdsBySelect($ids, true);
+    }
+
+    private function loadIdsBySelect(array $ids, bool $preserveOrder = false): void
+    {
+        if (!count($ids)) {
             $this->clear();
 
             return;
         }
 
-        $oBaseObject = $this->getBaseObject();
-        $sArticleTable = $oBaseObject->getViewName();
-        $sArticleFields = $oBaseObject->getSelectFields();
+        $baseObject = $this->getBaseObject();
+        $articleTable = $baseObject->getViewName();
+        $articleFields = $baseObject->getSelectFields();
 
-        $oxIdsSql = implode(',', DatabaseProvider::getDb()->quoteArray($aIds));
+        $idsSql = implode(',', DatabaseProvider::getDb()->quoteArray($ids));
 
-        $sSelect = "select $sArticleFields from $sArticleTable ";
-        $sSelect .= "where $sArticleTable.oxid in ( " . $oxIdsSql . " ) and ";
-        $sSelect .= $oBaseObject->getSqlActiveSnippet();
+        $select = "select $articleFields from $articleTable ";
+        $select .= "where $articleTable.oxid in ( " . $idsSql . " ) and ";
+        $select .= $baseObject->getSqlActiveSnippet();
 
-        $this->selectString($sSelect);
+        if ($preserveOrder) {
+            $select .= " order by field($articleTable.oxid, " . $idsSql . ")";
+        }
+
+        $this->selectString($select);
     }
 
     /**

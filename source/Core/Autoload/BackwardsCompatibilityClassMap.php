@@ -364,7 +364,6 @@ return [
     'oxreview' => 'OxidEsales\\Eshop\\Application\\Model\\Review',
     'oxrights' => 'OxidEsales\\Eshop\\Application\\Model\\Rights',
     'oxrole' => 'OxidEsales\\Eshop\\Application\\Model\\Role',
-    'oxsearch' => 'OxidEsales\\Eshop\\Application\\Model\\Search',
     'oxselectlist' => 'OxidEsales\\Eshop\\Application\\Model\\SelectList',
     'oxselection' => 'OxidEsales\\Eshop\\Application\\Model\\Selection',
     'oxseoencoderarticle' => 'OxidEsales\\Eshop\\Application\\Model\\SeoEncoderArticle',

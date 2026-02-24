@@ -43,4 +43,6 @@ interface ShopAdapterInterface
     public function activateTheme(string $themeId): void;
 
     public function generateDatabaseViewName(string $tableName, int $languageId, int $shopId): string;
+
+    public function prepareStrForSearch(string $searchElement): string;
 }

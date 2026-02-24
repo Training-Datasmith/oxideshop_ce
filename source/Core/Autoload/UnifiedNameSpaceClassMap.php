@@ -1947,12 +1947,6 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false
     ],
-    'OxidEsales\Eshop\Application\Model\Search'                                  => [
-        'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\Search::class,
-        'isAbstract'       => false,
-        'isInterface'      => false,
-        'isDeprecated'     => false
-    ],
     'OxidEsales\Eshop\Application\Model\SelectList'                              => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\SelectList::class,
         'isAbstract'       => false,

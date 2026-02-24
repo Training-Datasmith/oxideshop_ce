@@ -9,64 +9,67 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Legacy\Application\Controller;
 
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Controller\SearchController;
-use OxidEsales\EshopCommunity\Application\Model\Article;
-use OxidEsales\EshopCommunity\Core\Field;
 use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 
 final class SearchControllerTest extends IntegrationTestCase
 {
-    private string $productTitle1 = '1000';
-
-    private string $productid1 = 'seacharticle1000';
-
-    private string $productTitle2 = '1001';
-
-    private string $productid2 = 'seacharticle1001';
+    private array $originalSearchCols;
+    private bool $originalSearchUseAND;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $product1 = oxNew(Article::class);
-        $product1->setId($this->productid1);
-        $product1->oxarticles__oxtitle = new Field($this->productTitle1);
-        $product1->oxarticles__oxsearchkeys = new Field($this->productTitle1);
-        $product1->save();
+        $config = Registry::getConfig();
+        $this->originalSearchCols = $config->getConfigParam('aSearchCols') ?? [];
+        $this->originalSearchUseAND = (bool) $config->getConfigParam('blSearchUseAND');
 
-        $product2 = oxNew(Article::class);
-        $product2->setId($this->productid2);
-        $product2->oxarticles__oxtitle = new Field($this->productTitle2);
-        $product2->oxarticles__oxsearchkeys = new Field($this->productTitle2);
-        $product2->save();
+        $config->setConfigParam('aSearchCols', ['oxtitle', 'oxsearchkeys']);
+        $config->setConfigParam('blSearchUseAND', false);
+
+        $this->createProduct('_test_product_1', 'Wireless Keyboard');
+        $this->createProduct('_test_product_2', 'Wireless Mouse');
+    }
+
+    public function tearDown(): void
+    {
+        unset($_POST['searchparam']);
+
+        $config = Registry::getConfig();
+        $config->setConfigParam('aSearchCols', $this->originalSearchCols);
+        $config->setConfigParam('blSearchUseAND', $this->originalSearchUseAND);
+
+        parent::tearDown();
     }
 
     public function testSearchAnd(): void
     {
         Registry::getConfig()->setConfigParam('blSearchUseAND', true);
 
-        $this->setRequestParameter('searchparam', $this->productTitle1 . ' ' . $this->productTitle2);
+        $this->setRequestParameter('searchparam', 'Keyboard Mouse');
 
         $searchController = oxNew(SearchController::class);
         $searchController->init();
 
-        $this->assertEquals(0, ($searchController->getArticleList())->count());
+        $this->assertEquals(0, $searchController->getArticleList()->count());
 
-        $this->setRequestParameter('searchparam', $this->productTitle1);
+        $this->setRequestParameter('searchparam', 'Keyboard');
         $searchController->init();
 
         $articleList = $searchController->getArticleList();
 
-        $this->assertEquals(1, ($searchController->getArticleList())->count());
-        $this->assertEquals($this->productid1, $articleList->current()->getId());
+        $this->assertEquals(1, $articleList->count());
+        $this->assertEquals('_test_product_1', $articleList->current()->getId());
     }
 
     public function testSearchOr(): void
     {
         Registry::getConfig()->setConfigParam('blSearchUseAND', false);
 
-        $this->setRequestParameter('searchparam', $this->productTitle1 . ' ' . $this->productTitle2);
+        $this->setRequestParameter('searchparam', 'Keyboard Mouse');
 
         $searchController = oxNew(SearchController::class);
         $searchController->init();
@@ -75,9 +78,27 @@ final class SearchControllerTest extends IntegrationTestCase
         $this->assertEquals(2, $articleList->count());
 
         $articleArray = $articleList->getArray();
+        $this->assertArrayHasKey('_test_product_1', $articleArray);
+        $this->assertArrayHasKey('_test_product_2', $articleArray);
+    }
 
-        $this->assertTrue(array_key_exists($this->productid1, $articleArray));
-        $this->assertTrue(array_key_exists($this->productid2, $articleArray));
+    private function createProduct(string $id, string $title): void
+    {
+        $product = oxNew(Article::class);
+        $product->setId($id);
+        $product->assign([
+            'oxtitle' => $title,
+            'oxsearchkeys' => $title,
+            'oxprice' => 10.0,
+            'oxissearch' => 1,
+            'oxparentid' => '',
+            'oxactive' => 1,
+            'oxstock' => 10,
+            'oxstockflag' => 1,
+            'oxshopid' => 1,
+            'oxlowstockactive' => 0,
+        ]);
+        $product->save();
     }
 
     private function setRequestParameter(string $key, string $value): void

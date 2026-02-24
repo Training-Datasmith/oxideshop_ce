@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+
+  OxidEsales\EshopCommunity\Internal\Domain\Product\Search\Dao\ProductSearchDaoInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Search\Dao\ProductSearchDao
+
+  OxidEsales\EshopCommunity\Internal\Domain\Product\Search\ProductSearchServiceInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Search\ProductSearchService
+    public: true

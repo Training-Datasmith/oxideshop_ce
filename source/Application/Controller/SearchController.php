@@ -7,7 +7,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\EshopCommunity\Internal\Domain\Product\Search\ProductSearchCriteria;
+use OxidEsales\EshopCommunity\Internal\Domain\Product\Search\ProductSearchServiceInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Search\EqualsFilter;
+use OxidEsales\EshopCommunity\Internal\Framework\Search\Pagination;
+use OxidEsales\EshopCommunity\Internal\Framework\Search\SearchTerm;
+use OxidEsales\EshopCommunity\Internal\Framework\Search\Sorting;
 
 /**
  * Articles searching class.
@@ -175,34 +183,53 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
             $initialSearchManufacturer = null;
         }
 
-        // searching ..
-        /** @var \OxidEsales\Eshop\Application\Model\Search $oSearchHandler */
-        $oSearchHandler = oxNew(\OxidEsales\Eshop\Application\Model\Search::class);
-        $oSearchList = $oSearchHandler->getSearchArticles(
-            $searchParamForQuery,
-            $initialSearchCat,
-            $initialSearchVendor,
-            $initialSearchManufacturer,
-            $this->getSortingSql($this->getSortIdent())
-        );
+        $articlesPerPage = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
+        $articlesPerPage = $articlesPerPage ?: 10;
 
-        // list of found articles
-        $this->_aArticleList = $oSearchList;
-        $this->_iAllArtCnt = 0;
+        $activePage = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
+        $activePage = ($activePage < 0) ? 0 : $activePage;
 
-        // skip count calculation if no articles in list found
-        if ($oSearchList->count()) {
-            $this->_iAllArtCnt = $oSearchHandler->getSearchArticleCount(
-                $searchParamForQuery,
-                $initialSearchCat,
-                $initialSearchVendor,
-                $initialSearchManufacturer
-            );
+        $term = $searchParamForQuery ? new SearchTerm($searchParamForQuery) : SearchTerm::empty();
+        $pagination = Pagination::fromPage($activePage + 1, $articlesPerPage);
+
+        $filters = [];
+        if ($initialSearchCat) {
+            $filters[] = new EqualsFilter('oxcatnid', $initialSearchCat);
+        }
+        if ($initialSearchVendor) {
+            $filters[] = new EqualsFilter('oxvendorid', $initialSearchVendor);
+        }
+        if ($initialSearchManufacturer) {
+            $filters[] = new EqualsFilter('oxmanufacturerid', $initialSearchManufacturer);
         }
 
-        $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
-        $iNrofCatArticles = $iNrofCatArticles ?: 1;
-        $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
+        $sorting = [];
+        $sortingSql = $this->getSortingSql($this->getSortIdent());
+        if ($sortingSql) {
+            $parts = explode(' ', trim($sortingSql), 2);
+            $field = trim($parts[0], '`');
+            $direction = $parts[1] ?? 'ASC';
+            $sorting[] = Sorting::fromString($field, $direction);
+        }
+
+        $criteria = new ProductSearchCriteria($pagination, $term, $filters, $sorting);
+
+        $searchService = ContainerFacade::get(ProductSearchServiceInterface::class);
+        $result = $searchService->search($criteria);
+
+        $articleList = oxNew(ArticleList::class);
+        $productIds = $result->getProductIds();
+
+        if (!empty($productIds)) {
+            $ids = array_map('strval', $productIds);
+            $articleList->loadOrderedIds($ids);
+        }
+
+        $this->_aArticleList = $articleList;
+        $this->_iAllArtCnt = $result->getTotal();
+
+        $articlesPerPage = $articlesPerPage ?: 1;
+        $this->_iCntPages = ceil($this->_iAllArtCnt / $articlesPerPage);
     }
 
     /**

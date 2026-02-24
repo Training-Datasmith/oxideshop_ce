@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Core\Routing\ShopControllerMapProvider;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use OxidEsales\Eshop\Core\Theme;
 use OxidEsales\EshopCommunity\Application\Model\Shop;
+use OxidEsales\EshopCommunity\Core\UtilsString;
 
 class ShopAdapter implements ShopAdapterInterface
 {
@@ -141,5 +142,10 @@ class ShopAdapter implements ShopAdapterInterface
     public function generateDatabaseViewName(string $tableName, int $languageId, int $shopId): string
     {
         return oxNew(TableViewNameGenerator::class)->getViewName($tableName, $languageId, $shopId);
+    }
+
+    public function prepareStrForSearch(string $searchElement): string
+    {
+        return Registry::get(UtilsString::class)->prepareStrForSearch($searchElement);
     }
 }
