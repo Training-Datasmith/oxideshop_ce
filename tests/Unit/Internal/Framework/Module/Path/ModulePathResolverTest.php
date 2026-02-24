@@ -29,7 +29,7 @@ final class ModulePathResolverTest extends TestCase
             ->setId('testModuleId')
             ->setModuleSource('vendor/modulePath');
 
-        $moduleConfigurationDao = $this->createMock(ModuleConfigurationDaoInterface::class);
+        $moduleConfigurationDao = $this->createStub(ModuleConfigurationDaoInterface::class);
         $moduleConfigurationDao
             ->expects($this->once())
             ->method('get')
