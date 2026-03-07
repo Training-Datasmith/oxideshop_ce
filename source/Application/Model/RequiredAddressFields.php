@@ -68,10 +68,8 @@ class RequiredAddressFields
 
     /**
      * Returns required fields for user address validation.
-     *
-     * @return mixed
      */
-    public function getBillingFields()
+    public function getBillingFields(): array
     {
         $aRequiredFields = $this->getRequiredFields();
 
@@ -80,10 +78,8 @@ class RequiredAddressFields
 
     /**
      * Returns required fields for delivery address validation.
-     *
-     * @return mixed
      */
-    public function getDeliveryFields()
+    public function getDeliveryFields(): array
     {
         $aRequiredFields = $this->getRequiredFields();
 

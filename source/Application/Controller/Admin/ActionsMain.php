@@ -158,10 +158,8 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
     /**
      * Returns form data for Action.
-     *
-     * @return array
      */
-    private function getActionFormData()
+    private function getActionFormData(): array
     {
         $request    = oxNew(Request::class);
         $formData   = $request->getRequestEscapedParameter('editval');

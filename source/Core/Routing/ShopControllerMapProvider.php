@@ -288,7 +288,7 @@ class ShopControllerMapProvider implements ControllerMapProviderInterface
      *
      * @return array Edition specific mapping of controller keys to classes
      */
-    public function getControllerMap()
+    public function getControllerMap(): array
     {
         return $this->controllerMap;
     }

@@ -196,10 +196,8 @@ class GenericImport
 
     /**
      * Performs import action.
-     *
-     * @param array $data
      */
-    public function importData($data): void
+    public function importData(array $data): void
     {
         foreach ($data as $key => $row) {
             if ($row) {

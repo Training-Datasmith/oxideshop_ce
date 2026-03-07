@@ -260,7 +260,7 @@ class Email extends PHPMailer
         $myConfig = Registry::getConfig();
 
         $this->setSmtp();
-        $this::$validator = (static fn ($email) => filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) !== false);
+        $this::$validator = (static fn ($email): bool => filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) !== false);
 
         $this->setUseInlineImages($myConfig->getConfigParam('blInlineImgEmail'));
         $this->setMailWordWrap(100);

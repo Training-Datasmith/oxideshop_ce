@@ -45,6 +45,6 @@ class FormFieldsCleaner
     {
         $allowedFieldsLowerCase = array_map(strtolower(...), (array)$allowedFields);
 
-        return array_filter($listToClean, fn ($field) => in_array(strtolower((string) $field), $allowedFieldsLowerCase), ARRAY_FILTER_USE_KEY);
+        return array_filter($listToClean, fn ($field): bool => in_array(strtolower((string) $field), $allowedFieldsLowerCase), ARRAY_FILTER_USE_KEY);
     }
 }

@@ -161,7 +161,7 @@ class Database implements DatabaseInterface
 
     public function quoteArray($array): array
     {
-        return array_map(fn ($item) => $this->quote($item), $array);
+        return array_map($this->quote(...), $array);
     }
 
     public function startTransaction(): void
@@ -210,7 +210,7 @@ class Database implements DatabaseInterface
         return $this->executeUpdate($query, $parameters);
     }
 
-    public function select($query, $parameters = [])
+    public function select($query, $parameters = []): \OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\ResultSet
     {
         $this->checkIfSqlIsReadOnly($query);
         try {

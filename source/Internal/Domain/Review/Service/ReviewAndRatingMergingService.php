@@ -19,10 +19,8 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
     /**
      * Merges Reviews and Ratings to Collection of ReviewAndRating view objects.
      *
-     *
-     * @return ArrayCollection
      */
-    public function mergeReviewAndRating(ArrayCollection $reviews, ArrayCollection $ratings)
+    public function mergeReviewAndRating(ArrayCollection $reviews, ArrayCollection $ratings): \Doctrine\Common\Collections\ArrayCollection
     {
         $ratingAndReviewList = array_merge(
             $this->getReviewDataWithRating($reviews, $ratings),

@@ -102,10 +102,8 @@ class ApplicationServerService implements \OxidEsales\Eshop\Core\Service\Applica
 
     /**
      * Returns an array of all only active application servers.
-     *
-     * @return array
      */
-    public function loadActiveAppServerList()
+    public function loadActiveAppServerList(): array
     {
         $allFoundServers = $this->loadAppServerList();
         return $this->filterActiveAppServers($allFoundServers);

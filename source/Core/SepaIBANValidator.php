@@ -115,10 +115,8 @@ class SepaIBANValidator
      * Checks if IBAN is valid according to checksum algorithm
      *
      * @param string $sIBAN IBAN
-     *
-     * @return bool
      */
-    protected function isAlgorithmValid($sIBAN)
+    protected function isAlgorithmValid($sIBAN): bool
     {
         $sIBAN = $this->moveInitialCharactersToEnd($sIBAN);
 

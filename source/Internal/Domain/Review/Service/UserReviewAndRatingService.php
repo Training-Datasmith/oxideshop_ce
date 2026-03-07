@@ -76,7 +76,7 @@ class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
     {
         $reviewAndRatingListArray = $reviewAndRatingList->toArray();
 
-        usort($reviewAndRatingListArray, fn (ReviewAndRating $first, ReviewAndRating $second) => $first->getCreatedAt() < $second->getCreatedAt() ? 1 : -1);
+        usort($reviewAndRatingListArray, fn (ReviewAndRating $first, ReviewAndRating $second): int => $first->getCreatedAt() < $second->getCreatedAt() ? 1 : -1);
 
         return new ArrayCollection($reviewAndRatingListArray);
     }

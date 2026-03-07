@@ -107,7 +107,7 @@ class DirectoryValidator implements DirectoryValidatorInterface
         $shopSourcePath = rtrim($this->basicContext->getSourcePath(), DIRECTORY_SEPARATOR) .  DIRECTORY_SEPARATOR;
 
         $directories = array_map(
-            static fn (string $value) => $shopSourcePath . $value,
+            static fn (string $value): string => $shopSourcePath . $value,
             self::DIRECTORIES_LIST
         );
 

@@ -1385,7 +1385,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         if (count($aList)) {
             uasort(
                 $aList,
-                fn ($a, $b) => $a <=> $b
+                fn ($a, $b): int => $a <=> $b
             );
 
             $sSearch = $this->generateSimListSearchStr($sArticleTable, $aList);

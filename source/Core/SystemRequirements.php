@@ -365,7 +365,7 @@ class SystemRequirements
      *
      * @return array
      */
-    protected function getShopSSLHostInfo()
+    protected function getShopSSLHostInfo(): array|false
     {
         if ($this->isAdmin()) {
             return $this->getShopSSLHostInfoFromConfig();

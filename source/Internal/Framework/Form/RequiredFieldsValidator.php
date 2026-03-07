@@ -32,10 +32,7 @@ class RequiredFieldsValidator implements FormValidatorInterface
         return $isValid;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

@@ -87,10 +87,8 @@ class CompanyVatInValidator
 
     /**
      * Returns added validators
-     *
-     * @return array
      */
-    public function getCheckers()
+    public function getCheckers(): array
     {
         return $this->_aCheckers;
     }

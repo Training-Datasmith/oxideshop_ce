@@ -30,10 +30,7 @@ class Form implements FormInterface
         return $this->fields[$name];
     }
 
-    /**
-     * @return array
-     */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
@@ -74,10 +71,7 @@ class Form implements FormInterface
         return $isValid;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

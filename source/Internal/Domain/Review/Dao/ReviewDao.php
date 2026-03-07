@@ -26,10 +26,8 @@ class ReviewDao implements ReviewDaoInterface
      * Returns User Reviews.
      *
      * @param string $userId
-     *
-     * @return ArrayCollection
      */
-    public function getReviewsByUserId($userId)
+    public function getReviewsByUserId($userId): \Doctrine\Common\Collections\ArrayCollection
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder

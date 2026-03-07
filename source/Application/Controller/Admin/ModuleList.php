@@ -60,7 +60,7 @@ class ModuleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLis
 
     private function sortModulesByTitleAlphabetically(array $modules): array
     {
-        usort($modules, fn ($a, $b) => strcmp((string) $a->getTitle(), (string) $b->getTitle()));
+        usort($modules, fn ($a, $b): int => strcmp((string) $a->getTitle(), (string) $b->getTitle()));
 
         return $modules;
     }

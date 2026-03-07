@@ -261,7 +261,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @return \OxidEsales\Eshop\Core\DataObject\ApplicationServer
      */
-    protected function createServer($data)
+    protected function createServer(array $data)
     {
         /** @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer $appServer */
         $appServer = oxNew(\OxidEsales\Eshop\Core\DataObject\ApplicationServer::class);

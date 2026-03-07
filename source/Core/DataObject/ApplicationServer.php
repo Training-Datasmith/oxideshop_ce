@@ -176,10 +176,8 @@ class ApplicationServer
      * Check if application server availability check period is over.
      *
      * @param int $currentTimestamp The current timestamp.
-     *
-     * @return bool
      */
-    public function needToDelete($currentTimestamp)
+    public function needToDelete($currentTimestamp): bool
     {
         return $this->hasLifetimeExpired($currentTimestamp, self::INACTIVE_SERVER_STORAGE_PERIOD);
     }

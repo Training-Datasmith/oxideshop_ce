@@ -21,10 +21,8 @@ class BasketContentMarkGenerator
 
     /**
      * Marks added to array by article type.
-     *
-     * @var array
      */
-    private $_aMarks;
+    private ?array $_aMarks = null;
 
     /**
      * Basket that is used to get article type(downloadable, intangible etc..).

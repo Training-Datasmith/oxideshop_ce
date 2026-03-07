@@ -34,10 +34,8 @@ class UniversallyUniqueIdGenerator
 
     /**
      * Generates UUID based on either openSSL's openssl_random_pseudo_bytes or mt_rand.
-     *
-     * @return string
      */
-    public function generate()
+    public function generate(): string
     {
         $sSeed = $this->generateV4();
 
@@ -46,10 +44,8 @@ class UniversallyUniqueIdGenerator
 
     /**
      * Generates version 4 UUID.
-     *
-     * @return string
      */
-    public function generateV4()
+    public function generateV4(): string
     {
         if ($this->getOpenSSLChecker()->isOpenSslRandomBytesGeneratorAvailable()) {
             return $this->generateBasedOnOpenSSL();

@@ -19,10 +19,7 @@ class FormConfiguration implements FormConfigurationInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldConfigurations()
+    public function getFieldConfigurations(): array
     {
         return $this->fieldConfigurations;
     }

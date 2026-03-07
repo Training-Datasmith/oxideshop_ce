@@ -321,10 +321,8 @@ class StrMb
      * Checks if string has special chars
      *
      * @param string $sStr string to search in
-     *
-     * @return bool
      */
-    public function hasSpecialChars($sStr)
+    public function hasSpecialChars($sStr): int|false
     {
         return $this->preg_match('/(' . implode('|', $this->_aUmls) . '|(&amp;))/', $sStr);
     }
@@ -338,7 +336,7 @@ class StrMb
      *
      * @return string
      */
-    public function cleanStr($sStr, $sCleanChr = ' ')
+    public function cleanStr($sStr, $sCleanChr = ' '): ?string
     {
         return $this->preg_replace("/\n|\r|\t|\xc2\x95|\xc2\xa0|;/", $sCleanChr, $sStr);
     }
@@ -369,7 +367,7 @@ class StrMb
             $sString = $this->preg_replace("'<style[^>]*>.*</style>'siU", '', $sString);
         }
 
-        return strip_tags($sString, $sAllowableTags);
+        return strip_tags((string) $sString, $sAllowableTags);
     }
     // @codingStandardsIgnoreEnd
 

@@ -220,15 +220,12 @@ class UtilsObject
      *
      * @return string|null
      */
-    public function getClassAliasName($className)
+    public function getClassAliasName($className): int|string|null
     {
         return $this->getClassNameProvider()->getClassAliasName($className);
     }
 
-    /**
-     * @return BackwardsCompatibleClassNameProvider
-     */
-    protected function getClassNameProvider()
+    protected function getClassNameProvider(): \OxidEsales\EshopCommunity\Core\BackwardsCompatibleClassNameProvider
     {
         if (is_null($this->classNameProvider)) {
             $backwardsCompatibleClassMap = include 'Autoload/BackwardsCompatibilityClassMap.php';
@@ -248,10 +245,7 @@ class UtilsObject
         return $this->moduleChainsGenerator;
     }
 
-    /**
-     * @return ShopIdCalculator
-     */
-    protected function getShopIdCalculator()
+    protected function getShopIdCalculator(): \OxidEsales\EshopCommunity\Core\ShopIdCalculator
     {
         if (is_null($this->shopIdCalculator)) {
             $this->shopIdCalculator = new ShopIdCalculator(

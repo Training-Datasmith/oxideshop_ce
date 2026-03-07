@@ -88,10 +88,8 @@ class RequiredFieldsValidator
 
     /**
      * Gets invalid fields.
-     *
-     * @return array
      */
-    public function getInvalidFields()
+    public function getInvalidFields(): array
     {
         return $this->_aInvalidFields;
     }

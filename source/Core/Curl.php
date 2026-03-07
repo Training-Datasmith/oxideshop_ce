@@ -433,7 +433,7 @@ class Curl
      *
      * @return string
      */
-    protected function htmlDecode($mParam)
+    protected function htmlDecode($mParam): array|string
     {
         if (is_array($mParam)) {
             return $this->prepareQueryParameters($mParam);

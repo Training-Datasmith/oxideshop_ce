@@ -78,7 +78,7 @@ class ModuleAutoload
      *
      * @return ModuleAutoload The singleton instance.
      */
-    public static function getInstance()
+    public static function getInstance(): \OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload
     {
         if (null === static::$instance) {
             static::$instance = new static();

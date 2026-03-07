@@ -12,11 +12,9 @@ class InputHelpLogic
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed
      */
-    public function getTranslation($params)
+    public function getTranslation(array $params)
     {
         $ident = $this->getIdent($params);
         $lang = \OxidEsales\Eshop\Core\Registry::getLang();

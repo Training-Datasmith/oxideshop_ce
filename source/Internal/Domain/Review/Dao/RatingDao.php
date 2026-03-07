@@ -26,10 +26,8 @@ class RatingDao implements RatingDaoInterface
      * Returns User Ratings.
      *
      * @param string $userId
-     *
-     * @return ArrayCollection
      */
-    public function getRatingsByUserId($userId)
+    public function getRatingsByUserId($userId): \Doctrine\Common\Collections\ArrayCollection
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder
@@ -56,10 +54,8 @@ class RatingDao implements RatingDaoInterface
      * Returns Ratings for a product.
      *
      * @param string $productId
-     *
-     * @return ArrayCollection
      */
-    public function getRatingsByProductId($productId)
+    public function getRatingsByProductId($productId): \Doctrine\Common\Collections\ArrayCollection
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder

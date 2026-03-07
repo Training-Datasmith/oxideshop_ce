@@ -59,7 +59,7 @@ class PriceList
      *
      * @return double
      */
-    public function getSum($isNettoMode = true)
+    public function getSum($isNettoMode = true): int|float
     {
         if ($isNettoMode) {
             return $this->getNettoSum();

@@ -37,7 +37,7 @@ class TextEditorHandler
      *
      * @return string The Editor output.
      */
-    public function renderTextEditor($width, $height, $objectValue, $fieldName)
+    public function renderTextEditor($width, $height, $objectValue, $fieldName): string
     {
         $sEditorHtml = $this->renderRichTextEditor($width, $height, $objectValue, $fieldName);
         if (!$sEditorHtml) {
