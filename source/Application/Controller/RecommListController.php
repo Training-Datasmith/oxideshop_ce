@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -36,63 +38,63 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
     /**
      * Other recommendations list
      */
-    protected $_oOtherRecommList = null;
+    protected $_oOtherRecommList;
 
     /**
      * Recommlist reviews
      *
      * @var array
      */
-    protected $_aReviews = null;
+    protected $_aReviews;
 
     /**
      * Can user rate
      *
      * @var bool
      */
-    protected $_blRate = null;
+    protected $_blRate;
 
     /**
      * Rating value
      *
      * @var double
      */
-    protected $_dRatingValue = null;
+    protected $_dRatingValue;
 
     /**
      * Rating count
      *
      * @var integer
      */
-    protected $_iRatingCnt = null;
+    protected $_iRatingCnt;
 
     /**
      * Searched recommendations list
      *
      * @var object
      */
-    protected $_oSearchRecommLists = null;
+    protected $_oSearchRecommLists;
 
     /**
      * Search string
      *
      * @var string
      */
-    protected $_sSearch = null;
+    protected $_sSearch;
 
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sTplLocation = null;
+    protected $_sTplLocation;
 
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /**
      * Collects current view data, return current template file name
@@ -102,7 +104,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
     public function render()
     {
         \OxidEsales\Eshop\Application\Controller\FrontendController::render();
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
 
         $this->_iAllArtCnt = 0;
 
@@ -123,7 +125,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
 
         if ($oList && $oList->count()) {
             $iNrofCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-            $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
+            $iNrofCatArticles = $iNrofCatArticles ?: 10;
             $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
         }
         // processing list articles
@@ -153,7 +155,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
 
         if ($oRecommList = $this->getActiveRecommList()) {
-            $sAddParams .= "&amp;recommid=" . $oRecommList->getId();
+            $sAddParams .= '&amp;recommid=' . $oRecommList->getId();
         }
 
         return $sAddParams;
@@ -167,8 +169,8 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
     public function getAddSeoUrlParams()
     {
         $sAddParams = parent::getAddSeoUrlParams();
-        if ($sParam = Registry::getRequest()->getRequestParameter("searchrecomm")) {
-            $sAddParams .= "&amp;searchrecomm=" . rawurlencode($sParam);
+        if ($sParam = Registry::getRequest()->getRequestParameter('searchrecomm')) {
+            $sAddParams .= '&amp;searchrecomm=' . rawurlencode((string) $sParam);
         }
 
         return $sAddParams;
@@ -176,10 +178,8 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
 
     /**
      * Saves user ratings and review text (oxreview object)
-     *
-     * @return null
      */
-    public function saveReview()
+    public function saveReview(): void
     {
         if (!Registry::getSession()->checkSessionChallenge()) {
             return;
@@ -214,7 +214,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
                 $oReview->oxreviews__oxtext = new Field($sReviewText, Field::T_RAW);
                 $oReview->oxreviews__oxlang = new Field(Registry::getLang()->getBaseLanguage());
                 $oReview->oxreviews__oxuserid = new Field($oUser->getId());
-                $oReview->oxreviews__oxrating = new Field(($dRating !== null) ? $dRating : null);
+                $oReview->oxreviews__oxrating = new Field($dRating ?? null);
                 $oReview->save();
             }
         }
@@ -249,7 +249,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
 
                 // load only lists which we show on screen
                 $iNrofCatArticles = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-                $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
+                $iNrofCatArticles = $iNrofCatArticles ?: 10;
 
                 $this->_aArticleList = $oActiveRecommList->getArticles(
                     $iNrofCatArticles * $iActPage,
@@ -421,7 +421,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
 
         if ($sSearchParam = $this->getRecommSearch()) {
             $shopHomeURL = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopHomeUrl();
-            $sUrl = $shopHomeURL . "cl=recommlist&amp;searchrecomm=" . rawurlencode($sSearchParam);
+            $sUrl = $shopHomeURL . 'cl=recommlist&amp;searchrecomm=' . rawurlencode($sSearchParam);
             $sTitle = $oLang->translateString('RECOMMLIST_SEARCH') . ' "' . $sSearchParam . '"';
 
             $aPath[1] = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
@@ -494,11 +494,11 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
         $sAddParams = \OxidEsales\Eshop\Application\Controller\FrontendController::getAdditionalParams();
 
         if ($oRecomm = $this->getActiveRecommList()) {
-            $sAddParams .= "&amp;recommid=" . $oRecomm->getId();
+            $sAddParams .= '&amp;recommid=' . $oRecomm->getId();
         }
 
         if ($sSearch = $this->getRecommSearch()) {
-            $sAddParams .= "&amp;searchrecomm=" . rawurlencode($sSearch);
+            $sAddParams .= '&amp;searchrecomm=' . rawurlencode($sSearch);
         }
 
         return $sAddParams;
@@ -520,7 +520,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
         }
         $sSearch = Registry::getRequest()->getRequestEscapedParameter('searchrecomm');
         if ($sSearch) {
-            $sLink .= ((strpos($sLink, '?') === false) ? '?' : '&amp;') . "searchrecomm={$sSearch}";
+            $sLink .= ((!str_contains($sLink, '?')) ? '?' : '&amp;') . "searchrecomm={$sSearch}";
         }
 
         return $sLink;

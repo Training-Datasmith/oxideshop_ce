@@ -43,7 +43,7 @@ final class ManufacturerPictureTest extends IntegrationTestCase
 
     public function testSaveShouldThrowAnExceptionInDemoShopMode(): void
     {
-        $config = $this->createPartialMock(Config::class, ["isDemoShop"]);
+        $config = $this->createPartialMock(Config::class, ['isDemoShop']);
         $config->expects($this->once())->method('isDemoShop')->willReturn(true);
 
         Registry::getSession()->deleteVariable('Errors');
@@ -84,10 +84,10 @@ final class ManufacturerPictureTest extends IntegrationTestCase
 
     public function testDeleteShouldThrowAnExceptionInDemoShopMode(): void
     {
-        $config = $this->createPartialMock(Config::class, ["isDemoShop"]);
+        $config = $this->createPartialMock(Config::class, ['isDemoShop']);
         $config->expects($this->once())->method('isDemoShop')->willReturn(true);
 
-        Registry::getSession()->deleteVariable("Errors");
+        Registry::getSession()->deleteVariable('Errors');
         Registry::set(Config::class, $config);
 
         $manufacturerPicture = oxNew(ManufacturerPicture::class);

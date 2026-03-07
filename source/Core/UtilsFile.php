@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,7 +19,7 @@ use Symfony\Component\Filesystem\Path;
 
 class UtilsFile extends \OxidEsales\Eshop\Core\Base
 {
-    const PROMO_PICTURE_DIR = 'promo';
+    public const PROMO_PICTURE_DIR = 'promo';
 
     protected $_aTypeToPath = [
         'TC'    => 'master/category/thumb',
@@ -43,7 +45,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         'M10'   => 'master/product/10',
         'M11'   => 'master/product/11',
         'M12'   => 'master/product/12',
-        //
+
         'P1'    => '1',
         'P2'    => '2',
         'P3'    => '3',
@@ -68,7 +70,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         'Z10'   => 'z10',
         'Z11'   => 'z11',
         'Z12'   => 'z12',
-        //
+
         'WP'    => 'master/wrapping',
         'FL'    => 'media',
     ];
@@ -106,14 +108,14 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
 
     public function normalizeDir($sDir)
     {
-        if (isset($sDir) && $sDir != "" && substr($sDir, -1) !== '/') {
-            $sDir .= "/";
+        if (isset($sDir) && $sDir != '' && !str_ends_with((string) $sDir, '/')) {
+            $sDir .= '/';
         }
 
         return $sDir;
     }
 
-    public function copyDir($sSourceDir, $sTargetDir)
+    public function copyDir($sSourceDir, $sTargetDir): void
     {
         $oStr = Str::getStr();
         $handle = opendir($sSourceDir);
@@ -144,10 +146,12 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         if (is_dir($sSourceDir)) {
             if ($oDir = dir($sSourceDir)) {
                 while (false !== $sFile = $oDir->read()) {
-                    if ($sFile == '.' || $sFile == '..') {
+                    if ($sFile == '.') {
                         continue;
                     }
-
+                    if ($sFile == '..') {
+                        continue;
+                    }
                     if (!$this->deleteDir($oDir->path . DIRECTORY_SEPARATOR . $sFile)) {
                         $oDir->close();
 
@@ -195,28 +199,22 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
     {
         if ($sValue) {
             // add type to name
-            $aFilename = explode(".", $sValue);
+            $aFilename = explode('.', $sValue);
 
             $sFileType = trim($aFilename[count($aFilename) - 1]);
-
-            if (isset($sFileType)) {
-                // unallowed files ?
-                if (in_array($sFileType, $this->_aBadFiles) || ($blDemo && !in_array($sFileType, $this->_aAllowedFiles))) {
-                    Registry::getUtils()->showMessageAndExit("File didn't pass our allowed files filter.");
-                }
-
-                // removing file type
-                if (count($aFilename) > 0) {
-                    unset($aFilename[count($aFilename) - 1]);
-                }
-
-                $sFName = '';
-                if (isset($aFilename[0])) {
-                    $sFName = Str::getStr()->preg_replace('/[^a-zA-Z0-9()_\.-]/', '', implode('.', $aFilename));
-                }
-
-                $sValue = $this->getUniqueFileName($sImagePath, "{$sFName}", $sFileType, "", $blUnique);
+            // unallowed files ?
+            if (in_array($sFileType, $this->_aBadFiles) || ($blDemo && !in_array($sFileType, $this->_aAllowedFiles))) {
+                Registry::getUtils()->showMessageAndExit("File didn't pass our allowed files filter.");
             }
+            // removing file type
+            if (count($aFilename) > 0) {
+                unset($aFilename[count($aFilename) - 1]);
+            }
+            $sFName = '';
+            if (isset($aFilename[0])) {
+                $sFName = Str::getStr()->preg_replace('/[^a-zA-Z0-9()_\.-]/', '', implode('.', $aFilename));
+            }
+            $sValue = $this->getUniqueFileName($sImagePath, "{$sFName}", $sFileType, '', $blUnique);
         }
 
         return $sValue;
@@ -235,7 +233,6 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
 
         return $this->normalizeDir(Registry::getConfig()->getPictureDir(false)) . "{$sFolder}/";
     }
-
 
     /**
      * Uploaded file processor (filters, etc), sets configuration parameters to
@@ -269,11 +266,11 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
             foreach ($aFiles['myfile']['name'] as $sKey => $sValue) {
                 $sSource = $aSource[$sKey];
                 $iError = $aError[$sKey] ?? null;
-                $aFiletype = explode("@", $sKey);
+                $aFiletype = explode('@', (string) $sKey);
                 $sKey = $aFiletype[1] ?? null;
                 $sType = $aFiletype[0];
 
-                $sValue = strtolower($sValue);
+                $sValue = strtolower((string) $sValue);
                 $sImagePath = $this->getImagePath($sType);
 
                 // Should translate error to user if file was uploaded
@@ -287,7 +284,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
                 if ($sSource && ($sValue = $this->prepareImageName($sValue, $sType, $blDemo, $sImagePath, $blUnique))) {
                     // moving to tmp folder for processing as safe mode or spec. open_basedir setup
                     // usually does not allow file modification in php's temp folder
-                    $sProcessPath = $sTmpFolder . basename($sSource);
+                    $sProcessPath = $sTmpFolder . basename((string) $sSource);
 
                     if ($sProcessPath) {
                         $destination = Path::join("$sImagePath$sValue");
@@ -323,7 +320,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      */
     public function checkFile($sFile)
     {
-        $aCheckCache = Registry::getSession()->getVariable("checkcache");
+        $aCheckCache = Registry::getSession()->getVariable('checkcache');
 
         if (isset($aCheckCache[$sFile])) {
             return $aCheckCache[$sFile];
@@ -335,7 +332,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         }
 
         $aCheckCache[$sFile] = $blRet;
-        Registry::getSession()->setVariable("checkcache", $aCheckCache);
+        Registry::getSession()->setVariable('checkcache', $aCheckCache);
 
         return $blRet;
     }
@@ -384,13 +381,13 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
             throw oxNew(StandardException::class, 'EXCEPTION_FILEUPLOADERROR_' . ((int)$fileInfo['error']));
         }
 
-        $pathInfo = pathinfo($fileInfo['name']);
+        $pathInfo = pathinfo((string) $fileInfo['name']);
 
         $extension = $pathInfo['extension'];
         $filename = $pathInfo['filename'];
 
         $allowedUploadTypes = ContainerFacade::getParameter('oxid_esales.allowed_uploaded_types');
-        $allowedUploadTypes = array_map("strtolower", $allowedUploadTypes);
+        $allowedUploadTypes = array_map(strtolower(...), $allowedUploadTypes);
 
         if (!\in_array(strtolower($extension), $allowedUploadTypes, true)) {
             throw oxNew(StandardException::class, 'EXCEPTION_NOTALLOWEDTYPE');
@@ -414,7 +411,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      * @param bool $unique
      * @return string
      */
-    protected function getUniqueFileName($directory, $filename, $extension, $suffix = "", $unique = true)
+    protected function getUniqueFileName($directory, $filename, $extension, $suffix = '', $unique = true)
     {
         if (!$unique) {
             return "$filename$suffix.$extension";
@@ -451,7 +448,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         $sDir = $this->normalizeDir($sFolder);
 
         if ($blGenerated === true) {
-            $sDir = str_replace('master/', 'generated/', $sDir);
+            return str_replace('master/', 'generated/', $sDir);
         }
 
         return $sDir;
@@ -466,19 +463,14 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      */
     public function translateError($iError)
     {
-        $message = '';
         // Translate only if translation exist
         if ($iError > 0 && $iError < 9 && 5 !== $iError) {
-            $message = 'EXCEPTION_FILEUPLOADERROR_' . ((int) $iError);
+            return 'EXCEPTION_FILEUPLOADERROR_' . ((int) $iError);
         }
 
-        return $message;
+        return '';
     }
 
-    /**
-     * @param string $url
-     * @return bool
-     */
     private function isUrlSchemaValid(string $url): bool
     {
         return filter_var($url, FILTER_VALIDATE_URL) === false ? false : true;
@@ -502,11 +494,6 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         return false;
     }
 
-    /**
-     * @param string $source
-     * @param string $destination
-     * @return bool
-     */
     private function copyMasterImage(string $source, string $destination): bool
     {
         $copied = false;
@@ -523,11 +510,6 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         return $copied;
     }
 
-    /**
-     * @param string $source
-     * @param string $destination
-     * @return bool
-     */
     private function uploadMasterImage(string $source, string $destination): bool
     {
         $uploaded = false;
@@ -544,7 +526,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         return $uploaded;
     }
 
-    private function addErrorMessageToDisplay($message): void
+    private function addErrorMessageToDisplay(string $message): void
     {
         $exception = oxNew(ExceptionToDisplay::class);
         $exception->setMessage($message);

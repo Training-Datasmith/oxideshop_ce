@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,7 +30,7 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
                                      ['oxtitle', 'oxgroups', 1, 0, 0],
                                      ['oxid', 'oxgroups', 0, 0, 0],
                                      ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                 ]
+                                 ],
     ];
 
     /**
@@ -49,7 +51,7 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
             $sQAdd = " from $sgroupTable where 1 ";
         } else {
             $sQAdd = " from oxobject2delivery, {$sgroupTable} " .
-                     "where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) .
+                     'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) .
                      " and oxobject2delivery.oxobjectid = {$sgroupTable}.oxid " .
                      "and oxobject2delivery.oxtype = 'oxdelsetg' ";
         }
@@ -57,7 +59,7 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and {$sgroupTable}.oxid not in ( select {$sgroupTable}.oxid " .
                       "from oxobject2delivery, {$sgroupTable} " .
-                      "where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) .
+                      'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2delivery.oxobjectid = $sgroupTable.oxid " .
                       "and oxobject2delivery.oxtype = 'oxdelsetg' ) ";
         }
@@ -68,15 +70,15 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     /**
      * Removes user group from delivery sets config
      */
-    public function removeGroupFromSet()
+    public function removeGroupFromSet(): void
     {
         $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sRemoveGroups . ") ";
+            $sRemoveGroups = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . $sRemoveGroups . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -84,7 +86,7 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     /**
      * Adds user group to delivery sets config
      */
-    public function addGroupToSet()
+    public function addGroupToSet(): void
     {
         $aChosenCat = $this->getActionIds('oxgroups.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -94,13 +96,13 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
             $sGroupTable = $this->getViewName('oxgroups');
             $aChosenCat = $this->getAll($this->addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenCat)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCat)) {
             foreach ($aChosenCat as $sChosenCat) {
                 $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
                 $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
                 $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCat);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field("oxdelsetg");
+                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field('oxdelsetg');
                 $oObject2Delivery->save();
             }
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,17 +23,17 @@ namespace OxidEsales\EshopCommunity\Core;
 class OnlineModuleVersionNotifierCaller extends \OxidEsales\Eshop\Core\OnlineCaller
 {
     /** Online Module Version Notifier web service url. */
-    const WEB_SERVICE_URL = 'https://omvn.oxid-esales.com/check.php';
+    public const WEB_SERVICE_URL = 'https://omvn.oxid-esales.com/check.php';
 
     /** XML document tag name. */
-    const XML_DOCUMENT_NAME = 'omvnRequest';
+    public const XML_DOCUMENT_NAME = 'omvnRequest';
 
     /**
      * Performs Web service request
      *
      * @param \OxidEsales\Eshop\Core\OnlineModulesNotifierRequest $oRequest Object with request parameters
      */
-    public function doRequest(\OxidEsales\Eshop\Core\OnlineModulesNotifierRequest $oRequest)
+    public function doRequest(\OxidEsales\Eshop\Core\OnlineModulesNotifierRequest $oRequest): void
     {
         $this->call($oRequest);
     }

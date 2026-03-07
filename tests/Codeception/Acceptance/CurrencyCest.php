@@ -27,7 +27,7 @@ final class CurrencyCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productList->seeProductData($productData);

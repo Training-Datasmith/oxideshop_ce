@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -49,7 +51,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $activeItemId = '';
         $requestedCategory = Registry::getRequest()->getRequestEscapedParameter('art_category');
         $requestedSearchField = Registry::getRequest()->getRequestEscapedParameter('pwrsearchfld');
-        $searchField = $requestedSearchField ? strtolower($requestedSearchField) : 'oxtitle';
+        $searchField = $requestedSearchField ? strtolower((string) $requestedSearchField) : 'oxtitle';
 
         $productList = $this->getItemList();
         if ($productList && $productList->count()) {
@@ -70,8 +72,8 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
             $this->_aViewData['pwrsearchinput'] = $listFilter['oxarticles'][$searchField];
         }
 
-        if ($requestedCategory && strpos($requestedCategory, '@@') !== false) {
-            [$listType, $activeItemId] = explode('@@', $requestedCategory);
+        if ($requestedCategory && str_contains((string) $requestedCategory, '@@')) {
+            [$listType, $activeItemId] = explode('@@', (string) $requestedCategory);
         }
         $this->_aViewData['art_category'] = $requestedCategory;
 
@@ -84,7 +86,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         // vendor list
         $this->_aViewData['vndtree'] = $this->getVendorList($listType, $activeItemId);
 
-        return "article_list";
+        return 'article_list';
     }
 
     /**
@@ -95,12 +97,12 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     public function getSearchFields()
     {
         $aSkipFields = [
-            "oxblfixedprice",
-            "oxvarselect",
-            "oxamitemid",
-            "oxamtaskid",
-            "oxpixiexport",
-            "oxpixiexported"
+            'oxblfixedprice',
+            'oxvarselect',
+            'oxamitemid',
+            'oxamtaskid',
+            'oxpixiexport',
+            'oxpixiexported',
         ];
         $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
 
@@ -192,29 +194,29 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $sQ = parent::buildSelectString($oListObject);
         if ($sQ) {
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sTable = $tableViewNameGenerator->getViewName("oxarticles");
+            $sTable = $tableViewNameGenerator->getViewName('oxarticles');
             $sQ .= " and $sTable.oxparentid = '' ";
 
             $sType = false;
-            $sArtCat = Registry::getRequest()->getRequestEscapedParameter("art_category");
-            if ($sArtCat && strstr($sArtCat, "@@") !== false) {
-                list($sType, $sValue) = explode("@@", $sArtCat);
+            $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
+            if ($sArtCat && str_contains((string) $sArtCat, '@@')) {
+                [$sType, $sValue] = explode('@@', (string) $sArtCat);
             }
 
             switch ($sType) {
                 // add category
                 case 'cat':
                     $oStr = Str::getStr();
-                    $sViewName = $tableViewNameGenerator->getViewName("oxobject2category");
+                    $sViewName = $tableViewNameGenerator->getViewName('oxobject2category');
                     $sInsert = "from $sTable left join {$sViewName} on {$sTable}.oxid = {$sViewName}.oxobjectid " .
-                               "where {$sViewName}.oxcatnid = " . DatabaseProvider::getDb()->quote($sValue) . " and ";
+                               "where {$sViewName}.oxcatnid = " . DatabaseProvider::getDb()->quote($sValue) . ' and ';
                     $sQ = $oStr->preg_replace("/from\s+$sTable\s+where/i", $sInsert, $sQ);
                     break;
-                // add category
+                    // add category
                 case 'mnf':
                     $sQ .= " and $sTable.oxmanufacturerid = " . DatabaseProvider::getDb()->quote($sValue);
                     break;
-                // add vendor
+                    // add vendor
                 case 'vnd':
                     $sQ .= " and $sTable.oxvendorid = " . DatabaseProvider::getDb()->quote($sValue);
                     break;
@@ -238,7 +240,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         if ($sFolder && $sFolder != '-1') {
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $this->_aWhere[$tableViewNameGenerator->getViewName("oxarticles") . ".oxfolder"] = $sFolder;
+            $this->_aWhere[$tableViewNameGenerator->getViewName('oxarticles') . '.oxfolder'] = $sFolder;
         }
 
         return $this->_aWhere;
@@ -247,7 +249,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     /**
      * Deletes entry from the database
      */
-    public function deleteEntry()
+    public function deleteEntry(): void
     {
         $sOxId = $this->getEditObjectId();
         $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);

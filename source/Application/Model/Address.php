@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -10,7 +12,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 /**
  * Address handler
  */
-class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Address extends \OxidEsales\Eshop\Core\Model\BaseModel implements \Stringable
 {
     /**
      * Current class name
@@ -29,7 +31,7 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * @var \OxidEsales\Eshop\Application\Model\State
      */
-    protected $_oStateObject = null;
+    protected $_oStateObject;
 
     /**
      * Returns oxState object
@@ -56,10 +58,8 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
 
     /**
      * Magic getter returns address as a single line string
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toString();
     }
@@ -78,9 +78,9 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sCity = $this->oxaddress__oxcity->value;
 
         //format it
-        $sAddress = "";
+        $sAddress = '';
         if ($sFirstName || $sLastName) {
-            $sAddress = $sFirstName . ($sFirstName ? " " : "") . "$sLastName, ";
+            $sAddress = $sFirstName . ($sFirstName ? ' ' : '') . "$sLastName, ";
         }
         $sAddress .= "$sStreet $sStreetNr, $sCity";
 
@@ -106,7 +106,6 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         return $this->oxaddress__oxstateid->value;
     }
-
 
     /**
      * Get state title
@@ -139,7 +138,7 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Sets address state as selected
      */
-    public function setSelected()
+    public function setSelected(): void
     {
         $this->_blSelected = true;
     }
@@ -164,8 +163,7 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sDelAddress .= $this->oxaddress__oxzip;
         $sDelAddress .= $this->oxaddress__oxfon;
         $sDelAddress .= $this->oxaddress__oxfax;
-        $sDelAddress .= $this->oxaddress__oxsal;
 
-        return $sDelAddress;
+        return $sDelAddress . $this->oxaddress__oxsal;
     }
 }

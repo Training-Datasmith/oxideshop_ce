@@ -1,17 +1,12 @@
 <?php
 
-namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
+declare(strict_types=1);
 
-use OxidEsales\Eshop\Core\Exception\StandardException;
+namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 
 class InputHelpLogic
 {
-    /**
-     * @param array $params
-     *
-     * @return null
-     */
-    public function getIdent($params)
+    public function getIdent(array $params)
     {
         return $params['ident'] ?? null;
     }

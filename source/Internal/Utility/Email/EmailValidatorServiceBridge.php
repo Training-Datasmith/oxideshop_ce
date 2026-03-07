@@ -15,14 +15,12 @@ namespace OxidEsales\EshopCommunity\Internal\Utility\Email;
  */
 class EmailValidatorServiceBridge implements EmailValidatorServiceBridgeInterface
 {
-    public function __construct(private EmailValidatorServiceInterface $emailValidatorService)
+    public function __construct(private readonly EmailValidatorServiceInterface $emailValidatorService)
     {
     }
 
     /**
      * @param mixed $email
-     *
-     * @return bool
      */
     public function isEmailValid($email): bool
     {

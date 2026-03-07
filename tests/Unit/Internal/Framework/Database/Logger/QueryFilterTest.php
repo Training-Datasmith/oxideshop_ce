@@ -19,64 +19,63 @@ final class QueryFilterTest extends TestCase
     {
         return [
             [
-                "select * from oxarticles",
+                'select * from oxarticles',
                 [],
-                false
+                false,
             ],
             [
-                "delete * from oxarticles",
+                'delete * from oxarticles',
                 [],
-                true
+                true,
             ],
             [
                 "insert into oxarticles values ('some values')",
                 [],
-                true
+                true,
             ],
             [
                 "update oxarticles set oxtitle = 'other title' where oxid = '_someid' ",
                 [],
-                true
+                true,
             ],
             [
                 "UPDATE oxarticles set oxtitle = 'other title' where oxid = '_someid' ",
                 [],
-                true
+                true,
             ],
             [
                 "update oxarticles set oxtitle = 'other title' where oxid = '_someid' ",
                 [
-                    'oxarticles'
+                    'oxarticles',
                 ],
-                false
+                false,
             ],
             [
-                "yadda yadda yadda insert into blabla ",
+                'yadda yadda yadda insert into blabla ',
                 [
-                    'ox'
+                    'ox',
                 ],
-                true
+                true,
             ],
             [
-                "yadda oxyadda yadda insert into oxblabla ",
+                'yadda oxyadda yadda insert into oxblabla ',
                 [
-                    'ox'
+                    'ox',
                 ],
-                false
+                false,
             ],
             [
-                "yadda yadda yadda oxsession blabla ",
+                'yadda yadda yadda oxsession blabla ',
                 [],
-                false
+                false,
             ],
             [
-                "yadda yadda yadda oxcache blabla ",
+                'yadda yadda yadda oxcache blabla ',
                 [],
-                false
+                false,
             ],
         ];
     }
-
 
     #[DataProvider('providerTestFiltering')]
     public function testFiltering(string $query, array $skipLogTags, bool $expected): void

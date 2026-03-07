@@ -9,14 +9,16 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Legacy\Price;
 
+use function number_format;
+
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Component\Yaml\Yaml;
 
-use function number_format;
 use function round;
+
+use Symfony\Component\Yaml\Yaml;
 
 final class PriceTest extends IntegrationTestCase
 {

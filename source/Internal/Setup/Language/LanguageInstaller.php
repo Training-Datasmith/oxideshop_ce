@@ -18,8 +18,8 @@ use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 class LanguageInstaller implements LanguageInstallerInterface
 {
     public function __construct(
-        private ShopConfigurationSettingDaoInterface $shopConfigurationSettingDao,
-        private BasicContextInterface $context
+        private readonly ShopConfigurationSettingDaoInterface $shopConfigurationSettingDao,
+        private readonly BasicContextInterface $context
     ) {
     }
 

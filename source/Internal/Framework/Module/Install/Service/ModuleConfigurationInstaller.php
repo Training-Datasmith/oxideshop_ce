@@ -14,22 +14,22 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\Module
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface as MetadataDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-use Symfony\Component\Filesystem\Path;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Service\{
     ModuleConfigurationMergingServiceInterface
 };
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface as MetadataDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use Symfony\Component\Filesystem\Path;
 
 class ModuleConfigurationInstaller implements ModuleConfigurationInstallerInterface
 {
     public function __construct(
-        private ShopConfigurationDaoInterface $shopConfigurationDao,
-        private BasicContextInterface $context,
-        private ModuleConfigurationMergingServiceInterface $moduleConfigurationMergingService,
-        private MetadataDaoInterface $metadataModuleConfigurationDao,
-        private ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private ClassExtensionsChainDaoInterface $classExtensionsChainDao
+        private readonly ShopConfigurationDaoInterface $shopConfigurationDao,
+        private readonly BasicContextInterface $context,
+        private readonly ModuleConfigurationMergingServiceInterface $moduleConfigurationMergingService,
+        private readonly MetadataDaoInterface $metadataModuleConfigurationDao,
+        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
+        private readonly ClassExtensionsChainDaoInterface $classExtensionsChainDao
     ) {
     }
 

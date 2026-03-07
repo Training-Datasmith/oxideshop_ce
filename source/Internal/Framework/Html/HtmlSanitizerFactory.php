@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Html;
 
-use RuntimeException;
-
 readonly class HtmlSanitizerFactory
 {
     public function __construct(

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,12 +19,12 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
     /**
      * The name of config option for saving servers data information.
      */
-    const CONFIG_NAME_FOR_SERVER_INFO = 'aServersData_';
+    public const CONFIG_NAME_FOR_SERVER_INFO = 'aServersData_';
 
     /**
      * @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer[]
      */
-    private $appServer = [];
+    private array $appServer = [];
 
     /**
      * @var \OxidEsales\Eshop\Core\Config Main shop configuration class.
@@ -48,10 +50,8 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
 
     /**
      * Finds all application servers.
-     *
-     * @return array
      */
-    public function findAll()
+    public function findAll(): array
     {
         $appServerList = [];
 
@@ -76,14 +76,14 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @param string $id An id of the entity to delete.
      */
-    public function delete($id)
+    public function delete(string $id): void
     {
         unset($this->appServer[$id]);
 
-        $query = "DELETE FROM oxconfig WHERE oxvarname = :oxvarname and oxshopid = :oxshopid";
+        $query = 'DELETE FROM oxconfig WHERE oxvarname = :oxvarname and oxshopid = :oxshopid';
         $this->database->execute($query, [
             'oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $id,
-            'oxshopid' => $this->config->getBaseShopId()
+            'oxshopid' => $this->config->getBaseShopId(),
         ]);
     }
 
@@ -115,7 +115,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @param \OxidEsales\Eshop\Core\DataObject\ApplicationServer $appServer
      */
-    public function save($appServer)
+    public function save($appServer): void
     {
         $id = $appServer->getId();
         if ($this->findAppServer($id)) {
@@ -129,7 +129,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
     /**
      * Start a database transaction.
      */
-    public function startTransaction()
+    public function startTransaction(): void
     {
         $this->database->startTransaction();
     }
@@ -137,7 +137,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
     /**
      * Commit a database transaction.
      */
-    public function commitTransaction()
+    public function commitTransaction(): void
     {
         $this->database->commitTransaction();
     }
@@ -145,7 +145,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
     /**
      * RollBack a database transaction.
      */
-    public function rollbackTransaction()
+    public function rollbackTransaction(): void
     {
         $this->database->rollbackTransaction();
     }
@@ -157,13 +157,13 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      */
     protected function update($appServer)
     {
-        $query = "UPDATE oxconfig SET oxvarvalue = :value
-                  WHERE oxvarname = :oxvarname and oxshopid = :oxshopid";
+        $query = 'UPDATE oxconfig SET oxvarvalue = :value
+                  WHERE oxvarname = :oxvarname and oxshopid = :oxshopid';
 
         $parameter = [
             'value' => $this->convertAppServerToConfigOption($appServer),
             'oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $appServer->getId(),
-            'oxshopid' => $this->config->getBaseShopId()
+            'oxshopid' => $this->config->getBaseShopId(),
         ];
 
         $this->database->execute($query, $parameter);
@@ -197,15 +197,15 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @return string
      */
-    private function selectDataById($id)
+    private function selectDataById(string $id)
     {
-        $query = "SELECT oxvarvalue FROM oxconfig 
+        $query = 'SELECT oxvarvalue FROM oxconfig 
             WHERE oxvarname = :oxvarname 
-              AND oxshopid = :oxshopid FOR UPDATE";
+              AND oxshopid = :oxshopid FOR UPDATE';
 
         $parameter = [
-            "oxvarname" => self::CONFIG_NAME_FOR_SERVER_INFO . $id,
-            "oxshopid" => $this->config->getBaseShopId()
+            'oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $id,
+            'oxshopid' => $this->config->getBaseShopId(),
         ];
         return $this->database->getOne($query, $parameter);
     }
@@ -217,13 +217,13 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      */
     private function selectAllData()
     {
-        $query = "SELECT oxvarname, oxvarvalue
+        $query = 'SELECT oxvarname, oxvarvalue
                     FROM oxconfig
-                    WHERE oxvarname like :oxvarname AND oxshopid = :oxshopid";
+                    WHERE oxvarname like :oxvarname AND oxshopid = :oxshopid';
 
         $parameter = [
-            'oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . "%",
-            'oxshopid' => $this->config->getBaseShopId()
+            'oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . '%',
+            'oxshopid' => $this->config->getBaseShopId(),
         ];
 
         return $this->database->select($query, $parameter);
@@ -236,11 +236,10 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @return string The id of server.
      */
-    private function getServerIdFromConfig($varName)
+    private function getServerIdFromConfig($varName): string
     {
         $constNameLength = strlen(self::CONFIG_NAME_FOR_SERVER_INFO);
-        $id = substr($varName, $constNameLength);
-        return $id;
+        return substr($varName, $constNameLength);
     }
 
     /**
@@ -250,7 +249,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @return array The information of server.
      */
-    private function getValueFromConfig($varValue)
+    private function getValueFromConfig($varValue): array
     {
         return (array) unserialize($varValue);
     }
@@ -284,7 +283,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @return mixed
      */
-    private function getServerParameter($data, $name)
+    private function getServerParameter(array $data, string $name)
     {
         return array_key_exists($name, $data) ? $data[$name] : null;
     }
@@ -296,14 +295,14 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      *
      * @return array
      */
-    private function convertAppServerToConfigOption($appServer)
+    private function convertAppServerToConfigOption($appServer): string
     {
         $serverData = [
             'id'                => $appServer->getId(),
             'timestamp'         => $appServer->getTimestamp(),
             'ip'                => $appServer->getIp(),
             'lastFrontendUsage' => $appServer->getLastFrontendUsage(),
-            'lastAdminUsage'    => $appServer->getLastAdminUsage()
+            'lastAdminUsage'    => $appServer->getLastAdminUsage(),
         ];
 
         return serialize($serverData);

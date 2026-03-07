@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Codeception\Acceptance\Admin;
 
+use function codecept_data_dir;
+
 use Codeception\Attribute\After;
 use Codeception\Attribute\Before;
 use Codeception\Attribute\Group;
 use OxidEsales\Codeception\Admin\DataObject\Manufacturer;
-use OxidEsales\EshopCommunity\Tests\Codeception\Support\AcceptanceTester;
 
-use function codecept_data_dir;
+use OxidEsales\EshopCommunity\Tests\Codeception\Support\AcceptanceTester;
 
 #[Group('admin', 'manufacturer')]
 final class ManufacturerCest

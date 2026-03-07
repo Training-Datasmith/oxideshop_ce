@@ -18,25 +18,19 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateService
 class ModuleInstaller implements ModuleInstallerInterface
 {
     public function __construct(
-        private ModuleInstallerInterface $bootstrapModuleInstaller,
-        private ModuleActivationServiceInterface $moduleActivationService,
-        private ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private ShopConfigurationDaoInterface $shopConfigurationDao,
-        private ModuleStateServiceInterface $moduleStateService
+        private readonly ModuleInstallerInterface $bootstrapModuleInstaller,
+        private readonly ModuleActivationServiceInterface $moduleActivationService,
+        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
+        private readonly ShopConfigurationDaoInterface $shopConfigurationDao,
+        private readonly ModuleStateServiceInterface $moduleStateService
     ) {
     }
 
-    /**
-     * @param OxidEshopPackage $package
-     */
     public function install(OxidEshopPackage $package): void
     {
         $this->bootstrapModuleInstaller->install($package);
     }
 
-    /**
-     * @param OxidEshopPackage $package
-     */
     public function uninstall(OxidEshopPackage $package): void
     {
         $moduleConfiguration = $this->moduleConfigurationDao->get($package->getPackagePath());
@@ -45,19 +39,11 @@ class ModuleInstaller implements ModuleInstallerInterface
         $this->bootstrapModuleInstaller->uninstall($package);
     }
 
-    /**
-     * @param OxidEshopPackage $package
-     *
-     * @return bool
-     */
     public function isInstalled(OxidEshopPackage $package): bool
     {
         return $this->bootstrapModuleInstaller->isInstalled($package);
     }
 
-    /**
-     * @param string $moduleId
-     */
     private function deactivateModule(string $moduleId): void
     {
         foreach ($this->shopConfigurationDao->getAll() as $shopId => $shopConfiguration) {

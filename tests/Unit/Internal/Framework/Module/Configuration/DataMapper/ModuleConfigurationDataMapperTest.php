@@ -45,30 +45,30 @@ final class ModuleConfigurationDataMapperTest extends TestCase
                 'data' => [
                     ClassExtensionsDataMapper::MAPPING_KEY => [
                         'shopClass1' => 'moduleClass1',
-                        'shopClass2' => 'moduleClass2'
-                    ]
+                        'shopClass2' => 'moduleClass2',
+                    ],
                 ],
-                'dataMapper' => new ClassExtensionsDataMapper()
+                'dataMapper' => new ClassExtensionsDataMapper(),
 
             ],
             [
                 'data' => [
                     ControllersDataMapper::MAPPING_KEY => [
                         'controller1' => Controller1::class,
-                        'controller2' => Controller2::class
-                    ]
+                        'controller2' => Controller2::class,
+                    ],
                 ],
-                'dataMapper' => new ControllersDataMapper()
+                'dataMapper' => new ControllersDataMapper(),
 
             ],
             [
                 'data' => [
                     EventsDataMapper::MAPPING_KEY => [
                             'onActivate'   => 'MyEvents::onActivate',
-                            'onDeactivate' => 'MyEvents::onDeactivate'
-                    ]
+                            'onDeactivate' => 'MyEvents::onDeactivate',
+                    ],
                 ],
-                'dataMapper' => new EventsDataMapper()
+                'dataMapper' => new EventsDataMapper(),
 
             ],
             [
@@ -77,18 +77,18 @@ final class ModuleConfigurationDataMapperTest extends TestCase
                         'testEmptyBoolConfig' => [
                             'group' => 'settingsEmpty',
                             'type' => 'bool',
-                            'value' => 'false'
+                            'value' => 'false',
                         ],
                         'testFilledAArrConfig' => [
                             'group' => 'settingsFilled',
                             'type' => 'aarr',
-                            'value' => ['key1' => 'option1', 'key2' => 'option2']
-                        ]
-                    ]
+                            'value' => ['key1' => 'option1', 'key2' => 'option2'],
+                        ],
+                    ],
                 ],
-                'dataMapper' => new ModuleSettingsDataMapper()
+                'dataMapper' => new ModuleSettingsDataMapper(),
 
-            ]
+            ],
         ];
     }
 }

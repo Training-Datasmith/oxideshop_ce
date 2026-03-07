@@ -14,15 +14,10 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\{
 
 class AdminAreaModuleTranslationFileLocatorBridge implements AdminAreaModuleTranslationFileLocatorBridgeInterface
 {
-    public function __construct(private AdminAreaModuleTranslationFileLocatorInterface $moduleTranslationFileLocator)
+    public function __construct(private readonly AdminAreaModuleTranslationFileLocatorInterface $moduleTranslationFileLocator)
     {
     }
 
-    /**
-     * @param string $lang
-     *
-     * @return array
-     */
     public function locate(string $lang): array
     {
         return $this->moduleTranslationFileLocator->locate($lang);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,7 +17,7 @@ class SimpleVariantList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Parent article for list variants
      */
-    protected $_oParent = null;
+    protected $_oParent;
 
     /**
      * List Object class name
@@ -29,7 +31,7 @@ class SimpleVariantList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oParent Parent article
      */
-    public function setParent($oParent)
+    public function setParent($oParent): void
     {
         $this->_oParent = $oParent;
     }

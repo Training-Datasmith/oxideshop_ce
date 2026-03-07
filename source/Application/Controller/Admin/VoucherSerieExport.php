@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,21 +24,21 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
      *
      * @var string
      */
-    public $sClassDo = "voucherserie_export";
+    public $sClassDo = 'voucherserie_export';
 
     /**
      * Export file extension
      *
      * @var string
      */
-    public $sExportFileType = "csv";
+    public $sExportFileType = 'csv';
 
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = "voucherserie_export";
+    protected $_sThisTemplate = 'voucherserie_export';
 
     /**
      * Number of records to export per tick
@@ -84,11 +86,11 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     protected function getExportFileName()
     {
-        $sSessionFileName = Registry::getSession()->getVariable("sExportFileName");
+        $sSessionFileName = Registry::getSession()->getVariable('sExportFileName');
         if (!$sSessionFileName) {
             $session = Registry::getSession();
             $sSessionFileName = md5($session->getId() . Registry::getUtilsObject()->generateUId());
-            Registry::getSession()->setVariable("sExportFileName", $sSessionFileName);
+            Registry::getSession()->setVariable('sExportFileName', $sSessionFileName);
         }
 
         return $sSessionFileName;
@@ -111,35 +113,35 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Performs Voucherserie export to export file.
      */
-    public function download()
+    public function download(): void
     {
         $oUtils = Registry::getUtils();
-        $oUtils->setHeader("Pragma: public");
-        $oUtils->setHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        $oUtils->setHeader("Expires: 0");
-        $oUtils->setHeader("Content-Disposition: attachment; filename=vouchers.csv");
-        $oUtils->setHeader("Content-Type: application/csv");
+        $oUtils->setHeader('Pragma: public');
+        $oUtils->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        $oUtils->setHeader('Expires: 0');
+        $oUtils->setHeader('Content-Disposition: attachment; filename=vouchers.csv');
+        $oUtils->setHeader('Content-Type: application/csv');
         $sFile = $this->getExportFilePath();
         if (file_exists($sFile) && is_readable($sFile)) {
             readfile($sFile);
         }
-        $oUtils->showMessageAndExit("");
+        $oUtils->showMessageAndExit('');
     }
 
     /**
      * Does Export
      */
-    public function run()
+    public function run(): void
     {
         $blContinue = true;
 
-        $this->fpFile = @fopen($this->_sFilePath, "a");
+        $this->fpFile = @fopen($this->_sFilePath, 'a');
         if (!isset($this->fpFile) || !$this->fpFile) {
             // we do have an error !
             $this->stop(ERR_FILEIO);
         } else {
             // file is open
-            $iStart = Registry::getRequest()->getRequestEscapedParameter("iStart");
+            $iStart = Registry::getRequest()->getRequestEscapedParameter('iStart');
             if (!$iStart) {
                 ftruncate($this->fpFile, 0);
             }
@@ -149,13 +151,10 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
                 $this->stop(ERR_SUCCESS);
                 $blContinue = false;
             }
-
-            if ($blContinue) {
-                // make ticker continue
-                $this->_aViewData['refresh'] = 0;
-                $this->_aViewData['iStart'] = $iStart + $iExportedItems;
-                $this->_aViewData['iExpItems'] = $iStart + $iExportedItems;
-            }
+            // make ticker continue
+            $this->_aViewData['refresh'] = 0;
+            $this->_aViewData['iStart'] = $iStart + $iExportedItems;
+            $this->_aViewData['iExpItems'] = $iStart + $iExportedItems;
             fclose($this->fpFile);
         }
     }
@@ -209,7 +208,7 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
      *
      * @param string $sLine exported line
      */
-    public function write($sLine)
+    public function write($sLine): void
     {
         if ($sLine) {
             fwrite($this->fpFile, $sLine . "\n");

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -27,7 +29,7 @@ class ModuleList extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aModuleExtensions = null;
+    protected $_aModuleExtensions;
 
     /**
      * @return array
@@ -51,7 +53,7 @@ class ModuleList extends \OxidEsales\Eshop\Core\Base
     /**
      * Removes extension metadata from shop.
      */
-    public function cleanup()
+    public function cleanup(): void
     {
         $deletedModules = $this->getDeletedExtensions();
 
@@ -114,8 +116,8 @@ class ModuleList extends \OxidEsales\Eshop\Core\Base
 
         if (is_array($modules)) {
             foreach ($modules as $class => $moduleChain) {
-                if (strstr($moduleChain, '&')) {
-                    $moduleChain = explode('&', $moduleChain);
+                if (strstr((string) $moduleChain, '&')) {
+                    $moduleChain = explode('&', (string) $moduleChain);
                 } else {
                     $moduleChain = [$moduleChain];
                 }
@@ -156,10 +158,8 @@ class ModuleList extends \OxidEsales\Eshop\Core\Base
      * Returns shop classes and associated invalid module classes for a given module id
      *
      * @param string $moduleId Module id
-     *
-     * @return array
      */
-    private function getInvalidExtensions($moduleId)
+    private function getInvalidExtensions($moduleId): array
     {
         $extendedShopClasses = $this->getModuleExtensions($moduleId);
         $invalidModuleClasses = [];

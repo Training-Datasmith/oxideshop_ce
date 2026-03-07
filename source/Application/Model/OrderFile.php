@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
-use oxField;
 
 /**
  * Article file link manager.
@@ -29,7 +28,6 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected $_sClassName = 'oxorderfile';
 
-
     /**
      * Initialises the instance
      */
@@ -42,7 +40,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * reset order files downloadcount and / or expration times
      */
-    public function reset()
+    public function reset(): void
     {
         $oArticleFile = oxNew(\OxidEsales\Eshop\Application\Model\File::class);
         $oArticleFile->load($this->oxorderfiles__oxfileid->value);
@@ -63,7 +61,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param string $sOrderId - order id
      */
-    public function setOrderId($sOrderId)
+    public function setOrderId($sOrderId): void
     {
         $this->oxorderfiles__oxorderid = new \OxidEsales\Eshop\Core\Field($sOrderId);
     }
@@ -73,7 +71,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param string $sOrderArticleId - order article id
      */
-    public function setOrderArticleId($sOrderArticleId)
+    public function setOrderArticleId($sOrderArticleId): void
     {
         $this->oxorderfiles__oxorderarticleid = new \OxidEsales\Eshop\Core\Field($sOrderArticleId);
     }
@@ -83,7 +81,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param string $sShopId - shop id
      */
-    public function setShopId($sShopId)
+    public function setShopId($sShopId): void
     {
         $this->oxorderfiles__oxshopid = new \OxidEsales\Eshop\Core\Field($sShopId);
     }
@@ -97,7 +95,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param int    $iExpirationTime         main download time after order in times
      * @param int    $iExpirationDownloadTime download time after first download in hours
      */
-    public function setFile($sFileName, $sFileId, $iMaxDownloadCounts, $iExpirationTime, $iExpirationDownloadTime)
+    public function setFile($sFileName, $sFileId, $iMaxDownloadCounts, $iExpirationTime, $iExpirationDownloadTime): void
     {
         $sNow = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
         $sDate = date('Y-m-d G:i', $sNow + $iExpirationTime * 3600);
@@ -138,7 +136,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
             'oxorderfiles__oxordernr',
             'oxorderfiles__oxorderdate',
             'oxorderfiles__oxispaid',
-            'oxorderfiles__oxpurchasedonly'
+            'oxorderfiles__oxpurchasedonly',
         ];
 
         if (in_array($sFieldName, $aFieldNames)) {
@@ -155,16 +153,16 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function isValid()
     {
-        if (!$this->oxorderfiles__oxmaxdownloadcount->value || ($this->oxorderfiles__oxdownloadcount->value < $this->oxorderfiles__oxmaxdownloadcount->value)) {
-            if (!$this->oxorderfiles__oxlinkexpirationtime->value && !$this->oxorderfiles__oxdownloadxpirationtime->value) {
-                return true;
-            } else {
-                $sNow = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
-                $iTimestamp = strtotime($this->oxorderfiles__oxvaliduntil->value);
-                if (!$iTimestamp || ($iTimestamp > $sNow)) {
-                    return true;
-                }
-            }
+        if (!(!$this->oxorderfiles__oxmaxdownloadcount->value || $this->oxorderfiles__oxdownloadcount->value < $this->oxorderfiles__oxmaxdownloadcount->value)) {
+            return false;
+        }
+        if (!$this->oxorderfiles__oxlinkexpirationtime->value && !$this->oxorderfiles__oxdownloadxpirationtime->value) {
+            return true;
+        }
+        $sNow = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
+        $iTimestamp = strtotime((string) $this->oxorderfiles__oxvaliduntil->value);
+        if (!$iTimestamp || ($iTimestamp > $sNow)) {
+            return true;
         }
 
         return false;
@@ -187,7 +185,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function getValidUntil()
     {
-        return substr($this->oxorderfiles__oxvaliduntil->value, 0, 16);
+        return substr((string) $this->oxorderfiles__oxvaliduntil->value, 0, 16);
     }
 
     /**
@@ -199,7 +197,7 @@ class OrderFile extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $iLeft = $this->oxorderfiles__oxmaxdownloadcount->value - $this->oxorderfiles__oxdownloadcount->value;
         if ($iLeft < 0) {
-            $iLeft = 0;
+            return 0;
         }
 
         return $iLeft;

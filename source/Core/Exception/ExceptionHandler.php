@@ -13,8 +13,10 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopIdCalculator;
 use OxidEsales\EshopCommunity\Internal\Framework\Logger\LoggerServiceFactory;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\Context;
-use Throwable;
+
 use function oxTriggerOfflinePageDisplay;
+
+use Throwable;
 
 class ExceptionHandler
 {

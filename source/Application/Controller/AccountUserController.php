@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,7 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Current user Data Maintenance form.
@@ -44,7 +45,7 @@ class AccountUserController extends \OxidEsales\Eshop\Application\Controller\Acc
             return $this->_sThisTemplate = $this->_sThisLoginTemplate;
         }
 
-        $this->_aViewData["deladr"] = Registry::getRequest()->getRequestEscapedParameter('deladr');
+        $this->_aViewData['deladr'] = Registry::getRequest()->getRequestEscapedParameter('deladr');
 
         return $this->_sThisTemplate;
     }

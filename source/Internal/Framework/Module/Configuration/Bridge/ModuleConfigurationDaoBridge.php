@@ -17,25 +17,18 @@ use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 class ModuleConfigurationDaoBridge implements ModuleConfigurationDaoBridgeInterface
 {
     public function __construct(
-        private ContextInterface $context,
-        private ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private ModuleEnvironmentConfigurationDaoInterface $moduleEnvironmentConfigurationDao
+        private readonly ContextInterface $context,
+        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
+        private readonly ModuleEnvironmentConfigurationDaoInterface $moduleEnvironmentConfigurationDao
     ) {
     }
 
-    /**
-     * @param string $moduleId
-     * @return ModuleConfiguration
-     */
     public function get(string $moduleId): ModuleConfiguration
     {
         return $this->moduleConfigurationDao->get($moduleId, $this->context->getCurrentShopId());
     }
 
-    /**
-     * @param ModuleConfiguration $moduleConfiguration
-     */
-    public function save(ModuleConfiguration $moduleConfiguration)
+    public function save(ModuleConfiguration $moduleConfiguration): void
     {
         $this->moduleConfigurationDao->save($moduleConfiguration, $this->context->getCurrentShopId());
         $this->moduleEnvironmentConfigurationDao->remove(

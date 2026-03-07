@@ -35,15 +35,15 @@ return [
                     'OXAMOUNT' => '100',
                     'OXARTID' => '1000',
                     'OXARTNUM' => '1000',
-                    'OXTITLE' => '[DE 4] Test product 0 šÄßüл'
+                    'OXTITLE' => '[DE 4] Test product 0 šÄßüл',
                 ],
                 [
                     'OXID' => '919edbc539f414bdefc7f6975bbdf2b6',
                     'OXAMOUNT' => '150',
                     'OXARTID' => '1001',
                     'OXARTNUM' => '1001',
-                    'OXTITLE' => '[DE 1] Test product 1 šÄßüл'
+                    'OXTITLE' => '[DE 1] Test product 1 šÄßüл',
                 ],
-            ]
-        ]
+            ],
+        ],
 ];

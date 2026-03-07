@@ -29,7 +29,7 @@ final class ProductStatusTestCest
         $this->productData = [
             'title' => $product['OXTITLE_1'],
             'description' => $product['OXSHORTDESC_1'],
-            'price' => $product['OXPRICE']
+            'price' => $product['OXPRICE'],
         ];
     }
 
@@ -46,17 +46,16 @@ final class ProductStatusTestCest
             [
                 'OXACTIVE' => false,
                 'OXACTIVEFROM' => (new DateTime())->modify('-1 day')->format('Y-m-d H:i:s'),
-                'OXACTIVETO' => '0000-00-00 00:00:00'
+                'OXACTIVETO' => '0000-00-00 00:00:00',
             ],
             [
-                'OXID' => $this->productID
+                'OXID' => $this->productID,
             ]
         );
 
         $I->expect('Product is shown');
         $productList = $homePage->searchFor($this->productID);
         $productList->seeProductData($this->productData);
-
 
         $I->amGoingTo('Test product temporary active in the list with empty activefrom');
 
@@ -65,10 +64,10 @@ final class ProductStatusTestCest
             [
                 'OXACTIVE' => false,
                 'OXACTIVEFROM' => '0000-00-00 00:00:00',
-                'OXACTIVETO' => (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s')
+                'OXACTIVETO' => (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s'),
             ],
             [
-                'OXID' => $this->productID
+                'OXID' => $this->productID,
             ]
         );
 
@@ -90,17 +89,16 @@ final class ProductStatusTestCest
             [
                 'OXACTIVE' => false,
                 'OXACTIVEFROM' => (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s'),
-                'OXACTIVETO' => '0000-00-00 00:00:00'
+                'OXACTIVETO' => '0000-00-00 00:00:00',
             ],
             [
-                'OXID' => $this->productID
+                'OXID' => $this->productID,
             ]
         );
 
         $I->expect('Product is not shown in case 1');
         $productList = $homePage->searchFor($this->productID);
         $productList->dontSeeProductData($this->productData);
-
 
         $I->amGoingTo('Test product temporary inactive in the list with empty activefrom');
 
@@ -109,10 +107,10 @@ final class ProductStatusTestCest
             [
                 'OXACTIVE' => false,
                 'OXACTIVEFROM' => '0000-00-00 00:00:00',
-                'OXACTIVETO' => (new DateTime())->modify('-1 day')->format('Y-m-d H:i:s')
+                'OXACTIVETO' => (new DateTime())->modify('-1 day')->format('Y-m-d H:i:s'),
             ],
             [
-                'OXID' => $this->productID
+                'OXID' => $this->productID,
             ]
         );
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,7 +23,7 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      *
      * @var \OxidEsales\Eshop\Application\Model\Order
      */
-    protected $_oEditObject = null;
+    protected $_oEditObject;
 
     /** @inheritdoc */
     public function render()
@@ -29,10 +31,10 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         parent::render();
 
         if ($oOrder = $this->getEditObject()) {
-            $this->_aViewData["edit"] = $oOrder;
+            $this->_aViewData['edit'] = $oOrder;
         }
 
-        return "order_downloads";
+        return 'order_downloads';
     }
 
     /**
@@ -43,7 +45,7 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     public function getEditObject()
     {
         $soxId = $this->getEditObjectId();
-        if ($this->_oEditObject === null && isset($soxId) && $soxId != "-1") {
+        if ($this->_oEditObject === null && isset($soxId) && $soxId != '-1') {
             $this->_oEditObject = oxNew(\OxidEsales\Eshop\Application\Model\OrderFileList::class);
             $this->_oEditObject->loadOrderFiles($soxId);
         }
@@ -54,7 +56,7 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     /**
      * Returns editable order object
      */
-    public function resetDownloadLink()
+    public function resetDownloadLink(): void
     {
         $sOrderFileId = Registry::getRequest()->getRequestEscapedParameter('oxorderfileid');
         $oOrderFile = oxNew(\OxidEsales\Eshop\Application\Model\OrderFile::class);

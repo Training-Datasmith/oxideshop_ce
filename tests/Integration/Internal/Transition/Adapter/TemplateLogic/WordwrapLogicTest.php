@@ -26,10 +26,10 @@ final class WordwrapLogicTest extends TestCase
     public static function nonAsciiProvider(): array
     {
         return [
-            ["HÖ\nHÖ", "HÖ HÖ", 2],
-            ["HÖ\na\nHÖ\na", "HÖa HÖa", 2, "\n", true],
-            ["HÖa\na\nHÖa\na", "HÖaa HÖaa", 3, "\n", true],
-            ["HÖa\nHÖa", "HÖa HÖa", 2]
+            ["HÖ\nHÖ", 'HÖ HÖ', 2],
+            ["HÖ\na\nHÖ\na", 'HÖa HÖa', 2, "\n", true],
+            ["HÖa\na\nHÖa\na", 'HÖaa HÖaa', 3, "\n", true],
+            ["HÖa\nHÖa", 'HÖa HÖa', 2],
         ];
     }
 
@@ -62,8 +62,8 @@ final class WordwrapLogicTest extends TestCase
                 " finibus diam eu libero lobortis.\neu   ex   sit",
                 10,
                 "\n",
-                true
-            ]
+                true,
+            ],
         ];
     }
 

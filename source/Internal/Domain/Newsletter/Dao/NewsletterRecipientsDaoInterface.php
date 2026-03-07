@@ -11,10 +11,5 @@ namespace OxidEsales\EshopCommunity\Internal\Domain\Newsletter\Dao;
 
 interface NewsletterRecipientsDaoInterface
 {
-    /**
-     * @param int $shopId
-     *
-     * @return array
-     */
     public function getNewsletterRecipients(int $shopId): array;
 }

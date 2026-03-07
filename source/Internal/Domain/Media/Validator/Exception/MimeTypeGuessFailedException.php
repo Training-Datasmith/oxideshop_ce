@@ -11,13 +11,9 @@ namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception;
 
 class MimeTypeGuessFailedException extends MediaValidationException
 {
-    private string $path;
-
-    public function __construct(string $path)
+    public function __construct(private readonly string $path)
     {
-        $this->path = $path;
-
-        parent::__construct(\sprintf('Unable to guess MIME type for file "%s".', $path));
+        parent::__construct(\sprintf('Unable to guess MIME type for file "%s".', $this->path));
     }
 
     public function getPath(): string

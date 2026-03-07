@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -29,7 +31,7 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oArticle = null;
+    protected $_oArticle;
 
     /** @inheritdoc */
     public function render()
@@ -45,7 +47,7 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
             $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
             $oArticle->oxarticles__oxisdownloadable = new \OxidEsales\Eshop\Core\Field($oParentArticle->oxarticles__oxisdownloadable->value);
-            $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
+            $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
         }
 
         return $this->_sThisTemplate;
@@ -55,7 +57,7 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      * Saves editing article changes (oxisdownloadable)
      * and updates oxFile object which are associated with editing object
      */
-    public function save()
+    public function save(): void
     {
         // save article changes
         $aArticleChanges = Registry::getRequest()->getRequestEscapedParameter('editval');
@@ -103,8 +105,6 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
     /**
      * Creates new oxFile object and stores newly uploaded file
-     *
-     * @return null
      */
     public function upload()
     {
@@ -120,9 +120,9 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         $soxId = $this->getEditObjectId();
 
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("newfile");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('newfile');
         $aParams = $this->processOptions($aParams);
-        $aNewFile = \OxidEsales\Eshop\Core\Registry::getConfig()->getUploadedFile("newArticleFile");
+        $aNewFile = \OxidEsales\Eshop\Core\Registry::getConfig()->getUploadedFile('newArticleFile');
 
         //uploading and processing supplied file
         $oArticleFile = oxNew(\OxidEsales\Eshop\Application\Model\File::class);
@@ -188,7 +188,7 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     public function getConfigOptionValue($iOption)
     {
-        return ($iOption < 0) ? "" : $iOption;
+        return ($iOption < 0) ? '' : $iOption;
     }
 
     /**
@@ -204,17 +204,17 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             $aParams = [];
         }
 
-        if (!isset($aParams["oxfiles__oxdownloadexptime"]) || $aParams["oxfiles__oxdownloadexptime"] == "") {
-            $aParams["oxfiles__oxdownloadexptime"] = -1;
+        if (!isset($aParams['oxfiles__oxdownloadexptime']) || $aParams['oxfiles__oxdownloadexptime'] == '') {
+            $aParams['oxfiles__oxdownloadexptime'] = -1;
         }
-        if (!isset($aParams["oxfiles__oxlinkexptime"]) || $aParams["oxfiles__oxlinkexptime"] == "") {
-            $aParams["oxfiles__oxlinkexptime"] = -1;
+        if (!isset($aParams['oxfiles__oxlinkexptime']) || $aParams['oxfiles__oxlinkexptime'] == '') {
+            $aParams['oxfiles__oxlinkexptime'] = -1;
         }
-        if (!isset($aParams["oxfiles__oxmaxunregdownloads"]) || $aParams["oxfiles__oxmaxunregdownloads"] == "") {
-            $aParams["oxfiles__oxmaxunregdownloads"] = -1;
+        if (!isset($aParams['oxfiles__oxmaxunregdownloads']) || $aParams['oxfiles__oxmaxunregdownloads'] == '') {
+            $aParams['oxfiles__oxmaxunregdownloads'] = -1;
         }
-        if (!isset($aParams["oxfiles__oxmaxdownloads"]) || $aParams["oxfiles__oxmaxdownloads"] == "") {
-            $aParams["oxfiles__oxmaxdownloads"] = -1;
+        if (!isset($aParams['oxfiles__oxmaxdownloads']) || $aParams['oxfiles__oxmaxdownloads'] == '') {
+            $aParams['oxfiles__oxmaxdownloads'] = -1;
         }
 
         return $aParams;

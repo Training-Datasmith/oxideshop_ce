@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Domain\Media;
 
-use OxidEsales\EshopCommunity\Internal\Domain\Media\MediaUploader;
 use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\MediaPath;
+use OxidEsales\EshopCommunity\Internal\Domain\Media\MediaUploader;
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\ImageHandlerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

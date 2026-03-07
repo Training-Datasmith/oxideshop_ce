@@ -68,7 +68,7 @@ final class CategoryListTest extends IntegrationTestCase
                 'oxsort' => 1,
                 'oxleft' => 0,
                 'oxright' => 0,
-                'oxrootid' => 'test_root'
+                'oxrootid' => 'test_root',
             ],
             [
                 'oxid' => 'test_child1',
@@ -77,7 +77,7 @@ final class CategoryListTest extends IntegrationTestCase
                 'oxsort' => 1,
                 'oxleft' => 0,
                 'oxright' => 0,
-                'oxrootid' => ''
+                'oxrootid' => '',
             ],
             [
                 'oxid' => 'test_child2',
@@ -86,7 +86,7 @@ final class CategoryListTest extends IntegrationTestCase
                 'oxsort' => 2,
                 'oxleft' => 0,
                 'oxright' => 0,
-                'oxrootid' => ''
+                'oxrootid' => '',
             ],
             [
                 'oxid' => 'test_child1_1',
@@ -95,7 +95,7 @@ final class CategoryListTest extends IntegrationTestCase
                 'oxsort' => 1,
                 'oxleft' => 0,
                 'oxright' => 0,
-                'oxrootid' => ''
+                'oxrootid' => '',
             ],
             [
                 'oxid' => 'test_child1_2',
@@ -104,8 +104,8 @@ final class CategoryListTest extends IntegrationTestCase
                 'oxsort' => 2,
                 'oxleft' => 0,
                 'oxright' => 0,
-                'oxrootid' => ''
-            ]
+                'oxrootid' => '',
+            ],
         ];
 
         foreach ($categories as $categoryData) {

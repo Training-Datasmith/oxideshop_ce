@@ -9,20 +9,16 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Contact\Form;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 
 class ContactFormMessageBuilder implements ContactFormMessageBuilderInterface
 {
-    public function __construct(private ShopAdapterInterface $shopAdapter)
+    public function __construct(private readonly ShopAdapterInterface $shopAdapter)
     {
     }
 
-    /**
-     * @param FormInterface $form
-     * @return string
-     */
-    public function getContent(FormInterface $form)
+    public function getContent(FormInterface $form): string
     {
         $message = $this->shopAdapter->translateString('MESSAGE_FROM') . ' ';
 
@@ -42,7 +38,7 @@ class ContactFormMessageBuilder implements ContactFormMessageBuilderInterface
         $message .= '(' . $form->email->getValue() . ')<br /><br />';
 
         if ($form->message->getValue()) {
-            $message .= nl2br($form->message->getValue());
+            $message .= nl2br((string) $form->message->getValue());
         }
 
         return $message;

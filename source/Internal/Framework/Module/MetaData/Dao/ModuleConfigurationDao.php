@@ -12,25 +12,20 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao;
 // phpcs:disable
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataToModuleConfigurationDataMapperInterface;
+
 // phpcs:enable
 
 class ModuleConfigurationDao implements ModuleConfigurationDaoInterface
 {
-    /**
-     * @var string
-     */
-    private $metadataFileName = 'metadata.php';
+    private string $metadataFileName = 'metadata.php';
 
     public function __construct(
-        private MetaDataProviderInterface $metadataProvider,
-        private MetaDataToModuleConfigurationDataMapperInterface $metadataMapper
+        private readonly MetaDataProviderInterface $metadataProvider,
+        private readonly MetaDataToModuleConfigurationDataMapperInterface $metadataMapper
     ) {
     }
 
     /**
-     * @param string $modulePath
-     *
-     * @return ModuleConfiguration
      * @throws \OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\InvalidMetaDataException
      */
     public function get(string $modulePath): ModuleConfiguration
@@ -39,10 +34,6 @@ class ModuleConfigurationDao implements ModuleConfigurationDaoInterface
         return $this->metadataMapper->fromData($metadata);
     }
 
-    /**
-     * @param string $moduleFullPath
-     * @return string
-     */
     private function getMetadataFilePath(string $moduleFullPath): string
     {
         return $moduleFullPath . DIRECTORY_SEPARATOR . $this->metadataFileName;

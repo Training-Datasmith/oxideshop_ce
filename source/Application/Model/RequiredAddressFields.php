@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
 
 /**
  * Defines and returns delivery and billing required fields.
@@ -16,16 +16,14 @@ class RequiredAddressFields
 {
     /**
      * Default required fields for use when not set in config.
-     *
-     * @var array
      */
-    private $_aDefaultRequiredFields = [
+    private array $_aDefaultRequiredFields = [
         'oxuser__oxfname',
         'oxuser__oxlname',
         'oxuser__oxstreetnr',
         'oxuser__oxstreet',
         'oxuser__oxzip',
-        'oxuser__oxcity'
+        'oxuser__oxcity',
     ];
 
     /**
@@ -53,7 +51,7 @@ class RequiredAddressFields
      *
      * @param array $aRequiredFields
      */
-    public function setRequiredFields($aRequiredFields)
+    public function setRequiredFields($aRequiredFields): void
     {
         $this->_aRequiredFields = $aRequiredFields;
     }
@@ -95,16 +93,14 @@ class RequiredAddressFields
     /**
      * Removes delivery fields from fields list.
      *
-     * @param array  $aFields
-     * @param string $sPrefix
      *
-     * @return mixed
+     * @return mixed[]
      */
-    private function filterFields($aFields, $sPrefix)
+    private function filterFields(array $aFields, string $sPrefix): array
     {
         $aAllowed = [];
         foreach ($aFields as $sKey => $sValue) {
-            if (strpos($sValue, $sPrefix) === 0) {
+            if (str_starts_with((string) $sValue, $sPrefix)) {
                 $aAllowed[] = $aFields[$sKey];
             }
         }

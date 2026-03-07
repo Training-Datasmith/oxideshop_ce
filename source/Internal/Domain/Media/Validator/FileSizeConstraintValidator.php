@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileSizeConstraintValidator implements MediaConstraintValidatorInterface
 {
-    private int $minSizeBytes;
-    private int $maxSizeBytes;
+    private readonly int $minSizeBytes;
+    private readonly int $maxSizeBytes;
 
     public function __construct(
         private readonly int $minSizeKb,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,8 +23,6 @@ class UniversallyUniqueIdGenerator
 
     /**
      * Sets dependencies.
-     *
-     * @param OpenSSLFunctionalityChecker|null $openSSLChecker
      */
     public function __construct(?OpenSSLFunctionalityChecker $openSSLChecker = null)
     {
@@ -62,11 +62,9 @@ class UniversallyUniqueIdGenerator
      * Generates version 5 UUID.
      *
      * @param string $sSeed
-     * @param string $sSalt
      *
-     * @return string
      */
-    public function generateV5($sSeed, $sSalt)
+    public function generateV5($sSeed, string $sSalt): string
     {
         $sSeed = str_replace(['-', '{', '}'], '', $sSeed);
         $sBinarySeed = '';
@@ -74,7 +72,8 @@ class UniversallyUniqueIdGenerator
             $sBinarySeed .= chr(hexdec($sSeed[$i] . $sSeed[$i + 1]));
         }
         $sHash = sha1($sBinarySeed . $sSalt);
-        $sUUID = sprintf(
+
+        return sprintf(
             '%08s-%04s-%04x-%04x-%12s',
             substr($sHash, 0, 8),
             substr($sHash, 8, 4),
@@ -82,8 +81,6 @@ class UniversallyUniqueIdGenerator
             (hexdec(substr($sHash, 16, 4)) & 0x3fff) | 0x8000,
             substr($sHash, 20, 12)
         );
-
-        return $sUUID;
     }
 
     /**
@@ -98,10 +95,8 @@ class UniversallyUniqueIdGenerator
 
     /**
      * Generates UUID based on OpenSSL's openssl_random_pseudo_bytes.
-     *
-     * @return string
      */
-    protected function generateBasedOnOpenSSL()
+    protected function generateBasedOnOpenSSL(): string
     {
         $sRandomData = openssl_random_pseudo_bytes(16);
         $sRandomData[6] = chr(ord($sRandomData[6]) & 0x0f | 0x40); // set version to 0100
@@ -112,10 +107,8 @@ class UniversallyUniqueIdGenerator
 
     /**
      * Generates UUID based on mt_rand.
-     *
-     * @return string
      */
-    protected function generateBasedOnMtRand()
+    protected function generateBasedOnMtRand(): string
     {
         return sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',

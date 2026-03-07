@@ -16,11 +16,11 @@ use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 
 class ModuleConfigurationExportDataMapper implements ModuleConfigurationExportDataMapperInterface
 {
-    private array $dataMappers;
+    private readonly array $dataMappers;
 
     public function __construct(
-        private ModuleStateServiceInterface $moduleStateService,
-        private ContextInterface $context,
+        private readonly ModuleStateServiceInterface $moduleStateService,
+        private readonly ContextInterface $context,
         ModuleConfigurationExportDataMapperInterface ...$dataMappers
     ) {
         $this->dataMappers = $dataMappers;

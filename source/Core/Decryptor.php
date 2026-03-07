@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,10 +19,8 @@ class Decryptor
      *
      * @param string $string string
      * @param string $key    key
-     *
-     * @return string
      */
-    public function decrypt($string, $key)
+    public function decrypt($string, $key): string
     {
         $key = $this->formKey($key, $string);
 
@@ -37,10 +37,8 @@ class Decryptor
      *
      * @param string $key
      * @param string $string
-     *
-     * @return string
      */
-    protected function formKey($key, $string)
+    protected function formKey($key, $string): string
     {
         $key = '_' . $key;
         $keyLength = (int) (strlen($string) / strlen($key)) + 5;

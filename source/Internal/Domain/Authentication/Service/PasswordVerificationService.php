@@ -13,17 +13,14 @@ use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPol
 
 class PasswordVerificationService implements PasswordVerificationServiceInterface
 {
-    public function __construct(private PasswordPolicyInterface $passwordPolicy)
+    public function __construct(private readonly PasswordPolicyInterface $passwordPolicy)
     {
     }
 
     /**
      * Verify that a given password matches a given hash
      *
-     * @param string $password
-     * @param string $passwordHash
      *
-     * @return bool
      */
     public function verifyPassword(string $password, string $passwordHash): bool
     {

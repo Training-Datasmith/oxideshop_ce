@@ -8,7 +8,6 @@
 declare(strict_types=1);
 
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\ModuleController;
-use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\ModuleControllerMissingTemplate;
 
 $sMetadataVersion = '2.1';
 

@@ -93,7 +93,7 @@ final class ProjectYamlImportServiceTest extends TestCase
         $configuration = [
             'imports' => [
                 ['resource' => 'some/non/existing/directory/services.yaml'],
-                ['resource' => $existingImport]]
+                ['resource' => $existingImport]],
         ];
         $this->getDao()->saveProjectConfigFile(
             new DIConfigWrapper($configuration)

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -28,7 +29,7 @@ class UserAddressList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sUserId user id
      */
-    public function load($sUserId)
+    public function load($sUserId): void
     {
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
         $sViewName = $tableViewNameGenerator->getViewName('oxcountry');
@@ -41,7 +42,7 @@ class UserAddressList extends \OxidEsales\Eshop\Core\Model\ListModel
                 LEFT JOIN {$sViewName} AS oxcountry ON oxaddress.oxcountryid = oxcountry.oxid
                 WHERE oxaddress.oxuserid = :oxuserid";
         $this->selectString($sSelect, [
-            'oxuserid' => $sUserId
+            'oxuserid' => $sUserId,
         ]);
     }
 }

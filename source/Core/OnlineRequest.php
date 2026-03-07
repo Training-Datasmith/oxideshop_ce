@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -78,7 +80,7 @@ class OnlineRequest
         if (!$sClusterId) {
             $oUUIDGenerator = oxNew(\OxidEsales\Eshop\Core\UniversallyUniqueIdGenerator::class);
             $sClusterId = $oUUIDGenerator->generate();
-            $oConfig->saveShopConfVar("str", 'sClusterId', $sClusterId, $sBaseShop);
+            $oConfig->saveShopConfVar('str', 'sClusterId', $sClusterId, $sBaseShop);
         }
 
         return $sClusterId;

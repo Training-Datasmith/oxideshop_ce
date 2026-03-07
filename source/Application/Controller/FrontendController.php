@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,11 +16,12 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 use OxidEsales\EshopCommunity\Core\SortingValidator;
-use stdClass;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 
 use function rawurlencode;
+
+use stdClass;
 
 // view indexing state for search engines:
 define('VIEW_INDEXSTATE_INDEX', 0); //  index without limitations
@@ -72,7 +75,7 @@ class FrontendController extends BaseController
      *
      * @var string
      */
-    protected $_sListType = null;
+    protected $_sListType;
 
     /**
      * Possible list display types
@@ -86,49 +89,49 @@ class FrontendController extends BaseController
      *
      * @var string
      */
-    protected $_sListDisplayType = null;
+    protected $_sListDisplayType;
 
     /**
      * List display type
      *
      * @var string
      */
-    protected $_sCustomListDisplayType = null;
+    protected $_sCustomListDisplayType;
 
     /**
      * Active articles category object.
      *
      * @var \OxidEsales\Eshop\Application\Model\Category
      */
-    protected $_oActCategory = null;
+    protected $_oActCategory;
 
     /**
      * Active Manufacturer object.
      *
      * @var \OxidEsales\Eshop\Application\Model\Manufacturer
      */
-    protected $_oActManufacturer = null;
+    protected $_oActManufacturer;
 
     /**
      * Active vendor object.
      *
      * @var \OxidEsales\Eshop\Application\Model\Vendor
      */
-    protected $_oActVendor = null;
+    protected $_oActVendor;
 
     /**
      * Active recommendation's list
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      */
-    protected $_oActiveRecommList = null;
+    protected $_oActiveRecommList;
 
     /**
      * Active search object - stdClass object which keeps navigation info
      *
      * @var stdClass
      */
-    protected $_oActSearch = null;
+    protected $_oActSearch;
 
     /**
      * Marked which defines if current view is sortable or not
@@ -142,98 +145,98 @@ class FrontendController extends BaseController
      *
      * @var bool
      */
-    protected $_blLoadCurrency = null;
+    protected $_blLoadCurrency;
 
     /**
      * Load Manufacturers option
      *
      * @var bool
      */
-    protected $_blLoadManufacturerTree = null;
+    protected $_blLoadManufacturerTree;
 
     /**
      * Don't show empty cats
      *
      * @var bool
      */
-    protected $_blDontShowEmptyCats = null;
+    protected $_blDontShowEmptyCats;
 
     /**
      * Load language option
      *
      * @var bool
      */
-    protected $_blLoadLanguage = null;
+    protected $_blLoadLanguage;
 
     /**
      * Item count in category top navigation
      *
      * @var integer
      */
-    protected $_iTopCatNavItmCnt = null;
+    protected $_iTopCatNavItmCnt;
 
     /**
      * List's "order by"
      *
      * @var string
      */
-    protected $_sListOrderBy = null;
+    protected $_sListOrderBy;
 
     /**
      * Order direction of list
      *
      * @var string
      */
-    protected $_sListOrderDir = null;
+    protected $_sListOrderDir;
 
     /**
      * Meta description
      *
      * @var string
      */
-    protected $_sMetaDescription = null;
+    protected $_sMetaDescription;
 
     /**
      * Meta keywords
      *
      * @var string
      */
-    protected $_sMetaKeywords = null;
+    protected $_sMetaKeywords;
 
     /**
      * Start page meta description CMS ident
      *
      * @var string
      */
-    protected $_sMetaDescriptionIdent = null;
+    protected $_sMetaDescriptionIdent;
 
     /**
      * Start page meta keywords CMS ident
      *
      * @var string
      */
-    protected $_sMetaKeywordsIdent = null;
+    protected $_sMetaKeywordsIdent;
 
     /**
      * Additional params for url.
      *
      * @var string
      */
-    protected $_sAdditionalParams = null;
+    protected $_sAdditionalParams;
 
     /**
      * Active currency object.
      *
      * @var object
      */
-    protected $_oActCurrency = null;
+    protected $_oActCurrency;
 
     /**
      * Private sales on/off state
      *
      * @var bool
      */
-    protected $_blEnabledPrivateSales = null;
+    protected $_blEnabledPrivateSales;
 
     /**
      * Sign if any new component is added. On this case will be
@@ -265,23 +268,23 @@ class FrontendController extends BaseController
      *
      * @var integer
      */
-    protected $_iCompItemsCnt = null;
+    protected $_iCompItemsCnt;
 
     /**
      * Default content id
      *
      * @return string
      */
-    protected $_sContentId = null;
+    protected $_sContentId;
 
     /** @return \OxidEsales\Eshop\Application\Model\Content Default content. */
-    protected $_oContent = null;
+    protected $_oContent;
 
     /** @var string View id. */
-    protected $_sViewResetID = null;
+    protected $_sViewResetID;
 
     /** @var array Menu list. */
-    protected $_aMenueList = null;
+    protected $_aMenueList;
 
     /**
      * Names of components (classes) that are initiated and executed
@@ -296,7 +299,7 @@ class FrontendController extends BaseController
         'oxcmp_shop'       => 1,
         'oxcmp_categories' => 0,
         'oxcmp_utils'      => 1,
-        'oxcmp_basket'     => 1
+        'oxcmp_basket'     => 1,
     ];
 
     /**
@@ -308,61 +311,61 @@ class FrontendController extends BaseController
     protected $_aUserComponentNames = [];
 
     /** @var \OxidEsales\Eshop\Application\Model\Article Current view product object. */
-    protected $_oProduct = null;
+    protected $_oProduct;
 
     /** @var int Number of current list page. */
-    protected $_iActPage = null;
+    protected $_iActPage;
 
     /** @var array A list of articles. */
-    protected $_aArticleList = null;
+    protected $_aArticleList;
 
     /** @var \OxidEsales\Eshop\Application\Model\ManufacturerList Manufacturer list object. */
-    protected $_oManufacturerTree = null;
+    protected $_oManufacturerTree;
 
     /** @var \OxidEsales\Eshop\Application\Model\CategoryList Category tree object. */
-    protected $_oCategoryTree = null;
+    protected $_oCategoryTree;
 
     /** @var array Top 5 article list. */
-    protected $_aTop5ArticleList = null;
+    protected $_aTop5ArticleList;
 
     /** @var array Bargain article list. */
-    protected $_aBargainArticleList = null;
+    protected $_aBargainArticleList;
 
     /** @var integer If order price to low. */
-    protected $_blLowOrderPrice = null;
+    protected $_blLowOrderPrice;
 
     /** @var string Min order price. */
-    protected $_sMinOrderPrice = null;
+    protected $_sMinOrderPrice;
 
     /** @var string Real newsletter status. */
-    protected $_iNewsRealStatus = null;
+    protected $_iNewsRealStatus;
 
     /** @return array Url parameters which block redirection. */
     protected $_aBlockRedirectParams = ['fnc', 'stoken', 'force_sid', 'force_admin_sid'];
 
     /** @var \OxidEsales\Eshop\Application\Model\Vendor Root vendor object. */
-    protected $_oRootVendor = null;
+    protected $_oRootVendor;
 
     /** @var string Vendor id. */
-    protected $_sVendorId = null;
+    protected $_sVendorId;
 
     /** @var array Manufacturer list for search. */
-    protected $_aManufacturerlist = null;
+    protected $_aManufacturerlist;
 
     /** @var \OxidEsales\Eshop\Application\Model\Manufacturer Root manufacturer object. */
-    protected $_oRootManufacturer = null;
+    protected $_oRootManufacturer;
 
     /** @var string Manufacturer id. */
-    protected $_sManufacturerId = null;
+    protected $_sManufacturerId;
 
     /** @var bool Has user newsletter subscribed. */
-    protected $_blNewsSubscribed = null;
+    protected $_blNewsSubscribed;
 
     /** @var \OxidEsales\Eshop\Application\Model\Address Delivery address. */
-    protected $_oDelAddress = null;
+    protected $_oDelAddress;
 
     /** @var array Category tree path. */
-    protected $_sCatTreePath = null;
+    protected $_sCatTreePath;
 
     /** @var array Loaded contents array (cache). */
     protected $_aContents = [];
@@ -374,43 +377,43 @@ class FrontendController extends BaseController
     protected $_blBargainAction = false;
 
     /** @var array check all "must-be-fields" if they are completely. */
-    protected $_aMustFillFields = null;
+    protected $_aMustFillFields;
 
     /** @var bool If active root category was changed. */
     protected $_blRootCatChanged = false;
 
     /** @var array User address. */
-    protected $_aInvoiceAddress = null;
+    protected $_aInvoiceAddress;
 
     /** @var array User delivery address. */
-    protected $_aDeliveryAddress = null;
+    protected $_aDeliveryAddress;
 
     /** @var string Logged in user name. */
-    protected $_sActiveUsername = null;
+    protected $_sActiveUsername;
 
     /** @var boolean is VAT included in prices */
-    protected $_blIsVatIncluded = null;
+    protected $_blIsVatIncluded;
 
     /** @var array Components which needs to be initialized/rendered (depending on cache and its cache status). */
-    protected static $_aCollectedComponentNames = null;
+    protected static $_aCollectedComponentNames;
 
     /** @var array If active load components. By default active. */
     protected $_blLoadComponents = true;
 
     /** @var array Sorting columns list. */
-    protected $_aSortColumns = null;
+    protected $_aSortColumns;
 
     /** @var StdClass Page navigation. */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /** @var integer Number of possible pages. */
-    protected $_iCntPages = null;
+    protected $_iCntPages;
 
     /** @var string Form id. */
-    protected $_sFormId = null;
+    protected $_sFormId;
 
     /** @var bool Whether session form id matches with request form id. */
-    protected $_blCanAcceptFormData = null;
+    protected $_blCanAcceptFormData;
 
     /**
      * Return true, if the review manager should be shown.
@@ -430,15 +433,14 @@ class FrontendController extends BaseController
     public function getReviewAndRatingItemsCount()
     {
         $user = $this->getUser();
-        $count = 0;
         if ($user) {
-            $count = ContainerFacade::get(UserReviewAndRatingBridgeInterface::class)
+            return ContainerFacade::get(UserReviewAndRatingBridgeInterface::class)
                 ->getReviewAndRatingListCount(
                     $user->getId()
                 );
         }
 
-        return $count;
+        return 0;
     }
 
     /**
@@ -489,12 +491,12 @@ class FrontendController extends BaseController
                 if (ContainerFacade::getParameter('oxid_esales.log_not_seo_urls')) {
                     $shopId = Registry::getConfig()->getShopId();
                     $languageId = Registry::getLang()->getBaseLanguage();
-                    $id = md5(strtolower($requestUrl) . $shopId . $languageId);
+                    $id = md5(strtolower((string) $requestUrl) . $shopId . $languageId);
 
                     // logging "not found" url
                     $database = DatabaseProvider::getDb();
                     $database->execute(
-                        "replace oxseologs ( oxstdurl, oxident, oxshopid, oxlang ) values ( ?, ?, ?, ? ) ",
+                        'replace oxseologs ( oxstdurl, oxident, oxshopid, oxlang ) values ( ?, ?, ?, ? ) ',
                         [$requestUrl, $id, $shopId, $languageId]
                     );
                 }
@@ -506,7 +508,7 @@ class FrontendController extends BaseController
      * Calls self::_processRequest(), initializes components which needs to
      * be loaded, sets current list type, calls parent::init()
      */
-    public function init()
+    public function init(): void
     {
         $this->processRequest();
 
@@ -558,11 +560,7 @@ class FrontendController extends BaseController
      */
     public function getViewId()
     {
-        if (isset($this->_sViewId)) {
-            return $this->_sViewId;
-        }
-
-        return $this->_sViewId = $this->generateViewId();
+        return $this->_sViewId ?? $this->_sViewId = $this->generateViewId();
     }
 
     /**
@@ -575,11 +573,11 @@ class FrontendController extends BaseController
         $config = Registry::getConfig();
         $viewId = $this->generateViewIdBase();
 
-        $viewId .= "|" . ((int) $this->_blForceNoIndex) . '|' . ((int) $this->isRootCatChanged());
+        $viewId .= '|' . ((int) $this->_blForceNoIndex) . '|' . ((int) $this->isRootCatChanged());
 
         // #0004798: SSL should be included in viewId
         if ($config->isSsl()) {
-            $viewId .= "|ssl";
+            $viewId .= '|ssl';
         }
 
         // #0002866: external global viewID addition
@@ -622,7 +620,7 @@ class FrontendController extends BaseController
      *
      * @param array $components array of components objects
      */
-    public function setComponents($components = null)
+    public function setComponents($components = null): void
     {
         $this->_oaComponents = $components;
     }
@@ -656,7 +654,7 @@ class FrontendController extends BaseController
      *
      * @param bool $isOrderStep flag if current view is an order view
      */
-    public function setIsOrderStep($isOrderStep = null)
+    public function setIsOrderStep($isOrderStep = null): void
     {
         $this->_blIsOrderStep = $isOrderStep;
     }
@@ -671,13 +669,12 @@ class FrontendController extends BaseController
         return $this->_blIsOrderStep;
     }
 
-
     /**
      * Active category setter
      *
      * @param \OxidEsales\Eshop\Application\Model\Category $category active category
      */
-    public function setActiveCategory($category)
+    public function setActiveCategory($category): void
     {
         $this->_oActCategory = $category;
     }
@@ -759,7 +756,7 @@ class FrontendController extends BaseController
      *
      * @param string $type type of list
      */
-    public function setListType($type)
+    public function setListType($type): void
     {
         $this->_sListType = $type;
         Registry::getConfig()->setGlobalParameter('listtype', $type);
@@ -835,7 +832,7 @@ class FrontendController extends BaseController
     {
         if ($this->_iTopCatNavItmCnt == null) {
             $topCategoryNavigationItemsCount = Registry::getConfig()->getConfigParam('iTopNaviCatCount');
-            $this->_iTopCatNavItmCnt = $topCategoryNavigationItemsCount ? $topCategoryNavigationItemsCount : 5;
+            $this->_iTopCatNavItmCnt = $topCategoryNavigationItemsCount ?: 5;
         }
 
         return $this->_iTopCatNavItmCnt;
@@ -861,7 +858,6 @@ class FrontendController extends BaseController
         return 'listorder';
     }
 
-
     /**
      * Returns page sort ident. It is used as ident in session variable aSorting[ident]
      *
@@ -874,8 +870,6 @@ class FrontendController extends BaseController
 
     /**
      * Returns default category sorting for selected category
-     *
-     * @return null
      */
     public function getDefaultSorting()
     {
@@ -918,7 +912,7 @@ class FrontendController extends BaseController
      *
      * @param string $column - column name
      */
-    public function setListOrderBy($column)
+    public function setListOrderBy($column): void
     {
         $this->_sListOrderBy = $column;
     }
@@ -928,7 +922,7 @@ class FrontendController extends BaseController
      *
      * @param string $direction - direction desc / asc
      */
-    public function setListOrderDirection($direction)
+    public function setListOrderDirection($direction): void
     {
         $this->_sListOrderDir = $direction;
     }
@@ -963,8 +957,6 @@ class FrontendController extends BaseController
      * Sets the view parameter "meta_description"
      *
      * @param string $description prepared string for description
-     *
-     * @return null
      */
     public function setMetaDescription($description)
     {
@@ -975,8 +967,6 @@ class FrontendController extends BaseController
      * Sets the view parameter 'meta_keywords'
      *
      * @param string $keywords prepared string for meta keywords
-     *
-     * @return null
      */
     public function setMetaKeywords($keywords)
     {
@@ -1085,7 +1075,7 @@ class FrontendController extends BaseController
      *
      * @param object $currency Currency object
      */
-    public function setActCurrency($currency)
+    public function setActCurrency($currency): void
     {
         $this->_oActCurrency = $currency;
     }
@@ -1154,7 +1144,7 @@ class FrontendController extends BaseController
      *
      * @param array $menu menu list
      */
-    public function setMenueList($menu)
+    public function setMenueList($menu): void
     {
         $this->_aMenueList = $menu;
     }
@@ -1169,18 +1159,13 @@ class FrontendController extends BaseController
         //setting default values to avoid possible errors showing article list
         $numberOfCategoryArticles = $config->getConfigParam('iNrofCatArticles');
 
-        $numberOfCategoryArticles = ($numberOfCategoryArticles) ? $numberOfCategoryArticles : 10;
+        $numberOfCategoryArticles = $numberOfCategoryArticles ?: 10;
 
         // checking if all needed data is set
-        switch ($this->getListDisplayType()) {
-            case 'grid':
-                $numbersOfCategoryArticles = $config->getConfigParam('aNrofCatArticlesInGrid');
-                break;
-            case 'line':
-            case 'infogrid':
-            default:
-                $numbersOfCategoryArticles = $config->getConfigParam('aNrofCatArticles');
-        }
+        $numbersOfCategoryArticles = match ($this->getListDisplayType()) {
+            'grid' => $config->getConfigParam('aNrofCatArticlesInGrid'),
+            default => $config->getConfigParam('aNrofCatArticles'),
+        };
 
         if (!is_array($numbersOfCategoryArticles) || !isset($numbersOfCategoryArticles[0])) {
             $numbersOfCategoryArticles = [$numberOfCategoryArticles];
@@ -1264,7 +1249,7 @@ class FrontendController extends BaseController
             $meta = Registry::getUtilsString()->minimizeTruncateString($meta, $length);
             $meta = $stringModifier->htmlspecialchars($meta);
 
-            return trim($meta);
+            return trim((string) $meta);
         }
     }
 
@@ -1299,11 +1284,11 @@ class FrontendController extends BaseController
     {
         $stringModifier = Str::getStr();
         if (is_array($input)) {
-            $input = implode(" ", $input);
+            $input = implode(' ', $input);
         }
 
         // removing some usually met characters..
-        $input = $stringModifier->preg_replace("/[" . preg_quote($this->_sRemoveMetaChars, "/") . "]/", " ", $input);
+        $input = $stringModifier->preg_replace('/[' . preg_quote($this->_sRemoveMetaChars, '/') . ']/', ' ', $input);
 
         // splitting by word
         $strings = $stringModifier->preg_split("/[\s,]+/", $input);
@@ -1335,7 +1320,7 @@ class FrontendController extends BaseController
      */
     public function getNavigationParams()
     {
-        $config = Registry::getConfig();
+        Registry::getConfig();
         $params[self::CATEGORY_ID] = $this->getCategoryId();
         $params[self::MANUFACTURER_ID] = Registry::getRequest()->getRequestEscapedParameter(self::MANUFACTURER_ID);
 
@@ -1357,9 +1342,7 @@ class FrontendController extends BaseController
         $params[self::SEARCH_MANUFACTURER] = Registry::getRequest()
             ->getRequestEscapedParameter(self::SEARCH_MANUFACTURER);
 
-        $params = array_merge($params, $this->getViewConfig()->getAdditionalNavigationParameters());
-
-        return $params;
+        return array_merge($params, $this->getViewConfig()->getAdditionalNavigationParameters());
     }
 
     /**
@@ -1369,11 +1352,11 @@ class FrontendController extends BaseController
      * @param string $sortBy    sort field
      * @param string $sortDir   sort direction (optional)
      */
-    public function setItemSorting($sortIdent, $sortBy, $sortDir = null)
+    public function setItemSorting($sortIdent, $sortBy, $sortDir = null): void
     {
         $sorting = Registry::getSession()->getVariable('aSorting');
         $sorting[$sortIdent]['sortby'] = $sortBy;
-        $sorting[$sortIdent]['sortdir'] = $sortDir ? $sortDir : null;
+        $sorting[$sortIdent]['sortdir'] = $sortDir ?: null;
 
         Registry::getSession()->setVariable('aSorting', $sorting);
     }
@@ -1414,7 +1397,7 @@ class FrontendController extends BaseController
     {
         $sorting = $this->getSorting($ident);
         if (is_array($sorting)) {
-            $sortDir = isset($sorting['sortdir']) ? $sorting['sortdir'] : '';
+            $sortDir = $sorting['sortdir'] ?? '';
             if ($this->isAllowedSortingOrder($sortDir)) {
                 $sortBy = DatabaseProvider::getDb()->quoteIdentifier($sorting['sortby']);
                 return trim($sortBy . ' ' . $sortDir);
@@ -1449,7 +1432,6 @@ class FrontendController extends BaseController
         return Registry::getConfig()->getActiveShop()->oxshops__oxtitleprefix->value;
     }
 
-
     /**
      * Returns full page title
      *
@@ -1468,7 +1450,6 @@ class FrontendController extends BaseController
 
         return $this->replaceDoubleQuotesWithHTMLCharacters($title);
     }
-
 
     /**
      * returns object, associated with current view.
@@ -1541,7 +1522,6 @@ class FrontendController extends BaseController
 
         return $url;
     }
-
 
     /**
      * Get link of current view. In url its include also page number if it is list page
@@ -1664,9 +1644,8 @@ class FrontendController extends BaseController
         $url .= $this->appendBasenameValue(self::PAGE);
         $url .= $this->appendBasenameValue(self::TEMPLATE);
         $url .= $this->appendValue(self::LOAD_ID);
-        $url .= $this->appendValue(self::PAGE_NUMBER);
 
-        return $url;
+        return $url . $this->appendValue(self::PAGE_NUMBER);
     }
 
     /**
@@ -1693,13 +1672,12 @@ class FrontendController extends BaseController
         return $this->_aSortColumns;
     }
 
-
     /**
      * Set sorting columns
      *
      * @param array $sortColumns array of column names array('name1', 'name2',...)
      */
-    public function setSortColumns($sortColumns)
+    public function setSortColumns($sortColumns): void
     {
         $this->_aSortColumns = $sortColumns;
     }
@@ -1783,7 +1761,7 @@ class FrontendController extends BaseController
     public function getTitle()
     {
         $language = Registry::getLang();
-        $translationName = 'PAGE_TITLE_' . strtoupper(Registry::getConfig()->getActiveView()->getClassKey());
+        $translationName = 'PAGE_TITLE_' . strtoupper((string) Registry::getConfig()->getActiveView()->getClassKey());
         $translated = $language->translateString($translationName, Registry::getLang()->getBaseLanguage(), false);
 
         return $translationName == $translated ? null : $translated;
@@ -1885,13 +1863,13 @@ class FrontendController extends BaseController
             if ((strpos($url, 'pgNr='))) {
                 $url = preg_replace('/pgNr=[0-9]*/', 'pgNr=' . $page, $url);
             } else {
-                $url .= ((strpos($url, '?') === false) ? '?' : '&amp;') . 'pgNr=' . $page;
+                $url .= ((!str_contains($url, '?')) ? '?' : '&amp;') . 'pgNr=' . $page;
             }
         } else {
             $url = preg_replace('/pgNr=[0-9]*/', '', $url);
-            $url = preg_replace('/\&amp\;\&amp\;/', '&amp;', $url);
-            $url = preg_replace('/\?\&amp\;/', '?', $url);
-            $url = preg_replace('/\&amp\;$/', '', $url);
+            $url = preg_replace('/\&amp\;\&amp\;/', '&amp;', (string) $url);
+            $url = preg_replace('/\?\&amp\;/', '?', (string) $url);
+            $url = preg_replace('/\&amp\;$/', '', (string) $url);
         }
 
         return $url;
@@ -1957,11 +1935,11 @@ class FrontendController extends BaseController
             if ($pageNavigation->actPage <= $tmpVal) {
                 $startNo = 2;
                 $finishNo = $tmpVal + 1;
-            // actual page is at the end
+                // actual page is at the end
             } elseif ($pageNavigation->actPage >= $pageNavigation->NrOfPages - $tmpVal + 1) {
                 $startNo = $pageNavigation->NrOfPages - $tmpVal;
                 $finishNo = $pageNavigation->NrOfPages - 1;
-            // actual page is in the middle
+                // actual page is in the middle
             } else {
                 $startNo = $pageNavigation->actPage - $tmpVal2;
                 $finishNo = $pageNavigation->actPage + $tmpVal2;
@@ -2023,13 +2001,13 @@ class FrontendController extends BaseController
         $this->addListIdAndWidgetIdToViewData();
 
         $config = Registry::getConfig();
-        $this->_aViewData["defaultLang"] = $config->getConfigParam('sDefaultLang');
-        $this->_aViewData["shopURLParam"] = ContainerFacade::getParameter('oxid_esales.shop_url');
+        $this->_aViewData['defaultLang'] = $config->getConfigParam('sDefaultLang');
+        $this->_aViewData['shopURLParam'] = ContainerFacade::getParameter('oxid_esales.shop_url');
 
         return $this->_sThisTemplate;
     }
 
-    private function addListIdAndWidgetIdToViewData()
+    private function addListIdAndWidgetIdToViewData(): void
     {
         $config = Registry::getConfig();
 
@@ -2051,8 +2029,8 @@ class FrontendController extends BaseController
             $widgetId = $config->getConfigParam('sEcondaWidgetIdBasket');
         }
 
-        $this->_aViewData["sListId"] = $listId;
-        $this->_aViewData["sWidgetId"] = $widgetId;
+        $this->_aViewData['sListId'] = $listId;
+        $this->_aViewData['sWidgetId'] = $widgetId;
     }
 
     /**
@@ -2070,7 +2048,7 @@ class FrontendController extends BaseController
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $product view product object
      */
-    public function setViewProduct($product)
+    public function setViewProduct($product): void
     {
         $this->_oProduct = $product;
     }
@@ -2154,7 +2132,7 @@ class FrontendController extends BaseController
      *
      * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor active vendor
      */
-    public function setActVendor($vendor)
+    public function setActVendor($vendor): void
     {
         $this->_oActVendor = $vendor;
     }
@@ -2164,7 +2142,7 @@ class FrontendController extends BaseController
      *
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $manufacturer active Manufacturer
      */
-    public function setActManufacturer($manufacturer)
+    public function setActManufacturer($manufacturer): void
     {
         $this->_oActManufacturer = $manufacturer;
     }
@@ -2200,7 +2178,7 @@ class FrontendController extends BaseController
      *
      * @param \OxidEsales\Eshop\Application\Model\CategoryList $categoryTree category tree
      */
-    public function setCategoryTree($categoryTree)
+    public function setCategoryTree($categoryTree): void
     {
         $this->_oCategoryTree = $categoryTree;
     }
@@ -2220,7 +2198,7 @@ class FrontendController extends BaseController
      *
      * @param \OxidEsales\Eshop\Application\Model\ManufacturerList $manufacturerTree Manufacturer tree
      */
-    public function setManufacturerTree($manufacturerTree)
+    public function setManufacturerTree($manufacturerTree): void
     {
         $this->_oManufacturerTree = $manufacturerTree;
     }
@@ -2367,7 +2345,7 @@ class FrontendController extends BaseController
      *
      * @param array $list manufacturer list
      */
-    public function setManufacturerList($list)
+    public function setManufacturerList($list): void
     {
         $this->_aManufacturerlist = $list;
     }
@@ -2377,7 +2355,7 @@ class FrontendController extends BaseController
      *
      * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor vendor object
      */
-    public function setRootVendor($vendor)
+    public function setRootVendor($vendor): void
     {
         $this->_oRootVendor = $vendor;
     }
@@ -2397,7 +2375,7 @@ class FrontendController extends BaseController
      *
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $manufacturer manufacturer object
      */
-    public function setRootManufacturer($manufacturer)
+    public function setRootManufacturer($manufacturer): void
     {
         $this->_oRootManufacturer = $manufacturer;
     }
@@ -2552,8 +2530,8 @@ class FrontendController extends BaseController
         if ($this->_blCanAcceptFormData === null) {
             $this->_blCanAcceptFormData = false;
 
-            $formId = Registry::getRequest()->getRequestEscapedParameter("uformid");
-            $sessionFormId = Registry::getSession()->getVariable("sessionuformid");
+            $formId = Registry::getRequest()->getRequestEscapedParameter('uformid');
+            $sessionFormId = Registry::getSession()->getVariable('sessionuformid');
 
             // testing if form and session ids matches
             if ($formId && $formId === $sessionFormId) {
@@ -2663,8 +2641,6 @@ class FrontendController extends BaseController
 
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
-     *
-     * @return null
      */
     public function getBreadCrumb()
     {
@@ -2676,7 +2652,7 @@ class FrontendController extends BaseController
      *
      * @param bool $rootCategoryChanged root category changed
      */
-    public function setRootCatChanged($rootCategoryChanged)
+    public function setRootCatChanged($rootCategoryChanged): void
     {
         $this->_blRootCatChanged = $rootCategoryChanged;
     }
@@ -2731,7 +2707,7 @@ class FrontendController extends BaseController
      *
      * @param array $deliveryAddress delivery address
      */
-    public function setDeliveryAddress($deliveryAddress)
+    public function setDeliveryAddress($deliveryAddress): void
     {
         $this->_aDeliveryAddress = $deliveryAddress;
     }
@@ -2741,7 +2717,7 @@ class FrontendController extends BaseController
      *
      * @param array $address user address
      */
-    public function setInvoiceAddress($address)
+    public function setInvoiceAddress($address): void
     {
         $this->_aInvoiceAddress = $address;
     }
@@ -2811,7 +2787,7 @@ class FrontendController extends BaseController
      */
     public function getNewBasketItemMsgType()
     {
-        return (int) Registry::getConfig()->getConfigParam("iNewBasketItemMessage");
+        return (int) Registry::getConfig()->getConfigParam('iNewBasketItemMessage');
     }
 
     /**
@@ -2823,7 +2799,7 @@ class FrontendController extends BaseController
      */
     public function isActive($name)
     {
-        return Registry::getConfig()->getConfigParam("bl" . $name . "Enabled");
+        return Registry::getConfig()->getConfigParam('bl' . $name . 'Enabled');
     }
 
     /**
@@ -2833,7 +2809,7 @@ class FrontendController extends BaseController
      */
     public function isEnabledDownloadableFiles()
     {
-        return (bool) Registry::getConfig()->getConfigParam("blEnableDownloads");
+        return (bool) Registry::getConfig()->getConfigParam('blEnableDownloads');
     }
 
     /**
@@ -2918,7 +2894,7 @@ class FrontendController extends BaseController
     {
         if ($this->getUser()) {
             $wishId = Registry::getRequest()->getRequestEscapedParameter('wishid');
-            $userId = ($wishId) ? $wishId : Registry::getSession()->getVariable('wishid');
+            $userId = $wishId ?: Registry::getSession()->getVariable('wishid');
             if ($userId) {
                 $wishUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
                 if ($wishUser->load($userId)) {
@@ -2957,16 +2933,12 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    private function isAllowedSortingOrder($sortOrder)
+    private function isAllowedSortingOrder($sortOrder): bool
     {
         $allowedSortOrders = array_merge((new SortingValidator())->getSortingOrders(), ['']);
         return in_array(strtolower($sortOrder), $allowedSortOrders);
     }
 
-    /**
-     * @param string $title
-     * @return string
-     */
     private function replaceDoubleQuotesWithHTMLCharacters(string $title): string
     {
         return str_replace('"', '&quot;', $title);
@@ -2983,14 +2955,14 @@ class FrontendController extends BaseController
     {
         $value = Registry::getRequest()->getRequestEscapedParameter($param);
 
-        return $value ? "&amp;$param=" . basename($value) : '';
+        return $value ? "&amp;$param=" . basename((string) $value) : '';
     }
 
     private function appendUnescapedEncodedValue(string $param): string
     {
         $value = Registry::getRequest()->getRequestParameter($param);
 
-        return $value ? "&amp;$param=" . rawurlencode($value) : '';
+        return $value ? "&amp;$param=" . rawurlencode((string) $value) : '';
     }
 
     private function appendUnescapedValue(string $param): string

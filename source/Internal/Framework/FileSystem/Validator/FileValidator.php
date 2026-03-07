@@ -13,7 +13,7 @@ use Symfony\Component\Mime\MimeTypesInterface;
 
 class FileValidator implements FileValidatorInterface
 {
-    public function __construct(private MimeTypesInterface $mimeTypesService)
+    public function __construct(private readonly MimeTypesInterface $mimeTypesService)
     {
     }
 
@@ -26,8 +26,8 @@ class FileValidator implements FileValidatorInterface
             ) {
                 return false;
             }
-        } catch (\Exception $e) {
-            throw new ImageValidationException("Unable to get MimeType of file");
+        } catch (\Exception) {
+            throw new ImageValidationException('Unable to get MimeType of file');
         }
 
         return true;

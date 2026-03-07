@@ -19,16 +19,13 @@ class ContainerAwareProjectYamlDao extends ProjectYamlDao
 {
     public function __construct(
         BasicContextInterface $context,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly EventDispatcherInterface $eventDispatcher,
         Filesystem $filesystem
     ) {
         parent::__construct($context, $filesystem);
     }
 
-    /**
-     * @param DIConfigWrapper $config
-     */
-    public function saveProjectConfigFile(DIConfigWrapper $config)
+    public function saveProjectConfigFile(DIConfigWrapper $config): void
     {
         parent::saveProjectConfigFile($config);
         $this->eventDispatcher->dispatch(

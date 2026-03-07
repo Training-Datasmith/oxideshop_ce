@@ -100,7 +100,7 @@ final class OrderControllerTest extends IntegrationTestCase
             ->willReturnMap(
                 [
                     ['login-token', null],
-                    ['usr', $this->userId]
+                    ['usr', $this->userId],
                 ]
             );
         Registry::set(Session::class, $session);

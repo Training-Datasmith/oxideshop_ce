@@ -13,22 +13,16 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Controller;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Event;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataValueTypeException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataSchemaValidatorInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 
 class MetaDataMapper implements MetaDataToModuleConfigurationDataMapperInterface
 {
-    public function __construct(private MetaDataSchemaValidatorInterface $validator)
+    public function __construct(private readonly MetaDataSchemaValidatorInterface $validator)
     {
     }
 
-    /**
-     * @param array $metaData
-     *
-     * @return ModuleConfiguration
-     */
     public function fromData(array $metaData): ModuleConfiguration
     {
         $this->validateParameterFormat($metaData);
@@ -59,11 +53,6 @@ class MetaDataMapper implements MetaDataToModuleConfigurationDataMapperInterface
         return $this->mapModuleConfigurationSettings($moduleConfiguration, $metaData);
     }
 
-    /**
-     * @param ModuleConfiguration $moduleConfiguration
-     * @param array $metaData
-     * @return ModuleConfiguration
-     */
     private function mapModuleConfigurationSettings(
         ModuleConfiguration $moduleConfiguration,
         array $metaData
@@ -97,10 +86,7 @@ class MetaDataMapper implements MetaDataToModuleConfigurationDataMapperInterface
         return $this->mapSettings($moduleConfiguration, $moduleData);
     }
 
-    /**
-     * @param array $data
-     */
-    private function validateParameterFormat(array $data)
+    private function validateParameterFormat(array $data): void
     {
         $mandatoryKeys = [
             MetaDataProvider::METADATA_METADATA_VERSION,
@@ -116,11 +102,9 @@ class MetaDataMapper implements MetaDataToModuleConfigurationDataMapperInterface
     }
 
     /**
-     * @param ModuleConfiguration $moduleConfiguration
      * @param $moduleData
-     * @return ModuleConfiguration
      */
-    private function mapSettings(ModuleConfiguration $moduleConfiguration, $moduleData): ModuleConfiguration
+    private function mapSettings(ModuleConfiguration $moduleConfiguration, array $moduleData): ModuleConfiguration
     {
         if (isset($moduleData[MetaDataProvider::METADATA_SETTINGS])) {
             foreach ($moduleData[MetaDataProvider::METADATA_SETTINGS] as $data) {

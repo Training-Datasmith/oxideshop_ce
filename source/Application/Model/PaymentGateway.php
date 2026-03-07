@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,7 +27,7 @@ class PaymentGateway extends \OxidEsales\Eshop\Core\Base
      *
      * @var object
      */
-    protected $_oPaymentInfo = null;
+    protected $_oPaymentInfo;
 
     /**
      * Last error nr. For backward compatibility must be >3
@@ -41,14 +43,14 @@ class PaymentGateway extends \OxidEsales\Eshop\Core\Base
      * @abstract
      * @var string
      */
-    protected $_sLastError = null;
+    protected $_sLastError;
 
     /**
      * Sets payment parameters.
      *
      * @param object $oUserpayment User payment object
      */
-    public function setPaymentParams($oUserpayment)
+    public function setPaymentParams($oUserpayment): void
     {
         // store data
         $this->_oPaymentInfo = & $oUserpayment;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,8 +25,6 @@ class ApplicationServerExporter implements \OxidEsales\Eshop\Core\Service\Applic
 
     /**
      * ApplicationServerExporter constructor.
-     *
-     * @param \OxidEsales\Eshop\Core\Service\ApplicationServerServiceInterface $appServerService
      */
     public function __construct(\OxidEsales\Eshop\Core\Service\ApplicationServerServiceInterface $appServerService)
     {
@@ -33,10 +33,8 @@ class ApplicationServerExporter implements \OxidEsales\Eshop\Core\Service\Applic
 
     /**
      * Return an array of active application servers.
-     *
-     * @return array
      */
-    public function exportAppServerList()
+    public function exportAppServerList(): array
     {
         $activeServerCollection = [];
 
@@ -54,17 +52,14 @@ class ApplicationServerExporter implements \OxidEsales\Eshop\Core\Service\Applic
      * Converts ApplicationServer object into array for export.
      *
      * @param \OxidEsales\Eshop\Core\DataObject\ApplicationServer $server
-     *
-     * @return array
      */
-    private function convertToArray($server)
+    private function convertToArray($server): array
     {
-        $activeServer = [
+        return [
             'id' => $server->getId(),
             'ip' => $server->getIp(),
             'lastFrontendUsage' => $server->getLastFrontendUsage(),
-            'lastAdminUsage' => $server->getLastAdminUsage()
+            'lastAdminUsage' => $server->getLastAdminUsage(),
         ];
-        return $activeServer;
     }
 }

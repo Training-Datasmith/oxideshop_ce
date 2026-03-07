@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -42,7 +44,7 @@ class ConnectionException extends \OxidEsales\Eshop\Core\Exception\StandardExcep
      *
      * @param string $sAdress Externalserver address
      */
-    public function setAdress($sAdress)
+    public function setAdress($sAdress): void
     {
         $this->_sAddress = $sAdress;
     }
@@ -62,7 +64,7 @@ class ConnectionException extends \OxidEsales\Eshop\Core\Exception\StandardExcep
      *
      * @param string $sConnError connection error
      */
-    public function setConnectionError($sConnError)
+    public function setConnectionError($sConnError): void
     {
         $this->_sConnectionError = $sConnError;
     }
@@ -85,7 +87,7 @@ class ConnectionException extends \OxidEsales\Eshop\Core\Exception\StandardExcep
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Connection Adress --> " . $this->_sAddress . "\n" . "Connection Error --> " . $this->_sConnectionError;
+        return self::class . '-' . parent::getString() . ' Connection Adress --> ' . $this->_sAddress . "\n" . 'Connection Error --> ' . $this->_sConnectionError;
     }
 
     /**

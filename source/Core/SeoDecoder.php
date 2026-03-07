@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -29,8 +31,8 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
         $aRet = [];
         $sUrl = $oStr->html_entity_decode($sUrl);
 
-        if (($iPos = strpos($sUrl, '?')) !== false) {
-            parse_str($oStr->substr($sUrl, $iPos + 1), $aRet);
+        if (($iPos = strpos((string) $sUrl, '?')) !== false) {
+            parse_str((string) $oStr->substr($sUrl, $iPos + 1), $aRet);
         }
 
         return $aRet;
@@ -64,19 +66,19 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
         if ($stringObject->strpos($seoUrl, $baseUrl) === 0) {
             $seoUrl = $stringObject->substr($seoUrl, $stringObject->strlen($baseUrl));
         }
-        $seoUrl = rawurldecode($seoUrl);
+        $seoUrl = rawurldecode((string) $seoUrl);
 
         //extract page number from seo url
-        list($seoUrl, $pageNumber) = $this->extractPageNumberFromSeoUrl($seoUrl);
+        [$seoUrl, $pageNumber] = $this->extractPageNumberFromSeoUrl($seoUrl);
         $shopId = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
 
         $key = $this->getIdent($seoUrl);
         $urlParameters = false;
 
         $database = DatabaseProvider::getDb();
-        $resultSet = $database->select("select oxstdurl, oxlang from oxseo where oxident = :oxident and oxshopid = :oxshopid limit 1", [
+        $resultSet = $database->select('select oxstdurl, oxlang from oxseo where oxident = :oxident and oxshopid = :oxshopid limit 1', [
             'oxident' => $key,
-            'oxshopid' => $shopId
+            'oxshopid' => $shopId,
         ]);
         if (!$resultSet->EOF) {
             // primary seo language changed ?
@@ -102,31 +104,31 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
     protected function decodeOldUrl($seoUrl)
     {
         $stringObject = Str::getStr();
-        $database =DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $baseUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopURL();
         if ($stringObject->strpos($seoUrl, $baseUrl) === 0) {
             $seoUrl = $stringObject->substr($seoUrl, $stringObject->strlen($baseUrl));
         }
         $shopId = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
-        $seoUrl = rawurldecode($seoUrl);
+        $seoUrl = rawurldecode((string) $seoUrl);
 
         //extract page number from seo url
-        list($seoUrl, $pageNumber) = $this->extractPageNumberFromSeoUrl($seoUrl);
+        [$seoUrl, $pageNumber] = $this->extractPageNumberFromSeoUrl($seoUrl);
 
         $key = $this->getIdent($seoUrl, true);
 
         $url = false;
-        $resultSet = $database->select("select oxobjectid, oxlang from oxseohistory where oxident = :oxident and oxshopid = :oxshopid limit 1", [
+        $resultSet = $database->select('select oxobjectid, oxlang from oxseohistory where oxident = :oxident and oxshopid = :oxshopid limit 1', [
             'oxident' => $key,
-            'oxshopid' => $shopId
+            'oxshopid' => $shopId,
         ]);
         if (!$resultSet->EOF) {
             // updating hit info (oxtimestamp field will be updated automatically)
             $database->execute(
-                "update oxseohistory set oxhits = oxhits + 1 where oxident = :oxident and oxshopid = :oxshopid limit 1",
+                'update oxseohistory set oxhits = oxhits + 1 where oxident = :oxident and oxshopid = :oxshopid limit 1',
                 [
                     'oxident' => $key,
-                    'oxshopid' => $shopId
+                    'oxshopid' => $shopId,
                 ]
             );
 
@@ -137,7 +139,7 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
             $url = $this->addQueryString($url);
         }
         if ($url && !is_null($pageNumber)) {
-            $url = \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->appendUrl($url, ['pgNr' => $pageNumber]);
+            return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->appendUrl($url, ['pgNr' => $pageNumber]);
         }
 
         return $url;
@@ -152,11 +154,11 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
      */
     protected function addQueryString($sUrl)
     {
-        if (isset($_SERVER["QUERY_STRING"]) && $_SERVER["QUERY_STRING"]) {
-            $sUrl = rtrim($sUrl, "&?");
-            $sQ = ltrim($_SERVER["QUERY_STRING"], "&?");
+        if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']) {
+            $sUrl = rtrim($sUrl, '&?');
+            $sQ = ltrim((string) $_SERVER['QUERY_STRING'], '&?');
 
-            $sUrl .= (strpos($sUrl, '?') === false) ? "?" : "&";
+            $sUrl .= (!str_contains($sUrl, '?')) ? '?' : '&';
             $sUrl .= $sQ;
         }
 
@@ -176,19 +178,19 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
     protected function getSeoUrl($sObjectId, $iLang, $iShopId)
     {
         $oDb = DatabaseProvider::getDb();
-        $aInfo = $oDb->getRow("select oxseourl, oxtype from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid order by oxparams limit 1", [
+        $aInfo = $oDb->getRow('select oxseourl, oxtype from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid order by oxparams limit 1', [
             'oxobjectid' => $sObjectId,
             'oxlang' => $iLang,
             'oxshopid' => $iShopId,
         ]);
 
-        if (isset($aInfo['oxtype']) &&'oxarticle' == $aInfo['oxtype']) {
+        if (isset($aInfo['oxtype']) && 'oxarticle' == $aInfo['oxtype']) {
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sMainCatId = $oDb->getOne("select oxcatnid from " . $tableViewNameGenerator->getViewName("oxobject2category") . " where oxobjectid = :oxobjectid order by oxtime", [
-                'oxobjectid' => $sObjectId
+            $sMainCatId = $oDb->getOne('select oxcatnid from ' . $tableViewNameGenerator->getViewName('oxobject2category') . ' where oxobjectid = :oxobjectid order by oxtime', [
+                'oxobjectid' => $sObjectId,
             ]);
             if ($sMainCatId) {
-                $sUrl = $oDb->getOne("select oxseourl from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid  and oxparams = :oxparams order by oxexpired", [
+                $sUrl = $oDb->getOne('select oxseourl from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid  and oxparams = :oxparams order by oxexpired', [
                     'oxobjectid' => $sObjectId,
                     'oxlang' => $iLang,
                     'oxshopid' => $iShopId,
@@ -211,7 +213,7 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
      *
      * @access public
      */
-    public function processSeoCall($sRequest = null, $sPath = null)
+    public function processSeoCall($sRequest = null, $sPath = null): void
     {
         // first - collect needed parameters
         if (!$sRequest) {
@@ -223,7 +225,7 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
             }
         }
 
-        $sPath = $sPath ? $sPath : str_replace('oxseo.php', '', $_SERVER['SCRIPT_NAME']);
+        $sPath = $sPath ?: str_replace('oxseo.php', '', $_SERVER['SCRIPT_NAME']);
         if (($sParams = $this->getParams($sRequest, $sPath))) {
             // in case SEO url is actual
             if (is_array($aGet = $this->decodeUrl($sParams))) {
@@ -262,7 +264,7 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
             $iLanguage = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
 
             // article ?
-            if (strpos($sLastParam, '.htm') !== false) {
+            if (str_contains($sLastParam, '.htm')) {
                 $sUrl = $this->getObjectUrl($sLastParam, 'oxarticles', $iLanguage, 'oxarticle');
             } else {
                 // category ?
@@ -300,10 +302,10 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
             // if field exists - searching for object id
             if (
                 $sObjectId = $oDb->getOne("select oxid from {$sTable} where oxseoid = :oxseoid", [
-                'oxseoid' => $sSeoId
+                'oxseoid' => $sSeoId,
                 ])
             ) {
-                return $oDb->getOne("select oxseourl from oxseo where oxtype = :oxtype and oxobjectid = :oxobjectid and oxlang = :oxlang", [
+                return $oDb->getOne('select oxseourl from oxseo where oxtype = :oxtype and oxobjectid = :oxobjectid and oxlang = :oxlang', [
                     'oxtype' => $sType,
                     'oxobjectid' => $sObjectId,
                     'oxlang' => $iLanguage,
@@ -341,11 +343,9 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
      *     - seo url without page number
      *     - page number
      *
-     * @param string $seoUrl
      *
-     * @return array
      */
-    private function extractPageNumberFromSeoUrl($seoUrl)
+    private function extractPageNumberFromSeoUrl(string $seoUrl): array
     {
         $pageNumber = null;
         if (1 === preg_match('/(.*?)\/(\d+)\/(.*)/', $seoUrl, $matches)) {
@@ -358,14 +358,13 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
     /**
      * Converts seo url pagination number to actual page number.
      *
-     * @param int $seoPageNumber
      *
      * @return int
      */
-    private function convertSeoPageStringToActualPageNumber($seoPageNumber)
+    private function convertSeoPageStringToActualPageNumber(string $seoPageNumber)
     {
         if (!is_null($seoPageNumber)) {
-            $seoPageNumber = max(0, (int) $seoPageNumber - 1);
+            return max(0, (int) $seoPageNumber - 1);
         }
         return $seoPageNumber;
     }

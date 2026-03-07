@@ -18,16 +18,13 @@ use Symfony\Component\Yaml\Yaml;
 class YamlFileStorage implements ArrayStorageInterface
 {
     public function __construct(
-        private FileLocatorInterface $fileLocator,
-        private string $filePath,
-        private LockFactory $lockFactory,
-        private Filesystem $filesystemService
+        private readonly FileLocatorInterface $fileLocator,
+        private readonly string $filePath,
+        private readonly LockFactory $lockFactory,
+        private readonly Filesystem $filesystemService
     ) {
     }
 
-    /**
-     * @return array
-     */
     public function get(): array
     {
         $fileContent = file_get_contents($this->getLocatedFilePath());
@@ -39,9 +36,6 @@ class YamlFileStorage implements ArrayStorageInterface
         return $yaml ?? [];
     }
 
-    /**
-     * @param array $data
-     */
     public function save(array $data): void
     {
         $lock = $this->lockFactory->createLock($this->getLockId());
@@ -58,9 +52,6 @@ class YamlFileStorage implements ArrayStorageInterface
         }
     }
 
-    /**
-     * @return string
-     */
     private function getLocatedFilePath(): string
     {
         try {
@@ -92,9 +83,6 @@ class YamlFileStorage implements ArrayStorageInterface
         $this->filesystemService->touch($this->filePath);
     }
 
-    /**
-     * @return string
-     */
     private function getLockId(): string
     {
         return md5($this->filePath);

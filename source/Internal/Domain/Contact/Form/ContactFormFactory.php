@@ -21,16 +21,16 @@ use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfigura
 class ContactFormFactory implements FormFactoryInterface
 {
     public function __construct(
-        private FormConfigurationInterface $contactFormConfiguration,
-        private FormValidatorInterface $contactFormEmailValidator,
-        private FormValidatorInterface $requiredFieldsValidator
+        private readonly FormConfigurationInterface $contactFormConfiguration,
+        private readonly FormValidatorInterface $contactFormEmailValidator,
+        private readonly FormValidatorInterface $requiredFieldsValidator
     ) {
     }
 
     /**
      * @return FormInterface
      */
-    public function getForm()
+    public function getForm(): \OxidEsales\EshopCommunity\Internal\Framework\Form\Form
     {
         $form = new Form();
 
@@ -46,10 +46,9 @@ class ContactFormFactory implements FormFactoryInterface
     }
 
     /**
-     * @param FieldConfigurationInterface $fieldConfiguration
      * @return FormFieldInterface
      */
-    private function getFormField(FieldConfigurationInterface $fieldConfiguration)
+    private function getFormField(FieldConfigurationInterface $fieldConfiguration): \OxidEsales\EshopCommunity\Internal\Framework\Form\FormField
     {
         $field = new FormField();
         $field

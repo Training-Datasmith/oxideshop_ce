@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -33,7 +35,7 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
 
         $soxId = $this->getEditObjectId();
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oCategory->load($soxId);
 
@@ -42,13 +44,13 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                 $this->_aViewData['readonly'] = true;
             }
         }
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oCategoryOrderAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryOrderAjax->getColumns();
 
-            return "popups/category_order";
+            return 'popups/category_order';
         }
 
-        return "category_order";
+        return 'category_order';
     }
 }

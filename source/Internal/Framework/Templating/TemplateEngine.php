@@ -14,10 +14,9 @@ class TemplateEngine implements TemplateEngineInterface
     private array $globals = [];
 
     /**
-     * @param string $name
      * @param mixed  $value
      */
-    public function addGlobal(string $name, $value)
+    public function addGlobal(string $name, $value): void
     {
         $this->globals[$name] = $value;
     }
@@ -46,8 +45,6 @@ class TemplateEngine implements TemplateEngineInterface
      * @param string $fragment   The template fragment to render
      * @param string $fragmentId The Id of the fragment
      * @param array  $context    An array of parameters to pass to the template
-     *
-     * @return string
      */
     public function renderFragment(string $fragment, string $fragmentId, array $context = []): string
     {

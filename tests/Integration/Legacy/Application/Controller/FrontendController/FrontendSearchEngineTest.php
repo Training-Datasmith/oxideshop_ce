@@ -41,10 +41,10 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
     public static function providerSeoLoggingScenarios(): array
     {
         return [
-            [0, false, false, "Url should not be processed"],
-            [1, false, false, "Url should not be processed"],
-            [0, true, true, "Url should be processed"],
-            [1, true, true, "Url should be processed"],
+            [0, false, false, 'Url should not be processed'],
+            [1, false, false, 'Url should not be processed'],
+            [0, true, true, 'Url should be processed'],
+            [1, true, true, 'Url should be processed'],
         ];
     }
 
@@ -97,7 +97,7 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
 
     private function setRequest(): void
     {
-        $_SERVER["REQUEST_METHOD"] = 'GET';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = 'index.php?param1=value1&param2=value2';
     }
 
@@ -115,13 +115,13 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
 
     private function unsetRequest(): void
     {
-        unset($_SERVER["REQUEST_METHOD"]);
+        unset($_SERVER['REQUEST_METHOD']);
         unset($_SERVER['REQUEST_URI']);
     }
 
     private function setUtilsSpy(): void
     {
-        $utils = new class extends Utils {
+        $utils = new class () extends Utils {
             public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302)
             {
                 $aArgs = func_get_args();
@@ -134,7 +134,7 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
 
     private function getFrontendSeoLoggingSpy(): FrontendController
     {
-        return new class extends FrontendController {
+        return new class () extends FrontendController {
             public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302)
             {
                 $aArgs = func_get_args();
@@ -155,7 +155,7 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
 
     private function getFrontendNoIndexSpy(): FrontendController
     {
-        return new class extends FrontendController {
+        return new class () extends FrontendController {
             public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302)
             {
                 $aArgs = func_get_args();

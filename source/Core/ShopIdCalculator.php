@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,14 +9,17 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use Doctrine\DBAL\DriverManager;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionParameterProvider;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
-
 use function array_fill_keys;
 use function array_filter;
 use function array_merge;
+
+use Doctrine\DBAL\DriverManager;
+
 use function is_array;
+
+use OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionParameterProvider;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
+
 use function unserialize;
 
 class ShopIdCalculator

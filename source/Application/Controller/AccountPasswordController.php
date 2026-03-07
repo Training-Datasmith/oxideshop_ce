@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -55,8 +57,6 @@ class AccountPasswordController extends \OxidEsales\Eshop\Application\Controller
 
     /**
      * changes current user password
-     *
-     * @return null
      */
     public function changePassword()
     {
@@ -76,21 +76,18 @@ class AccountPasswordController extends \OxidEsales\Eshop\Application\Controller
         /** @var \OxidEsales\Eshop\Core\InputValidator $oInputValidator */
         $oInputValidator = \OxidEsales\Eshop\Core\Registry::getInputValidator();
         if (($oExcp = $oInputValidator->checkPassword($oUser, $sNewPass, $sConfPass, true))) {
-            switch ($oExcp->getMessage()) {
-                case \OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_EMPTYPASS'):
-                case \OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_TOO_SHORT'):
-                    return \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(
-                        'ERROR_MESSAGE_PASSWORD_TOO_SHORT',
-                        false,
-                        true
-                    );
-                default:
-                    return \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(
-                        'ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH',
-                        false,
-                        true
-                    );
-            }
+            return match ($oExcp->getMessage()) {
+                \OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_EMPTYPASS'), \OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_TOO_SHORT') => \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(
+                    'ERROR_MESSAGE_PASSWORD_TOO_SHORT',
+                    false,
+                    true
+                ),
+                default => \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(
+                    'ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH',
+                    false,
+                    true
+                ),
+            };
         }
 
         if (!$sOldPass || !$oUser->isSamePassword($sOldPass)) {

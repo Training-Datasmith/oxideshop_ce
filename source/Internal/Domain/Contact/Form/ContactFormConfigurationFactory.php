@@ -20,15 +20,15 @@ use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 class ContactFormConfigurationFactory implements FormConfigurationFactoryInterface
 {
     public function __construct(
-        private FormFieldsConfigurationDataProviderInterface $contactFormConfigurationDataProvider,
-        private ContextInterface $context
+        private readonly FormFieldsConfigurationDataProviderInterface $contactFormConfigurationDataProvider,
+        private readonly ContextInterface $context
     ) {
     }
 
     /**
      * @return FormConfigurationInterface
      */
-    public function getFormConfiguration()
+    public function getFormConfiguration(): \OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfiguration
     {
         $formConfiguration = new FormConfiguration();
 
@@ -44,11 +44,7 @@ class ContactFormConfigurationFactory implements FormConfigurationFactoryInterfa
         return $formConfiguration;
     }
 
-    /**
-     * @param array $fieldConfigurationData
-     * @return FieldConfiguration
-     */
-    private function getFieldConfiguration($fieldConfigurationData)
+    private function getFieldConfiguration(array $fieldConfigurationData): \OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfiguration
     {
         $fieldConfiguration = new FieldConfiguration();
         $fieldConfiguration->setName($fieldConfigurationData['name']);
@@ -61,11 +57,7 @@ class ContactFormConfigurationFactory implements FormConfigurationFactoryInterfa
         return $fieldConfiguration;
     }
 
-    /**
-     * @param FieldConfigurationInterface $fieldConfiguration
-     * @return bool
-     */
-    private function isFieldRequired(FieldConfigurationInterface $fieldConfiguration)
+    private function isFieldRequired(FieldConfigurationInterface $fieldConfiguration): bool
     {
         return in_array(
             $fieldConfiguration->getName(),

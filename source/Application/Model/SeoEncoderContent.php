@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
-use oxDb;
 
 /**
  * Seo encoder base
@@ -93,17 +92,17 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @param string $sId content ids
      */
-    public function onDeleteContent($sId)
+    public function onDeleteContent($sId): void
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcontent'", [
-            'oxobjectid' => $sId
+            'oxobjectid' => $sId,
         ]);
-        $oDb->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $sId
+        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $sId,
         ]);
-        $oDb->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $sId
+        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $sId,
         ]);
     }
 
@@ -120,7 +119,7 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
         $sSeoUrl = null;
         $oCont = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
         if ($oCont->loadInLang($iLang, $sObjectId)) {
-            $sSeoUrl = $this->getContentUri($oCont, $iLang, true);
+            return $this->getContentUri($oCont, $iLang, true);
         }
 
         return $sSeoUrl;

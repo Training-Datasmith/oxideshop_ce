@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -11,9 +13,9 @@ use OxidEsales\Eshop\Application\Model\Review;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserRatingBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 
 /**
  * Class AccountReviewController
@@ -29,7 +31,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Redirect to My Account, if validation does not pass.
      */
-    public function init()
+    public function init(): void
     {
         if (!$this->isUserAllowedToManageOwnReviews() || !$this->getUser()) {
             $this->redirectToAccountDashboard();
@@ -64,7 +66,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Delete review and rating, which belongs to the active user.
      */
-    public function deleteReviewAndRating()
+    public function deleteReviewAndRating(): void
     {
         $session = \OxidEsales\Eshop\Core\Registry::getSession();
 
@@ -72,7 +74,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
             try {
                 $this->deleteReview();
                 $this->deleteRating();
-            } catch (EntryDoesNotExistDaoException $exception) {
+            } catch (EntryDoesNotExistDaoException) {
                 //if user reloads the page after deletion
             }
         }
@@ -131,7 +133,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
         $currentPage = parent::getActPage();
 
         if ($currentPage >= $lastPage) {
-            $currentPage = $lastPage - 1;
+            return $lastPage - 1;
         }
 
         return $currentPage;
@@ -140,7 +142,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Deletes Review.
      */
-    private function deleteReview()
+    private function deleteReview(): void
     {
         $userId = $this->getUser()->getId();
         $reviewId = $this->getReviewIdFromRequest();
@@ -154,7 +156,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Deletes Rating.
      */
-    private function deleteRating()
+    private function deleteRating(): void
     {
         $userId = $this->getUser()->getId();
         $ratingId = $this->getRatingIdFromRequest();
@@ -192,7 +194,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Redirect to My Account dashboard
      */
-    private function redirectToAccountDashboard()
+    private function redirectToAccountDashboard(): void
     {
         Registry::getUtils()->redirect(
             $this->getMyAccountPageUrl(),
@@ -203,10 +205,8 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
 
     /**
      * Returns pages count.
-     *
-     * @return int
      */
-    private function getPagesCount()
+    private function getPagesCount(): float
     {
         return ceil($this->getReviewAndRatingItemsCount() / $this->getItemsPerPage());
     }
@@ -226,11 +226,10 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Returns translated string.
      *
-     * @param string $string
      *
      * @return string
      */
-    private function getTranslatedString($string)
+    private function getTranslatedString(string $string)
     {
         $languageId = Registry::getLang()->getBaseLanguage();
 
@@ -247,14 +246,12 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
      * @param array $reviewAndRatingList
      * @param int   $itemsCount
      * @param int   $offset
-     *
-     * @return array
      */
     private function getPaginatedReviewAndRatingList(
         $reviewAndRatingList,
         $itemsCount,
-        $offset
-    ) {
+        int|float $offset
+    ): array {
         return array_slice(
             $reviewAndRatingList,
             $offset,

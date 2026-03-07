@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,7 +26,7 @@
 */
 
 // including generator class
-require_once __DIR__ . "/bootstrap.php";
+require_once __DIR__ . '/bootstrap.php';
 
 // rendering requested image
 OxidEsales\EshopCommunity\Core\DynamicImageGenerator::getInstance()->outputImage();

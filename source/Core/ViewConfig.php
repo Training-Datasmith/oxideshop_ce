@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,7 +14,6 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModuleAssetsPathResolverBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 
 /**
  * View config data access class. Keeps most
@@ -26,14 +27,14 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
      *
      * @var \OxidEsales\Eshop\Application\Model\Shop
      */
-    protected $_oShop = null;
+    protected $_oShop;
 
     /**
      * View data array, may only be accedded when it is assigned tohether with shop object
      *
      * @var array
      */
-    protected $_aViewData = null;
+    protected $_aViewData;
 
     /**
      * View config parameters cache array
@@ -47,26 +48,24 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected $_sHelpPageLink = null;
+    protected $_sHelpPageLink;
 
     /**
      * @var \OxidEsales\Eshop\Application\Model\CountryList
      */
-    protected $_oCountryList = null;
+    protected $_oCountryList;
 
     /**
      * Active theme name
-     *
-     * @var null
      */
-    protected $_sActiveTheme = null;
+    protected $_sActiveTheme;
 
     /**
      * Shop logo
      *
      * @var string
      */
-    protected $_sShopLogo = null;
+    protected $_sShopLogo;
 
     /**
      * Returns shops home link
@@ -126,7 +125,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
             $sTplName = Registry::getConfig()->getTopActiveView()->getViewConfig()->getViewConfigParam('oxloadid');
         }
 
-        return $sTplName ? basename($sTplName) : null;
+        return $sTplName ? basename((string) $sTplName) : null;
     }
 
     /**
@@ -180,10 +179,10 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
                . ($sRecommId ? "&amp;recommid={$sRecommId}" : '')
                // END deprecated
                . ($sListType ? "&amp;listtype={$sListType}" : '')
-               . "&amp;fnc=logout"
-               . ($sTplName ? "&amp;tpl=" . basename($sTplName) : '')
-               . ($sContentLoadId ? "&amp;oxloadid=" . $sContentLoadId : '')
-               . "&amp;redirect=1";
+               . '&amp;fnc=logout'
+               . ($sTplName ? '&amp;tpl=' . basename($sTplName) : '')
+               . ($sContentLoadId ? '&amp;oxloadid=' . $sContentLoadId : '')
+               . '&amp;redirect=1';
     }
 
     /**
@@ -211,7 +210,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     public function getHelpPageLink()
     {
         if ($this->_sHelpPageLink === null) {
-            $this->_sHelpPageLink = "";
+            $this->_sHelpPageLink = '';
             $aContentIdents = $this->getHelpContentIdents();
             $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
             foreach ($aContentIdents as $sIdent) {
@@ -305,7 +304,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
      * @param string $sName  name of parameter
      * @param mixed  $sValue parameter value
      */
-    public function setViewConfigParam($sName, $sValue)
+    public function setViewConfigParam($sName, $sValue): void
     {
         startProfile('\OxidEsales\Eshop\Core\ViewConfig::setViewConfigParam');
 
@@ -330,7 +329,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         } elseif ($this->_aViewData && isset($this->_aViewData[$sName])) {
             $sValue = $this->_aViewData[$sName];
         } else {
-            $sValue = (isset($this->_aConfigParams[$sName]) ? $this->_aConfigParams[$sName] : null);
+            $sValue = ($this->_aConfigParams[$sName] ?? null);
         }
 
         stopProfile('\OxidEsales\Eshop\Core\ViewConfig::getViewConfigParam');
@@ -345,7 +344,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
      * @param \OxidEsales\Eshop\Application\Model\Shop $oShop     shop object
      * @param array                                    $aViewData view data array
      */
-    public function setViewShop($oShop, $aViewData)
+    public function setViewShop($oShop, $aViewData): void
     {
         $this->_oShop = $oShop;
         $this->_aViewData = $aViewData;
@@ -729,7 +728,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     public function getPopupIdent()
     {
         if (($sValue = $this->getViewConfigParam('popupident')) === null) {
-            $sValue = md5(Registry::getConfig()->getShopUrl());
+            $sValue = md5((string) Registry::getConfig()->getShopUrl());
             $this->setViewConfigParam('popupident', $sValue);
         }
 
@@ -800,12 +799,10 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         }
 
         if ('grid' === $sListType) {
-            $aNrOfCatArticles = Registry::getConfig()->getConfigParam('aNrofCatArticlesInGrid');
-        } else {
-            $aNrOfCatArticles = Registry::getConfig()->getConfigParam('aNrofCatArticles');
+            return Registry::getConfig()->getConfigParam('aNrofCatArticlesInGrid');
         }
 
-        return $aNrOfCatArticles;
+        return Registry::getConfig()->getConfigParam('aNrofCatArticles');
     }
 
     /**
@@ -826,16 +823,15 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     public function getShowCompareList()
     {
         $myConfig = Registry::getConfig();
-        $blShowCompareList = true;
 
         if (
             !$myConfig->getConfigParam('bl_showCompareList') ||
             ($myConfig->getConfigParam('blDisableNavBars') && $myConfig->getActiveView()->getIsOrderStep())
         ) {
-            $blShowCompareList = false;
+            return false;
         }
 
-        return $blShowCompareList;
+        return true;
     }
 
     /**
@@ -1030,7 +1026,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     {
         $oShop = Registry::getConfig()->getActiveShop();
 
-        return isset($oShop->oxshops__oxismultishop) ? ((bool) $oShop->oxshops__oxismultishop->value) : false;
+        return isset($oShop->oxshops__oxismultishop) && (bool) $oShop->oxshops__oxismultishop->value;
     }
 
     /**
@@ -1119,14 +1115,10 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         return $this->_oCountryList;
     }
 
-
     /**
      * Return path to the requested module file
      *
-     * @param string $moduleId
-     * @param string $filePath
      *
-     * @return string
      * @throws FileException
      *
      */
@@ -1158,13 +1150,11 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     {
         $config = Registry::getConfig();
 
-        $moduleUrl = str_replace(
-            rtrim(ContainerFacade::getParameter('oxid_esales.shop_source_directory'), '/'),
-            rtrim($config->getCurrentShopUrl(false), '/'),
+        return str_replace(
+            rtrim((string) ContainerFacade::getParameter('oxid_esales.shop_source_directory'), '/'),
+            rtrim((string) $config->getCurrentShopUrl(false), '/'),
             $this->getModulePath($sModule, $sFile)
         );
-
-        return $moduleUrl;
     }
 
     /**
@@ -1176,14 +1166,12 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
      */
     public function getViewThemeParam($sName)
     {
-        $sValue = false;
         if (Registry::getConfig()->isThemeOption($sName)) {
-            $sValue = Registry::getConfig()->getConfigParam($sName);
+            return Registry::getConfig()->getConfigParam($sName);
         }
 
-        return $sValue;
+        return false;
     }
-
 
     /**
      * Returns true if selection lists must be displayed in details page
@@ -1252,7 +1240,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         if ($this->_sShopLogo === null) {
             $sLogoImage = ContainerFacade::getParameter('oxid_esales.shop_logo');
             if (empty($sLogoImage)) {
-                $sLogoImage = 'logo_' . strtolower(Registry::getConfig()->getEdition()->value) . '.png';
+                $sLogoImage = 'logo_' . strtolower((string) Registry::getConfig()->getEdition()->value) . '.png';
             }
             $this->setShopLogo($sLogoImage);
         }
@@ -1265,7 +1253,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sLogo shop logo image file name
      */
-    public function setShopLogo($sLogo)
+    public function setShopLogo($sLogo): void
     {
         $this->_sShopLogo = $sLogo;
     }
@@ -1279,28 +1267,10 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     {
         if (Registry::getSession()->isSessionStarted()) {
             $session = Registry::getSession();
-            $sessionChallengeToken = $session->getSessionChallengeToken();
-        } else {
-            $sessionChallengeToken = "";
+            return $session->getSessionChallengeToken();
         }
 
-        return $sessionChallengeToken;
-    }
-
-    /**
-     * Checks whether module is enabled.
-     *
-     * @param string $moduleId Module id
-     *
-     * @return bool
-     */
-    private function isModuleEnabled($moduleId): bool
-    {
-        return ContainerFacade::get(ModuleActivationBridgeInterface::class)
-            ->isActive(
-                $moduleId,
-                Registry::getConfig()->getShopId()
-            );
+        return '';
     }
 
     /**
@@ -1362,8 +1332,6 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * @param string $filePath
-     * @param string $moduleId
      * @throws FileException
      */
     private function validateModuleFile(string $filePath, string $moduleId): void

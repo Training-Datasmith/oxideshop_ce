@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,31 +16,31 @@ namespace OxidEsales\EshopCommunity\Core;
 class Curl
 {
     /** Curl option for setting the timeout of whole execution process. */
-    const EXECUTION_TIMEOUT_OPTION = 'CURLOPT_TIMEOUT';
+    public const EXECUTION_TIMEOUT_OPTION = 'CURLOPT_TIMEOUT';
 
     /** Curl option for setting the timeout for connect. */
-    const CONNECT_TIMEOUT_OPTION = 'CURLOPT_CONNECTTIMEOUT';
+    public const CONNECT_TIMEOUT_OPTION = 'CURLOPT_CONNECTTIMEOUT';
 
     /**
      * Curl instance.
      *
      * @var resource
      */
-    protected $_rCurl = null;
+    protected $_rCurl;
 
     /**
      * URL to call
      *
      * @var string|null
      */
-    protected $_sUrl = null;
+    protected $_sUrl;
 
     /**
      * Query like "param1=value1&param2=values2.."
      *
      * @return string
      */
-    protected $_sQuery = null;
+    protected $_sQuery;
 
     /**
      * Set CURL method
@@ -52,28 +54,28 @@ class Curl
      *
      * @var array|null
      */
-    protected $_aParameters = null;
+    protected $_aParameters;
 
     /**
      * Connection Charset.
      *
      * @var string
      */
-    protected $_sConnectionCharset = "UTF-8";
+    protected $_sConnectionCharset = 'UTF-8';
 
     /**
      * Curl call header.
      *
      * @var array
      */
-    protected $_aHeader = null;
+    protected $_aHeader;
 
     /**
      * Host for header.
      *
      * @var string
      */
-    protected $_sHost = null;
+    protected $_sHost;
 
     /**
      * Curl Options
@@ -87,14 +89,14 @@ class Curl
      *
      * @var int|null
      */
-    protected $_sStatusCode = null;
+    protected $_sStatusCode;
 
     /**
      * Sets url to call
      *
      * @param string $url URL to call.
      */
-    public function setUrl($url)
+    public function setUrl($url): void
     {
         $this->_sUrl = $url;
     }
@@ -106,8 +108,8 @@ class Curl
      */
     public function getUrl()
     {
-        if ($this->getMethod() == "GET" && $this->getQuery()) {
-            $this->_sUrl = $this->_sUrl . "?" . $this->getQuery();
+        if ($this->getMethod() == 'GET' && $this->getQuery()) {
+            $this->_sUrl = $this->_sUrl . '?' . $this->getQuery();
         }
 
         return $this->_sUrl;
@@ -118,7 +120,7 @@ class Curl
      *
      * @param string $query Request query.
      */
-    public function setQuery($query)
+    public function setQuery($query): void
     {
         $this->_sQuery = $query;
     }
@@ -131,10 +133,10 @@ class Curl
     public function getQuery()
     {
         if (is_null($this->_sQuery)) {
-            $query = "";
+            $query = '';
             if ($params = $this->getParameters()) {
                 $params = $this->prepareQueryParameters($params);
-                $query = http_build_query($params, "", "&");
+                $query = http_build_query($params, '', '&');
             }
             $this->setQuery($query);
         }
@@ -147,7 +149,7 @@ class Curl
      *
      * @param array $parameters parameters
      */
-    public function setParameters($parameters)
+    public function setParameters($parameters): void
     {
         $this->setQuery(null);
         $this->_aParameters = $parameters;
@@ -168,7 +170,7 @@ class Curl
      *
      * @param string $host
      */
-    public function setHost($host)
+    public function setHost($host): void
     {
         $this->_sHost = $host;
     }
@@ -188,9 +190,9 @@ class Curl
      *
      * @param array $header
      */
-    public function setHeader($header = null)
+    public function setHeader($header = null): void
     {
-        if (is_null($header) && $this->getMethod() == "POST") {
+        if (is_null($header) && $this->getMethod() == 'POST') {
             $host = $this->getHost();
 
             $header = [];
@@ -223,7 +225,7 @@ class Curl
      *
      * @param string $method method to send (POST/GET)
      */
-    public function setMethod($method)
+    public function setMethod($method): void
     {
         $this->_sMethod = strtoupper($method);
     }
@@ -246,9 +248,9 @@ class Curl
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException curl errors
      */
-    public function setOption($name, $value)
+    public function setOption($name, $value): void
     {
-        if (strpos($name, 'CURLOPT_') !== 0 || !defined($constant  = strtoupper($name))) {
+        if (!str_starts_with($name, 'CURLOPT_') || !defined($constant  = strtoupper($name))) {
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\StandardException::class);
             $lang = \OxidEsales\Eshop\Core\Registry::getLang();
             $exception->setMessage(sprintf($lang->translateString('EXCEPTION_NOT_VALID_CURL_CONSTANT', $lang->getTplLanguage()), $name));
@@ -272,10 +274,8 @@ class Curl
      * Executes curl call and returns response data as associative array.
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException on curl errors
-     *
-     * @return string
      */
-    public function execute()
+    public function execute(): string
     {
         $this->setOptions();
 
@@ -301,7 +301,7 @@ class Curl
      *
      * @param string $charset charset
      */
-    public function setConnectionCharset($charset)
+    public function setConnectionCharset($charset): void
     {
         $this->_sConnectionCharset = $charset;
     }
@@ -360,7 +360,7 @@ class Curl
         }
         $this->setOpt(CURLOPT_URL, $this->getUrl());
 
-        if ($this->getMethod() == "POST") {
+        if ($this->getMethod() == 'POST') {
             $this->setOpt(CURLOPT_POST, 1);
             $this->setOpt(CURLOPT_POSTFIELDS, $this->getQuery());
         }
@@ -375,8 +375,6 @@ class Curl
 
     /**
      * Wrapper function to be mocked for testing.
-     *
-     * @return string
      */
     protected function executeCurl(): string
     {
@@ -404,10 +402,8 @@ class Curl
 
     /**
      * Check if curl has errors. Set error message if has.
-     *
-     * @return int
      */
-    protected function getErrorNumber()
+    protected function getErrorNumber(): int
     {
         return curl_errno($this->getResource());
     }
@@ -424,12 +420,10 @@ class Curl
      * Decodes html entities.
      *
      * @param array $params Parameters.
-     *
-     * @return array
      */
-    protected function prepareQueryParameters($params)
+    protected function prepareQueryParameters($params): array
     {
-        return array_map([$this, 'htmlDecode'], array_filter($params));
+        return array_map($this->htmlDecode(...), array_filter($params));
     }
 
     /**
@@ -442,11 +436,9 @@ class Curl
     protected function htmlDecode($mParam)
     {
         if (is_array($mParam)) {
-            $mParam = $this->prepareQueryParameters($mParam);
-        } else {
-            $mParam = html_entity_decode(stripslashes($mParam), ENT_QUOTES, $this->getConnectionCharset());
+            return $this->prepareQueryParameters($mParam);
         }
 
-        return $mParam;
+        return html_entity_decode(stripslashes((string) $mParam), ENT_QUOTES, $this->getConnectionCharset());
     }
 }

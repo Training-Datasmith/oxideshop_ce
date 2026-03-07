@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,10 +14,7 @@ use OxidEsales\EshopCommunity\Application\Model\Content;
 class ContentFactory
 {
     /**
-     * @param string $key
-     * @param string $value
      *
-     * @return null|Content
      * @throws \Exception
      */
     public function getContent(string $key, string $value): ?Content
@@ -27,7 +26,7 @@ class ContentFactory
         } elseif ($key == 'oxid') {
             $isLoaded = $content->load($value);
         } else {
-            throw new \Exception("Cannot load content. Not provided neither ident nor oxid.");
+            throw new \Exception('Cannot load content. Not provided neither ident nor oxid.');
         }
 
         return $isLoaded ? $content : null;

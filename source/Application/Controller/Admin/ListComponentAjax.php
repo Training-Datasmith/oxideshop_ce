@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -45,7 +47,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      *
      * @var string
      */
-    protected $_sContainer = null;
+    protected $_sContainer;
 
     /**
      * If true extended column selection will be build
@@ -70,7 +72,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      *
      * @param array $aColumns columns array
      */
-    public function setColumns($aColumns)
+    public function setColumns($aColumns): void
     {
         $this->_aColumns = $aColumns;
     }
@@ -99,7 +101,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sName name of container
      */
-    public function setName($sName)
+    public function setName($sName): void
     {
         $this->_sContainer = $sName;
     }
@@ -143,7 +145,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $function name of action to execute (optional)
      */
-    public function processRequest($function = null)
+    public function processRequest($function = null): void
     {
         if ($function) {
             $this->$function();
@@ -169,11 +171,9 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         $aVisibleNames = $this->getVisibleColNames();
         $iCol = Registry::getRequest()->getRequestEscapedParameter('sort');
         $iCol = $iCol ? ((int) str_replace('_', '', $iCol)) : 0;
-        $iCol = (!isset($aVisibleNames[$iCol])) ? 0 : $iCol;
 
-        return $iCol;
+        return (!isset($aVisibleNames[$iCol])) ? 0 : $iCol;
     }
-
 
     /**
      * Returns array of cotainer DB cols which must be loaded. If id is not
@@ -229,7 +229,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
 
         // user defined some cols to load ?
         if (is_array($aUserCols)) {
-            foreach ($aUserCols as $iKey => $sCol) {
+            foreach ($aUserCols as $sCol) {
                 $iCol = (int) str_replace('_', '', $sCol);
                 if (isset($aColNames[$iCol]) && !$aColNames[$iCol][4]) {
                     $aVisibleCols[$iCol] = $aColNames[$iCol];
@@ -258,7 +258,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function getQueryCols()
     {
-        $sQ = $this->buildColsQuery($this->getVisibleColNames(), false) . ", ";
+        $sQ = $this->buildColsQuery($this->getVisibleColNames(), false) . ', ';
         $sQ .= $this->buildColsQuery($this->getIdentColNames());
 
         return " $sQ ";
@@ -345,8 +345,8 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function getLimit($iStart)
     {
-        $iLimit = (int) Registry::getRequest()->getRequestEscapedParameter("results");
-        $iLimit = $iLimit ? $iLimit : $this->_iSqlLimit;
+        $iLimit = (int) Registry::getRequest()->getRequestEscapedParameter('results');
+        $iLimit = $iLimit ?: $this->_iSqlLimit;
 
         return " limit $iStart, $iLimit ";
     }
@@ -429,7 +429,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     {
         $sDir = Registry::getRequest()->getRequestEscapedParameter('dir');
         if (!in_array($sDir, $this->_aPosDir)) {
-            $sDir = $this->_aPosDir[0];
+            return $this->_aPosDir[0];
         }
 
         return $sDir;
@@ -558,10 +558,8 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      *
      * @param array $aArtIds article id's
      * @param array $aCatIds ids if categories, which must be removed from oxseo
-     *
-     * @return null
      */
-    public function resetArtSeoUrl($aArtIds, $aCatIds = null)
+    public function resetArtSeoUrl($aArtIds, $aCatIds = null): void
     {
         if (empty($aArtIds)) {
             return;
@@ -573,7 +571,6 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
 
         $sShopId = Registry::getConfig()->getShopId();
         foreach ($aArtIds as $sArtId) {
-            /** @var \OxidEsales\Eshop\Core\SeoEncoder $oSeoEncoder */
             Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
         }
     }
@@ -581,7 +578,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     /**
      * Reset output cache
      */
-    public function resetContentCache()
+    public function resetContentCache(): void
     {
         $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
@@ -599,7 +596,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sCounterType counter type
      * @param string $sValue       reset value
      */
-    public function resetCounter($sCounterType, $sValue = null)
+    public function resetCounter($sCounterType, $sValue = null): void
     {
         $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 

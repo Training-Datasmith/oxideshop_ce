@@ -64,7 +64,6 @@ final class ModuleEventsTest extends IntegrationTestCase
         $this->assertSame('Method onActivate was called', $eventMessage);
     }
 
-
     public function testDeactivationEventWasExecuted(): void
     {
         $moduleConfiguration = $this->getTestModuleConfiguration();

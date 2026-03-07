@@ -24,7 +24,7 @@ class ModuleInstallCommand extends Command
     private const ERROR_MESSAGE = 'Error installing module: ';
 
     public function __construct(
-        private ModuleInstallerInterface $moduleInstaller
+        private readonly ModuleInstallerInterface $moduleInstaller
     ) {
         parent::__construct();
     }
@@ -41,9 +41,6 @@ class ModuleInstallCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      * @throws \Throwable
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -63,19 +60,11 @@ class ModuleInstallCommand extends Command
         return Command::FAILURE;
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     private function getModulePath(string $path): string
     {
         return Path::isRelative($path) ? Path::makeAbsolute($path, getcwd()) : $path;
     }
 
-    /**
-     * @param string $modulePath
-     * @return OxidEshopPackage
-     */
     private function getPackage(string $modulePath): OxidEshopPackage
     {
         return new OxidEshopPackage($modulePath);

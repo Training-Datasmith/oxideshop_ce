@@ -12,7 +12,7 @@ $sMetadataVersion = '2.0';
 $aModule = [
     'id'             => 'TestModuleWithSurplusData',
     'extraStuff'     => [
-        'key1' => 'value1'
+        'key1' => 'value1',
     ],
-    'moreExtraStuff' => new StdClass()
+    'moreExtraStuff' => new StdClass(),
 ];

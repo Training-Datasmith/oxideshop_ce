@@ -35,9 +35,8 @@ class ModuleSettingsBooleanConverter implements MetaDataConverterInterface
 
     /**
      * @param $setting
-     * @return mixed
      */
-    private function updateValue($setting)
+    private function updateValue(array $setting): array
     {
         if (isset($setting['type']) && $setting['type'] === 'bool') {
             $value = is_string($setting['value']) ? strtolower($setting['value']) : $setting['value'];

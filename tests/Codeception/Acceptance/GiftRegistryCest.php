@@ -30,7 +30,7 @@ final class GiftRegistryCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
         $userData = $this->getExistingUserData();
 
@@ -85,7 +85,7 @@ final class GiftRegistryCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
         $userData = $this->getExistingUserData();
         $adminUserData = $this->getAdminUserData();
@@ -159,13 +159,13 @@ final class GiftRegistryCest
         $I->wantToTest('disabled user gift registry via performance options');
 
         //(Use gift registry) is disabled
-        $I->updateConfigInDatabase('bl_showWishlist', false, "bool");
+        $I->updateConfigInDatabase('bl_showWishlist', false, 'bool');
 
         $productData = [
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -185,7 +185,7 @@ final class GiftRegistryCest
         $accountPage->dontSeeGiftRegistryLink();
 
         //(Use gift registry) is enabled again
-        $I->updateConfigInDatabase('bl_showWishlist', true, "bool");
+        $I->updateConfigInDatabase('bl_showWishlist', true, 'bool');
     }
 
     private function getExistingUserData()

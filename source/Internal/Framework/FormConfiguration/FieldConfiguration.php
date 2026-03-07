@@ -36,9 +36,8 @@ class FieldConfiguration implements FieldConfigurationInterface
 
     /**
      * @param string $name
-     * @return FieldConfiguration
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
         return $this;
@@ -54,9 +53,8 @@ class FieldConfiguration implements FieldConfigurationInterface
 
     /**
      * @param string $label
-     * @return FieldConfiguration
      */
-    public function setLabel($label)
+    public function setLabel($label): static
     {
         $this->label = $label;
         return $this;
@@ -72,9 +70,8 @@ class FieldConfiguration implements FieldConfigurationInterface
 
     /**
      * @param bool $isRequired
-     * @return FieldConfiguration
      */
-    public function setIsRequired($isRequired)
+    public function setIsRequired($isRequired): static
     {
         $this->isRequired = $isRequired;
         return $this;

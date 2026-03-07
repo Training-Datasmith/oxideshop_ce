@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,7 +36,7 @@ class ObjectException extends \OxidEsales\Eshop\Core\Exception\StandardException
      *
      * @param object $oObject exception object
      */
-    public function setObject($oObject)
+    public function setObject($oObject): void
     {
         $this->_oObject = $oObject;
     }
@@ -57,6 +59,6 @@ class ObjectException extends \OxidEsales\Eshop\Core\Exception\StandardException
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty Object --> " . get_class($this->_oObject) . "\n";
+        return self::class . '-' . parent::getString() . ' Faulty Object --> ' . $this->_oObject::class . "\n";
     }
 }

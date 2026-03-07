@@ -18,8 +18,4 @@ final class Version20251009121500 extends AbstractMigration
     {
         $this->addSql("DELETE FROM `oxconfig` WHERE `OXVARNAME` = 'blSendTechnicalInformationToOxid'");
     }
-
-    public function down(Schema $schema): void
-    {
-    }
 }

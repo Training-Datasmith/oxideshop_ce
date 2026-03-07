@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,7 +26,7 @@ class ShopList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Loads all shops to list
      */
-    public function getAll()
+    public function getAll(): void
     {
         $this->selectString('SELECT `oxshops`.* FROM `oxshops`');
     }
@@ -32,7 +34,7 @@ class ShopList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Gets shop list into object
      */
-    public function getIdTitleList()
+    public function getIdTitleList(): void
     {
         $this->setBaseObject(oxNew('oxListObject', 'oxshops'));
         $this->selectString('SELECT `OXID`, `OXNAME` FROM `oxshops`');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -30,7 +32,7 @@ class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     {
         $sUrl = $this->oxmediaurls__oxurl->value;
         //youtube link
-        if (strpos($sUrl, 'youtube.com') || strpos($sUrl, 'youtu.be')) {
+        if (strpos((string) $sUrl, 'youtube.com') || strpos((string) $sUrl, 'youtu.be')) {
             return $this->getYoutubeHtml();
         }
 
@@ -51,20 +53,16 @@ class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $sDesc = $this->oxmediaurls__oxdesc->value;
         $sUrl = $this->getLink();
 
-        $sHtmlLink = "<a href=\"$sUrl\"{$sForceBlank}>$sDesc</a>";
-
-        return $sHtmlLink;
+        return "<a href=\"$sUrl\"{$sForceBlank}>$sDesc</a>";
     }
 
     public function getLink()
     {
         if ($this->oxmediaurls__oxisuploaded->value) {
-            $url = Registry::getConfig()->getShopUrl() . 'out/media/' . basename($this->oxmediaurls__oxurl->value);
-        } else {
-            $url = $this->oxmediaurls__oxurl->value;
+            return Registry::getConfig()->getShopUrl() . 'out/media/' . basename((string) $this->oxmediaurls__oxurl->value);
         }
 
-        return $url;
+        return $this->oxmediaurls__oxurl->value;
     }
 
     /**
@@ -90,7 +88,7 @@ class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             ContainerFacade::getParameter('oxid_esales.shop_source_directory'),
             'out',
             'media',
-            basename($this->oxmediaurls__oxurl->value)
+            basename((string) $this->oxmediaurls__oxurl->value)
         );
 
         if ($this->oxmediaurls__oxisuploaded->value) {
@@ -110,11 +108,11 @@ class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $url = $this->oxmediaurls__oxurl->value;
         $youTubeUrl = '';
 
-        if (strpos($url, 'youtube.com')) {
+        if (strpos((string) $url, 'youtube.com')) {
             $youTubeUrl = str_replace('www.youtube.com/watch?v=', 'www.youtube.com/embed/', $url);
-            $youTubeUrl = preg_replace("/&/", '?', $youTubeUrl, 1);
+            $youTubeUrl = preg_replace('/&/', '?', $youTubeUrl, 1);
         }
-        if (strpos($url, 'youtu.be')) {
+        if (strpos((string) $url, 'youtu.be')) {
             $youTubeUrl = str_replace('youtu.be/', 'www.youtube.com/embed/', $url);
         }
 

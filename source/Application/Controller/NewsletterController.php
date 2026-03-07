@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,21 +27,21 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
      *
      * @var string
      */
-    protected $_sHomeCountryId = null;
+    protected $_sHomeCountryId;
 
     /**
      * Newletter status.
      *
      * @var integer
      */
-    protected $_iNewsletterStatus = null;
+    protected $_iNewsletterStatus;
 
     /**
      * User newsletter registration data.
      *
      * @var object
      */
-    protected $_aRegParams = null;
+    protected $_aRegParams;
 
     /**
      * Current class template name.
@@ -61,10 +63,10 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
      * Template variables:
      * <b>aRegParams</b>
      */
-    public function fill()
+    public function fill(): void
     {
         // loads submited values
-        $this->_aRegParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $this->_aRegParams = Registry::getRequest()->getRequestEscapedParameter('editval');
     }
 
     /**
@@ -74,29 +76,26 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
      *
      * Template variables:
      * <b>success</b>, <b>error</b>, <b>aRegParams</b>
-     *
-     * @return bool
      */
-    public function send()
+    public function send(): void
     {
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         $emailValidator = ContainerFacade::get(EmailValidatorServiceBridgeInterface::class);
 
         // loads submited values
         $this->_aRegParams = $aParams;
-
         if (!$aParams['oxuser__oxusername']) {
             Registry::getUtilsView()->addErrorToDisplay('ERROR_MESSAGE_COMPLETE_FIELDS_CORRECTLY');
-
-            return;
-        } elseif (!$emailValidator->isEmailValid($aParams['oxuser__oxusername'])) {
-            // #1052C - eMail validation added
-            Registry::getUtilsView()->addErrorToDisplay('MESSAGE_INVALID_EMAIL');
-
             return;
         }
 
-        $blSubscribe = Registry::getRequest()->getRequestEscapedParameter("subscribeStatus");
+        if (!$emailValidator->isEmailValid($aParams['oxuser__oxusername'])) {
+            // #1052C - eMail validation added
+            Registry::getUtilsView()->addErrorToDisplay('MESSAGE_INVALID_EMAIL');
+            return;
+        }
+
+        $blSubscribe = Registry::getRequest()->getRequestEscapedParameter('subscribeStatus');
 
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $oUser->oxuser__oxusername = new Field($aParams['oxuser__oxusername'], Field::T_RAW);
@@ -108,16 +107,15 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
                 Registry::getUtilsView()->addErrorToDisplay('NEWSLETTER_EMAIL_NOT_EXIST');
 
                 return;
-            } else {
-                $oUser->oxuser__oxactive = new \OxidEsales\Eshop\Core\Field(1, \OxidEsales\Eshop\Core\Field::T_RAW);
-                $oUser->oxuser__oxrights = new \OxidEsales\Eshop\Core\Field('user', \OxidEsales\Eshop\Core\Field::T_RAW);
-                $oUser->oxuser__oxshopid = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopId(), \OxidEsales\Eshop\Core\Field::T_RAW);
-                $oUser->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxfname'], \OxidEsales\Eshop\Core\Field::T_RAW);
-                $oUser->oxuser__oxlname = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxlname'], \OxidEsales\Eshop\Core\Field::T_RAW);
-                $oUser->oxuser__oxsal = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxsal'], \OxidEsales\Eshop\Core\Field::T_RAW);
-                $oUser->oxuser__oxcountryid = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxcountryid'], \OxidEsales\Eshop\Core\Field::T_RAW);
-                $blUserLoaded = $oUser->save();
             }
+            $oUser->oxuser__oxactive = new \OxidEsales\Eshop\Core\Field(1, \OxidEsales\Eshop\Core\Field::T_RAW);
+            $oUser->oxuser__oxrights = new \OxidEsales\Eshop\Core\Field('user', \OxidEsales\Eshop\Core\Field::T_RAW);
+            $oUser->oxuser__oxshopid = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopId(), \OxidEsales\Eshop\Core\Field::T_RAW);
+            $oUser->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxfname'], \OxidEsales\Eshop\Core\Field::T_RAW);
+            $oUser->oxuser__oxlname = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxlname'], \OxidEsales\Eshop\Core\Field::T_RAW);
+            $oUser->oxuser__oxsal = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxsal'], \OxidEsales\Eshop\Core\Field::T_RAW);
+            $oUser->oxuser__oxcountryid = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxcountryid'], \OxidEsales\Eshop\Core\Field::T_RAW);
+            $blUserLoaded = $oUser->save();
         } else {
             $blUserLoaded = $oUser->load($oUser->getId());
         }
@@ -151,7 +149,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
      * Template variables:
      * <b>success</b>
      */
-    public function addme()
+    public function addme(): void
     {
         // user exists ?
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
@@ -169,7 +167,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     /**
      * Loads user and removes him from newsletter group.
      */
-    public function removeme()
+    public function removeme(): void
     {
         // existing user ?
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
@@ -186,7 +184,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     /**
      * simlink to function removeme bug fix #0002894
      */
-    public function rmvm()
+    public function rmvm(): void
     {
         $this->removeme();
     }

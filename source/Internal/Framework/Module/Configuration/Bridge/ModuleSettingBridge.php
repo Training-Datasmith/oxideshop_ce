@@ -20,16 +20,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ModuleSettingBridge implements ModuleSettingBridgeInterface
 {
     public function __construct(
-        private ContextInterface $context,
-        private ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private EventDispatcherInterface $eventDispatcher
+        private readonly ContextInterface $context,
+        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 
     /**
-     * @param string $name
      * @param mixed $value
-     * @param string $moduleId
      */
     public function save(string $name, $value, string $moduleId): void
     {
@@ -42,8 +40,6 @@ class ModuleSettingBridge implements ModuleSettingBridgeInterface
     }
 
     /**
-     * @param string $name
-     * @param string $moduleId
      * @return mixed
      */
     public function get(string $name, string $moduleId)

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,70 +23,70 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var object
      */
-    protected $_oPaymentList = null;
+    protected $_oPaymentList;
 
     /**
      * Paymentlist count
      *
      * @var integer
      */
-    protected $_iPaymentCnt = null;
+    protected $_iPaymentCnt;
 
     /**
      * All delivery sets
      *
      * @var array
      */
-    protected $_aAllSets = null;
+    protected $_aAllSets;
 
     /**
      * Delivery sets count
      *
      * @var integer
      */
-    protected $_iAllSetsCnt = null;
+    protected $_iAllSetsCnt;
 
     /**
      * Payment object 'oxempty'
      *
      * @var object
      */
-    protected $_oEmptyPayment = null;
+    protected $_oEmptyPayment;
 
     /**
      * Payment error
      *
      * @var string
      */
-    protected $_sPaymentError = null;
+    protected $_sPaymentError;
 
     /**
      * Payment error text
      *
      * @var string
      */
-    protected $_sPaymentErrorText = null;
+    protected $_sPaymentErrorText;
 
     /**
      * Dyn values
      *
      * @var array
      */
-    protected $_aDynValue = null;
+    protected $_aDynValue;
 
     /**
      * Checked payment id
      *
      * @var string
      */
-    protected $_sCheckedId = null;
+    protected $_sCheckedId;
 
     /**
      * Selected payment id in db
      *
      * @var string
      */
-    protected $_sCheckedPaymentId = null;
+    protected $_sCheckedPaymentId;
 
     /**
      * Current class template name.
@@ -105,12 +107,12 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var array
      */
-    protected $_aTsProducts = null;
+    protected $_aTsProducts;
 
     /**
      * Executes parent method parent::init().
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
     }
@@ -170,7 +172,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
             $sPayError = $sPayErrorParameter ? 'payerror=' . $sPayErrorParameter : '';
             $sPayErrorText = $sPayErrorTextParameter ? 'payerrortext=' . $sPayErrorTextParameter : '';
-            $sRedirectURL = $shopSecureHomeURL . 'sslredirect=forced&cl=payment&' . $sPayError . "&" . $sPayErrorText;
+            $sRedirectURL = $shopSecureHomeURL . 'sslredirect=forced&cl=payment&' . $sPayError . '&' . $sPayErrorText;
             Registry::getUtils()->redirect($sRedirectURL, true, 302);
         }
 
@@ -233,7 +235,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Changes shipping set to chosen one. Sets basket status to not up-to-date, which later
      * forces to recalculate it
      */
-    public function changeshipping()
+    public function changeshipping(): void
     {
         $session = \OxidEsales\Eshop\Core\Registry::getSession();
 
@@ -307,15 +309,11 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             $session->deleteVariable('_selected_paymentid');
 
             return 'order';
-        } else {
-            $session->setVariable('payerror', $oPayment->getPaymentErrorNumber());
-
-            //#1308C - delete paymentid from session, and save selected it just for view
-            $session->deleteVariable('paymentid');
-            $session->setVariable('_selected_paymentid', $sPaymentId);
-
-            return;
         }
+        $session->setVariable('payerror', $oPayment->getPaymentErrorNumber());
+        //#1308C - delete paymentid from session, and save selected it just for view
+        $session->deleteVariable('paymentid');
+        $session->setVariable('_selected_paymentid', $sPaymentId);
     }
 
     /**
@@ -337,7 +335,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             $oBasket = $session->getBasket();
 
             // load sets, active set, and active set payment list
-            list($aAllSets, $sActShipSet, $aPaymentList) =
+            [$aAllSets, $sActShipSet, $aPaymentList] =
                 Registry::get(DeliverySetList::class)->getDeliverySetData($sActShipSet, $this->getUser(), $oBasket);
 
             $oBasket->setShipping($sActShipSet);
@@ -460,7 +458,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             if (($aDynValue = Registry::getSession()->getVariable('dynvalue'))) {
                 $this->_aDynValue = $aDynValue;
             } else {
-                $this->_aDynValue = Registry::getRequest()->getRequestEscapedParameter("dynvalue");
+                $this->_aDynValue = Registry::getRequest()->getRequestEscapedParameter('dynvalue');
             }
 
             // #701A
@@ -534,8 +532,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             // #646
             $oPaymentList = $this->getPaymentList();
             if (isset($oPaymentList) && $oPaymentList && isset($sCheckedId) && !isset($oPaymentList[$sCheckedId])) {
-                end($oPaymentList);
-                $sCheckedId = key($oPaymentList);
+                $sCheckedId = array_key_last($oPaymentList);
             }
             $this->_sCheckedPaymentId = $sCheckedId;
         }
@@ -593,7 +590,6 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         $aPaths = [];
         $aPath = [];
-
 
         $iBaseLanguage = Registry::getLang()->getBaseLanguage();
         $aPath['title'] = Registry::getLang()->translateString('PAY', $iBaseLanguage, false);

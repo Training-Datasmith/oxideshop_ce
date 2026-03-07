@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,22 +20,21 @@ class DiagnosticsOutput
      *
      * @var string
      */
-    protected $_sOutputKey = "diagnostic_tool_result";
-
+    protected $_sOutputKey = 'diagnostic_tool_result';
 
     /**
      * Result file path
      *
      * @var string
      */
-    protected $_sOutputFileName = "diagnostic_tool_result.html";
+    protected $_sOutputFileName = 'diagnostic_tool_result.html';
 
     /**
      * Utils object
      *
      * @var mixed
      */
-    protected $_oUtils = null;
+    protected $_oUtils;
 
     /**
      * Object constructor
@@ -48,7 +49,7 @@ class DiagnosticsOutput
      *
      * @param string $sOutputKey Output key.
      */
-    public function setOutputKey($sOutputKey)
+    public function setOutputKey($sOutputKey): void
     {
         if (!empty($sOutputKey)) {
             $this->_sOutputKey = $sOutputKey;
@@ -70,7 +71,7 @@ class DiagnosticsOutput
      *
      * @param string $sOutputFileName Output file name.
      */
-    public function setOutputFileName($sOutputFileName)
+    public function setOutputFileName($sOutputFileName): void
     {
         if (!empty($sOutputFileName)) {
             $this->_sOutputFileName = $sOutputFileName;
@@ -92,7 +93,7 @@ class DiagnosticsOutput
      *
      * @param string $sResult Result.
      */
-    public function storeResult($sResult)
+    public function storeResult($sResult): void
     {
         $this->_oUtils->toFileCache($this->_sOutputKey, $sResult);
     }
@@ -116,21 +117,21 @@ class DiagnosticsOutput
      *
      * @param string $sOutputKey Output key.
      */
-    public function downloadResultFile($sOutputKey = null)
+    public function downloadResultFile($sOutputKey = null): void
     {
         $sCurrentKey = (empty($sOutputKey)) ? $this->_sOutputKey : $sOutputKey;
 
         $this->_oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
         $content = $this->_oUtils->fromFileCache($sCurrentKey);
-        $contentLength = strlen($content);
+        $contentLength = strlen((string) $content);
 
-        $this->_oUtils->setHeader("Pragma: public");
-        $this->_oUtils->setHeader("Expires: 0");
-        $this->_oUtils->setHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0, private");
+        $this->_oUtils->setHeader('Pragma: public');
+        $this->_oUtils->setHeader('Expires: 0');
+        $this->_oUtils->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0, private');
         $this->_oUtils->setHeader('Content-Disposition: attachment;filename=' . $this->_sOutputFileName);
-        $this->_oUtils->setHeader("Content-Type:text/html;charset=utf-8");
+        $this->_oUtils->setHeader('Content-Type:text/html;charset=utf-8');
         if ($contentLength) {
-            $this->_oUtils->setHeader("Content-Length: " . $contentLength);
+            $this->_oUtils->setHeader('Content-Length: ' . $contentLength);
         }
 
         echo $content;

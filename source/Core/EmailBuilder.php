@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,7 +18,7 @@ use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
  */
 abstract class EmailBuilder
 {
-    protected $buildParam = null;
+    protected $buildParam;
 
     /**
      * Set configuration first, build and return the email after.
@@ -119,7 +121,7 @@ abstract class EmailBuilder
         $lang = \OxidEsales\Eshop\Core\Registry::getLang();
         $shopUrl = ContainerFacade::getParameter('oxid_esales.shop_url');
 
-        return "<br>" . sprintf(
+        return '<br>' . sprintf(
             $lang->translateString(
                 'SHOP_EMAIL_ORIGIN_MESSAGE',
                 null,

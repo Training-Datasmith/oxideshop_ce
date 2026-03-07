@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,7 +19,7 @@ class TextEditorHandler
     /**
      * @var string The style sheet for the editor.
      */
-    private $stylesheet = null;
+    private $stylesheet;
 
     /**
      * @var bool Information in the text editor is editable by default.
@@ -39,7 +41,7 @@ class TextEditorHandler
     {
         $sEditorHtml = $this->renderRichTextEditor($width, $height, $objectValue, $fieldName);
         if (!$sEditorHtml) {
-            $sEditorHtml = $this->renderPlainTextEditor($width, $height, $objectValue, $fieldName);
+            return $this->renderPlainTextEditor($width, $height, $objectValue, $fieldName);
         }
         return $sEditorHtml;
     }
@@ -54,12 +56,12 @@ class TextEditorHandler
      *
      * @return string The Editor output.
      */
-    public function renderPlainTextEditor($width, $height, $objectValue, $fieldName)
+    public function renderPlainTextEditor($width, $height, $objectValue, $fieldName): string
     {
-        if (strpos($width, '%') === false) {
+        if (!str_contains($width, '%')) {
             $width .= 'px';
         }
-        if (strpos($height, '%') === false) {
+        if (!str_contains($height, '%')) {
             $height .= 'px';
         }
 
@@ -79,7 +81,7 @@ class TextEditorHandler
      *
      * @return string The Editor output.
      */
-    public function renderRichTextEditor($width, $height, $objectValue, $fieldName)
+    public function renderRichTextEditor($width, $height, $objectValue, $fieldName): string
     {
         return '';
     }
@@ -89,7 +91,7 @@ class TextEditorHandler
      *
      * @param string $stylesheet The stylesheet for editor.
      */
-    public function setStyleSheet($stylesheet)
+    public function setStyleSheet($stylesheet): void
     {
         $this->stylesheet = $stylesheet;
     }
@@ -107,7 +109,7 @@ class TextEditorHandler
     /**
      * Mark text editor disabled: information in it should not be editable.
      */
-    public function disableTextEditor()
+    public function disableTextEditor(): void
     {
         $this->textEditorDisabled = true;
     }

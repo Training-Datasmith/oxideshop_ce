@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Registry;
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class controls article assignment to selection lists
@@ -25,14 +27,14 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxtitle', 'oxselectlist', 1, 1, 0],
             ['oxident', 'oxselectlist', 1, 0, 0],
             ['oxvaldesc', 'oxselectlist', 1, 0, 0],
-            ['oxid', 'oxselectlist', 0, 0, 1]
+            ['oxid', 'oxselectlist', 0, 0, 1],
         ],
         'container2' => [
             ['oxtitle', 'oxselectlist', 1, 1, 0],
             ['oxident', 'oxselectlist', 1, 0, 0],
             ['oxvaldesc', 'oxselectlist', 1, 0, 0],
-            ['oxid', 'oxobject2selectlist', 0, 0, 1]
-        ]
+            ['oxid', 'oxobject2selectlist', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -49,27 +51,27 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchArtId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        $sOxid = ($sArtId) ? $sArtId : $sSynchArtId;
+        $sOxid = $sArtId ?: $sSynchArtId;
         $sQ = "select oxparentid from {$sArtViewName} where oxid = :oxid and oxparentid != '' ";
-        $sQ .= "and (select count(oxobjectid) from oxobject2selectlist " .
-               "where oxobjectid = :oxobjectid) = 0";
+        $sQ .= 'and (select count(oxobjectid) from oxobject2selectlist ' .
+               'where oxobjectid = :oxobjectid) = 0';
         // We force reading from master to prevent issues with slow replications or open transactions
         // (see ESDEV-3804 and ESDEV-3822).
         $sParentId = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sQ, [
             'oxid' => $sOxid,
-            'oxobjectid' => $sOxid
+            'oxobjectid' => $sOxid,
         ]);
 
         // all selectlists article is in
         $sQAdd = " from oxobject2selectlist left join {$sSLViewName} " .
                  "on {$sSLViewName}.oxid=oxobject2selectlist.oxselnid  " .
-                 "where oxobject2selectlist.oxobjectid = " . $oDb->quote($sOxid) . " ";
+                 'where oxobject2selectlist.oxobjectid = ' . $oDb->quote($sOxid) . ' ';
         if ($sParentId) {
-            $sQAdd .= "or oxobject2selectlist.oxobjectid = " . $oDb->quote($sParentId) . " ";
+            $sQAdd .= 'or oxobject2selectlist.oxobjectid = ' . $oDb->quote($sParentId) . ' ';
         }
         // all not assigned selectlists
         if ($sSynchArtId) {
-            $sQAdd = " from {$sSLViewName}  " .
+            return " from {$sSLViewName}  " .
                      "where {$sSLViewName}.oxid not in ( select oxobject2selectlist.oxselnid {$sQAdd} ) ";
         }
 
@@ -79,16 +81,16 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Removes article selection lists.
      */
-    public function removeSel()
+    public function removeSel(): void
     {
         $aChosenArt = $this->getActionIds('oxobject2selectlist.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2selectlist.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2selectlist.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
-            $sQ = "delete from oxobject2selectlist " .
-                  "where oxobject2selectlist.oxid in (" . $sChosenArticles . ") ";
+            $sChosenArticles = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sQ = 'delete from oxobject2selectlist ' .
+                  'where oxobject2selectlist.oxid in (' . $sChosenArticles . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
 
@@ -101,7 +103,7 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @throws Exception
      */
-    public function addSel()
+    public function addSel(): void
     {
         $aAddSel = $this->getActionIds('oxselectlist.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -112,13 +114,13 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             $aAddSel = $this->getAll($this->addFilter("select $sSLViewName.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aAddSel)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddSel)) {
             // We force reading from master to prevent issues with slow replications or open transactions
             // (see ESDEV-3804).
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
             foreach ($aAddSel as $sAdd) {
                 $oNew = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oNew->init("oxobject2selectlist");
+                $oNew->init('oxobject2selectlist');
                 $sObjectIdField = 'oxobject2selectlist__oxobjectid';
                 $sSelectetionIdField = 'oxobject2selectlist__oxselnid';
                 $sOxSortField = 'oxobject2selectlist__oxsort';
@@ -126,10 +128,10 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
                 $oNew->$sObjectIdField = new \OxidEsales\Eshop\Core\Field($soxId);
                 $oNew->$sSelectetionIdField = new \OxidEsales\Eshop\Core\Field($sAdd);
 
-                $sSql = "select max(oxsort) + 1 from oxobject2selectlist where oxobjectid = :oxobjectid";
+                $sSql = 'select max(oxsort) + 1 from oxobject2selectlist where oxobjectid = :oxobjectid';
 
                 $oNew->$sOxSortField = new \OxidEsales\Eshop\Core\Field((int) $database->getOne($sSql, [
-                    'oxobjectid' => $soxId
+                    'oxobjectid' => $soxId,
                 ]));
                 $oNew->save();
             }

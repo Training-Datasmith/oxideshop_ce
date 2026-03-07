@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -55,7 +57,7 @@ class StandardException extends Exception
      *
      * @param string $sMessage exception message
      */
-    public function setMessage($sMessage)
+    public function setMessage($sMessage): void
     {
         $this->message = $sMessage;
     }
@@ -63,7 +65,7 @@ class StandardException extends Exception
     /**
      * To define that the exception was caught in renderer
      */
-    public function setRenderer()
+    public function setRenderer(): void
     {
         $this->_blRenderer = true;
     }
@@ -81,7 +83,7 @@ class StandardException extends Exception
     /**
      * To define that the exception was not caught (only in oxexceptionhandler)
      */
-    public function setNotCaught()
+    public function setNotCaught(): void
     {
         $this->_blNotCaught = true;
     }
@@ -99,33 +101,29 @@ class StandardException extends Exception
     /**
      * Get complete string dump, should be overwritten by excptions extending this exceptions
      * if they introduce new fields
-     *
-     * @return string
      */
-    public function getString()
+    public function getString(): string
     {
-        $sWarning = "";
+        $sWarning = '';
         if ($this->_blNotCaught) {
-            $sWarning .= "--!--NOT CAUGHT--!--";
+            $sWarning .= '--!--NOT CAUGHT--!--';
         }
 
         if ($this->_blRenderer) {
-            $sWarning .= "--!--RENDERER--!--";
+            $sWarning .= '--!--RENDERER--!--';
         }
 
         $currentTime = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
 
-        return $sWarning . __CLASS__ . " (time: " . $currentTime . "): [{$this->code}]: {$this->message} \n Stack Trace: {$this->getTraceAsString()}\n\n";
+        return $sWarning . self::class . ' (time: ' . $currentTime . "): [{$this->code}]: {$this->message} \n Stack Trace: {$this->getTraceAsString()}\n\n";
     }
 
     /**
      * Creates an array of field name => field value of the object.
      * To make a easy conversion of exceptions to error messages possible.
      * Should be extended when additional fields are used!
-     *
-     * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         return [];
     }

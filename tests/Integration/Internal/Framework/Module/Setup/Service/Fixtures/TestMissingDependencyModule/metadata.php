@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 $sMetadataVersion = '2.1';
 
-$aModule = array(
+$aModule = [
     'id'           => 'test-missing-dependency-module',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
-);
+];

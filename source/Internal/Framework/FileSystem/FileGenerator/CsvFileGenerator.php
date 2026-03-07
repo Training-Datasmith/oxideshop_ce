@@ -11,10 +11,6 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\FileSystem\FileGenerator;
 
 class CsvFileGenerator implements FileGeneratorInterface
 {
-    /**
-     * @param string $filename
-     * @param array  $data
-     */
     public function generate(string $filename, array $data): void
     {
         $file = fopen($filename, 'wb');

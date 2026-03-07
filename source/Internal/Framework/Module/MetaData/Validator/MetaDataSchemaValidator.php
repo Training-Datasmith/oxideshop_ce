@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataKeyException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataValueTypeException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataSchemataProviderInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataKeyException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataValueTypeException;
 
 /**
  * @deprecated will be removed in v7.0
@@ -22,26 +22,23 @@ class MetaDataSchemaValidator implements MetaDataSchemaValidatorInterface
     private static array $sectionsExcludedFromItemValidation = [
         MetaDataProvider::METADATA_EXTEND,
         MetaDataProvider::METADATA_CONTROLLERS,
-        MetaDataProvider::METADATA_EVENTS
+        MetaDataProvider::METADATA_EVENTS,
     ];
 
     private string $currentValidationMetaDataVersion;
 
-    public function __construct(private MetaDataSchemataProviderInterface $metaDataSchemataProvider)
+    public function __construct(private readonly MetaDataSchemataProviderInterface $metaDataSchemataProvider)
     {
     }
 
     /**
      * Validate that a given metadata meets the specifications of a given metadata version
      *
-     * @param string $metaDataFilePath
-     * @param string $metaDataVersion
-     * @param array  $metaData
      *
      * @throws UnsupportedMetaDataValueTypeException
      * @throws UnsupportedMetaDataKeyException
      */
-    public function validate(string $metaDataFilePath, string $metaDataVersion, array $metaData)
+    public function validate(string $metaDataFilePath, string $metaDataVersion, array $metaData): void
     {
         $this->currentValidationMetaDataVersion = $metaDataVersion;
 
@@ -63,8 +60,6 @@ class MetaDataSchemaValidator implements MetaDataSchemaValidatorInterface
     }
 
     /**
-     * @param array $supportedMetaDataKeys
-     * @param string $metaDataKey
      *
      * @throws UnsupportedMetaDataKeyException
      */
@@ -81,13 +76,10 @@ class MetaDataSchemaValidator implements MetaDataSchemaValidatorInterface
     /**
      * Validate well defined section items
      *
-     * @param array  $supportedMetaDataKeys
-     * @param string $sectionName
-     * @param array  $sectionData
      *
      * @throws UnsupportedMetaDataKeyException
      */
-    private function validateMetaDataSectionItems(array $supportedMetaDataKeys, string $sectionName, array $sectionData)
+    private function validateMetaDataSectionItems(array $supportedMetaDataKeys, string $sectionName, array $sectionData): void
     {
         foreach ($sectionData as $sectionItem) {
             if (\is_array($sectionItem)) {
@@ -104,9 +96,6 @@ class MetaDataSchemaValidator implements MetaDataSchemaValidatorInterface
      * defined items. There are sections (e.g. extend), which are arrays or multidimensional arrays
      * of not well defined items. In these cases the items cannot be validated.
      *
-     * @param array  $supportedMetaDataKeys
-     * @param string $sectionName
-     * @param array  $sectionData
      * @throws UnsupportedMetaDataKeyException
      */
     private function validateMetaDataSection(

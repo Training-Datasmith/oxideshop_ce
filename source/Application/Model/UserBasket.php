@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
-use oxField;
-use oxDb;
 
 /**
  * Virtual basket manager class. Virtual baskets are user article lists which are stored in database (noticelists, wishlists).
@@ -39,7 +37,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @var array
      */
-    protected $_aBasketItems = null;
+    protected $_aBasketItems;
 
     /**
      * Marker if basket is newly created. This avoids empty basket storing to DB
@@ -83,7 +81,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
      * Sets basket as newly created. This usually means that it is not
      * yet stored in DB and will only be stored if some item is added
      */
-    public function setIsNewBasket()
+    public function setIsNewBasket(): void
     {
         $this->_blNewBasket = true;
         $iTime = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
@@ -162,12 +160,12 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
         }
         $sSelect .= "where oxuserbasketitems.oxbasketid = :oxbasketid and $sViewName.oxid is not null ";
 
-        $sSelect .= " order by oxartnum, oxsellist, oxpersparam ";
+        $sSelect .= ' order by oxartnum, oxsellist, oxpersparam ';
 
         $oItems = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
         $oItems->init('oxuserbasketitem');
         $oItems->selectstring($sSelect, [
-            'oxbasketid' => $this->getId()
+            'oxbasketid' => $this->getId(),
         ]);
 
         foreach ($oItems as $oItem) {
@@ -209,7 +207,6 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         return $oNewItem;
     }
-
 
     /**
      * Searches for item in basket items array and returns it. If not item was
@@ -330,9 +327,9 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
         if ($sOXID && ($blDelete = parent::delete($sOXID))) {
             // cleaning up related data
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sQ = "delete from oxuserbasketitems where oxbasketid = :oxbasketid";
+            $sQ = 'delete from oxuserbasketitems where oxbasketid = :oxbasketid';
             $oDb->execute($sQ, [
-                'oxbasketid' => $sOXID
+                'oxbasketid' => $sOXID,
             ]);
             $this->_aBasketItems = null;
         }
@@ -353,9 +350,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
             $sActivUserId = $oActivUser->getId();
         }
 
-        $blIsVisible = (bool) ($this->oxuserbaskets__oxpublic->value) ||
+        return (bool) ($this->oxuserbaskets__oxpublic->value) ||
                        ($sActivUserId && ($this->oxuserbaskets__oxuserid->value == $sActivUserId));
-
-        return $blIsVisible;
     }
 }

@@ -10,28 +10,25 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Config\Dao;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject\ShopConfigurationSetting;
+use OxidEsales\EshopCommunity\Internal\Framework\Config\Event\ShopConfigurationChangedEvent;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Utility\ShopSettingEncoderInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
-use OxidEsales\EshopCommunity\Internal\Framework\Config\Event\ShopConfigurationChangedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterface
 {
     public function __construct(
-        private QueryBuilderFactoryInterface $queryBuilderFactory,
-        private ShopSettingEncoderInterface $shopSettingEncoder,
-        private EventDispatcherInterface $eventDispatcher
+        private readonly QueryBuilderFactoryInterface $queryBuilderFactory,
+        private readonly ShopSettingEncoderInterface $shopSettingEncoder,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 
     private array $cache = [];
 
-    /**
-     * @param ShopConfigurationSetting $shopConfigurationSetting
-     */
-    public function save(ShopConfigurationSetting $shopConfigurationSetting)
+    public function save(ShopConfigurationSetting $shopConfigurationSetting): void
     {
         $this->delete($shopConfigurationSetting);
 
@@ -67,9 +64,6 @@ class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterfac
     }
 
     /**
-     * @param string $name
-     * @param int    $shopId
-     * @return ShopConfigurationSetting
      * @throws EntryDoesNotExistDaoException
      */
     public function get(string $name, int $shopId): ShopConfigurationSetting
@@ -108,10 +102,7 @@ class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterfac
         return clone $this->cache[$shopId][$name];
     }
 
-    /**
-     * @param ShopConfigurationSetting $setting
-     */
-    public function delete(ShopConfigurationSetting $setting)
+    public function delete(ShopConfigurationSetting $setting): void
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder

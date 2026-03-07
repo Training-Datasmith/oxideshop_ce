@@ -23,7 +23,7 @@ trait EnvTrait
     {
         $filesystem = new Filesystem();
         $fixtureFile = Path::join($fixtureDir, '.env');
-        $filesystem->dumpFile($fixtureFile, implode("\n", $envFileLines),);
+        $filesystem->dumpFile($fixtureFile, implode("\n", $envFileLines), );
         (new DotenvLoader($fixtureDir))->loadEnvironmentVariables();
         $filesystem->remove($fixtureFile);
     }

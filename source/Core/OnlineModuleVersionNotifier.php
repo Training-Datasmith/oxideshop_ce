@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -38,10 +40,8 @@ class OnlineModuleVersionNotifier
 
     /**
      * Perform Online Module version Notification. Returns result
-     *
-     * @return null
      */
-    public function versionNotify()
+    public function versionNotify(): void
     {
         if (true === \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('preventModuleVersionNotify')) {
             return;
@@ -51,7 +51,10 @@ class OnlineModuleVersionNotifier
         $oOMNCaller->doRequest($this->formRequest());
     }
 
-    protected function prepareModulesInformation()
+    /**
+     * @return mixed[]
+     */
+    protected function prepareModulesInformation(): array
     {
         $shopConfiguration = ContainerFacade::get(ShopConfigurationDaoBridgeInterface::class)->get();
 
@@ -66,10 +69,8 @@ class OnlineModuleVersionNotifier
 
     /**
      * Send request message to Online Module Version Notifier web service.
-     *
-     * @return \OxidEsales\Eshop\Core\OnlineModulesNotifierRequest
      */
-    protected function formRequest()
+    protected function formRequest(): \OxidEsales\Eshop\Core\OnlineModulesNotifierRequest
     {
         $oRequestParams = new \OxidEsales\Eshop\Core\OnlineModulesNotifierRequest();
 

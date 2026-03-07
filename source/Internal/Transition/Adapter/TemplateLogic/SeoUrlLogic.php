@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,9 +16,7 @@ class SeoUrlLogic
     /**
      * Output SEO style url
      *
-     * @param array $params
      *
-     * @return string
      */
     public function seoUrl(array $params): string
     {
@@ -33,7 +33,7 @@ class SeoUrlLogic
                 $sUrl = $oObject->getLink();
             } elseif ($sOxid) {
                 // minimising aricle object loading
-                if (strtolower($sType) == "oxarticle") {
+                if (strtolower((string) $sType) == 'oxarticle') {
                     $oObject->disablePriceLoad();
                     $oObject->setNoVariantLoading(true);
                 }

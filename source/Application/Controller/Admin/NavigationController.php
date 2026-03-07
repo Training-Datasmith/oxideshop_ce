@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,7 +24,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @var string
      */
-    protected $_sAllowedHost = "http://admin.oxid-esales.com";
+    protected $_sAllowedHost = 'http://admin.oxid-esales.com';
 
     /** @inheritdoc */
     public function render()
@@ -34,7 +36,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         $utilsServer = Registry::getUtilsServer();
 
         $itemParam = $request->getRequestEscapedParameter('item');
-        $item = $itemParam ? basename($itemParam) : false;
+        $item = $itemParam ? basename((string) $itemParam) : false;
 
         if (!$item) {
             $item = 'nav_frame';
@@ -44,10 +46,10 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
             }
         } else {
             $navTree = $this->getNavigation();
-            $this->_aViewData["menustructure"] = $navTree->getDomXml()->documentElement->childNodes;
-            $this->_aViewData["sVersion"] = ShopVersion::getVersion();
+            $this->_aViewData['menustructure'] = $navTree->getDomXml()->documentElement->childNodes;
+            $this->_aViewData['sVersion'] = ShopVersion::getVersion();
 
-            if (!$request->getRequestEscapedParameter("navReload")) {
+            if (!$request->getRequestEscapedParameter('navReload')) {
                 $templateExtension = ContainerFacade::getParameter('oxid_esales.templating.engine_template_extension');
                 if ($item === "home.$templateExtension") {
                     $this->_aViewData['aMessage'] = $this->doStartUpChecks();
@@ -59,17 +61,17 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
             $favoritesCookie = $utilsServer->getOxCookie('oxidadminfavorites');
             $favorites = is_string($favoritesCookie) ? explode('|', $favoritesCookie) : [];
             if ($favorites) {
-                $this->_aViewData["menufavorites"] = $navTree->getListNodes($favorites);
-                $this->_aViewData["aFavorites"] = $favorites;
+                $this->_aViewData['menufavorites'] = $navTree->getListNodes($favorites);
+                $this->_aViewData['aFavorites'] = $favorites;
             }
 
             $historyCookie = $utilsServer->getOxCookie('oxidadminhistory');
             $history = is_string($historyCookie) ? explode('|', $historyCookie) : [];
             if ($history) {
-                $this->_aViewData["menuhistory"] = $navTree->getListNodes($history);
+                $this->_aViewData['menuhistory'] = $navTree->getListNodes($history);
             }
 
-            $this->_aViewData["blOpenHistory"] = $request->getRequestEscapedParameter('openHistory');
+            $this->_aViewData['blOpenHistory'] = $request->getRequestEscapedParameter('openHistory');
         }
 
         $isMallAdmin = $session->getVariable('malladmin');
@@ -84,7 +86,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         }
 
         $this->_aViewData['shoplist'] = $shopList;
-        $this->_aViewData["shopURL"] = Registry::getConfig()->getShopURL();
+        $this->_aViewData['shopURL'] = Registry::getConfig()->getShopURL();
 
         return $item;
     }
@@ -92,7 +94,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Changing active shop
      */
-    public function chshp()
+    public function chshp(): void
     {
         parent::chshp();
 
@@ -106,7 +108,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Destroy session, redirects to admin login and clears cache
      */
-    public function logout()
+    public function logout(): void
     {
         $session = Registry::getSession();
         $myConfig = Registry::getConfig();
@@ -128,15 +130,15 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Caches external url file locally, adds <base> tag with original url to load images and other links correcly
      */
-    public function exturl()
+    public function exturl(): void
     {
         $myUtils = Registry::getUtils();
-        if ($sUrl = Registry::getRequest()->getRequestEscapedParameter("url")) {
+        if ($sUrl = Registry::getRequest()->getRequestEscapedParameter('url')) {
             // Caching not allowed, redirecting
             $myUtils->redirect($sUrl, true, 302);
         }
 
-        $myUtils->showMessageAndExit("");
+        $myUtils->showMessageAndExit('');
     }
 
     /**

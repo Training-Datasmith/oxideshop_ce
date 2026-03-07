@@ -11,11 +11,12 @@ namespace OxidEsales\EshopCommunity\Tests\Codeception\Acceptance\Admin;
 
 use Codeception\Attribute\Group;
 use OxidEsales\Codeception\Module\Translation\Translator;
-use OxidEsales\EshopCommunity\Tests\Codeception\Support\AcceptanceTester;
-use Symfony\Component\Filesystem\Path;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FileSizeLogic;
+use OxidEsales\EshopCommunity\Tests\Codeception\Support\AcceptanceTester;
 
 use function sprintf;
+
+use Symfony\Component\Filesystem\Path;
 
 #[Group('admin', 'product', 'pictures')]
 final class ProductPicturesCest
@@ -89,7 +90,7 @@ final class ProductPicturesCest
     {
         $I->wantToTest('uploading invalid image will display an error message with filename');
         $minSize = '1024';
-        $I->amGoingTo("set the minimum image size to make previously valid image fixtures invalid");
+        $I->amGoingTo('set the minimum image size to make previously valid image fixtures invalid');
         $I->updateProjectConfigurations(['oxid_esales.product.media.file.min_size_kb' => $minSize], []);
         $picturesPage = $I
             ->loginAdmin()

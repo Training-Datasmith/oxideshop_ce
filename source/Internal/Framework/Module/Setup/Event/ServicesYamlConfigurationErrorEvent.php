@@ -18,24 +18,19 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ServicesYamlConfigurationErrorEvent extends Event
 {
     public function __construct(
-        private string $errorMessage,
-        private string $configurationFilePath
+        private readonly string $errorMessage,
+        private readonly string $configurationFilePath
     ) {
     }
 
     /**
      * Returns the file that is misconfigured
-     *
-     * @return string
      */
     public function getConfigurationFilePath(): string
     {
         return $this->configurationFilePath;
     }
 
-    /**
-     * @return string
-     */
     public function getErrorMessage(): string
     {
         return $this->errorMessage;

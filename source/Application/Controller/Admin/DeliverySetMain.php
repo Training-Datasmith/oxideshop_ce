@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,8 +25,8 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $odeliveryset = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySet::class);
             $odeliveryset->loadInLang($this->_iEditLang, $soxId);
@@ -35,7 +37,7 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
                 $odeliveryset->loadInLang(key($oOtherLang), $soxId);
             }
 
-            $this->_aViewData["edit"] = $odeliveryset;
+            $this->_aViewData['edit'] = $odeliveryset;
             //Disable editing for derived articles
             if ($odeliveryset->isDerived()) {
                 $this->_aViewData['readonly'] = true;
@@ -43,42 +45,40 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             // remove already created languages
             $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oDeliverysetMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetMainAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetMainAjax->getColumns();
 
-            return "popups/deliveryset_main";
+            return 'popups/deliveryset_main';
         }
 
-        return "deliveryset_main";
+        return 'deliveryset_main';
     }
 
     /**
      * Saves deliveryset information changes.
-     *
-     * @return mixed
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oDelSet = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySet::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oDelSet->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxdeliveryset__oxid'] = null;
@@ -107,13 +107,11 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
     /**
      * Saves deliveryset data to different language (eg. english).
-     *
-     * @return null
      */
-    public function saveinnlang()
+    public function saveinnlang(): void
     {
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (!isset($aParams['oxdeliveryset__oxactive'])) {
             $aParams['oxdeliveryset__oxactive'] = 0;
@@ -121,7 +119,7 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         $oDelSet = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySet::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oDelSet->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxdeliveryset__oxid'] = null;
@@ -137,7 +135,7 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         }
 
         // apply new language
-        $oDelSet->setLanguage(Registry::getRequest()->getRequestEscapedParameter("new_lang"));
+        $oDelSet->setLanguage(Registry::getRequest()->getRequestEscapedParameter('new_lang'));
         $oDelSet->save();
 
         // set oxid if inserted

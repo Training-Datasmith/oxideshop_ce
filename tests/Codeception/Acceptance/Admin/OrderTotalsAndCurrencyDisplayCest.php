@@ -75,7 +75,7 @@ final class OrderTotalsAndCurrencyDisplayCest
             'OXTOTALBRUTSUM' => 20000.00,
             'OXTOTALORDERSUM' => 20000.00,
             'OXCURRENCY' => 'EUR',
-            'OXCURRATE' => 1.00
+            'OXCURRATE' => 1.00,
         ]);
 
         $I->haveInDatabase('oxorderarticles', [
@@ -86,7 +86,7 @@ final class OrderTotalsAndCurrencyDisplayCest
             'OXARTNUM' => '1000',
             'OXTITLE' => 'Test product 1',
             'OXBRUTPRICE' => 5000.00,
-            'OXORDERSHOPID' => 1
+            'OXORDERSHOPID' => 1,
         ]);
 
         $I->haveInDatabase('oxorderarticles', [
@@ -97,7 +97,7 @@ final class OrderTotalsAndCurrencyDisplayCest
             'OXARTNUM' => '1001',
             'OXTITLE' => 'Test product 2',
             'OXBRUTPRICE' => 15000.00,
-            'OXORDERSHOPID' => 1
+            'OXORDERSHOPID' => 1,
         ]);
     }
 }

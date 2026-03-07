@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,7 +30,7 @@ class CountryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param integer $iLang language
      */
-    public function loadActiveCountries($iLang = null)
+    public function loadActiveCountries($iLang = null): void
     {
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
         $sViewName = $tableViewNameGenerator->getViewName('oxcountry', $iLang);

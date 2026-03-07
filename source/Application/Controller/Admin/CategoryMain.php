@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,7 +21,7 @@ use stdClass;
  */
 class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
 {
-    const NEW_CATEGORY_ID = "-1";
+    public const NEW_CATEGORY_ID = '-1';
 
     /**
      * Loads article category data,
@@ -38,12 +40,12 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         $categoryId = $this->getEditObjectId();
 
-        $this->_aViewData["edit"] = $oCategory;
-        $this->_aViewData["oxid"] = $categoryId;
+        $this->_aViewData['edit'] = $oCategory;
+        $this->_aViewData['oxid'] = $categoryId;
 
         if (isset($categoryId) && $categoryId != self::NEW_CATEGORY_ID) {
             // generating category tree for select list
-            $this->createCategoryTree("artcattree", $categoryId);
+            $this->createCategoryTree('artcattree', $categoryId);
 
             // load object
             $oCategory->loadInLang($this->_iEditLang, $categoryId);
@@ -61,42 +63,42 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
             if ($oCategory->oxcategories__oxparentid->value == 'oxrootid') {
                 $oCategory->oxcategories__oxparentid->setValue('');
             }
 
-            $this->getCategoryTree("cattree", $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
+            $this->getCategoryTree('cattree', $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
 
-            $this->_aViewData["defsort"] = $oCategory->oxcategories__oxdefsort->value;
+            $this->_aViewData['defsort'] = $oCategory->oxcategories__oxdefsort->value;
         } else {
-            $this->createCategoryTree("cattree", "", true, $myConfig->getShopId());
+            $this->createCategoryTree('cattree', '', true, $myConfig->getShopId());
         }
 
-        $this->_aViewData["sortableFields"] = $this->getSortableFields();
+        $this->_aViewData['sortableFields'] = $this->getSortableFields();
 
         if ($this->getViewConfig()->isAltImageServerConfigured()) {
-            $this->_aViewData["imageUrl"] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
+            $this->_aViewData['imageUrl'] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
         }
 
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             /** @var \OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax $oCategoryMainAjax */
             $oCategoryMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryMainAjax->getColumns();
 
-            return "popups/category_main";
+            return 'popups/category_main';
         }
 
-        return "category_main";
+        return 'category_main';
     }
 
     /**
@@ -106,40 +108,37 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     public function getSortableFields()
     {
-        $aSkipFields = ["OXID", "OXSHOPID", "OXMAPID", "OXPARENTID", "OXACTIVE", "OXACTIVEFROM"
-        , "OXACTIVETO", "OXSHORTDESC"
-        , "OXUNITNAME", "OXUNITQUANTITY", "OXEXTURL", "OXURLDESC", "OXURLIMG", "OXVAT"
-        , "OXTHUMB", "OXPIC1", "OXPIC2", "OXPIC3", "OXPIC4", "OXPIC5"
-        , "OXPIC6", "OXPIC7", "OXPIC8", "OXPIC9", "OXPIC10", "OXPIC11", "OXPIC12", "OXSTOCKFLAG"
-        , "OXSTOCKTEXT", "OXNOSTOCKTEXT", "OXDELIVERY", "OXFILE", "OXSEARCHKEYS", "OXTEMPLATE"
-        , "OXQUESTIONEMAIL", "OXISSEARCH", "OXISCONFIGURABLE", "OXBUNDLEID", "OXFOLDER", "OXSUBCLASS"
-        , "OXREMINDACTIVE", "OXREMINDAMOUNT", "OXVENDORID", "OXMANUFACTURERID", "OXSKIPDISCOUNTS"
-        , "OXBLFIXEDPRICE", "OXICON", "OXVARSELECT", "OXAMITEMID", "OXAMTASKID", "OXPIXIEXPORT", "OXPIXIEXPORTED", "OXSORT"
-        , "OXUPDATEPRICE", "OXUPDATEPRICEA", "OXUPDATEPRICEB", "OXUPDATEPRICEC", "OXUPDATEPRICETIME", "OXISDOWNLOADABLE"
-        , "OXVARMAXPRICE", "OXSHOWCUSTOMAGREEMENT"
+        $aSkipFields = ['OXID', 'OXSHOPID', 'OXMAPID', 'OXPARENTID', 'OXACTIVE', 'OXACTIVEFROM'
+        , 'OXACTIVETO', 'OXSHORTDESC'
+        , 'OXUNITNAME', 'OXUNITQUANTITY', 'OXEXTURL', 'OXURLDESC', 'OXURLIMG', 'OXVAT'
+        , 'OXTHUMB', 'OXPIC1', 'OXPIC2', 'OXPIC3', 'OXPIC4', 'OXPIC5'
+        , 'OXPIC6', 'OXPIC7', 'OXPIC8', 'OXPIC9', 'OXPIC10', 'OXPIC11', 'OXPIC12', 'OXSTOCKFLAG'
+        , 'OXSTOCKTEXT', 'OXNOSTOCKTEXT', 'OXDELIVERY', 'OXFILE', 'OXSEARCHKEYS', 'OXTEMPLATE'
+        , 'OXQUESTIONEMAIL', 'OXISSEARCH', 'OXISCONFIGURABLE', 'OXBUNDLEID', 'OXFOLDER', 'OXSUBCLASS'
+        , 'OXREMINDACTIVE', 'OXREMINDAMOUNT', 'OXVENDORID', 'OXMANUFACTURERID', 'OXSKIPDISCOUNTS'
+        , 'OXBLFIXEDPRICE', 'OXICON', 'OXVARSELECT', 'OXAMITEMID', 'OXAMTASKID', 'OXPIXIEXPORT', 'OXPIXIEXPORTED', 'OXSORT'
+        , 'OXUPDATEPRICE', 'OXUPDATEPRICEA', 'OXUPDATEPRICEB', 'OXUPDATEPRICEC', 'OXUPDATEPRICETIME', 'OXISDOWNLOADABLE'
+        , 'OXVARMAXPRICE', 'OXSHOWCUSTOMAGREEMENT',
         ];
         /** @var \OxidEsales\Eshop\Core\DbMetaDataHandler $oDbHandler */
         $oDbHandler = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
         $aFields = array_merge($oDbHandler->getMultilangFields('oxarticles'), array_keys($oDbHandler->getSinglelangFields('oxarticles', 0)));
         $aFields = array_diff($aFields, $aSkipFields);
-        $aFields = array_unique($aFields);
 
-        return $aFields;
+        return array_unique($aFields);
     }
 
     /**
      * Saves article category data.
-     *
-     * @return mixed
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
 
         $aParams = $this->parseRequestParametersForSave(
-            Registry::getRequest()->getRequestEscapedParameter("editval")
+            Registry::getRequest()->getRequestEscapedParameter('editval')
         );
 
         if (!$this->validateRequestImages()) {
@@ -151,7 +150,7 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $oCategory = $this->createCategory();
 
         if ($soxId != self::NEW_CATEGORY_ID) {
-            $this->resetCounter("catArticle", $soxId);
+            $this->resetCounter('catArticle', $soxId);
             $this->resetCategoryPictures($oCategory, $aParams, $soxId);
         }
 
@@ -183,17 +182,15 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     /**
      * Saves article category data to different language (eg. english).
      */
-    public function saveinnlang()
+    public function saveinnlang(): void
     {
         $this->save();
     }
 
     /**
      * Deletes selected master picture.
-     *
-     * @return null
      */
-    public function deletePicture()
+    public function deletePicture(): void
     {
         $myConfig = Registry::getConfig();
 
@@ -227,8 +224,6 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      *
      * @param \OxidEsales\Eshop\Application\Model\Category $item  active category object
      * @param string                                       $field picture field name
-     *
-     * @return null
      */
     protected function deleteCatPicture($item, $field)
     {
@@ -239,22 +234,12 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $myConfig = Registry::getConfig();
         $sItemKey = 'oxcategories__' . $field;
 
-        switch ($field) {
-            case 'oxthumb':
-                $sImgType = 'TC';
-                break;
-
-            case 'oxicon':
-                $sImgType = 'CICO';
-                break;
-
-            case 'oxpromoicon':
-                $sImgType = 'PICO';
-                break;
-
-            default:
-                $sImgType = false;
-        }
+        $sImgType = match ($field) {
+            'oxthumb' => 'TC',
+            'oxicon' => 'CICO',
+            'oxpromoicon' => 'PICO',
+            default => false,
+        };
 
         if ($sImgType !== false) {
             /** @var \OxidEsales\Eshop\Core\UtilsPic $myUtilsPic */
@@ -302,8 +287,8 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             $aReqParams['oxcategories__oxid'] = null;
         }
 
-        if (isset($aReqParams["oxcategories__oxlongdesc"])) {
-            $aReqParams["oxcategories__oxlongdesc"] = $this->processLongDesc($aReqParams["oxcategories__oxlongdesc"]);
+        if (isset($aReqParams['oxcategories__oxlongdesc'])) {
+            $aReqParams['oxcategories__oxlongdesc'] = $this->processLongDesc($aReqParams['oxcategories__oxlongdesc']);
         }
 
         if (empty($aReqParams['oxcategories__oxpricefrom'])) {
@@ -361,8 +346,6 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     protected function createCategory()
     {
-        $category = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-
-        return $category;
+        return oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
     }
 }

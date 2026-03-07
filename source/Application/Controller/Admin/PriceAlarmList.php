@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,7 +37,7 @@ class PriceAlarmList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      *
      * @var string
      */
-    protected $_sDefSortField = "oxuserid";
+    protected $_sDefSortField = 'oxuserid';
 
     /**
      * Modifying SQL query to load additional article and customer data
@@ -47,13 +49,12 @@ class PriceAlarmList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     protected function buildSelectString($oListObject = null)
     {
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sViewName = $tableViewNameGenerator->getViewName("oxarticles", (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam("sDefaultLang"));
+        $sViewName = $tableViewNameGenerator->getViewName('oxarticles', (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sDefaultLang'));
         $sSql = "select oxpricealarm.*, {$sViewName}.oxtitle AS articletitle, ";
-        $sSql .= "oxuser.oxlname as userlname, oxuser.oxfname as userfname ";
+        $sSql .= 'oxuser.oxlname as userlname, oxuser.oxfname as userfname ';
         $sSql .= "from oxpricealarm left join {$sViewName} on {$sViewName}.oxid = oxpricealarm.oxartid ";
-        $sSql .= "left join oxuser on oxuser.oxid = oxpricealarm.oxuserid WHERE 1 ";
 
-        return $sSql;
+        return $sSql . 'left join oxuser on oxuser.oxid = oxpricealarm.oxuserid WHERE 1 ';
     }
 
     /**
@@ -65,8 +66,8 @@ class PriceAlarmList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     {
         $this->_aWhere = parent::buildWhere();
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sViewName = $tableViewNameGenerator->getViewName("oxpricealarm");
-        $sArtViewName = $tableViewNameGenerator->getViewName("oxarticles");
+        $sViewName = $tableViewNameGenerator->getViewName('oxpricealarm');
+        $sArtViewName = $tableViewNameGenerator->getViewName('oxarticles');
 
         // updating price fields values for correct search in DB
         if (isset($this->_aWhere[$sViewName . '.oxprice'])) {

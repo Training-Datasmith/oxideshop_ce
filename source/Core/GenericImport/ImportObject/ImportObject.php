@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,16 +18,16 @@ use OxidEsales\Eshop\Core\TableViewNameGenerator;
 abstract class ImportObject
 {
     /** @var string Database table name. */
-    protected $tableName = null;
+    protected $tableName;
 
     /** @var array List of database fields, to which data should be imported. */
-    protected $fieldList = null;
+    protected $fieldList;
 
     /** @var array List of database key fields (i.e. oxid). */
-    protected $keyFieldList = null;
+    protected $keyFieldList;
 
     /** @var string Shop object name. */
-    protected $shopObjectName = null;
+    protected $shopObjectName;
 
     /**
      * Getter for _sTableName
@@ -42,7 +44,7 @@ abstract class ImportObject
      *
      * @param array $aFieldList fields to set
      */
-    public function setFieldList($aFieldList)
+    public function setFieldList($aFieldList): void
     {
         $this->fieldList = $aFieldList;
     }
@@ -56,7 +58,7 @@ abstract class ImportObject
      *
      * @throws Exception on now access
      */
-    public function checkWriteAccess($shopObject, $data = null)
+    public function checkWriteAccess($shopObject, $data = null): void
     {
         if ($shopObject->isDerived()) {
             throw new Exception(GenericImport::ERROR_USER_NO_RIGHTS);
@@ -117,7 +119,7 @@ abstract class ImportObject
         $fields = str_ireplace(
             "`$viewName`.",
             '',
-            strtoupper($shopObject->getSelectFields())
+            strtoupper((string) $shopObject->getSelectFields())
         );
         $fields = str_ireplace(
             [' ', '`'],
@@ -171,7 +173,7 @@ abstract class ImportObject
      *
      * @return array
      */
-    protected function preAssignObject($shopObject, $data, $allowCustomShopId)
+    protected function preAssignObject($shopObject, array $data, $allowCustomShopId)
     {
         if (isset($data['OXSHOPID'])) {
             $data['OXSHOPID'] = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
@@ -220,7 +222,7 @@ abstract class ImportObject
 
         foreach ($data as $key => $value) {
             // change case to UPPER
-            $uppercaseKey = strtoupper($key);
+            $uppercaseKey = strtoupper((string) $key);
             if (!isset($data[$uppercaseKey])) {
                 unset($data[$key]);
                 $data[$uppercaseKey] = $value;
@@ -281,7 +283,7 @@ abstract class ImportObject
      *
      * @return string
      */
-    protected function getOxidFromKeyFields($data)
+    protected function getOxidFromKeyFields(array $data)
     {
         if (!is_array($this->getKeyFields())) {
             return null;
@@ -320,7 +322,7 @@ abstract class ImportObject
         $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $user->loadAdminUser();
 
-        if ($user->oxuser__oxrights->value == "malladmin" || $user->oxuser__oxrights->value == (int) $shopId) {
+        if ($user->oxuser__oxrights->value == 'malladmin' || $user->oxuser__oxrights->value == (int) $shopId) {
             return true;
         }
 
@@ -337,9 +339,10 @@ abstract class ImportObject
     protected function checkIdField($id)
     {
         if (!isset($id) || !$id) {
-            throw new Exception("ERROR: Articlenumber/ID missing!");
-        } elseif (strlen($id) > 32) {
-            throw new Exception("ERROR: Articlenumber/ID longer then allowed (32 chars max.)!");
+            throw new Exception('ERROR: Articlenumber/ID missing!');
+        }
+        if (strlen($id) > 32) {
+            throw new Exception('ERROR: Articlenumber/ID longer then allowed (32 chars max.)!');
         }
     }
 

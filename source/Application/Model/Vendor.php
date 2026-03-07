@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
-use oxField;
 
 /**
  * Vendor manager
@@ -79,7 +78,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @param bool $blShowArticleCount Marker to load vendor article count
      */
-    public function setShowArticleCnt($blShowArticleCount = false)
+    public function setShowArticleCnt($blShowArticleCount = false): void
     {
         $this->_blShowArticleCnt = $blShowArticleCount;
     }
@@ -89,7 +88,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @param array $dbRecord parameters/values
      */
-    public function assign($dbRecord)
+    public function assign($dbRecord): void
     {
         parent::assign($dbRecord);
 
@@ -192,7 +191,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
             $sUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        return $sUrl . "index.php?cl=vendorlist" . ($blAddId ? "&amp;cnid=v_" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=vendorlist' . ($blAddId ? '&amp;cnid=v_' . $this->getId() : '');
     }
 
     /**
@@ -248,7 +247,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @param bool $blVisible vendors visibility status setter
      */
-    public function setIsVisible($blVisible)
+    public function setIsVisible($blVisible): void
     {
         $this->_blIsVisible = $blVisible;
     }
@@ -272,7 +271,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @param bool $blHasVisibleSubcats marker if vendor has visible subcategories
      */
-    public function setHasVisibleSubCats($blHasVisibleSubcats)
+    public function setHasVisibleSubCats($blHasVisibleSubcats): void
     {
         $this->_blHasVisibleSubCats = $blHasVisibleSubcats;
     }
@@ -308,7 +307,6 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
         return false;
     }
 
-
     /**
      * Returns article picture
      *
@@ -323,7 +321,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
                 $sSize = $oConfig->getConfigParam('sIconsize');
             }
 
-            return \OxidEsales\Eshop\Core\Registry::getPictureHandler()->getPicUrl("vendor/icon/", $sIcon, $sSize);
+            return \OxidEsales\Eshop\Core\Registry::getPictureHandler()->getPicUrl('vendor/icon/', $sIcon, $sSize);
         }
     }
 

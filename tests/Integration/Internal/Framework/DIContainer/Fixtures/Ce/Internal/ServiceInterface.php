@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Ce\Internal;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Ce\Internal;
 
 interface ServiceInterface
 {

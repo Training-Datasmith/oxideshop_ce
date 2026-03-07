@@ -49,10 +49,10 @@ final class MetaDataMapperTest extends TestCase
                             'name'  => 'setting',
                             'type'  => 'bool',
                             'value' => 'true',
-                            'position' => '2'
+                            'position' => '2',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 

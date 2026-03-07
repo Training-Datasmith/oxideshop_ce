@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -59,7 +61,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
     /**
      * Executes Email::sendForgotPwdEmail() to send "forgot password" email to user
      */
-    public function forgotPassword()
+    public function forgotPassword(): void
     {
         $this->_sForgotEmail = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
         if ($this->_sForgotEmail) {
@@ -105,12 +107,10 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
             Registry::getSession()->setVariable('usr', $oUser->getId());
 
             return 'forgotpwd?success=1';
-        } else {
-            // expired reminder
-            $oUtilsView = Registry::getUtilsView();
-
-            return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_PASSWORD_LINK_EXPIRED', false, true);
         }
+        // expired reminder
+        $oUtilsView = Registry::getUtilsView();
+        return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_PASSWORD_LINK_EXPIRED', false, true);
     }
 
     /**

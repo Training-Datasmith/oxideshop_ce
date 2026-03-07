@@ -15,12 +15,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 
 class SettingsMergingService implements SettingsMergingServiceInterface
 {
-    /**
-     * @param ShopConfiguration   $shopConfiguration
-     * @param ModuleConfiguration $moduleConfigurationToMerge
-     *
-     * @return ModuleConfiguration
-     */
     public function merge(
         ShopConfiguration $shopConfiguration,
         ModuleConfiguration $moduleConfigurationToMerge

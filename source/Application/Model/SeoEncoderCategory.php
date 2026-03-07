@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -59,10 +61,8 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      * @param int                                          $iLang active language
      *
      * @access private
-     *
-     * @return string
      */
-    private function getCategoryCacheId($oCat, $iLang)
+    private function getCategoryCacheId($oCat, $iLang): string
     {
         return $oCat->getId() . '_' . ((int) $iLang);
     }
@@ -174,7 +174,7 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
         }
         // category may have specified url
         if (($sSeoUrl = $this->getCategoryUri($oCategory, $iLang))) {
-            $sUrl = $this->getFullUrl($sSeoUrl, $iLang);
+            return $this->getFullUrl($sSeoUrl, $iLang);
         }
 
         return $sUrl;
@@ -185,15 +185,15 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @param \OxidEsales\Eshop\Application\Model\Category $oCategory Category object
      */
-    public function markRelatedAsExpired($oCategory)
+    public function markRelatedAsExpired($oCategory): void
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         // select it from table instead of using object carrying value
         // this is because this method is usually called inside update,
         // where object may already be carrying changed id
-        $aCatInfo = $oDb->getRow("select oxrootid, oxleft, oxright from oxcategories where oxid = :oxid limit 1", [
-            'oxid' => $oCategory->getId()
+        $aCatInfo = $oDb->getRow('select oxrootid, oxleft, oxright from oxcategories where oxid = :oxid limit 1', [
+            'oxid' => $oCategory->getId(),
         ]);
 
         // update sub cats
@@ -205,42 +205,42 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
         $oDb->execute($sQ, [
             'oxrootid' => $aCatInfo['oxrootid'],
             'oxleft' => (int) $aCatInfo['oxleft'],
-            'oxright' => (int) $aCatInfo['oxright']
+            'oxright' => (int) $aCatInfo['oxright'],
         ]);
 
         // update subarticles
-        $sQ = "update oxseo as seo1, (select distinct o2c.oxobjectid as id from oxcategories as cat left join oxobject2category "
-              . "as o2c on o2c.oxcatnid=cat.oxid where cat.oxrootid = :oxrootid and cat.oxleft >= :oxleft "
-              . "and cat.oxright <= :oxright) as seo2 "
+        $sQ = 'update oxseo as seo1, (select distinct o2c.oxobjectid as id from oxcategories as cat left join oxobject2category '
+              . 'as o2c on o2c.oxcatnid=cat.oxid where cat.oxrootid = :oxrootid and cat.oxleft >= :oxleft '
+              . 'and cat.oxright <= :oxright) as seo2 '
               . "set seo1.oxexpired = '1' where seo1.oxtype = 'oxarticle' and seo1.oxobjectid = seo2.id "
-              . "and seo1.oxfixed = 0";
+              . 'and seo1.oxfixed = 0';
         $oDb->execute($sQ, [
             'oxrootid' => $aCatInfo['oxrootid'],
             'oxleft' => (int) $aCatInfo['oxleft'],
-            'oxright' => (int) $aCatInfo['oxright']
+            'oxright' => (int) $aCatInfo['oxright'],
         ]);
     }
 
     /**
      * @param Category $category
      */
-    public function onDeleteCategory($category)
+    public function onDeleteCategory($category): void
     {
         $this->setRelatedToCategorySeoUrlsAsExpired($category);
 
         $database = DatabaseProvider::getDb();
 
         $database->execute("delete from oxseo where oxseo.oxtype = 'oxarticle' and oxseo.oxparams = :oxparams", [
-            'oxparams' => $category->getId()
+            'oxparams' => $category->getId(),
         ]);
         $database->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcategory'", [
-            'oxobjectid' => $category->getId()
+            'oxobjectid' => $category->getId(),
         ]);
-        $database->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $category->getId()
+        $database->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $category->getId(),
         ]);
-        $database->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $category->getId()
+        $database->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $category->getId(),
         ]);
     }
 
@@ -257,7 +257,7 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
         $sSeoUrl = null;
         $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
         if ($oCat->loadInLang($iLang, $sObjectId)) {
-            $sSeoUrl = $this->getCategoryUri($oCat, $iLang);
+            return $this->getCategoryUri($oCat, $iLang);
         }
 
         return $sSeoUrl;

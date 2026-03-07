@@ -233,7 +233,7 @@ final class ArticlePicturesAjaxTest extends IntegrationTestCase
         $this->rewriteProjectConfiguration([
             'parameters' => [
                 'oxid_esales.product.media.file.min_size_kb' => '1048576',
-            ]
+            ],
         ]);
 
         $this->setupContainerWithRequest(
@@ -301,7 +301,7 @@ final class ArticlePicturesAjaxTest extends IntegrationTestCase
     private function addProductMediaWithId(Id $mediaId, Id $productId, string ...$roles): ProductMedia
     {
         $roleSet = new ProductMediaRoleSet(...array_map(
-            fn(string $role) => ProductMediaRole::from($role),
+            fn (string $role) => ProductMediaRole::from($role),
             $roles
         ));
 
@@ -335,7 +335,7 @@ final class ArticlePicturesAjaxTest extends IntegrationTestCase
         $this->rewriteProjectConfiguration([
             'parameters' => [
                 'oxid_esales.product.media.file.min_size_kb' => '0',
-            ]
+            ],
         ]);
 
         $this->createContainer();

@@ -21,6 +21,6 @@ $aModule = [
     'author' => 'OXID',
     'extend' => [
         /** The class file does not exist at all and thus the class cannot be loaded */
-        Article::class => NonExistentFile::class
+        Article::class => NonExistentFile::class,
     ],
 ];

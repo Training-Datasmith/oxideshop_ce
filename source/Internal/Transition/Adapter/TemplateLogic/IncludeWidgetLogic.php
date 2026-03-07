@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,8 +14,6 @@ use OxidEsales\EshopCommunity\Core\WidgetControl;
 class IncludeWidgetLogic
 {
     /**
-     * @param array $params
-     *
      * @return mixed
      */
     public function renderWidget(array $params)
@@ -25,9 +25,9 @@ class IncludeWidgetLogic
         }
 
         $parentViews = null;
-        if (!empty($params["_parent"])) {
-            $parentViews = explode("|", $params["_parent"]);
-            unset($params["_parent"]);
+        if (!empty($params['_parent'])) {
+            $parentViews = explode('|', (string) $params['_parent']);
+            unset($params['_parent']);
         }
 
         /**

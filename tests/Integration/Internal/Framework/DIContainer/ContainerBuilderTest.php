@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer;
 
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\ContainerBuilder;
 use OxidEsales\EshopCommunity\Internal\Framework\Edition\Edition;
 use OxidEsales\EshopCommunity\Tests\EnvTrait;
@@ -45,7 +44,6 @@ final class ContainerBuilderTest extends TestCase
 
         $container = (new ContainerBuilder($context))->getContainer();
         $container->compile();
-
 
         $decoratorChainOutput =
             'ce.component.module.project_default_env';

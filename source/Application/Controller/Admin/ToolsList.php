@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Registry;
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
 
 /**
@@ -28,27 +30,27 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
     /**
      * Performs full view update
      */
-    public function updateViews()
+    public function updateViews(): void
     {
         //preventing edit for anyone except malladmin
-        if (\OxidEsales\Eshop\Core\Registry::getSession()->getVariable("malladmin")) {
+        if (\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('malladmin')) {
             $oMetaData = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
-            $this->_aViewData["blViewSuccess"] = $oMetaData->updateViews();
+            $this->_aViewData['blViewSuccess'] = $oMetaData->updateViews();
         }
     }
 
     /**
      * Method performs user passed SQL query
      */
-    public function performsql()
+    public function performsql(): void
     {
         $oAuthUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $oAuthUser->loadAdminUser();
-        if ($oAuthUser->oxuser__oxrights->value === "malladmin") {
-            $sUpdateSQL = Registry::getRequest()->getRequestEscapedParameter("updatesql");
+        if ($oAuthUser->oxuser__oxrights->value === 'malladmin') {
+            $sUpdateSQL = Registry::getRequest()->getRequestEscapedParameter('updatesql');
             $sUpdateSQLFile = $this->processFiles();
 
-            if ($sUpdateSQLFile && strlen($sUpdateSQLFile) > 0) {
+            if ($sUpdateSQLFile && strlen((string) $sUpdateSQLFile) > 0) {
                 if (isset($sUpdateSQL) && strlen($sUpdateSQL)) {
                     $sUpdateSQL .= ";\r\n" . $sUpdateSQLFile;
                 } else {
@@ -56,12 +58,12 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
                 }
             }
 
-            $sUpdateSQL = trim(stripslashes($sUpdateSQL));
+            $sUpdateSQL = trim(stripslashes((string) $sUpdateSQL));
             $oStr = Str::getStr();
             $iLen = $oStr->strlen($sUpdateSQL);
             if ($this->prepareSQL($sUpdateSQL, $iLen)) {
                 $aQueries = $this->aSQLs;
-                $this->_aViewData["aQueries"] = [];
+                $this->_aViewData['aQueries'] = [];
                 $aPassedQueries = [];
                 $aQAffectedRows = [];
                 $aQErrorMessages = [];
@@ -73,15 +75,15 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
                     $iQueriesCounter = 0;
                     for ($i = 0; $i < count($aQueries); $i++) {
                         $sUpdateSQL = $aQueries[$i];
-                        $sUpdateSQL = trim($sUpdateSQL);
+                        $sUpdateSQL = trim((string) $sUpdateSQL);
 
                         if ($oStr->strlen($sUpdateSQL) > 0) {
-                            $aPassedQueries[$iQueriesCounter] = nl2br($oStr->htmlentities($sUpdateSQL));
+                            $aPassedQueries[$iQueriesCounter] = nl2br((string) $oStr->htmlentities($sUpdateSQL));
                             if ($oStr->strlen($aPassedQueries[$iQueriesCounter]) > 200) {
-                                $aPassedQueries[$iQueriesCounter] = $oStr->substr($aPassedQueries[$iQueriesCounter], 0, 200) . "...";
+                                $aPassedQueries[$iQueriesCounter] = $oStr->substr($aPassedQueries[$iQueriesCounter], 0, 200) . '...';
                             }
 
-                            while ($sUpdateSQL[$oStr->strlen($sUpdateSQL) - 1] == ";") {
+                            while ($sUpdateSQL[$oStr->strlen($sUpdateSQL) - 1] == ';') {
                                 $sUpdateSQL = $oStr->substr($sUpdateSQL, 0, ($oStr->strlen($sUpdateSQL) - 1));
                             }
 
@@ -108,10 +110,10 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
                         }
                     }
                 }
-                $this->_aViewData["aQueries"] = $aPassedQueries;
-                $this->_aViewData["aAffectedRows"] = $aQAffectedRows;
-                $this->_aViewData["aErrorMessages"] = $aQErrorMessages;
-                $this->_aViewData["aErrorNumbers"] = $aQErrorNumbers;
+                $this->_aViewData['aQueries'] = $aPassedQueries;
+                $this->_aViewData['aAffectedRows'] = $aQAffectedRows;
+                $this->_aViewData['aErrorMessages'] = $aQErrorMessages;
+                $this->_aViewData['aErrorNumbers'] = $aQErrorNumbers;
             }
             $this->_iDefEdit = 1;
         }
@@ -129,13 +131,13 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
             foreach ($_FILES['myfile']['name'] as $key => $value) {
                 $aSource = $_FILES['myfile']['tmp_name'];
                 $sSource = $aSource[$key];
-                $value = strtolower($value);
+                $value = strtolower((string) $value);
                 // add type to name
-                $aFilename = explode(".", $value);
+                $aFilename = explode('.', $value);
 
                 //hack?
 
-                $aBadFiles = ["php", 'php4', 'php5', "jsp", "cgi", "cmf", "exe"];
+                $aBadFiles = ['php', 'php4', 'php5', 'jsp', 'cgi', 'cmf', 'exe'];
 
                 if (in_array($aFilename[1], $aBadFiles)) {
                     \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("File didn't pass our allowed files filter.");
@@ -143,7 +145,7 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
 
                 //reading SQL dump file
                 if (filesize($sSource) > 0) {
-                    $rHandle = fopen($sSource, "r");
+                    $rHandle = fopen($sSource, 'r');
                     $sContents = fread($rHandle, filesize($sSource));
                     fclose($rHandle);
 
@@ -154,8 +156,6 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
                 return;
             }
         }
-
-        return;
     }
 
     /**
@@ -168,16 +168,16 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      */
     protected function prepareSQL($sSQL, $iSQLlen)
     {
-        $sStrStart = "";
+        $sStrStart = '';
         $blString = false;
         $oStr = Str::getStr();
 
         //removing "mysqldump" application comments
         while ($oStr->preg_match("/^\-\-.*\n/", $sSQL)) {
-            $sSQL = trim($oStr->preg_replace("/^\-\-.*\n/", "", $sSQL));
+            $sSQL = trim((string) $oStr->preg_replace("/^\-\-.*\n/", '', $sSQL));
         }
         while ($oStr->preg_match("/\n\-\-.*\n/", $sSQL)) {
-            $sSQL = trim($oStr->preg_replace("/\n\-\-.*\n/", "\n", $sSQL));
+            $sSQL = trim((string) $oStr->preg_replace("/\n\-\-.*\n/", "\n", $sSQL));
         }
 
         for ($iPos = 0; $iPos < $iSQLlen; ++$iPos) {
@@ -188,12 +188,13 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
                     //we are at the end of string ?
                     if (!$iPos) {
                         $this->aSQLs[] = $sSQL;
-
                         return true;
-                    } elseif ($sStrStart == '`' || $sSQL[$iPos - 1] != '\\') {
+                    }
+                    //we are at the end of string ?
+                    if ($sStrStart == '`' || $sSQL[$iPos - 1] != '\\') {
                         //found some query separators
                         $blString = false;
-                        $sStrStart = "";
+                        $sStrStart = '';
                         break;
                     } else {
                         $iNext = 2;
@@ -204,17 +205,17 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
                         }
                         if ($blBackslash) {
                             $blString = false;
-                            $sStrStart = "";
+                            $sStrStart = '';
                             break;
                         } else {
                             $iPos++;
                         }
                     }
                 }
-            } elseif ($sChar == ";") {
+            } elseif ($sChar == ';') {
                 // delimiter found, appending query array
                 $this->aSQLs[] = $oStr->substr($sSQL, 0, $iPos);
-                $sSQL = ltrim($oStr->substr($sSQL, min($iPos + 1, $iSQLlen)));
+                $sSQL = ltrim((string) $oStr->substr($sSQL, min($iPos + 1, $iSQLlen)));
                 $iSQLlen = $oStr->strlen($sSQL);
                 if ($iSQLlen) {
                     $iPos = -1;
@@ -224,30 +225,27 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
             } elseif (($sChar == '"') || ($sChar == '\'') || ($sChar == '`')) {
                 $blString = true;
                 $sStrStart = $sChar;
-            } elseif ($sChar == "#" || ($sChar == ' ' && $iPos > 1 && $sSQL[$iPos - 2] . $sSQL[$iPos - 1] == '--')) {
+            } elseif ($sChar == '#' || ($sChar == ' ' && $iPos > 1 && $sSQL[$iPos - 2] . $sSQL[$iPos - 1] == '--')) {
                 // removing # commented query code
-                $iCommStart = (($sSQL[$iPos] == "#") ? $iPos : $iPos - 2);
-                $iCommEnd = ($oStr->strpos(' ' . $sSQL, "\012", $iPos + 2))
-                    ? $oStr->strpos(' ' . $sSQL, "\012", $iPos + 2)
-                    : $oStr->strpos(' ' . $sSQL, "\015", $iPos + 2);
+                $iCommStart = (($sSQL[$iPos] == '#') ? $iPos : $iPos - 2);
+                $iCommEnd = $oStr->strpos(' ' . $sSQL, "\012", $iPos + 2) ?: $oStr->strpos(' ' . $sSQL, "\015", $iPos + 2);
                 if (!$iCommEnd) {
                     if ($iCommStart > 0) {
-                        $this->aSQLs[] = trim($oStr->substr($sSQL, 0, $iCommStart));
+                        $this->aSQLs[] = trim((string) $oStr->substr($sSQL, 0, $iCommStart));
                     }
 
                     return true;
-                } else {
-                    $sSQL = $oStr->substr($sSQL, 0, $iCommStart) . ltrim($oStr->substr($sSQL, $iCommEnd));
-                    $iSQLlen = $oStr->strlen($sSQL);
-                    $iPos--;
                 }
+                $sSQL = $oStr->substr($sSQL, 0, $iCommStart) . ltrim((string) $oStr->substr($sSQL, $iCommEnd));
+                $iSQLlen = $oStr->strlen($sSQL);
+                $iPos--;
             } elseif (32358 < 32270 && ($sChar == '!' && $iPos > 1 && $sSQL[$iPos - 2] . $sSQL[$iPos - 1] == '/*')) {
                 // removing comments like /**/
                 $sSQL[$iPos] = ' ';
             }
         }
 
-        if (!empty($sSQL) && $oStr->preg_match("/[^[:space:]]+/", $sSQL)) {
+        if (!empty($sSQL) && $oStr->preg_match('/[^[:space:]]+/', $sSQL)) {
             $this->aSQLs[] = $sSQL;
         }
 

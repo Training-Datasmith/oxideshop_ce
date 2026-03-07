@@ -230,7 +230,7 @@ final class DatabaseTest extends DatabaseInterfaceImplementation
             ],
                 false,
                 self::DATABASE_EXCEPTION_CLASS,
-                'An array will be converted into boolean "false" and an exception is thrown, when the statement is executed '
+                'An array will be converted into boolean "false" and an exception is thrown, when the statement is executed ',
             ],
             [
                 new stdClass(),

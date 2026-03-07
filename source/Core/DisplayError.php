@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -31,7 +33,7 @@ class DisplayError implements \OxidEsales\Eshop\Core\Contract\IDisplayError
     {
         $translatedMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->_sMessage);
         if (!empty($this->_aFormatParameters)) {
-            $translatedMessage = vsprintf($translatedMessage, $this->_aFormatParameters);
+            return vsprintf($translatedMessage, $this->_aFormatParameters);
         }
 
         return $translatedMessage;
@@ -42,7 +44,7 @@ class DisplayError implements \OxidEsales\Eshop\Core\Contract\IDisplayError
      *
      * @param string $message message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->_sMessage = $message;
     }
@@ -52,17 +54,15 @@ class DisplayError implements \OxidEsales\Eshop\Core\Contract\IDisplayError
      *
      * @param array $formatParameters
      */
-    public function setFormatParameters($formatParameters)
+    public function setFormatParameters($formatParameters): void
     {
         $this->_aFormatParameters = $formatParameters;
     }
 
     /**
      * Returns errorrous class name (currently returns null)
-     *
-     * @return null
      */
-    public function getErrorClassType()
+    public function getErrorClassType(): null
     {
         return null;
     }
@@ -71,10 +71,8 @@ class DisplayError implements \OxidEsales\Eshop\Core\Contract\IDisplayError
      * Returns value (currently returns empty string)
      *
      * @param string $name value ignored
-     *
-     * @return string
      */
-    public function getValue($name)
+    public function getValue($name): string
     {
         return '';
     }

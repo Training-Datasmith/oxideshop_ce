@@ -22,7 +22,8 @@ abstract class DatabaseInterfaceImplementation extends DatabaseInterfaceImplemen
         $this->loadFixtureToTestTable();
 
         $resultSet = $this->database->select(
-            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?', [self::FIXTURE_OXID_2]
+            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?',
+            [self::FIXTURE_OXID_2]
         );
 
         $result = $resultSet->fetchAll();
@@ -42,7 +43,8 @@ abstract class DatabaseInterfaceImplementation extends DatabaseInterfaceImplemen
         $this->loadFixtureToTestTable();
 
         $resultSet = $this->database->select(
-            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?', [[ 'key' => 'value']]
+            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?',
+            [[ 'key' => 'value']]
         );
 
         $result = $resultSet->fetchAll();
@@ -55,7 +57,8 @@ abstract class DatabaseInterfaceImplementation extends DatabaseInterfaceImplemen
         $this->loadFixtureToTestTable();
 
         $resultSet = $this->database->select(
-            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID <> ?', [self::FIXTURE_OXID_2]
+            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID <> ?',
+            [self::FIXTURE_OXID_2]
         );
 
         $result = $resultSet->fetchAll();
@@ -172,7 +175,7 @@ abstract class DatabaseInterfaceImplementation extends DatabaseInterfaceImplemen
         $expectedRows = [
             ['OXID' => self::FIXTURE_OXID_1],
             ['OXID' => self::FIXTURE_OXID_2],
-            ['OXID' => self::FIXTURE_OXID_3]
+            ['OXID' => self::FIXTURE_OXID_3],
         ];
         $allRows = $result->fetchAll();
 
@@ -331,11 +334,11 @@ abstract class DatabaseInterfaceImplementation extends DatabaseInterfaceImplemen
             . ' to Doctrine::getAll()';
         $expectedResult = [
             [
-                'OXID' => self::FIXTURE_OXID_1
+                'OXID' => self::FIXTURE_OXID_1,
             ],
             [
-                'OXID' => self::FIXTURE_OXID_2
-            ]
+                'OXID' => self::FIXTURE_OXID_2,
+            ],
         ];
 
         $this->truncateTestTable();
@@ -549,7 +552,7 @@ abstract class DatabaseInterfaceImplementation extends DatabaseInterfaceImplemen
                 1,
                 "'1'",
                 [],
-                'The integer 1  will be converted into the string "1" and the query result will be empty'
+                'The integer 1  will be converted into the string "1" and the query result will be empty',
             ],
             [
                 1.5,
@@ -708,7 +711,7 @@ abstract class DatabaseInterfaceImplementation extends DatabaseInterfaceImplemen
                 'unsigned' => true,
                 'has_default' => true,
                 'default_value' => '1.30',
-            ]
+            ],
         ];
     }
 

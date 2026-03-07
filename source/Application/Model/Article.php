@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -75,29 +77,28 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice = null;
-
+    protected $_oPrice;
 
     /**
      * cached article variant min price
      *
      * @var double|null
      */
-    protected $_dVarMinPrice = null;
+    protected $_dVarMinPrice;
 
     /**
      * cached article variant max price
      *
      * @var double|null
      */
-    protected $_dVarMaxPrice = null;
+    protected $_dVarMaxPrice;
 
     /**
      * caches article vat
      *
      * @var double|null
      */
-    protected $_dArticleVat = null;
+    protected $_dArticleVat;
 
     /**
      * Status of article - buyable/not buyable.
@@ -119,14 +120,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var array
      */
-    protected $_aVariants = null;
+    protected $_aVariants;
 
     /**
      * Article variants with empty stock, not orderable flagged variants
      *
      * @var array
      */
-    protected $_aVariantsWithNotOrderables = null;
+    protected $_aVariantsWithNotOrderables;
 
     /**
      * $_blNotBuyableParent is set to true, when article has variants and is not buyable due to:
@@ -137,7 +138,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @var bool
      */
     protected $_blNotBuyableParent = false;
-
 
     /**
      * $_blHasVariants is set to true if article has any variants.
@@ -161,7 +161,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var \OxidEsales\Eshop\Application\Model\User
      */
-    protected $_oUser = null;
+    protected $_oUser;
 
     /**
      * Performance issue. Sometimes you want to load articles without calculating
@@ -179,7 +179,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * values is empty then $_fPricePerUnit is not calculated. Example: In case when product price is 10 EUR and
      * product quantity is 0.5 (liters) then $_fPricePerUnit would be 20,00
      */
-    protected $_fPricePerUnit = null;
+    protected $_fPricePerUnit;
 
     /**
      * Variable used to force load parent data in export
@@ -201,33 +201,33 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var bool
      */
-    protected $_blSkipDiscounts = null;
+    protected $_blSkipDiscounts;
 
     /**
      * Object holding the list of attributes and attribute values associated with this article
      * @var \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    protected $_oAttributeList = null;
+    protected $_oAttributeList;
 
     /**
      * Object holding the list of attributes and attribute values associated with this article and displayable in basket
      * @var \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    protected $basketAttributeList = null;
+    protected $basketAttributeList;
 
     /**
      * Indicates whether the price is "From" price
      *
      * @var bool
      */
-    protected $_blIsRangePrice = null;
+    protected $_blIsRangePrice;
 
     /**
      * The list of article media URLs
      *
      * @var string
      */
-    protected $_aMediaUrls = null;
+    protected $_aMediaUrls;
 
     /**
      * Array containing references to already loaded parent articles, in order for variant to skip parent data loading
@@ -262,7 +262,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var \OxidEsales\Eshop\Application\Model\AmountPriceList
      */
-    protected $_oAmountPriceList = null;
+    protected $_oAmountPriceList;
 
     /**
      * Article details link type (default is 0):
@@ -307,28 +307,28 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var string
      */
-    protected $_sDynImageDir = null;
+    protected $_sDynImageDir;
 
     /**
      * More details link
      *
      * @var string
      */
-    protected $_sMoreDetailLink = null;
+    protected $_sMoreDetailLink;
 
     /**
      * To basket link
      *
      * @var string
      */
-    protected $_sToBasketLink = null;
+    protected $_sToBasketLink;
 
     /**
      * Article stock status when article is initially loaded.
      *
      * @var int
      */
-    protected $_iStockStatusOnLoad = null;
+    protected $_iStockStatusOnLoad;
 
     /**
      * Article original parameters when loaded.
@@ -342,28 +342,28 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var integer
      */
-    protected $_iStockStatus = null;
+    protected $_iStockStatus;
 
     /**
      * T price
      *
      * @var object
      */
-    protected $_oTPrice = null;
+    protected $_oTPrice;
 
     /**
      * Amount price list info
      *
      * @var object
      */
-    protected $_oAmountPriceInfo = null;
+    protected $_oAmountPriceInfo;
 
     /**
      * Amount price
      *
      * @var double
      */
-    protected $_dAmountPrice = null;
+    protected $_dAmountPrice;
 
     /**
      * Articles manufacturer ids cache
@@ -396,7 +396,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         'oxarticles__oxtimestamp',
         'oxarticles__oxnid',
         'oxarticles__oxid',
-        'oxarticles__oxparentid'
+        'oxarticles__oxparentid',
     ];
 
     /**
@@ -408,7 +408,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         'oxarticles__oxnonmaterial',
         'oxarticles__oxfreeshipping',
         'oxarticles__oxisdownloadable',
-        'oxarticles__oxshowcustomagreement'
+        'oxarticles__oxshowcustomagreement',
     ];
 
     /**
@@ -416,14 +416,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var \OxidEsales\Eshop\Application\Model\MdVariant
      */
-    protected $_oMdVariants = null;
+    protected $_oMdVariants;
 
     /**
      * Product long description field
      *
      * @var \OxidEsales\Eshop\Core\Field
      */
-    protected $_oLongDesc = null;
+    protected $_oLongDesc;
 
     /**
      * Variant selections array
@@ -453,21 +453,21 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var bool
      */
-    protected static $_blHasAmountPrice = null;
+    protected static $_blHasAmountPrice;
 
     /**
      * stores downloadable file list
      *
      * @var array|\OxidEsales\Eshop\Core\Model\ListModel
      */
-    protected $_aArticleFiles = null;
+    protected $_aArticleFiles;
 
     /**
      * If admin can edit any field.
      *
      * @var bool
      */
-    protected $_blCanUpdateAnyField = null;
+    protected $_blCanUpdateAnyField;
 
     /**
      * Triggered action type
@@ -516,7 +516,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * @param \OxidEsales\Eshop\Application\Model\AmountPriceList $amountPriceList
      */
-    public function setAmountPriceList($amountPriceList)
+    public function setAmountPriceList($amountPriceList): void
     {
         $this->_oAmountPriceList = $amountPriceList;
     }
@@ -575,7 +575,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $query .= " and $viewName.oxhidden = 0 ";
 
         if (Registry::getConfig()->getConfigParam('blUseTimeCheck')) {
-            $query = $this->addSqlActiveRangeSnippet($query, $viewName);
+            return $this->addSqlActiveRangeSnippet($query, $viewName);
         }
 
         return $query;
@@ -599,7 +599,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $myConfig = Registry::getConfig();
         $sTable = $this->getViewName($blForceCoreTable);
 
-        $sQ = "";
+        $sQ = '';
 
         //do not check for variants
         if ($myConfig->getConfigParam('blUseStock')) {
@@ -613,7 +613,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 }
                 $sQ = " $sQ and IF( $sTable.oxvarcount = 0, 1, ( select 1 from $sTable as art"
                     . " where art.oxparentid=$sTable.oxid and $activeCheck and"
-                    . " ( art.oxstockflag != 2 or art.oxstock > 0 ) limit 1 ) ) ";
+                    . ' ( art.oxstockflag != 2 or art.oxstock > 0 ) limit 1 ) ) ';
             }
         }
 
@@ -642,7 +642,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             if ($blRemoveNotOrderables) {
                 $sQ .= " and $sTable.oxstockflag != 3 ";
             }
-            $sQ .= " ) ) ";
+            $sQ .= ' ) ) ';
         }
 
         return $sQ;
@@ -727,7 +727,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param bool $blSkipAssign Whether to skip assign process for the article
      */
-    public function setSkipAssign($blSkipAssign)
+    public function setSkipAssign($blSkipAssign): void
     {
         $this->_blSkipAssign = $blSkipAssign;
     }
@@ -735,7 +735,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Disables article price loading. Should be called before assign(), or load()
      */
-    public function disablePriceLoad()
+    public function disablePriceLoad(): void
     {
         $this->_blLoadPrice = false;
     }
@@ -743,7 +743,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Enable article price loading, if disabled.
      */
-    public function enablePriceLoad()
+    public function enablePriceLoad(): void
     {
         $this->_blLoadPrice = true;
     }
@@ -763,7 +763,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param string $sItemKey Item key
      */
-    public function setItemKey($sItemKey)
+    public function setItemKey($sItemKey): void
     {
         $this->_sItemKey = $sItemKey;
     }
@@ -773,7 +773,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param bool $blLoadVariants skip variant loading or not
      */
-    public function setNoVariantLoading($blLoadVariants)
+    public function setNoVariantLoading($blLoadVariants): void
     {
         $this->_blLoadVariants = !$blLoadVariants;
     }
@@ -820,7 +820,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param bool $blOnList Whether is article on the list
      */
-    public function setOnComparisonList($blOnList)
+    public function setOnComparisonList($blOnList): void
     {
         $this->_blIsOnComparisonList = $blOnList;
     }
@@ -830,7 +830,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param bool $blLoadParentData Whether to load parent data
      */
-    public function setLoadParentData($blLoadParentData)
+    public function setLoadParentData($blLoadParentData): void
     {
         $this->_blLoadParentData = $blLoadParentData;
     }
@@ -1004,9 +1004,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected function prepareModifiedPrice($dPrice)
     {
-        $dPrice = $this->preparePrice($dPrice, $this->getArticleVat());
-
-        return $dPrice;
+        return $this->preparePrice($dPrice, $this->getArticleVat());
     }
 
     /**
@@ -1035,13 +1033,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         return $this->_blIsRangePrice;
     }
 
-
     /**
      * Setter to set if article has range price
      *
      * @param bool $blIsRangePrice - true if range, else false
-     *
-     * @return null
      */
     public function setRangePrice($blIsRangePrice = true)
     {
@@ -1058,10 +1053,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             return false;
         }
 
-        return (Registry::getUtilsDate()->isEmptyDate($activeTo) || strtotime($activeTo) >= $now)
-            && (Registry::getUtilsDate()->isEmptyDate($activeFrom) || strtotime($activeFrom) <= $now);
+        return (Registry::getUtilsDate()->isEmptyDate($activeTo) || strtotime((string) $activeTo) >= $now)
+            && (Registry::getUtilsDate()->isEmptyDate($activeFrom) || strtotime((string) $activeFrom) <= $now);
     }
-
 
     /**
      * Checks if article has visible status. Returns TRUE if its visible
@@ -1103,10 +1097,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * detaillink, moredetaillink, etc).
      *
      * @param array $aRecord Array representing current field values
-     *
-     * @return null
      */
-    public function assign($aRecord)
+    public function assign($aRecord): void
     {
         startProfile('articleAssign');
 
@@ -1217,7 +1209,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param integer $rating new rating value
      */
-    public function addToRatingAverage($rating)
+    public function addToRatingAverage($rating): void
     {
         $dOldRating = $this->oxarticles__oxrating->value;
         $dOldCnt = $this->oxarticles__oxratingcnt->value;
@@ -1227,15 +1219,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $dRatingCnt = (int) ($dOldCnt + 1);
         // oxarticles.oxtimestamp = oxarticles.oxtimestamp to keep old timestamp value
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $query = "update oxarticles
+        $query = 'update oxarticles
                   set oxarticles.oxrating = :oxrating,
                       oxarticles.oxratingcnt = :oxratingcnt,
                       oxarticles.oxtimestamp = oxarticles.oxtimestamp
-                  where oxarticles.oxid = :oxid";
+                  where oxarticles.oxid = :oxid';
         $oDb->execute($query, [
             'oxrating' => $dRating,
             'oxratingcnt' => $dRatingCnt,
-            'oxid' => $this->getId()
+            'oxid' => $this->getId(),
         ]);
     }
 
@@ -1244,7 +1236,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param integer $iRating new rating value
      */
-    public function setRatingAverage($iRating)
+    public function setRatingAverage($iRating): void
     {
         $this->oxarticles__oxrating = new Field($iRating);
     }
@@ -1254,7 +1246,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param integer $iRatingCnt new rating count
      */
-    public function setRatingCount($iRatingCnt)
+    public function setRatingCount($iRatingCnt): void
     {
         $this->oxarticles__oxratingcnt = new Field($iRatingCnt);
     }
@@ -1270,11 +1262,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     {
         if (!$blIncludeVariants) {
             return round($this->oxarticles__oxrating->value, 1);
-        } else {
-            $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
-
-            return $oRating->getRatingAverage($this->getId(), 'oxarticle', $this->getVariantIds());
         }
+        $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
+        return $oRating->getRatingAverage($this->getId(), 'oxarticle', $this->getVariantIds());
     }
 
     /**
@@ -1288,13 +1278,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     {
         if (!$blIncludeVariants) {
             return $this->oxarticles__oxratingcnt->value;
-        } else {
-            $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
-
-            return $oRating->getRatingCount($this->getId(), 'oxarticle', $this->getVariantIds());
         }
+        $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
+        return $oRating->getRatingCount($this->getId(), 'oxarticle', $this->getVariantIds());
     }
-
 
     /**
      * Collects user written reviews about an article.
@@ -1398,9 +1385,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         if (count($aList)) {
             uasort(
                 $aList,
-                function ($a, $b) {
-                    return $a <=> $b;
-                }
+                fn ($a, $b) => $a <=> $b
             );
 
             $sSearch = $this->generateSimListSearchStr($sArticleTable, $aList);
@@ -1641,7 +1626,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
         if (self::$_aSelections[$sId]) {
             // marking active from filter
-            $aFilter = ($aFilter === null) ? Registry::getRequest()->getRequestEscapedParameter("sel") : $aFilter;
+            $aFilter ??= Registry::getRequest()->getRequestEscapedParameter('sel');
             if ($aFilter) {
                 $iSelIdx = 0;
                 foreach (self::$_aSelections[$sId] as $oSelection) {
@@ -1687,8 +1672,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Simple way to get variants without querying oxArticle table first. This is basically used for lists.
-     *
-     * @return null
      */
     public function getSimpleVariants()
     {
@@ -1717,9 +1700,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 $oBaseObj->setLanguage($sLanguage);
             }
 
-            $sSql = "select * from " . $oBaseObj->getViewName() . "
+            $sSql = 'select * from ' . $oBaseObj->getViewName() . '
                 where oxparentid = :oxparentid
-                order by oxsort ";
+                order by oxsort ';
             $oVariants->selectString($sSql, ['oxparentid' => $sId]);
 
             //if we have variants then depending on config option the parent may be non buyable
@@ -1765,8 +1748,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 $select,
                 'where'
             ) ? ' and ' : ' where '
-        ) . $where . " order by oxobject2category.oxtime limit 1";
-
+        ) . $where . ' order by oxobject2category.oxtime limit 1';
 
         // category not found ?
         $record = DatabaseProvider::getDb()->select($select);
@@ -1774,7 +1756,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $category->assign($record->fields);
         } else {
             $select = $this->generateSearchStr($id, true);
-            $select .= ($str->strstr($select, 'where') ? ' and ' : ' where ') . $where . " limit 1";
+            $select .= ($str->strstr($select, 'where') ? ' and ' : ' where ') . $where . ' limit 1';
 
             // looking for price category
             $record = DatabaseProvider::getDb()->select($select);
@@ -1868,12 +1850,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getVendorId()
     {
-        $sVendorId = false;
         if ($this->oxarticles__oxvendorid->value) {
-            $sVendorId = $this->oxarticles__oxvendorid->value;
+            return $this->oxarticles__oxvendorid->value;
         }
 
-        return $sVendorId;
+        return false;
     }
 
     /**
@@ -1910,12 +1891,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             if (!Registry::getConfig()->getConfigParam('bl_perfLoadManufacturerTree')) {
                 $oManufacturer->setReadOnly(true);
             }
-            $oManufacturer = $oManufacturer->oxmanufacturers__oxactive->value ? $oManufacturer : null;
-        } else {
-            $oManufacturer = null;
+            return $oManufacturer->oxmanufacturers__oxactive->value ? $oManufacturer : null;
         }
 
-        return $oManufacturer;
+        return null;
     }
 
     /**
@@ -2030,7 +2009,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             return true;
         }
 
-
         $this->_blSkipDiscounts = false;
         if (Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->hasSkipDiscountCategories()) {
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
@@ -2045,7 +2023,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $params = [
                 'oxobjectid' => $this->getId(),
                 'oxactive' => 1,
-                'oxskipdiscounts' => 1
+                'oxskipdiscounts' => 1,
             ];
             $this->_blSkipDiscounts = ($oDb->getOne($sSelect, $params) == 1);
         }
@@ -2058,7 +2036,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice the new price object
      */
-    public function setPrice(Price $oPrice)
+    public function setPrice(Price $oPrice): void
     {
         $this->_oPrice = $oPrice;
     }
@@ -2146,7 +2124,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param \OxidEsales\Eshop\Application\Model\User $oUser user to set
      */
-    public function setArticleUser($oUser)
+    public function setArticleUser($oUser): void
     {
         $this->_oUser = $oUser;
     }
@@ -2269,7 +2247,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             from oxarticles
             where oxid = :oxid FOR UPDATE ';
         $actualStock = $database->getOne($query, [
-            'oxid' => $this->getId()
+            'oxid' => $this->getId(),
         ]);
 
         $iStockCount = $actualStock - $dAmount;
@@ -2282,7 +2260,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $query = 'update oxarticles set oxarticles.oxstock = :oxstock where oxarticles.oxid = :oxid';
         $database->execute($query, [
             'oxstock' => $iStockCount,
-            'oxid' => $this->getId()
+            'oxid' => $this->getId(),
         ]);
         $this->onChange(ACTION_UPDATE_STOCK);
 
@@ -2308,16 +2286,17 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             //updating by SQL query, due to wrong behaviour if saving article using not admin mode
             $dAmount = (float) $dAmount;
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $query = "update oxarticles
+            $query = 'update oxarticles
                       set oxarticles.oxsoldamount = (oxarticles.oxsoldamount + :amount)
-                      where oxarticles.oxid = :oxid";
+                      where oxarticles.oxid = :oxid';
             $rs = $oDb->execute($query, [
                 'oxid' => $this->oxarticles__oxid->value,
-                'amount' => $dAmount
+                'amount' => $dAmount,
             ]);
-
             return (bool) $rs;
-        } elseif ($this->oxarticles__oxparentid->value) {
+        }
+        // article is not variant - should be updated current amount
+        if ($this->oxarticles__oxparentid->value) {
             // article is variant - should be updated this article parent amount
             $oUpdateArticle = $this->getParentArticle();
             if ($oUpdateArticle) {
@@ -2336,7 +2315,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     public function disableReminder()
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $query = "update oxarticles set oxarticles.oxremindactive = 2 where oxarticles.oxid = :oxid";
+        $query = 'update oxarticles set oxarticles.oxremindactive = 2 where oxarticles.oxid = :oxid';
 
         return (bool) $oDb->execute($query, ['oxid' => $this->oxarticles__oxid->value]);
     }
@@ -2359,7 +2338,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Changes article variant to parent article
      */
-    public function resetParent()
+    public function resetParent(): void
     {
         $sParentId = $this->oxarticles__oxparentid->value;
         $this->oxarticles__oxparentid = new Field('', Field::T_RAW);
@@ -2419,10 +2398,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $action          Action constant
      * @param string $articleId       Article ID
      * @param string $parentArticleId Parent ID
-     *
-     * @return null
      */
-    public function onChange($action = null, $articleId = null, $parentArticleId = null)
+    public function onChange($action = null, $articleId = null, $parentArticleId = null): void
     {
         $this->actionType = !is_null($action) ? $action : $this->actionType;
         $myConfig = Registry::getConfig();
@@ -2450,7 +2427,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
                 $sQ = 'select oxparentid from oxarticles where oxid = :oxid';
                 $parentArticleId = $oDb->getOne($sQ, [
-                    'oxid' => $articleId
+                    'oxid' => $articleId,
                 ]);
             }
             //if we have parent id then update stock
@@ -2464,7 +2441,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $this->onChangeUpdateVarCount($parentArticleId);
         }
 
-        $sId = ($parentArticleId) ? $parentArticleId : $articleId;
+        $sId = $parentArticleId ?: $articleId;
         $this->setVarMinMaxPrice($sId);
 
         $this->updateParentDependFields();
@@ -2514,7 +2491,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             where oxid = :oxid';
         $sQ .= $selectForUpdate ? ' FOR UPDATE ' : '';
         $rs = $oDb->select($sQ, [
-            'oxid' => $this->getId()
+            'oxid' => $this->getId(),
         ]);
 
         $iOnStock = 0;
@@ -2546,17 +2523,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         }
         if ($iOnStock >= $dAmount) {
             return true;
-        } else {
-            if ($iOnStock > 0) {
-                return $iOnStock;
-            } else {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ArticleInputException::class);
-                $oEx->setMessage('ERROR_MESSAGE_ARTICLE_ARTICLE_NOT_BUYABLE');
-                Registry::getUtilsView()->addErrorToDisplay($oEx);
-
-                return false;
-            }
         }
+        if ($iOnStock > 0) {
+            return $iOnStock;
+        }
+        $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ArticleInputException::class);
+        $oEx->setMessage('ERROR_MESSAGE_ARTICLE_ARTICLE_NOT_BUYABLE');
+        Registry::getUtilsView()->addErrorToDisplay($oEx);
+        return false;
     }
 
     /**
@@ -2577,7 +2551,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
             $sDbValue = $oDb->getOne("select oxlongdesc from {$sViewName} where oxid = :oxid", [
-                'oxid' => $sOxid
+                'oxid' => $sOxid,
             ]);
 
             if ($sDbValue != false) {
@@ -2600,7 +2574,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param string $longDescription description to set
      */
-    public function setArticleLongDesc($longDescription)
+    public function setArticleLongDesc($longDescription): void
     {
         // setting current value
         $this->_oLongDesc = new Field($longDescription, Field::T_RAW);
@@ -2647,14 +2621,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         return $this->basketAttributeList;
     }
 
-
     /**
      * Appends article seo url with additional request parameters
      *
      * @param string $sAddParams additional parameters which needs to be added to product url
      * @param int    $iLang      language id
      */
-    public function appendLink($sAddParams, $iLang = null)
+    public function appendLink($sAddParams, $iLang = null): void
     {
         if ($sAddParams) {
             if ($iLang === null) {
@@ -2662,8 +2635,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             }
 
             $this->_aSeoAddParams[$iLang] = isset($this->_aSeoAddParams[$iLang])
-                ? $this->_aSeoAddParams[$iLang] . "&amp;"
-                : "";
+                ? $this->_aSeoAddParams[$iLang] . '&amp;'
+                : '';
             $this->_aSeoAddParams[$iLang] .= $sAddParams;
         }
     }
@@ -2712,7 +2685,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
         $sUrl = $this->_aSeoUrls[$iLang][$iLinkType];
         if (isset($this->_aSeoAddParams[$iLang])) {
-            $sUrl .= ((strpos($sUrl . $this->_aSeoAddParams[$iLang], '?') === false) ? '?' : '&amp;')
+            $sUrl .= ((!str_contains($sUrl . $this->_aSeoAddParams[$iLang], '?')) ? '?' : '&amp;')
                 . $this->_aSeoAddParams[$iLang];
         }
 
@@ -2737,7 +2710,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param int $iType type of link to load
      */
-    public function setLinkType($iType)
+    public function setLinkType($iType): void
     {
         // resetting details link, to force new
         $this->_sDetailLink = null;
@@ -2762,7 +2735,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $sAddParams additional parameters which needs to be added to product url
      * @param int    $iLang      language id
      */
-    public function appendStdLink($sAddParams, $iLang = null)
+    public function appendStdLink($sAddParams, $iLang = null): void
     {
         if ($sAddParams) {
             if ($iLang === null) {
@@ -2770,8 +2743,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             }
 
             $this->_aStdAddParams[$iLang] = isset($this->_aStdAddParams[$iLang])
-                ? $this->_aStdAddParams[$iLang] . "&amp;"
-                : "";
+                ? $this->_aStdAddParams[$iLang] . '&amp;'
+                : '';
             $this->_aStdAddParams[$iLang] .= $sAddParams;
         }
     }
@@ -2793,9 +2766,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        $sUrl .= "index.php?cl=details" . ($blAddId ? "&amp;anid=" . $this->getId() : "");
+        $sUrl .= 'index.php?cl=details' . ($blAddId ? '&amp;anid=' . $this->getId() : '');
 
-        return $sUrl . (isset($this->_aStdAddParams[$iLang]) ? "&amp;" . $this->_aStdAddParams[$iLang] : "");
+        return $sUrl . (isset($this->_aStdAddParams[$iLang]) ? '&amp;' . $this->_aStdAddParams[$iLang] : '');
     }
 
     /**
@@ -2828,14 +2801,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     {
         if ($this->_aMediaUrls === null) {
             $this->_aMediaUrls = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $this->_aMediaUrls->init("oxmediaurl");
+            $this->_aMediaUrls->init('oxmediaurl');
             $this->_aMediaUrls->getBaseObject()->setLanguage($this->getLanguage());
 
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sViewName = $tableViewNameGenerator->getViewName("oxmediaurls", $this->getLanguage());
+            $sViewName = $tableViewNameGenerator->getViewName('oxmediaurls', $this->getLanguage());
             $sQ = "select * from {$sViewName} where oxobjectid = :oxobjectid";
             $this->_aMediaUrls->selectString($sQ, [
-                'oxobjectid' => $this->getId()
+                'oxobjectid' => $this->getId(),
             ]);
         }
 
@@ -2922,7 +2895,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
                 $this->_sToBasketLink .= '&amp;fnc=tobasket&amp;aid=' . $this->getId() . '&amp;anid=' . $this->getId();
 
-                if ($sTpl = basename(Registry::getRequest()->getRequestEscapedParameter('tpl'))) {
+                if ($sTpl = basename((string) Registry::getRequest()->getRequestEscapedParameter('tpl'))) {
                     $this->_sToBasketLink .= '&amp;tpl=' . $sTpl;
                 }
             }
@@ -3024,7 +2997,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Resets oxremindactive status.
      * If remindActive status is 2, reminder is already sent.
      */
-    public function resetRemindStatus()
+    public function resetRemindStatus(): void
     {
         if (
             $this->oxarticles__oxremindactive->value == 2 &&
@@ -3073,7 +3046,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param bool $blBuyable state - buyable or not (default false)
      */
-    public function setBuyableState($blBuyable = false)
+    public function setBuyableState($blBuyable = false): void
     {
         $this->_blNotBuyable = !$blBuyable;
     }
@@ -3083,7 +3056,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param array $aSelList selectlist
      */
-    public function setSelectlist($aSelList)
+    public function setSelectlist($aSelList): void
     {
         $this->_aDispSelList = $aSelList;
     }
@@ -3110,13 +3083,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         );
     }
 
-
     /**
      * apply article and article use
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice target price
      */
-    public function applyVats(Price $oPrice)
+    public function applyVats(Price $oPrice): void
     {
         $this->applyVAT($oPrice, $this->getArticleVat());
     }
@@ -3126,7 +3098,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
      */
-    public function applyDiscountsForVariant($oPrice)
+    public function applyDiscountsForVariant($oPrice): void
     {
         // apply discounts
         if (!$this->skipDiscounts()) {
@@ -3149,7 +3121,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     public function getParentArticle()
     {
         if ($this->oxarticles__oxparentid && ($sParentId = $this->oxarticles__oxparentid->value)) {
-            $sIndex = $sParentId . "_" . $this->getLanguage();
+            $sIndex = $sParentId . '_' . $this->getLanguage();
             if (!isset(self::$_aLoadedParents[$sIndex])) {
                 self::$_aLoadedParents[$sIndex] = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
                 self::$_aLoadedParents[$sIndex]->_blLoadPrice = false;
@@ -3168,19 +3140,19 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Updates article variants oxremindactive field, as variants inherit this setting from parent
      */
-    public function updateVariantsRemind()
+    public function updateVariantsRemind(): void
     {
         // check if it is parent article
         if (!$this->isVariant() && $this->hasAnyVariant()) {
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sUpdate = "update oxarticles
+            $sUpdate = 'update oxarticles
                         set oxremindactive = :oxremindactive
                         where oxparentid = :oxparentid and
-                              oxshopid = :oxshopid";
+                              oxshopid = :oxshopid';
             $oDb->execute($sUpdate, [
                 'oxremindactive' => $this->oxarticles__oxremindactive->value,
                 'oxparentid' => $this->getId(),
-                'oxshopid' => $this->getShopId()
+                'oxshopid' => $this->getShopId(),
             ]);
         }
     }
@@ -3218,17 +3190,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Returns TRUE if product is variant, and false if not
-     *
-     * @return bool
      */
     public function isVariant(): bool
     {
-        $isVariant = false;
         if (isset($this->oxarticles__oxparentid) && false !== $this->oxarticles__oxparentid) {
-            $isVariant = (bool) $this->oxarticles__oxparentid->value;
+            return (bool) $this->oxarticles__oxparentid->value;
         }
 
-        return $isVariant;
+        return false;
     }
 
     /**
@@ -3255,7 +3224,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         if (!$sFields) {
             $sFields = 'oxid';
         }
-        $sSelectWhere = "select $sFields from " . $this->getObjectViewName('oxcategories') . " where";
+        $sSelectWhere = "select $sFields from " . $this->getObjectViewName('oxcategories') . ' where';
         $sQuotedPrice = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote(
             $this->getFieldData('oxprice') ?? ''
         );
@@ -3291,9 +3260,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
         $query = $this->createFetchFirstInPriceCategorySql($categoryPriceId);
 
-        $result = $database->getOne($query);
-
-        return $result;
+        return $database->getOne($query);
     }
 
     /**
@@ -3310,14 +3277,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $quotedPrice = $database->quote($this->oxarticles__oxprice->value);
         $quotedCategoryId = $database->quote($categoryPriceId);
 
-        $query = "select 1 from " . $this->getObjectViewName('oxcategories')
+        return 'select 1 from ' . $this->getObjectViewName('oxcategories')
             . " where oxid=$quotedCategoryId and"
             . "(   (oxpricefrom != 0 and oxpriceto != 0 and oxpricefrom <= $quotedPrice and oxpriceto >= $quotedPrice)"
             . " or (oxpricefrom != 0 and oxpriceto = 0 and oxpricefrom <= $quotedPrice)"
             . " or (oxpricefrom = 0 and oxpriceto != 0 and oxpriceto >= $quotedPrice)"
-            . ")";
-
-        return $query;
+            . ')';
     }
 
     /**
@@ -3376,7 +3341,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     public function getPictureFieldValue($sFieldName, $iIndex = null)
     {
         if ($sFieldName) {
-            $sFieldName = "oxarticles__" . $sFieldName . $iIndex;
+            $sFieldName = 'oxarticles__' . $sFieldName . $iIndex;
 
             if ($this->$sFieldName && $this->$sFieldName->value) {
                 return $this->$sFieldName->value;
@@ -3386,12 +3351,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         return '';
     }
 
-
-    /**
-     * @param string $file
-     *
-     * @return string
-     */
     public function getMasterPicturePath(string $file): string
     {
         return Registry::getConfig()->getMasterPicturePath($file);
@@ -3414,16 +3373,16 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         if ($this->_aArticleFiles === null) {
             $this->_aArticleFiles = false;
 
-            $filesQuery = "SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid";
+            $filesQuery = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
             $filesQueryParameters = ['oxartid' => $this->getId()];
 
             if (!Registry::getConfig()->getConfigParam('blVariantParentBuyable') && $addFromParent) {
-                $filesQuery .= " OR `oxartId` = :oxparentid";
+                $filesQuery .= ' OR `oxartId` = :oxparentid';
                 $filesQueryParameters['oxparentid'] = $this->oxarticles__oxparentid->value;
             }
 
             $articleFiles = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $articleFiles->init("oxfile");
+            $articleFiles->init('oxfile');
             $articleFiles->selectString($filesQuery, $filesQueryParameters);
             $this->_aArticleFiles = $articleFiles;
         }
@@ -3452,7 +3411,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             self::$_blHasAmountPrice = false;
 
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sQ = "SELECT 1 FROM `oxprice2article` LIMIT 1";
+            $sQ = 'SELECT 1 FROM `oxprice2article` LIMIT 1';
 
             if ($oDb->getOne($sQ)) {
                 self::$_blHasAmountPrice = true;
@@ -3478,7 +3437,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $variants = [];
         if (($articleId = $this->getId())) {
             //do not load me as a parent later
-            self::$_aLoadedParents[$articleId . "_" . $this->getLanguage()] = $this;
+            self::$_aLoadedParents[$articleId . '_' . $this->getLanguage()] = $this;
 
             $config = Registry::getConfig();
 
@@ -3491,7 +3450,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             }
 
             // cache
-            $cacheKey = $loadSimpleVariants ? "simple" : "full";
+            $cacheKey = $loadSimpleVariants ? 'simple' : 'full';
             if ($blRemoveNotOrderables) {
                 if (isset($this->_aVariants[$cacheKey])) {
                     return $this->_aVariants[$cacheKey];
@@ -3515,7 +3474,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                     $variants->getBaseObject()->modifyCacheKey('_variants');
                 }
 
-                startProfile("selectVariants");
+                startProfile('selectVariants');
                 $forceCoreTableUsage = (bool) $forceCoreTableUsage;
 
                 $baseObject = $variants->getBaseObject();
@@ -3536,7 +3495,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                     $oMdVariants = oxNew(\OxidEsales\Eshop\Application\Model\VariantHandler::class);
                     $this->_blHasMdVariants = $oMdVariants->isMdVariant($variants->current());
                 }
-                stopProfile("selectVariants");
+                stopProfile('selectVariants');
             }
 
             //if we have variants then depending on config option the parent may be non buyable
@@ -3600,15 +3559,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         }
         $sActiveCategorySql = $blActCats ? $this->getActiveCategorySelectSnippet() : '';
 
-        $sSelect = "select
+        return "select
                         oxobject2category.oxcatnid as oxcatnid
                      from $sO2CView as oxobject2category
                         left join $sCatView as oxcategories on oxcategories.oxid = oxobject2category.oxcatnid
                     where $sArticleIdSql and oxcategories.oxid is not null
                     and oxcategories.oxactive = 1 $sActiveCategorySql
                     order by oxobject2category.oxtime";
-
-        return $sSelect;
     }
 
     /**
@@ -3621,8 +3578,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $sCatView = $this->getObjectViewName('oxcategories');
 
         return "and oxcategories.oxhidden = 0 and (select count(cats.oxid) from $sCatView as cats"
-            . " where cats.oxrootid = oxcategories.oxrootid and cats.oxleft < oxcategories.oxleft "
-            . "and cats.oxright > oxcategories.oxright and ( cats.oxhidden = 1 or cats.oxactive = 0 ) ) = 0 ";
+            . ' where cats.oxrootid = oxcategories.oxrootid and cats.oxleft < oxcategories.oxleft '
+            . 'and cats.oxright > oxcategories.oxright and ( cats.oxhidden = 1 or cats.oxactive = 0 ) ) = 0 ';
     }
 
     /**
@@ -3638,7 +3595,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     {
         // apply VAT only if configuration requires it
         if (isset($dVat) || !Registry::getConfig()->getConfigParam('bl_perfCalcVatOnlyForBasketOrder')) {
-            $this->applyVAT($oPrice, isset($dVat) ? $dVat : $this->getArticleVat());
+            $this->applyVAT($oPrice, $dVat ?? $this->getArticleVat());
         }
 
         // apply currency
@@ -3675,7 +3632,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
             $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
             return (bool)$db->getOne("select 1 from $sArticleTable where oxparentid = :oxparentid", [
-                'oxparentid' => $sId
+                'oxparentid' => $sId,
             ]);
         }
 
@@ -3704,12 +3661,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * inserts article long description to artextends table
-     *
-     * @return null
      */
     protected function saveArtLongDesc()
     {
-        if (in_array("oxlongdesc", $this->_aSkipSaveFields)) {
+        if (in_array('oxlongdesc', $this->_aSkipSaveFields)) {
             return;
         }
 
@@ -3735,7 +3690,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             }
 
             foreach ($aObjFields as $sKey => $sValue) {
-                if (preg_match('/^oxlongdesc(_(\d{1,2}))?$/', $sKey)) {
+                if (preg_match('/^oxlongdesc(_(\d{1,2}))?$/', (string) $sKey)) {
                     $sField = $this->getFieldLongName($sKey);
 
                     if (isset($this->$sField)) {
@@ -3815,7 +3770,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
         // #1437/1436C - added config option, and check for zero A,B,C price values
         if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices') && (float) $dPrice == 0) {
-            $dPrice = $this->oxarticles__oxprice->value;
+            return $this->oxarticles__oxprice->value;
         }
 
         return $dPrice;
@@ -3831,7 +3786,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected function getAmountPrice($amount = 1)
     {
-        startProfile("_getAmountPrice");
+        startProfile('_getAmountPrice');
 
         $dPrice = $this->getGroupPrice();
         $oAmtPrices = $this->buildAmountPriceList();
@@ -3845,7 +3800,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             }
         }
 
-        stopProfile("_getAmountPrice");
+        stopProfile('_getAmountPrice');
 
         return $dPrice;
     }
@@ -3941,9 +3896,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             return [];
         }
 
-        $activeSqlSnippet = "";
+        $activeSqlSnippet = '';
         if ($activeVariants) {
-            $activeSqlSnippet = " and " . $this->getSqlActiveSnippet(true);
+            $activeSqlSnippet = ' and ' . $this->getSqlActiveSnippet(true);
         }
         $variantsQuery = sprintf(
             'select oxid from %s where oxparentid = :oxparentid %s order by oxsort',
@@ -3953,7 +3908,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         return DatabaseProvider::getDb()->getCol(
             $variantsQuery,
             [
-                'oxparentid' => $sId
+                'oxparentid' => $sId,
             ]
         );
     }
@@ -3976,8 +3931,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     public function hasProductValidTimeRange(): bool
     {
-        return !Registry::getUtilsDate()->isEmptyDate($this->oxarticles__oxactivefrom->value)
-            || !Registry::getUtilsDate()->isEmptyDate($this->oxarticles__oxactiveto->value);
+        if (!Registry::getUtilsDate()->isEmptyDate($this->oxarticles__oxactivefrom->value)) {
+            return true;
+        }
+        return !Registry::getUtilsDate()->isEmptyDate($this->oxarticles__oxactiveto->value);
     }
 
     public function isProductAlwaysActive(): bool
@@ -4036,7 +3993,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $sAttributeSql = '';
         $aAttributeIds = $oDb->getCol($sSelect, [
             'oxobjectid' => $this->getId(),
-            'oxparentid' => $this->getParentId()
+            'oxparentid' => $this->getParentId(),
         ]);
         if (is_array($aAttributeIds) && count($aAttributeIds)) {
             $aAttributeIds = array_unique($aAttributeIds);
@@ -4073,10 +4030,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         // we do not use lists here as we don't need this overhead right now
         $sSelect = "select oxobjectid from oxobject2attribute as t1 where ( $sAttributeSql ) and t1.oxobjectid NOT IN ("
             . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aExcludeIds))
-            . ") group by t1.oxobjectid having count(*) >= :minhit LIMIT 0, 20";
+            . ') group by t1.oxobjectid having count(*) >= :minhit LIMIT 0, 20';
 
         return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol($sSelect, [
-            'minhit' => $iHitMin
+            'minhit' => $iHitMin,
         ]);
     }
 
@@ -4157,11 +4114,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             "select oxid from {$sArtTable} where oxparentid = :oxparentid and oxid != :oxid ",
             [
                 'oxparentid' => $sParentIdForVariants,
-                'oxid' => $this->oxarticles__oxid->value
+                'oxid' => $this->oxarticles__oxid->value,
             ]
         );
         foreach ($articlesIds as $articlesId) {
-            $articlesIn .= ", " . $database->quote($articlesId) . " ";
+            $articlesIn .= ', ' . $database->quote($articlesId) . ' ';
         }
 
         $iLimit = (int) Registry::getConfig()->getConfigParam('iNrofCustomerWhoArticles');
@@ -4170,13 +4127,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         return "select distinct {$sArtTable}.* from ("
                    . " select d.oxorderid as suborderid from {$sOrderArtTable} as d use index"
                    . " ( oxartid ) where d.oxartid in ( {$articlesIn} ) limit {$iLimit}"
-               . " ) as suborder"
+               . ' ) as suborder'
                . " left join {$sOrderArtTable} force index ( oxorderid )"
                         . " on suborder.suborderid = {$sOrderArtTable}.oxorderid"
                . " left join {$sArtTable} on {$sArtTable}.oxid = {$sOrderArtTable}.oxartid"
                . " where {$sArtTable}.oxid not in ( {$articlesIn} )"
                 . " and ( {$sArtTable}.oxissearch = 1 or {$sArtTable}.oxparentid <> '' )"
-                . " and " . $this->getSqlActiveSnippet();
+                . ' and ' . $this->getSqlActiveSnippet();
     }
 
     /**
@@ -4202,7 +4159,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $sSelect = "select oxobject2category.oxcatnid from $sO2CView as oxobject2category ";
             $sSelect .= "left join $sCategoryView as oxcategories on oxcategories.oxid = oxobject2category.oxcatnid ";
             $sSelect .= "where oxobject2category.oxcatnid=$sCatId and oxobject2category.oxobjectid=$sOXID ";
-            $sSelect .= "and oxcategories.oxactive = 1 order by oxobject2category.oxtime ";
+            $sSelect .= 'and oxcategories.oxactive = 1 order by oxobject2category.oxtime ';
         } else {
             $dPriceFromTo = $oDb->quote($dPriceFromTo);
             $sSelect = "select oxcategories.oxid from $sCategoryView as oxcategories where ";
@@ -4273,28 +4230,23 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             return true;
         }
 
-
-        if (!strcmp($mValue, '0000-00-00 00:00:00') || !strcmp($mValue, '0000-00-00')) {
+        if (!strcmp((string) $mValue, '0000-00-00 00:00:00') || !strcmp((string) $mValue, '0000-00-00')) {
             return true;
         }
 
         $sFieldName = strtolower($sFieldName);
 
         if (
-            $sFieldName == 'oxarticles__oxicon' && (strpos($mValue, "nopic_ico.jpg") !== false || strpos(
-                $mValue,
-                "nopic.jpg"
-            ) !== false)
+            $sFieldName == 'oxarticles__oxicon' && (str_contains((string) $mValue, 'nopic_ico.jpg') || str_contains(
+                (string) $mValue,
+                'nopic.jpg'
+            ))
         ) {
             return true;
         }
 
         if (
-            strpos($mValue, "nopic.jpg") !== false && ($sFieldName == 'oxarticles__oxthumb' || substr(
-                $sFieldName,
-                0,
-                17
-            ) == 'oxarticles__oxpic' || substr($sFieldName, 0, 18) == 'oxarticles__oxzoom')
+            str_contains((string) $mValue, 'nopic.jpg') && ($sFieldName == 'oxarticles__oxthumb' || str_starts_with($sFieldName, 'oxarticles__oxpic') || str_starts_with($sFieldName, 'oxarticles__oxzoom'))
         ) {
             return true;
         }
@@ -4306,8 +4258,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Assigns parent field values to article
      *
      * @param string $sFieldName field name
-     *
-     * @return null
      */
     protected function assignParentFieldValue($sFieldName)
     {
@@ -4320,7 +4270,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         // assigning only these which parent article has
         if ($oParentArticle->$sCopyFieldName != null) {
             // only overwrite database values
-            if (substr($sCopyFieldName, 0, 12) != 'oxarticles__') {
+            if (!str_starts_with($sCopyFieldName, 'oxarticles__')) {
                 return;
             }
 
@@ -4544,71 +4494,71 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         //remove other records
         $sDelete = 'delete from oxobject2article where oxarticlenid = :articleId or oxobjectid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxobject2attribute where oxobjectid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxobject2category where oxobjectid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxobject2selectlist where oxobjectid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxprice2article where oxartid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxreviews where oxtype="oxarticle" and oxobjectid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxratings where oxobjectid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxaccessoire2article where oxobjectid = :articleId or oxarticlenid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         //#1508C - deleting oxobject2delivery entries added
         $sDelete = 'delete from oxobject2delivery where oxobjectid = :articleId and oxtype=\'oxarticles\' ';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxartextends where oxid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         //delete the record
-        foreach ($this->getLanguageSetTables("oxartextends") as $sSetTbl) {
+        foreach ($this->getLanguageSetTables('oxartextends') as $sSetTbl) {
             $oDb->execute("delete from $sSetTbl where oxid = :articleId", [
-                'articleId' => $articleId
+                'articleId' => $articleId,
             ]);
         }
 
         $sDelete = 'delete from oxactions2article where oxartid = :articleId';
         $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
 
         $sDelete = 'delete from oxobject2list where oxobjectid = :articleId';
 
         return $oDb->execute($sDelete, [
-            'articleId' => $articleId
+            'articleId' => $articleId,
         ]);
     }
 
@@ -4623,7 +4573,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             //collect variants to remove recursively
             $query = 'select oxid from ' . $this->getViewName() . ' where oxparentid = :oxparentid';
             $products = DatabaseProvider::getDb()->getCol($query, [
-                'oxparentid' => $sOXID
+                'oxparentid' => $sOXID,
             ]);
             $product = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
             foreach ($products as $productId) {
@@ -4685,7 +4635,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
             $query = 'SELECT oxstock, oxvendorid, oxmanufacturerid FROM oxarticles WHERE oxid = :oxid';
             $rs = $database->select($query, [
-                'oxid' => $parentId
+                'oxid' => $parentId,
             ]);
 
             $query = 'SELECT SUM(oxstock) FROM ' . $this->getViewName(true) . '
@@ -4693,13 +4643,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 AND ' . $this->getSqlActiveSnippet(true) . '
                 AND oxstock > 0 ';
             $stock = (float) $database->getOne($query, [
-                'oxparentid' => $parentId
+                'oxparentid' => $parentId,
             ]);
 
             $query = 'UPDATE oxarticles SET oxvarstock = :oxvarstock WHERE oxid = :oxid';
             $database->execute($query, [
                 'oxvarstock' => $stock,
-                'oxid' => $parentId
+                'oxid' => $parentId,
             ]);
 
             //now lets update category counts
@@ -4754,15 +4704,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         if ($parentId) {
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-            $query = "SELECT COUNT(*) AS varcount FROM oxarticles WHERE oxparentid = :oxparentid";
+            $query = 'SELECT COUNT(*) AS varcount FROM oxarticles WHERE oxparentid = :oxparentid';
             $varCount = (int) $database->getOne($query, [
-                'oxparentid' => $parentId
+                'oxparentid' => $parentId,
             ]);
 
-            $query = "UPDATE oxarticles SET oxvarcount = :oxvarcount WHERE oxid = :oxid";
+            $query = 'UPDATE oxarticles SET oxvarcount = :oxvarcount WHERE oxid = :oxid';
             $database->execute($query, [
                 'oxvarcount' => $varCount,
-                'oxid' => $parentId
+                'oxid' => $parentId,
             ]);
         }
     }
@@ -4786,7 +4736,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 WHERE ' . $this->getSqlActiveSnippet(true) . '
                     AND ( `oxarticles`.`oxparentid` = :oxparentid )';
             $aPrices = $database->getRow($sQ, [
-                'oxparentid' => $sParentId
+                'oxparentid' => $sParentId,
             ]);
             if (isset($aPrices['varminprice'], $aPrices['varmaxprice'])) {
                 $sQ = '
@@ -4799,7 +4749,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 $params = [
                     'oxvarminprice' => $aPrices['varminprice'],
                     'oxvarmaxprice' => $aPrices['varmaxprice'],
-                    'oxid' => $sParentId
+                    'oxid' => $sParentId,
                 ];
             } else {
                 $sQ = '
@@ -4824,21 +4774,21 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected function hasMasterImage($iIndex)
     {
-        $sPicName = basename($this->{"oxarticles__oxpic" . $iIndex}->value);
+        $sPicName = basename((string) $this->{'oxarticles__oxpic' . $iIndex}->value);
 
-        if ($sPicName == "nopic.jpg" || $sPicName == "") {
+        if ($sPicName == 'nopic.jpg' || $sPicName == '') {
             return false;
         }
         if (
             $this->isVariant() &&
             $this->getParentArticle() &&
-            $this->getParentArticle()->{"oxarticles__oxpic" . $iIndex}->value
-                == $this->{"oxarticles__oxpic" . $iIndex}->value
+            $this->getParentArticle()->{'oxarticles__oxpic' . $iIndex}->value
+                == $this->{'oxarticles__oxpic' . $iIndex}->value
         ) {
             return false;
         }
 
-        $sMasterPic = 'product/' . $iIndex . "/" . $sPicName;
+        $sMasterPic = 'product/' . $iIndex . '/' . $sPicName;
 
         if (Registry::getConfig()->getMasterPicturePath($sMasterPic)) {
             return true;
@@ -4846,7 +4796,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
         return false;
     }
-
 
     /**
      * Checks and return true if price view mode is netto
@@ -4858,12 +4807,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $blResult = (bool) Registry::getConfig()->getConfigParam('blShowNetPrice');
         $oUser = $this->getArticleUser();
         if ($oUser) {
-            $blResult = $oUser->isPriceViewModeNetto();
+            return $oUser->isPriceViewModeNetto();
         }
 
         return $blResult;
     }
-
 
     /**
      * Depending on view mode prepare oxPrice object
@@ -4900,14 +4848,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     protected function getPriceForView($oPrice)
     {
         if ($this->isPriceViewModeNetto()) {
-            $dPrice = $oPrice->getNettoPrice();
-        } else {
-            $dPrice = $oPrice->getBruttoPrice();
+            return $oPrice->getNettoPrice();
         }
 
-        return $dPrice;
+        return $oPrice->getBruttoPrice();
     }
-
 
     /**
      * Depending on view mode prepare price before calculation
@@ -4936,11 +4881,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         return $dPrice;
     }
 
-
     /**
      * Return price suffix
-     *
-     * @return null
      */
     protected function getUserPriceSufix()
     {
@@ -4962,8 +4904,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Return prepared price
-     *
-     * @return null
      */
     protected function getRawPrice()
     {
@@ -4985,8 +4925,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Return variant min price
-     *
-     * @return null
      */
     protected function getVarMinRawPrice()
     {
@@ -5011,7 +4949,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                         AND ( `oxparentid` = :oxparentid )';
 
                     $dPrice = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSql, [
-                        'oxparentid' => $this->getId()
+                        'oxparentid' => $this->getId(),
                     ]);
                 }
             }
@@ -5024,8 +4962,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Return variant max price
-     *
-     * @return null
      */
     protected function getVarMaxPrice()
     {
@@ -5050,7 +4986,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                             AND ( `oxparentid` = :oxparentid )';
 
                     $dPrice = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSql, [
-                        'oxparentid' => $this->getId()
+                        'oxparentid' => $this->getId(),
                     ]);
                 }
             }
@@ -5092,11 +5028,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected function loadFromDb($articleId)
     {
-        $sSelect = $this->buildSelectString([$this->getViewName() . ".oxid" => $articleId]);
+        $sSelect = $this->buildSelectString([$this->getViewName() . '.oxid' => $articleId]);
 
         return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getRow($sSelect);
     }
-
 
     /**
      * Place to hook and change amount if it should be calculated by different logic,
@@ -5118,13 +5053,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         foreach ($this->getCopyParentFields() as $sField) {
-            $sValue = isset($this->$sField->value) ? $this->$sField->value : 0;
+            $sValue = $this->$sField->value ?? 0;
             $sSqlSets[] = '`' . str_replace('oxarticles__', '', $sField) . '` = ' . $oDb->quote($sValue);
         }
 
-        $sSql = "UPDATE `oxarticles` SET ";
+        $sSql = 'UPDATE `oxarticles` SET ';
         $sSql .= implode(', ', $sSqlSets) . '';
-        $sSql .= " WHERE `oxparentid` = :oxparentid";
+        $sSql .= ' WHERE `oxparentid` = :oxparentid';
 
         return $oDb->execute($sSql, ['oxparentid' => $this->getId()]);
     }
@@ -5178,7 +5113,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected function getLoadVariantsQuery($blRemoveNotOrderables, $forceCoreTableUsage, $baseObject, $sArticleTable)
     {
-        return "select " . $baseObject->getSelectFields($forceCoreTableUsage) . " from $sArticleTable where " .
+        return 'select ' . $baseObject->getSelectFields($forceCoreTableUsage) . " from $sArticleTable where " .
                $this->getActiveCheckQuery($forceCoreTableUsage) .
                $this->getVariantsQuery($blRemoveNotOrderables, $forceCoreTableUsage) .
                " order by $sArticleTable.oxsort";

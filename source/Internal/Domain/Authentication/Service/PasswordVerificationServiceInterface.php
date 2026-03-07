@@ -14,10 +14,7 @@ interface PasswordVerificationServiceInterface
     /**
      * Verify that a given password matches a given hash
      *
-     * @param string $password
-     * @param string $passwordHash
      *
-     * @return bool
      */
     public function verifyPassword(string $password, string $passwordHash): bool;
 }

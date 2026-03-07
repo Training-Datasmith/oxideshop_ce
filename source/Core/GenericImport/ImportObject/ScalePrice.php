@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,6 +19,6 @@ class ScalePrice extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\Impor
 
     /** @var array List of database key fields (i.e. oxid). */
     protected $keyFieldList = [
-        'OXID' => 'OXID'
+        'OXID' => 'OXID',
     ];
 }

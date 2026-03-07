@@ -92,8 +92,6 @@ class ShopAdapter implements ShopAdapterInterface
      * Examples:
      *      if flow theme is active we will get ['flow']
      *      if azure is extended by some other we will get ['azure', 'extending_theme']
-     *
-     * @return array
      */
     public function getActiveThemesList(): array
     {

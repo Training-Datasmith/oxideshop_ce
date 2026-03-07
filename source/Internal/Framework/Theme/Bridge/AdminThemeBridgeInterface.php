@@ -15,8 +15,5 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge;
  */
 interface AdminThemeBridgeInterface
 {
-    /**
-     * @return string
-     */
     public function getActiveTheme(): string;
 }

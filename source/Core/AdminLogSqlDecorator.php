@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,13 +20,12 @@ class AdminLogSqlDecorator
      * Injects argument to admin log insert sql.
      *
      * @param string $originalSql
-     * @return string
      */
-    public function prepareSqlForLogging($originalSql)
+    public function prepareSqlForLogging($originalSql): string
     {
         $userId = $this->getUserId();
 
-        return "insert into {$this->table} (oxuserid, oxsql) values ('{$userId}', " . $this->quote($originalSql) . ")";
+        return "insert into {$this->table} (oxuserid, oxsql) values ('{$userId}', " . $this->quote($originalSql) . ')';
     }
 
     /**

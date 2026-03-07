@@ -16,12 +16,11 @@ use Symfony\Component\Lock\LockFactory;
 class YamlFileStorageFactory implements FileStorageFactoryInterface
 {
     public function __construct(
-        private FileLocatorInterface $fileLocator,
-        private LockFactory $lockFactory,
-        private Filesystem $filesystemService
+        private readonly FileLocatorInterface $fileLocator,
+        private readonly LockFactory $lockFactory,
+        private readonly Filesystem $filesystemService
     ) {
     }
-
 
     public function create(string $filePath): ArrayStorageInterface
     {

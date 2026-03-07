@@ -84,7 +84,7 @@ final class FormatPriceLogicTest extends TestCase
         $formattedPrice = $this->formatPriceLogic->formatPrice(
             [
                 'currency' => '',
-                'price' => 10_000
+                'price' => 10_000,
             ]
         );
 
@@ -99,7 +99,7 @@ final class FormatPriceLogicTest extends TestCase
         $formattedPrice = $this->formatPriceLogic->formatPrice(
             [
                 'currency' => '',
-                'price' => -100
+                'price' => -100,
             ]
         );
 
@@ -114,7 +114,7 @@ final class FormatPriceLogicTest extends TestCase
         $formattedPrice = $this->formatPriceLogic->formatPrice(
             [
                 'currency' => (object)['dec' => '-'],
-                'price' => 10_000
+                'price' => 10_000,
             ]
         );
 
@@ -129,7 +129,7 @@ final class FormatPriceLogicTest extends TestCase
         $formattedPrice = $this->formatPriceLogic->formatPrice(
             [
                 'currency' => (object)['thousand' => '-'],
-                'price' => 10_000
+                'price' => 10_000,
             ]
         );
 
@@ -144,7 +144,7 @@ final class FormatPriceLogicTest extends TestCase
         $formattedPrice = $this->formatPriceLogic->formatPrice(
             [
                 'currency' => (object)['sign' => '$'],
-                'price' => 10_000
+                'price' => 10_000,
             ]
         );
 
@@ -159,7 +159,7 @@ final class FormatPriceLogicTest extends TestCase
         $formattedPrice = $this->formatPriceLogic->formatPrice(
             [
                 'currency' => (object)['decimal' => 4],
-                'price' => 10_000
+                'price' => 10_000,
             ]
         );
 
@@ -175,9 +175,9 @@ final class FormatPriceLogicTest extends TestCase
             [
                 'currency' => (object)[
                     'sign' => '$',
-                    'side' => 'Front'
+                    'side' => 'Front',
                 ],
-                'price' => 10_000
+                'price' => 10_000,
             ]
         );
 
@@ -193,9 +193,9 @@ final class FormatPriceLogicTest extends TestCase
             [
                 'currency' => (object)[
                     'sign' => '$',
-                    'side' => 'incorrect'
+                    'side' => 'incorrect',
                 ],
-                'price' => 10_000
+                'price' => 10_000,
             ]
         );
 

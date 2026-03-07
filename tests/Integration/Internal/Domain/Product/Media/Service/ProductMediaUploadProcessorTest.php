@@ -80,7 +80,7 @@ final class ProductMediaUploadProcessorTest extends IntegrationTestCase
         $this->rewriteProjectConfiguration([
             'parameters' => [
                 'oxid_esales.product.media.file.min_size_kb' => '1024',
-            ]
+            ],
         ]);
         $this->replaceMediaUploaderServiceInstance();
         $fixture = Path::join(
@@ -106,7 +106,7 @@ final class ProductMediaUploadProcessorTest extends IntegrationTestCase
             'parameters' => [
                 'oxid_esales.product.media.file.min_size_kb' => '0',
                 'oxid_esales.product.media.file.max_size_kb' => '1',
-            ]
+            ],
         ]);
         $this->replaceMediaUploaderServiceInstance();
         $fixture = Path::join(
@@ -231,7 +231,7 @@ final class ProductMediaUploadProcessorTest extends IntegrationTestCase
         $this->rewriteProjectConfiguration([
             'parameters' => [
                 'oxid_esales.product.media.file.min_size_kb' => '0',
-            ]
+            ],
         ]);
     }
 }

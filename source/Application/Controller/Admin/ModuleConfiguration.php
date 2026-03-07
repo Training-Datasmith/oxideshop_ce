@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -40,8 +42,8 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
                 $formatModuleSettings = $this
                     ->formatModuleSettingsForTemplate($moduleConfiguration->getModuleSettings());
 
-                $this->_aViewData["var_constraints"] = $formatModuleSettings['constraints'];
-                $this->_aViewData["var_grouping"] = $formatModuleSettings['grouping'];
+                $this->_aViewData['var_constraints'] = $formatModuleSettings['constraints'];
+                $this->_aViewData['var_grouping'] = $formatModuleSettings['grouping'];
 
                 foreach ($this->_aConfParams as $sType => $sParam) {
                     $this->_aViewData[$sParam] = $formatModuleSettings['vars'][$sType] ?? null;
@@ -63,7 +65,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
     /**
      * Saves shop configuration variables
      */
-    public function saveConfVars()
+    public function saveConfVars(): void
     {
         $this->resetContentCache();
         $this->_sModuleId = $this->getSelectedModuleId();
@@ -76,9 +78,6 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
         }
     }
 
-    /**
-     * @return string
-     */
     private function getSelectedModuleId(): string
     {
         $moduleId = $this->_sEditObjectId
@@ -129,9 +128,6 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
         $moduleConfigurationDaoBridge->save($moduleConfiguration);
     }
 
-    /**
-     * @return array
-     */
     private function getConfigVariablesFromRequest(): array
     {
         $settings = [];
@@ -151,7 +147,6 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
 
     /**
      * @param Setting[] $moduleSettings
-     * @return array
      */
     private function formatModuleSettingsForTemplate(array $moduleSettings): array
     {
@@ -172,25 +167,16 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             $value = null;
 
             if ($setting->getValue() !== null) {
-                switch ($setting->getType()) {
-                    case 'arr':
-                        $value = $this->arrayToMultiline($setting->getValue());
-                        break;
-                    case 'aarr':
-                        $value = $this->aarrayToMultiline($setting->getValue());
-                        break;
-                    case 'bool':
-                        $value = filter_var($setting->getValue(), FILTER_VALIDATE_BOOLEAN);
-                        break;
-                    default:
-                        $value = $setting->getValue();
-                        break;
-                }
+                $value = match ($setting->getType()) {
+                    'arr' => $this->arrayToMultiline($setting->getValue()),
+                    'aarr' => $this->aarrayToMultiline($setting->getValue()),
+                    'bool' => filter_var($setting->getValue(), FILTER_VALIDATE_BOOLEAN),
+                    default => $setting->getValue(),
+                };
                 $value = Str::getStr()->htmlentities($value);
             }
 
             $group = $setting->getGroupName();
-
 
             $confVars[$valueType][$name] = $value;
             $constraints[$name] = $setting->getConstraints() ?? '';

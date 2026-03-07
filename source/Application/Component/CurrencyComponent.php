@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,14 +23,14 @@ class CurrencyComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @var array
      */
-    public $aCurrencies = null;
+    public $aCurrencies;
 
     /**
      * Active currency object.
      *
      * @var object
      */
-    protected $_oActCur = null;
+    protected $_oActCur;
 
     /**
      * Marking object as component
@@ -45,10 +47,8 @@ class CurrencyComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * parameter so session ($myConfig->setActShopCurrency($iCur)),
      * loads basket and forces ir to recalculate (oBasket->blCalcNeeded
      * = true). Finally executes parent::init().
-     *
-     * @return null
      */
-    public function init()
+    public function init(): void
     {
         // Performance
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
@@ -107,11 +107,11 @@ class CurrencyComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfLoadCurrency')) {
             $oUrlUtils = \OxidEsales\Eshop\Core\Registry::getUtilsUrl();
-            $sUrl = $oUrlUtils->cleanUrl(\OxidEsales\Eshop\Core\Registry::getConfig()->getTopActiveView()->getLink(), ["cur"]);
+            $sUrl = $oUrlUtils->cleanUrl(\OxidEsales\Eshop\Core\Registry::getConfig()->getTopActiveView()->getLink(), ['cur']);
 
             reset($this->aCurrencies);
             foreach ($this->aCurrencies as $oItem) {
-                $oItem->link = $oUrlUtils->processUrl($sUrl, true, ["cur" => $oItem->id]);
+                $oItem->link = $oUrlUtils->processUrl($sUrl, true, ['cur' => $oItem->id]);
             }
         }
 

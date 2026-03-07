@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,19 +26,17 @@ class SystemEventHandler
     /**
      * @var \OxidEsales\Eshop\Core\OnlineModuleVersionNotifier
      */
-    private $onlineModuleVersionNotifier = null;
+    private $onlineModuleVersionNotifier;
 
     /**
      * @var \OxidEsales\Eshop\Core\OnlineLicenseCheck
      */
-    private $onlineLicenseCheck = null;
+    private $onlineLicenseCheck;
 
     /**
      * OLC dependency setter
-     *
-     * @param \OxidEsales\Eshop\Core\OnlineLicenseCheck $onlineLicenseCheck
      */
-    public function setOnlineLicenseCheck(\OxidEsales\Eshop\Core\OnlineLicenseCheck $onlineLicenseCheck)
+    public function setOnlineLicenseCheck(\OxidEsales\Eshop\Core\OnlineLicenseCheck $onlineLicenseCheck): void
     {
         $this->onlineLicenseCheck = $onlineLicenseCheck;
     }
@@ -91,10 +91,8 @@ class SystemEventHandler
 
     /**
      * OnlineModuleVersionNotifier dependency setter
-     *
-     * @param \OxidEsales\Eshop\Core\OnlineModuleVersionNotifier $onlineModuleVersionNotifier
      */
-    public function setOnlineModuleVersionNotifier(\OxidEsales\Eshop\Core\OnlineModuleVersionNotifier $onlineModuleVersionNotifier)
+    public function setOnlineModuleVersionNotifier(\OxidEsales\Eshop\Core\OnlineModuleVersionNotifier $onlineModuleVersionNotifier): void
     {
         $this->onlineModuleVersionNotifier = $onlineModuleVersionNotifier;
     }
@@ -140,18 +138,18 @@ class SystemEventHandler
     /**
      * onAdminLogin() is called on every successful login to the backend
      */
-    public function onAdminLogin()
+    public function onAdminLogin(): void
     {
         try {
             $this->getOnlineModuleVersionNotifier()->versionNotify();
-        } catch (Exception $o) {
+        } catch (Exception) {
         }
     }
 
     /**
      * Perform shop startup related actions, like license check.
      */
-    public function onShopStart()
+    public function onShopStart(): void
     {
         $this->validateOffline();
     }
@@ -159,7 +157,7 @@ class SystemEventHandler
     /**
      * Perform shop finishing up related actions, like updating app server data.
      */
-    public function onShopEnd()
+    public function onShopEnd(): void
     {
         $this->validateOnline();
     }
@@ -200,20 +198,16 @@ class SystemEventHandler
     /**
      * Check if need to send information.
      * We will not send information on each request due to possible performance drop.
-     *
-     * @return bool
      */
-    private function needToSendShopInformation()
+    private function needToSendShopInformation(): bool
     {
         return $this->getNextCheckTime() < $this->getCurrentTime();
     }
 
     /**
      * Return time stamp when shop was checked last with white noise from config.
-     *
-     * @return int
      */
-    private function getNextCheckTime()
+    private function getNextCheckTime(): int
     {
         return (int) Registry::getConfig()->getSystemConfigParameter('sOnlineLicenseNextCheckTime');
     }
@@ -222,7 +216,7 @@ class SystemEventHandler
      * Update when shop was checked last time with white noise.
      * White noise is used to separate call time for different shop.
      */
-    private function updateNextCheckTime()
+    private function updateNextCheckTime(): void
     {
         $hourToCheck = $this->getCheckTime();
 
@@ -243,9 +237,9 @@ class SystemEventHandler
     {
         $checkTime = Registry::getConfig()->getSystemConfigParameter('sOnlineLicenseCheckTime');
         if (!$checkTime) {
-            $hourToCheck = rand(8, 23);
-            $minuteToCheck = rand(0, 59);
-            $secondToCheck = rand(0, 59);
+            $hourToCheck = random_int(8, 23);
+            $minuteToCheck = random_int(0, 59);
+            $secondToCheck = random_int(0, 59);
 
             $checkTime = $hourToCheck . ':' . $minuteToCheck . ':' . $secondToCheck;
             Registry::getConfig()->saveSystemConfigParameter('str', 'sOnlineLicenseCheckTime', $checkTime);
@@ -281,7 +275,7 @@ class SystemEventHandler
      */
     protected function getAppServerService()
     {
-        $appServerService = oxNew(
+        return oxNew(
             ApplicationServerService::class,
             oxNew(
                 ApplicationServerDao::class,
@@ -289,9 +283,7 @@ class SystemEventHandler
                 Registry::getConfig()
             ),
             oxNew(\OxidEsales\Eshop\Core\UtilsServer::class),
-            Registry::get("oxUtilsDate")->getTime()
+            Registry::get('oxUtilsDate')->getTime()
         );
-
-        return $appServerService;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,10 +16,8 @@ class UserCounter
 {
     /**
      * Returns count of admins (mall and subshops). Only counts active admins.
-     *
-     * @return int
      */
-    public function getAdminCount()
+    public function getAdminCount(): int
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
@@ -28,10 +28,8 @@ class UserCounter
 
     /**
      * Returns count of admins (mall and subshops). Only counts active admins.
-     *
-     * @return int
      */
-    public function getActiveAdminCount()
+    public function getActiveAdminCount(): int
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 

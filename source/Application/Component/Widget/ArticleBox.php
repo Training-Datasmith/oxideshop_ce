@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
-
-use oxRegistry;
-use oxArticle;
 
 /**
  * Article box widget
@@ -36,7 +35,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      *
      * @var \OxidEsales\Eshop\Application\Model\Article|null
      */
-    protected $_oArticle = null;
+    protected $_oArticle;
 
     /**
      * Returns active category
@@ -66,7 +65,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
         $sListType = $this->getViewParameter('sListType');
 
         if ($sWidgetType && $sListType) {
-            $this->_sTemplate = "widget/" . $sWidgetType . "/" . $sListType;
+            $this->_sTemplate = 'widget/' . $sWidgetType . '/' . $sListType;
         }
 
         $sForceTemplate = $this->getViewParameter('oxwtemplate');
@@ -82,7 +81,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Box product
      */
-    public function setProduct($oArticle)
+    public function setProduct($oArticle): void
     {
         $this->_oArticle = $oArticle;
     }
@@ -131,7 +130,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      */
     public function isVatIncluded()
     {
-        return (bool) $this->getViewParameter("isVatIncluded");
+        return (bool) $this->getViewParameter('isVatIncluded');
     }
 
     /**

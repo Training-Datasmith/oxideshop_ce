@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxDb;
 
 /**
  * Seo encoder base
@@ -19,7 +19,7 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @var array
      */
-    protected $_aRootManufacturerUri = null;
+    protected $_aRootManufacturerUri;
 
     /**
      * Returns target "extension" (/)
@@ -123,17 +123,17 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer Manufacturer object
      */
-    public function onDeleteManufacturer($oManufacturer)
+    public function onDeleteManufacturer($oManufacturer): void
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxmanufacturer'", [
-            'oxobjectid' => $oManufacturer->getId()
+            'oxobjectid' => $oManufacturer->getId(),
         ]);
-        $oDb->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $oManufacturer->getId()
+        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $oManufacturer->getId(),
         ]);
-        $oDb->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $oManufacturer->getId()
+        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $oManufacturer->getId(),
         ]);
     }
 
@@ -150,7 +150,7 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
         $sSeoUrl = null;
         $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
         if ($oManufacturer->loadInLang($iLang, $sObjectId)) {
-            $sSeoUrl = $this->getManufacturerUri($oManufacturer, $iLang, true);
+            return $this->getManufacturerUri($oManufacturer, $iLang, true);
         }
 
         return $sSeoUrl;

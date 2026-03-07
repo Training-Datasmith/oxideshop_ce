@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-use OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler;
 use OxidEsales\EshopCommunity\Core\Autoload\BackwardsCompatibilityAutoload;
 use OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload;
+use OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler;
 use OxidEsales\EshopCommunity\Internal\Framework\Env\DotenvLoader;
 
 define('INSTALLATION_ROOT_PATH', dirname(__DIR__));
@@ -36,7 +36,7 @@ if (!function_exists('oxTriggerOfflinePageDisplay')) {
 
 /** For errors not caught by the application. */
 register_shutdown_function(
-    static function () {
+    static function (): void {
         $lastError = error_get_last();
         $fatalErrors = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR];
         if ($lastError && in_array($lastError['type'], $fatalErrors, true)) {
@@ -57,14 +57,14 @@ register_shutdown_function(
     }
 );
 
-spl_autoload_register([BackwardsCompatibilityAutoload::class, 'autoload']);
-spl_autoload_register([ModuleAutoload::class, 'autoload']);
+spl_autoload_register(BackwardsCompatibilityAutoload::autoload(...));
+spl_autoload_register(ModuleAutoload::autoload(...));
 
 /** Set exception handler before including modules/functions.php, so it can be overwritten by shop operators. */
 set_exception_handler(
     [
         new ExceptionHandler(filter_var(getenv('OXID_DEBUG_MODE'), FILTER_VALIDATE_BOOLEAN)),
-        'handleUncaughtException'
+        'handleUncaughtException',
     ]
 );
 

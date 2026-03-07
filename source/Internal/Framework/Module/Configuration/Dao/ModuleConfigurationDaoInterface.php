@@ -20,7 +20,6 @@ interface ModuleConfigurationDaoInterface
     public function delete(string $moduleId, int $shopId): void;
 
     /**
-     * @param int $shopId
      * @return ModuleConfiguration[]
      */
     public function getAll(int $shopId): array;

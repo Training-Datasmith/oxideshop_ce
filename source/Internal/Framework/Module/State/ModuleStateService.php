@@ -13,15 +13,10 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\Module
 
 class ModuleStateService implements ModuleStateServiceInterface
 {
-    public function __construct(private ModuleConfigurationDaoInterface $moduleConfigurationDao)
+    public function __construct(private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao)
     {
     }
 
-    /**
-     * @param string $moduleId
-     * @param int    $shopId
-     * @return bool
-     */
     public function isActive(string $moduleId, int $shopId): bool
     {
         return $this->moduleConfigurationDao->get($moduleId, $shopId)->isActivated();

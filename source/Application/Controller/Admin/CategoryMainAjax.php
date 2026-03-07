@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -37,7 +39,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         ['oxmpn', 'oxarticles', 0, 0, 0],
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
+        ['oxid', 'oxarticles', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -46,8 +48,8 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                                      ['oxmpn', 'oxarticles', 0, 0, 0],
                                      ['oxprice', 'oxarticles', 0, 0, 0],
                                      ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxarticles', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxarticles', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -76,7 +78,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             if ($sSynchOxid && $sOxid != $sSynchOxid) {
                 $sSubSelect = ' and ' . $sArticleTable . '.oxid not in ( ';
                 $sSubSelect .= "select $sArticleTable.oxid from $sO2CView left join $sArticleTable ";
-                $sSubSelect .= "on $sJoin where $sO2CView.oxcatnid =  " . $oDb->quote($sSynchOxid) . " ";
+                $sSubSelect .= "on $sJoin where $sO2CView.oxcatnid =  " . $oDb->quote($sSynchOxid) . ' ';
                 $sSubSelect .= 'and ' . $sArticleTable . '.oxid is not null ) ';
             }
 
@@ -114,7 +116,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      *
      * @throws Exception
      */
-    public function addArticle()
+    public function addArticle(): void
     {
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
 
@@ -136,7 +138,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                 $sO2CView = $this->getViewName('oxobject2category');
 
                 $oNew = oxNew(\OxidEsales\Eshop\Application\Model\Object2Category::class);
-                $sProdIds = "";
+                $sProdIds = '';
                 foreach ($aArticles as $sAdd) {
                     // check, if it's already in, then don't add it again
                     $sSelect = sprintf(
@@ -158,7 +160,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                     $oNew->save();
 
                     if ($sProdIds) {
-                        $sProdIds .= ",";
+                        $sProdIds .= ',';
                     }
                     $sProdIds .= $database->quote($sAdd);
                 }
@@ -167,7 +169,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                 $this->updateOxTime($sProdIds);
 
                 $this->resetArtSeoUrl($aArticles);
-                $this->resetCounter("catArticle", $sCategoryID);
+                $this->resetCounter('catArticle', $sCategoryID);
             }
         } catch (Exception $exception) {
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->rollbackTransaction();
@@ -226,7 +228,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     /**
      * Removes article from category
      */
-    public function removeArticle()
+    public function removeArticle(): void
     {
         $aArticles = $this->getActionIds('oxarticles.oxid');
         $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('oxid');
@@ -243,7 +245,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         }
 
         $this->resetArtSeoUrl($aArticles, $sCategoryID);
-        $this->resetCounter("catArticle", $sCategoryID);
+        $this->resetCounter('catArticle', $sCategoryID);
 
         //notify services
         $relation = oxNew(\OxidEsales\Eshop\Application\Model\Object2Category::class);
@@ -260,11 +262,10 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     protected function removeCategoryArticles($articles, $categoryID)
     {
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $prodIds = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articles));
+        $prodIds = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articles));
 
-        $delete = "delete from oxobject2category ";
+        $delete = 'delete from oxobject2category ';
         $where = $this->getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds);
-
 
         $sQ = $delete . $where;
         $db->execute($sQ);
@@ -284,17 +285,16 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     protected function getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds)
     {
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $where = "where oxcatnid=" . $db->quote($categoryID);
+        $where = 'where oxcatnid=' . $db->quote($categoryID);
 
         $whereProductIdIn = " oxobjectid in ( {$prodIds} )";
         if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVariantsSelection')) {
-            $whereProductIdIn = "( " . $whereProductIdIn . " OR oxobjectid in (
+            $whereProductIdIn = '( ' . $whereProductIdIn . " OR oxobjectid in (
                                         select oxid from oxarticles where oxparentid in ({$prodIds})
                                         )
             )";
         }
-        $where = $where . ' AND ' . $whereProductIdIn;
 
-        return $where;
+        return $where . ' AND ' . $whereProductIdIn;
     }
 }

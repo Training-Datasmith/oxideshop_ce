@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -10,8 +12,6 @@ namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 class IfContentLogic
 {
     /**
-     * @param string|null $sIdent
-     * @param string|null $sOxid
      *
      * @return mixed
      */
@@ -25,7 +25,7 @@ class IfContentLogic
         ) {
             $oContent = $sOxid ? $aContentCache[$sOxid] : $aContentCache[$sIdent];
         } else {
-            $oContent = oxNew("oxContent");
+            $oContent = oxNew('oxContent');
             $blLoaded = $sOxid ? $oContent->load($sOxid) : ($oContent->loadbyIdent($sIdent));
             if ($blLoaded && $oContent->isActive()) {
                 $aContentCache[$oContent->getId()] = $aContentCache[$oContent->getLoadId()] = $oContent;

@@ -20,20 +20,15 @@ class MetaDataSchemataProvider implements MetaDataSchemataProviderInterface
     {
     }
 
-    /**
-     * @return array
-     */
     public function getMetaDataSchemata(): array
     {
         return $this->metaDataSchemata;
     }
 
     /**
-     * @param string $metaDataVersion
      *
      * @throws UnsupportedMetaDataVersionException
      *
-     * @return array
      */
     public function getMetaDataSchemaForVersion(string $metaDataVersion): array
     {
@@ -45,11 +40,9 @@ class MetaDataSchemataProvider implements MetaDataSchemataProviderInterface
     }
 
     /**
-     * @param string $metaDataVersion
      *
      * @throws UnsupportedMetaDataVersionException
      *
-     * @return array
      */
     public function getFlippedMetaDataSchemaForVersion(string $metaDataVersion): array
     {
@@ -63,9 +56,7 @@ class MetaDataSchemataProvider implements MetaDataSchemataProviderInterface
     /**
      * Recursively exchange keys and values for a given array
      *
-     * @param array $metaDataVersion
      *
-     * @return array
      */
     private function arrayFlipRecursive(array $metaDataVersion): array
     {

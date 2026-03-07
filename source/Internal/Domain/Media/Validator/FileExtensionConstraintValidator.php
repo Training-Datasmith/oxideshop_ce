@@ -30,7 +30,7 @@ readonly class FileExtensionConstraintValidator implements MediaConstraintValida
             ?? throw new MimeTypeGuessFailedException($path);
 
         $validExtensions = array_map(
-            'strtolower',
+            strtolower(...),
             $this->mimeTypeGuesser->getExtensions($guessedMimeType)
         );
 

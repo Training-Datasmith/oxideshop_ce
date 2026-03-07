@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -52,7 +54,7 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
      * @param array $aView  view data array
      * @param array $errors array of errors to pass to view
      */
-    public function passAllErrorsToView(&$aView, $errors)
+    public function passAllErrorsToView(&$aView, $errors): void
     {
         if (count($errors) > 0) {
             foreach ($errors as $sLocation => $aEx2) {
@@ -78,11 +80,11 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
      * @param string                                 $activeController     defines a name of the controller, which should
      *                                                                     handle the error.
      */
-    public function addErrorToDisplay($exception, $blFull = false, $useCustomDestination = false, $customDestination = "", $activeController = "")
+    public function addErrorToDisplay($exception, $blFull = false, $useCustomDestination = false, $customDestination = '', $activeController = ''): void
     {
         //default
         $destination = 'default';
-        $customDestination = $customDestination ? $customDestination : Registry::getRequest()->getRequestEscapedParameter('CustomError');
+        $customDestination = $customDestination ?: Registry::getRequest()->getRequestEscapedParameter('CustomError');
         if ($useCustomDestination && $customDestination) {
             $destination = $customDestination;
         }

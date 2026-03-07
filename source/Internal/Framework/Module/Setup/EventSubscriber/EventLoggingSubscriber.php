@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EventLoggingSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LoggerInterface $logger)
+    public function __construct(private readonly LoggerInterface $logger)
     {
     }
 
@@ -28,10 +28,7 @@ class EventLoggingSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ServicesYamlConfigurationErrorEvent::class => 'logConfigurationError',

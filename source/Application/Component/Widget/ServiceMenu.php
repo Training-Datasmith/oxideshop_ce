@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -42,7 +44,7 @@ class ServiceMenu extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
         $aCompareItems = $oCompare->getCompareItems();
 
         if ($blJson) {
-            $aCompareItems = json_encode($aCompareItems);
+            return json_encode($aCompareItems);
         }
 
         return $aCompareItems;

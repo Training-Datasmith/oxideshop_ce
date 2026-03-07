@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,7 +37,7 @@ class User extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObjec
             $id = $data['OXID'];
             $userName = $data['OXUSERNAME'];
 
-            $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class, "core");
+            $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class, 'core');
             $user->oxuser__oxusername = new \OxidEsales\Eshop\Core\Field($userName, \OxidEsales\Eshop\Core\Field::T_RAW);
 
             if ($user->exists($id) && $id != $user->getId()) {

@@ -39,13 +39,13 @@ $aModule = [
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1|2|3',
-            'position' => 3
+            'position' => 3,
         ],
-        ['group' => 'main', 'name' => 'setting_2', 'type' => 'arr', 'value' => ['value1', 'value2']]
+        ['group' => 'main', 'name' => 'setting_2', 'type' => 'arr', 'value' => ['value1', 'value2']],
     ],
     'events'      => [
         'onActivate'   => 'TestModuleMetaData20\Events::onActivate',
-        'onDeactivate' => 'TestModuleMetaData20\Events::onDeactivate'
+        'onDeactivate' => 'TestModuleMetaData20\Events::onDeactivate',
     ],
 
 ];

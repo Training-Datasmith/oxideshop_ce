@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer;
 
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\CompilerPass\ViewControllerPass;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\CompilerPass\RoutePass;
+use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\CompilerPass\ViewControllerPass;
 use OxidEsales\EshopCommunity\Internal\Framework\Edition\Edition;
 use OxidEsales\EshopCommunity\Internal\Framework\Env\EnvUrlFormatter;
 use OxidEsales\EshopCommunity\Internal\Framework\Logger\LoggerServiceFactory;

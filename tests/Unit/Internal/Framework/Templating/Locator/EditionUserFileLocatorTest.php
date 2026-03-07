@@ -76,11 +76,11 @@ final class EditionUserFileLocatorTest extends TestCase
                 'Application' => [
                     'views' => [
                         'admin' => [
-                            'user.xml' => '*this is menu xml for test*'
-                        ]
-                    ]
-                ]
-            ]
+                            'user.xml' => '*this is menu xml for test*',
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $this->vfsStreamDirectory = vfsStream::setup('root', null, $structure);

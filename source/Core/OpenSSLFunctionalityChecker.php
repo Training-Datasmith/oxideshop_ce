@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,10 +16,8 @@ class OpenSSLFunctionalityChecker
 {
     /**
      * Checks if openssl_random_pseudo_bytes function is available.
-     *
-     * @return bool
      */
-    public function isOpenSslRandomBytesGeneratorAvailable()
+    public function isOpenSslRandomBytesGeneratorAvailable(): bool
     {
         return function_exists('openssl_random_pseudo_bytes');
     }

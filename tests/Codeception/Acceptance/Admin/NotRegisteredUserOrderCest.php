@@ -70,7 +70,7 @@ final class NotRegisteredUserOrderCest
                 'OXTRANSSTATUS' => 'OK',
                 'OXFOLDER' => 'ORDERFOLDER_NEW',
                 'OXDELTYPE' => 'oxidstandard',
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s'),
             ]
         );
 
@@ -94,7 +94,7 @@ final class NotRegisteredUserOrderCest
                 'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s'),
                 'OXSEARCHKEYS' => 'šÄßüл1002',
                 'OXISSEARCH' => 1,
-                'OXORDERSHOPID' => 1
+                'OXORDERSHOPID' => 1,
             ]
         );
     }

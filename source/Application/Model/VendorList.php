@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
-use oxField;
 
 /**
  * Vendor list manager.
@@ -21,7 +20,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var \stdClass
      */
-    protected $_oRoot = null;
+    protected $_oRoot;
 
     /**
      * Vendor tree path.
@@ -42,7 +41,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var \OxidEsales\Eshop\Application\Model\Vendor
      */
-    protected $_oClickedVendor = null;
+    protected $_oClickedVendor;
 
     /**
      * Calls parent constructor and defines if Article vendor count is shown
@@ -58,7 +57,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param bool $blShowVendorArticleCnt to show article count or not
      */
-    public function setShowVendorArticleCnt($blShowVendorArticleCnt = false)
+    public function setShowVendorArticleCnt($blShowVendorArticleCnt = false): void
     {
         $this->_blShowVendorArticleCnt = $blShowVendorArticleCnt;
     }
@@ -66,7 +65,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Loads simple vendor list
      */
-    public function loadVendorList()
+    public function loadVendorList(): void
     {
         $oBaseObject = $this->getBaseObject();
         $sFieldList = $oBaseObject->getSelectFields();
@@ -91,13 +90,12 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @param string $sActCat      Active category
      * @param string $sShopHomeUrl base shop url ($myConfig->getShopHomeUrl())
      */
-    public function buildVendorTree($sLinkTarget, $sActCat, $sShopHomeUrl)
+    public function buildVendorTree($sLinkTarget, $sActCat, $sShopHomeUrl): void
     {
         $sActCat = str_replace('v_', '', $sActCat);
 
         //Load vendor list
         $this->loadVendorList();
-
 
         //Create fake vendor root category
         $this->_oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
@@ -149,7 +147,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     protected function addCategoryFields($oVendor)
     {
-        $oVendor->oxcategories__oxid = new \OxidEsales\Eshop\Core\Field("v_" . $oVendor->oxvendor__oxid->value);
+        $oVendor->oxcategories__oxid = new \OxidEsales\Eshop\Core\Field('v_' . $oVendor->oxvendor__oxid->value);
         $oVendor->oxcategories__oxicon = $oVendor->oxvendor__oxicon;
         $oVendor->oxcategories__oxtitle = $oVendor->oxvendor__oxtitle;
         $oVendor->oxcategories__oxdesc = $oVendor->oxvendor__oxshortdesc;
@@ -163,7 +161,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param \OxidEsales\Eshop\Application\Model\Vendor $oVendor active vendor
      */
-    public function setClickVendor($oVendor)
+    public function setClickVendor($oVendor): void
     {
         $this->_oClickedVendor = $oVendor;
     }

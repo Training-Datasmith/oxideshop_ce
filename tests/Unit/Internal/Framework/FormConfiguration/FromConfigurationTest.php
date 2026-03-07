@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\FormConfiguration;
 
-use PHPUnit\Framework\TestCase;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfiguration;
+use PHPUnit\Framework\TestCase;
 
 final class FromConfigurationTest extends TestCase
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -45,11 +47,11 @@ class Review extends BaseModel
         if (isset($this->oxreviews__oxuserid) && $this->oxreviews__oxuserid->value) {
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
             $params = [
-                'oxid' => $this->oxreviews__oxuserid->value
+                'oxid' => $this->oxreviews__oxuserid->value,
             ];
 
-            $firstName = $oDb->getOne("SELECT oxfname FROM oxuser 
-                WHERE oxid = :oxid", $params);
+            $firstName = $oDb->getOne('SELECT oxfname FROM oxuser 
+                WHERE oxid = :oxid', $params);
 
             $this->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($firstName);
         }
@@ -104,13 +106,13 @@ class Review extends BaseModel
 
         $params = [
             'oxtype' => $sType,
-            'oxlang' => is_null($iLoadInLang) ? (int) Registry::getLang()->getBaseLanguage() : (int) $iLoadInLang
+            'oxlang' => is_null($iLoadInLang) ? (int) Registry::getLang()->getBaseLanguage() : (int) $iLoadInLang,
         ];
 
         if (is_array($aIds) && count($aIds)) {
-            $sObjectIdWhere = "oxreviews.oxobjectid in ( " . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . " )";
+            $sObjectIdWhere = 'oxreviews.oxobjectid in ( ' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . ' )';
         } elseif (is_string($aIds) && $aIds) {
-            $sObjectIdWhere = "oxreviews.oxobjectid = :oxobjectid";
+            $sObjectIdWhere = 'oxreviews.oxobjectid = :oxobjectid';
             $params['oxobjectid'] = $aIds;
         } else {
             return $reviews;

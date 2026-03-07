@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -21,7 +22,7 @@ class DiscountList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var string User ID
      */
-    protected $_sUserId = null;
+    protected $_sUserId;
 
     /**
      * Forced list reload marker
@@ -30,13 +31,12 @@ class DiscountList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     protected $_blReload = true;
 
-
     /**
      * If any shops category has "skip discounts" status this parameter value will be true
      *
      * @var bool
      */
-    protected $_hasSkipDiscountCategories = null;
+    protected $_hasSkipDiscountCategories;
 
     /**
      * Class Constructor
@@ -83,18 +83,17 @@ class DiscountList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function getCountryId($oUser)
     {
-        $sCountryId = null;
         if ($oUser) {
-            $sCountryId = $oUser->getActiveCountry();
+            return $oUser->getActiveCountry();
         }
 
-        return $sCountryId;
+        return null;
     }
 
     /**
      * Used to force discount list reload
      */
-    public function forceReload()
+    public function forceReload(): void
     {
         $this->_blReload = true;
     }
@@ -111,9 +110,8 @@ class DiscountList extends \OxidEsales\Eshop\Core\Model\ListModel
         $oBaseObject = $this->getBaseObject();
 
         $sTable = $oBaseObject->getViewName();
-        $sQ = "select " . $oBaseObject->getSelectFields() . " from $sTable ";
-        $sQ .= "where " . $oBaseObject->getSqlActiveSnippet() . ' ';
-
+        $sQ = 'select ' . $oBaseObject->getSelectFields() . " from $sTable ";
+        $sQ .= 'where ' . $oBaseObject->getSqlActiveSnippet() . ' ';
 
         // defining initial filter parameters
         $sUserId = null;
@@ -140,8 +138,8 @@ class DiscountList extends \OxidEsales\Eshop\Core\Model\ListModel
         $sGroupTable = $tableViewNameGenerator->getViewName('oxgroups');
         $sCountryTable = $tableViewNameGenerator->getViewName('oxcountry');
 
-        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxcountry' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sCountryId) . ")" : '0';
-        $sUserSql = $sUserId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxuser' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sUserId) . ")" : '0';
+        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxcountry' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sCountryId) . ')' : '0';
+        $sUserSql = $sUserId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxuser' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sUserId) . ')' : '0';
         $sGroupSql = $sGroupIds ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxgroups' and oxobject2discount.OXOBJECTID in ($sGroupIds) )" : '0';
 
         $sQ .= "and (
@@ -156,9 +154,7 @@ class DiscountList extends \OxidEsales\Eshop\Core\Model\ListModel
                         1)
             )";
 
-        $sQ .= " order by $sTable.oxsort ";
-
-        return $sQ;
+        return $sQ . " order by $sTable.oxsort ";
     }
 
     /**

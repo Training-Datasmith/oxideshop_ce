@@ -13,13 +13,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\RecommendationList;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRating;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewAndRatingServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\ReviewAndRatingObjectTypeException;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewAndRatingServiceInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRating;
 
 class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
 {
-    public function __construct(private UserReviewAndRatingServiceInterface $userReviewAndRatingService)
+    public function __construct(private readonly UserReviewAndRatingServiceInterface $userReviewAndRatingService)
     {
     }
 
@@ -60,7 +60,7 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @param ArrayCollection $reviewAndRatingList
      */
-    private function prepareRatingAndReviewPropertiesData($reviewAndRatingList)
+    private function prepareRatingAndReviewPropertiesData($reviewAndRatingList): void
     {
         foreach ($reviewAndRatingList as $reviewAndRating) {
             $this->setObjectTitleToReviewAndRating($reviewAndRating);
@@ -71,10 +71,8 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
 
     /**
      * Formats Review text.
-     *
-     * @param ReviewAndRating $reviewAndRating
      */
-    private function formatReviewText(ReviewAndRating $reviewAndRating)
+    private function formatReviewText(ReviewAndRating $reviewAndRating): void
     {
         $preparedText = htmlspecialchars($reviewAndRating->getReviewText());
 
@@ -83,10 +81,8 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
 
     /**
      * Formats ReviewAndRating date.
-     *
-     * @param ReviewAndRating $reviewAndRating
      */
-    private function formatReviewAndRatingDate(ReviewAndRating $reviewAndRating)
+    private function formatReviewAndRatingDate(ReviewAndRating $reviewAndRating): void
     {
         $formattedDate = Registry::getUtilsDate()->formatDBDate($reviewAndRating->getCreatedAt());
 
@@ -95,10 +91,8 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
 
     /**
      * Sets object title to ReviewAndRating.
-     *
-     * @param ReviewAndRating $reviewAndRating
      */
-    private function setObjectTitleToReviewAndRating(ReviewAndRating $reviewAndRating)
+    private function setObjectTitleToReviewAndRating(ReviewAndRating $reviewAndRating): void
     {
         $title = $this->getObjectTitle(
             $reviewAndRating->getObjectType(),
@@ -132,7 +126,6 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @param string $type
      *
-     * @return Article|RecommendationList
      * @throws ReviewAndRatingObjectTypeException
      */
     private function getObjectModel($type): Article|RecommendationList
@@ -157,10 +150,9 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @param string $type
      *
-     * @return string
      * @throws ReviewAndRatingObjectTypeException
      */
-    private function getObjectTitleFieldName($type)
+    private function getObjectTitleFieldName($type): string
     {
         if ($type === 'oxarticle') {
             $fieldName = 'oxarticles__oxtitle';

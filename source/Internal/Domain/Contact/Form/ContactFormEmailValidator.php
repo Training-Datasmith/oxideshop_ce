@@ -9,24 +9,20 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Contact\Form;
 
-use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormFieldInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormValidatorInterface;
+use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceInterface;
 
 class ContactFormEmailValidator implements FormValidatorInterface
 {
-    /**
-     * @var array
-     */
-    private $errors;
+    private ?array $errors = null;
 
-    public function __construct(private EmailValidatorServiceInterface $emailValidatorService)
+    public function __construct(private readonly EmailValidatorServiceInterface $emailValidatorService)
     {
     }
 
     /**
-     * @param FormInterface $form
      * @return bool
      */
     public function isValid(FormInterface $form)
@@ -47,20 +43,15 @@ class ContactFormEmailValidator implements FormValidatorInterface
         return $isValid;
     }
 
-    /**
-     * @param FormFieldInterface $email
-     * @return bool
-     */
-    private function isValidationNeeded(FormFieldInterface $email)
+    private function isValidationNeeded(FormFieldInterface $email): bool
     {
-        return $this->isNotEmptyEmail($email) || $email->isRequired();
+        if ($this->isNotEmptyEmail($email)) {
+            return true;
+        }
+        return $email->isRequired();
     }
 
-    /**
-     * @param FormFieldInterface $email
-     * @return bool
-     */
-    private function isNotEmptyEmail(FormFieldInterface $email)
+    private function isNotEmptyEmail(FormFieldInterface $email): bool
     {
         return $email->getValue() !== '';
     }

@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use oxRegistry;
 
 /**
  * Interesting, useful links window.
@@ -29,7 +29,7 @@ class LinksController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      *
      * @var object
      */
-    protected $_oLinksList = null;
+    protected $_oLinksList;
 
     /**
      * Template variable getter. Returns links list
@@ -42,7 +42,7 @@ class LinksController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_oLinksList = false;
             // Load links
             $oLinksList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $oLinksList->init("oxlinks");
+            $oLinksList->init('oxlinks');
             $oLinksList->getList();
             $this->_oLinksList = $oLinksList;
         }

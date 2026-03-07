@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,7 +21,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @var string
      */
-    protected $_sUserViewId = null;
+    protected $_sUserViewId;
 
     /**
      * Returns category article count
@@ -37,12 +39,10 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
         $aCatData = $this->getCatCache();
 
         if (!$aCatData || !isset($aCatData[$sCatId][$sActIdent])) {
-            $iCnt = $this->setCatArticleCount($aCatData, $sCatId, $sActIdent);
-        } else {
-            $iCnt = $aCatData[$sCatId][$sActIdent];
+            return $this->setCatArticleCount($aCatData, $sCatId, $sActIdent);
         }
 
-        return $iCnt;
+        return $aCatData[$sCatId][$sActIdent];
     }
 
     /**
@@ -63,12 +63,10 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
         $aCatData = $this->getCatCache();
 
         if (!$aCatData || !isset($aCatData[$sCatId][$sActIdent])) {
-            $iCnt = $this->setPriceCatArticleCount($aCatData, $sCatId, $sActIdent, $dPriceFrom, $dPriceTo);
-        } else {
-            $iCnt = $aCatData[$sCatId][$sActIdent];
+            return $this->setPriceCatArticleCount($aCatData, $sCatId, $sActIdent, $dPriceFrom, $dPriceTo);
         }
 
-        return $iCnt;
+        return $aCatData[$sCatId][$sActIdent];
     }
 
     /**
@@ -87,12 +85,10 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
         $aVendorData = $this->getVendorCache();
 
         if (!$aVendorData || !isset($aVendorData[$sVendorId][$sActIdent])) {
-            $iCnt = $this->setVendorArticleCount($aVendorData, $sVendorId, $sActIdent);
-        } else {
-            $iCnt = $aVendorData[$sVendorId][$sActIdent];
+            return $this->setVendorArticleCount($aVendorData, $sVendorId, $sActIdent);
         }
 
-        return $iCnt;
+        return $aVendorData[$sVendorId][$sActIdent];
     }
 
     /**
@@ -110,12 +106,10 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
         // loading from cache
         $aManufacturerData = $this->getManufacturerCache();
         if (!$aManufacturerData || !isset($aManufacturerData[$sManufacturerId][$sActIdent])) {
-            $iCnt = $this->setManufacturerArticleCount($aManufacturerData, $sManufacturerId, $sActIdent);
-        } else {
-            $iCnt = $aManufacturerData[$sManufacturerId][$sActIdent];
+            return $this->setManufacturerArticleCount($aManufacturerData, $sManufacturerId, $sActIdent);
         }
 
-        return $iCnt;
+        return $aManufacturerData[$sManufacturerId][$sActIdent];
     }
 
     /**
@@ -142,7 +136,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
                WHERE $sO2CView.`oxcatnid` = :oxcatnid AND " . $oArticle->getSqlActiveSnippet();
 
         $aCache[$sCatId][$sActIdent] = $oDb->getOne($sQ, [
-            'oxcatnid' => $sCatId
+            'oxcatnid' => $sCatId,
         ]);
 
         $this->setCatCache($aCache);
@@ -158,8 +152,6 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      * @param string $sActIdent  Category ID
      * @param int    $dPriceFrom Price from
      * @param int    $dPriceTo   Price to
-     *
-     * @return null
      */
     public function setPriceCatArticleCount($aCache, $sCatId, $sActIdent, $dPriceFrom, $dPriceTo)
     {
@@ -169,12 +161,12 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
         $params = [];
         $sSelect = "SELECT count({$sTable}.oxid) FROM {$sTable} WHERE oxvarminprice >= 0";
         if ($dPriceTo) {
-            $sSelect .= " AND oxvarminprice <= :oxvarpriceto";
+            $sSelect .= ' AND oxvarminprice <= :oxvarpriceto';
             $params['oxvarpriceto'] = (float) $dPriceTo;
         }
 
         if ($dPriceFrom) {
-            $sSelect .= " AND oxvarminprice  >= :oxvarpricefrom";
+            $sSelect .= ' AND oxvarminprice  >= :oxvarpricefrom';
             $params['oxvarpricefrom'] = (float) $dPriceFrom;
         }
 
@@ -217,7 +209,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
 
         $this->setVendorCache($aCache);
 
-        return isset($aCache[$sCatId][$sActIdent]) ? $aCache[$sCatId][$sActIdent] : 0;
+        return $aCache[$sCatId][$sActIdent] ?? 0;
     }
 
     /**
@@ -282,7 +274,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
         //#3485
         $sQ = "SELECT count($sArtTable.oxid) FROM $sArtTable WHERE $sArtTable.oxparentid = '' AND oxmanufacturerid = :manufacturerId AND " . $oArticle->getSqlActiveSnippet();
         $iValue = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQ, [
-            'manufacturerId' => $sMnfId
+            'manufacturerId' => $sMnfId,
         ]);
 
         $aCache[$sMnfId][$sActIdent] = (int) $iValue;
@@ -297,7 +289,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sCatId Category/vendor/manufacturer ID
      */
-    public function resetCatArticleCount($sCatId = null)
+    public function resetCatArticleCount($sCatId = null): void
     {
         if (!$sCatId) {
             \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalCatCache', null);
@@ -317,7 +309,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @param int $iPrice article price
      */
-    public function resetPriceCatArticleCount($iPrice)
+    public function resetPriceCatArticleCount($iPrice): void
     {
         // loading from cache
         if ($aCatData = $this->getCatCache()) {
@@ -326,12 +318,12 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
             $categoriesIds = DatabaseProvider::getMaster()->getCol(
                 sprintf(
-                    "SELECT oxid FROM %s WHERE :oxpricefrom >= oxpricefrom AND :oxpriceto <= oxpriceto",
+                    'SELECT oxid FROM %s WHERE :oxpricefrom >= oxpricefrom AND :oxpriceto <= oxpriceto',
                     $tableViewNameGenerator->getViewName('oxcategories')
                 ),
                 [
                     'oxpricefrom' => (float) $iPrice,
-                    'oxpriceto' => (float) $iPrice
+                    'oxpriceto' => (float) $iPrice,
                 ]
             );
             foreach ($categoriesIds as $categoryId) {
@@ -351,7 +343,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sVendorId Category/vendor ID
      */
-    public function resetVendorArticleCount($sVendorId = null)
+    public function resetVendorArticleCount($sVendorId = null): void
     {
         if (!$sVendorId) {
             \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalVendorCache', null);
@@ -371,7 +363,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sManufacturerId Category/Manufacturer ID
      */
-    public function resetManufacturerArticleCount($sManufacturerId = null)
+    public function resetManufacturerArticleCount($sManufacturerId = null): void
     {
         if (!$sManufacturerId) {
             \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalManufacturerCache', null);

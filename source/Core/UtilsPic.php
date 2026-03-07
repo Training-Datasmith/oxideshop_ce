@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,7 +18,7 @@ use Symfony\Component\Filesystem\Path;
 /**
  * Including pictures generator functions file
  */
-require_once __DIR__ . "/utils/oxpicgenerator.php";
+require_once __DIR__ . '/utils/oxpicgenerator.php';
 
 class UtilsPic extends \OxidEsales\Eshop\Core\Base
 {
@@ -25,7 +27,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aImageTypes = ["GIF" => IMAGETYPE_GIF, "JPG" => IMAGETYPE_JPEG, "PNG" => IMAGETYPE_PNG, "JPEG" => IMAGETYPE_JPEG];
+    protected $_aImageTypes = ['GIF' => IMAGETYPE_GIF, 'JPG' => IMAGETYPE_JPEG, 'PNG' => IMAGETYPE_PNG, 'JPEG' => IMAGETYPE_JPEG];
 
     /**
      * Resizes image to desired width and height, returns true on success.
@@ -41,7 +43,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
     {
         if (file_exists($sSrc) && ($aImageInfo = @getimagesize($sSrc))) {
             $myConfig = Registry::getConfig();
-            list($iWidth, $iHeight) = calcImageSize($iDesiredWidth, $iDesiredHeight, $aImageInfo[0], $aImageInfo[1]);
+            [$iWidth, $iHeight] = calcImageSize($iDesiredWidth, $iDesiredHeight, $aImageInfo[0], $aImageInfo[1]);
 
             return $this->resize($aImageInfo, $sSrc, null, $sTarget, $iWidth, $iHeight, getGdVersion(), $myConfig->getConfigParam('blDisableTouch'), $myConfig->getConfigParam('sDefaultImageQuality'));
         }
@@ -61,12 +63,11 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      */
     public function safePictureDelete($sPicName, $sAbsDynImageDir, $sTable, $sField)
     {
-        $blDelete = false;
         if ($this->isPicDeletable($sPicName, $sTable, $sField)) {
-            $blDelete = $this->deletePicture($sPicName, $sAbsDynImageDir);
+            return $this->deletePicture($sPicName, $sAbsDynImageDir);
         }
 
-        return $blDelete;
+        return false;
     }
 
     /**
@@ -83,7 +84,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
 
         if (!ContainerFacade::getParameter('oxid_esales.alternative_image_url')) {
             $generatedImagePath = str_replace('/master/', '/generated/', $masterImagePath);
-            $files = glob(Path::join($generatedImagePath,'*',$filename));
+            $files = glob(Path::join($generatedImagePath, '*', $filename));
             if (\is_array($files)) {
                 foreach ($files as $file) {
                     $removed = unlink($file);
@@ -129,7 +130,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
         $query = "SELECT count(*) FROM $sTable WHERE $sField = :picturename group by $sField ";
 
         return $masterDb->getOne($query, [
-            'picturename' => (string) $sPicName
+            'picturename' => (string) $sPicName,
         ]);
     }
 
@@ -143,8 +144,6 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      * @param string $sPicDir         directory of pic
      * @param array  $aParams         new input text array
      * @param string $sAbsDynImageDir the absolute image diectory, where to delete the given image ($myConfig->getPictureDir(false))
-     *
-     * @return null
      */
     public function overwritePic($oObject, $sPicTable, $sPicField, $sPicType, $sPicDir, $aParams, $sAbsDynImageDir)
     {
@@ -176,7 +175,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      */
     protected function resizeGif($sSrc, $sTarget, $iNewWidth, $iNewHeight, $iOriginalWidth, $iOriginalHeigth, $iGDVer, $blDisableTouch)
     {
-        return resizeGif($sSrc, $sTarget, $iNewWidth, $iNewHeight, $iOriginalWidth, $iOriginalHeigth, $iGDVer, $blDisableTouch);
+        return resizeGif($sSrc, $sTarget, $iNewWidth, $iNewHeight, $iOriginalWidth, $iOriginalHeigth, $iGDVer);
     }
 
     /**
@@ -196,21 +195,21 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      */
     protected function resize($aImageInfo, $sSrc, $hDestinationImage, $sTarget, $iNewWidth, $iNewHeight, $iGdVer, $blDisableTouch, $iDefQuality)
     {
-        startProfile("PICTURE_RESIZE");
+        startProfile('PICTURE_RESIZE');
 
         $blSuccess = false;
         switch ($aImageInfo[2]) { //Image type
-            case ($this->_aImageTypes["GIF"]):
+            case ($this->_aImageTypes['GIF']):
                 //php does not process gifs until 7th July 2004 (see lzh licensing)
-                if (function_exists("imagegif")) {
+                if (function_exists('imagegif')) {
                     $blSuccess = resizeGif($sSrc, $sTarget, $iNewWidth, $iNewHeight, $aImageInfo[0], $aImageInfo[1], $iGdVer);
                 }
                 break;
-            case ($this->_aImageTypes["JPEG"]):
-            case ($this->_aImageTypes["JPG"]):
+            case ($this->_aImageTypes['JPEG']):
+            case ($this->_aImageTypes['JPG']):
                 $blSuccess = resizeJpeg($sSrc, $sTarget, $iNewWidth, $iNewHeight, $aImageInfo, $iGdVer, $hDestinationImage, $iDefQuality);
                 break;
-            case ($this->_aImageTypes["PNG"]):
+            case ($this->_aImageTypes['PNG']):
                 $blSuccess = resizePng($sSrc, $sTarget, $iNewWidth, $iNewHeight, $aImageInfo, $iGdVer, $hDestinationImage);
                 break;
         }
@@ -219,7 +218,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
             @touch($sTarget);
         }
 
-        stopProfile("PICTURE_RESIZE");
+        stopProfile('PICTURE_RESIZE');
 
         return $blSuccess;
     }
@@ -235,8 +234,6 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      * @param string $sTarget           target file path
      * @param int    $iGdVer            used gd version @deprecated
      * @param bool   $blDisableTouch    wether Touch() should be called or not
-     *
-     * @return null
      */
     protected function copyAlteredImage($sDestinationImage, $sSourceImage, $iNewWidth, $iNewHeight, $aImageInfo, $sTarget, $iGdVer, $blDisableTouch)
     {
@@ -248,19 +245,11 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
         return $blSuccess;
     }
 
-    /**
-     * @param string $filename
-     * @return bool
-     */
     private function isPlaceholderImage(string $filename): bool
     {
-        return strpos($filename, 'nopic.jpg') !== false || strpos($filename, 'nopic_ico.jpg') !== false;
+        return str_contains($filename, 'nopic.jpg') || str_contains($filename, 'nopic_ico.jpg');
     }
 
-    /**
-     * @param string $filepath
-     * @return bool
-     */
     private function removeMasterFile(string $filepath): bool
     {
         $removed = false;
@@ -278,10 +267,6 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
         return $removed;
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     private function makePathRelativeToShopSource(string $path): string
     {
         return Path::makeRelative(

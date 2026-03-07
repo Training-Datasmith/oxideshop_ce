@@ -14,10 +14,8 @@ use Psr\Log\LoggerInterface;
 if (!function_exists('getShopBasePath')) {
     /**
      * Returns framework base path.
-     *
-     * @return string
      */
-    function getShopBasePath()
+    function getShopBasePath(): string
     {
         return OX_BASE_PATH;
     }
@@ -29,7 +27,7 @@ if (!function_exists('error_404_handler')) {
      *
      * @param string $sUrl url wich was given, can be not specified in some cases
      */
-    function error_404_handler($sUrl = '')
+    function error_404_handler($sUrl = ''): void
     {
         Registry::getUtils()->handlePageNotFoundError($sUrl);
     }
@@ -39,10 +37,8 @@ if (!function_exists('isSearchEngineUrl')) {
 
     /**
      * Returns search engine url status
-     *
-     * @return bool
      */
-    function isSearchEngineUrl()
+    function isSearchEngineUrl(): bool
     {
         return false;
     }
@@ -54,7 +50,7 @@ if (!function_exists('startProfile')) {
      *
      * @param string $sProfileName name of profile
      */
-    function startProfile($sProfileName)
+    function startProfile($sProfileName): void
     {
         global $aStartTimes;
         global $executionCounts;
@@ -75,7 +71,7 @@ if (!function_exists('stopProfile')) {
      *
      * @param string $sProfileName name of profile
      */
-    function stopProfile($sProfileName)
+    function stopProfile($sProfileName): void
     {
         global $aProfileTimes;
         global $aStartTimes;
@@ -92,12 +88,10 @@ if (!function_exists('getLangTableIdx')) {
      * Returns language table index
      *
      * @param int $iLangId language id
-     *
-     * @return string
      */
-    function getLangTableIdx($iLangId)
+    function getLangTableIdx($iLangId): int
     {
-        $iLangPerTable = Registry::getConfig()->getConfigParam("iLangPerTable");
+        $iLangPerTable = Registry::getConfig()->getConfigParam('iLangPerTable');
         //#0002718 min language count per table 2
         $iLangPerTable = ($iLangPerTable > 1) ? $iLangPerTable : 8;
 
@@ -112,10 +106,8 @@ if (!function_exists('getLangTableName')) {
      *
      * @param string $sTable  table name
      * @param int    $iLangId language id
-     *
-     * @return string
      */
-    function getLangTableName($sTable, $iLangId)
+    function getLangTableName(string $sTable, $iLangId): string
     {
         $iTableIdx = getLangTableIdx($iLangId);
         if ($iTableIdx && in_array($sTable, Registry::getLang()->getMultiLangTables(), true)) {

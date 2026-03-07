@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,22 +24,22 @@ class AttributeCategory extends \OxidEsales\Eshop\Application\Controller\Admin\A
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oAttr = oxNew(\OxidEsales\Eshop\Application\Model\Attribute::class);
             $oAttr->load($soxId);
-            $this->_aViewData["edit"] = $oAttr;
+            $this->_aViewData['edit'] = $oAttr;
         }
 
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oAttributeCategoryAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class);
             $this->_aViewData['oxajax'] = $oAttributeCategoryAjax->getColumns();
 
-            return "popups/attribute_category";
+            return 'popups/attribute_category';
         }
 
-        return "attribute_category";
+        return 'attribute_category';
     }
 }

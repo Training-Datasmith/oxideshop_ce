@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -11,7 +13,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 
 class ModuleConfigurationValidatorAggregate implements ModuleConfigurationValidatorInterface
 {
-    private array $validators;
+    private readonly array $validators;
 
     public function __construct(ModuleConfigurationValidatorInterface ...$validators)
     {

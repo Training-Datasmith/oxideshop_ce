@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -54,8 +56,8 @@ class TableViewNameGenerator
 
         if (!ContainerFacade::getParameter('oxid_esales.skip_database_views_usage')) {
             $language = $this->getLanguage();
-            $languageId = $languageId !== null ? $languageId : $language->getBaseLanguage();
-            $shopId = $shopId !== null ? $shopId : $config->getShopId();
+            $languageId ??= $language->getBaseLanguage();
+            $shopId ??= $config->getShopId();
             $isMultiLang = in_array($table, $language->getMultiLangTables());
             $viewSuffix = $this->getViewSuffix($table, $languageId, $shopId, $isMultiLang);
 
@@ -74,10 +76,8 @@ class TableViewNameGenerator
      * @param int    $languageId
      * @param int    $shopId
      * @param bool   $isMultiLang
-     *
-     * @return string
      */
-    protected function getViewSuffix($table, $languageId, $shopId, $isMultiLang)
+    protected function getViewSuffix($table, $languageId, $shopId, $isMultiLang): string
     {
         $viewSuffix = '';
         if ($languageId != -1 && $isMultiLang) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -27,7 +28,7 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @var array
      */
-    protected $_aStates = null;
+    protected $_aStates;
 
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
@@ -55,7 +56,7 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function isInEU()
     {
-        return (bool) ($this->oxcountry__oxvatstatus->value == 1);
+        return $this->oxcountry__oxvatstatus->value == 1;
     }
 
     /**
@@ -71,12 +72,12 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
 
         $sCountryId = $this->getId();
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sViewName = $tableViewNameGenerator->getViewName("oxstates", $this->getLanguage());
+        $sViewName = $tableViewNameGenerator->getViewName('oxstates', $this->getLanguage());
         $sQ = "select * from {$sViewName} where `oxcountryid` = :oxcountryid order by `oxtitle`  ";
         $this->_aStates = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $this->_aStates->init("oxstate");
+        $this->_aStates->init('oxstate');
         $this->_aStates->selectString($sQ, [
-            'oxcountryid' => $sCountryId
+            'oxcountryid' => $sCountryId,
         ]);
 
         return $this->_aStates;
@@ -93,8 +94,8 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        return $oDb->getOne("select oxid from oxcountry where oxisoalpha2 = :oxisoalpha2", [
-            'oxisoalpha2' => $sCode
+        return $oDb->getOne('select oxid from oxcountry where oxisoalpha2 = :oxisoalpha2', [
+            'oxisoalpha2' => $sCode,
         ]);
     }
 

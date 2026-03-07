@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,21 +36,19 @@ class WidgetController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * Sets self::$_aCollectedComponentNames to null, as views and widgets
      * controllers loads different components and calls parent::init()
      */
-    public function init()
+    public function init(): void
     {
         self::$_aCollectedComponentNames = null;
 
-        if (!empty($this->_aComponentNames)) {
-            foreach ($this->_aComponentNames as $sComponentName => $sCompCache) {
-                $oActTopView = \OxidEsales\Eshop\Core\Registry::getConfig()->getTopActiveView();
-                if ($oActTopView) {
-                    $this->_oaComponents[$sComponentName] = $oActTopView->getComponent($sComponentName);
-                    if (!isset($this->_oaComponents[$sComponentName])) {
-                        $this->_blLoadComponents = true;
-                        break;
-                    } else {
-                        $this->_oaComponents[$sComponentName]->setParent($this);
-                    }
+        foreach ($this->_aComponentNames as $sComponentName => $sCompCache) {
+            $oActTopView = \OxidEsales\Eshop\Core\Registry::getConfig()->getTopActiveView();
+            if ($oActTopView) {
+                $this->_oaComponents[$sComponentName] = $oActTopView->getComponent($sComponentName);
+                if (!isset($this->_oaComponents[$sComponentName])) {
+                    $this->_blLoadComponents = true;
+                    break;
+                } else {
+                    $this->_oaComponents[$sComponentName]->setParent($this);
                 }
             }
         }

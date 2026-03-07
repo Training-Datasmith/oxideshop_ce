@@ -14,22 +14,9 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao;
  */
 interface MetaDataSchemataProviderInterface
 {
-    /**
-     * @return array
-     */
     public function getMetaDataSchemata(): array;
 
-    /**
-     * @param string $metaDataVersion
-     *
-     * @return array
-     */
     public function getMetaDataSchemaForVersion(string $metaDataVersion): array;
 
-    /**
-     * @param string $metaDataVersion
-     *
-     * @return array
-     */
     public function getFlippedMetaDataSchemaForVersion(string $metaDataVersion): array;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -31,7 +33,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      *
      * @var string
      */
-    protected $_oArticles = null;
+    protected $_oArticles;
 
     /**
      * Article list loading filter (appended where statement)
@@ -94,7 +96,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         $iCnt = 0;
         $sSelect = $this->getArticleSelect();
         if ($sSelect) {
-            $iCnt = DatabaseProvider::getDb()->getOne($sSelect);
+            return DatabaseProvider::getDb()->getOne($sSelect);
         }
 
         return $iCnt;
@@ -111,9 +113,8 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         $sArtView = $tableViewNameGenerator->getViewName('oxarticles');
         $sSelect = "select count(distinct $sArtView.oxid) from oxobject2list ";
         $sSelect .= "left join $sArtView on oxobject2list.oxobjectid = $sArtView.oxid ";
-        $sSelect .= "where (oxobject2list.oxlistid = '" . $this->getId() . "') ";
 
-        return $sSelect;
+        return $sSelect . ("where (oxobject2list.oxlistid = '" . $this->getId() . "') ");
     }
 
     /**
@@ -150,8 +151,8 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         if (($blDelete = parent::delete($sOXID))) {
             $oDb = DatabaseProvider::getDb();
             // cleaning up related data
-            $oDb->execute("delete from oxobject2list where oxlistid = :oxlistid", [
-                'oxlistid' => $sOXID
+            $oDb->execute('delete from oxobject2list where oxlistid = :oxlistid', [
+                'oxlistid' => $sOXID,
             ]);
             $this->onDelete();
         }
@@ -178,7 +179,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
 
         return $oDb->getOne($sSelect, [
             'oxlistid' => $this->getId(),
-            'oxobjectid' => $sOXID
+            'oxobjectid' => $sOXID,
         ]);
     }
 
@@ -193,11 +194,11 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     {
         if ($sOXID) {
             $oDb = DatabaseProvider::getDb();
-            $sQ = "delete from oxobject2list where oxobjectid = :oxobjectid and oxlistid = :oxlistid";
+            $sQ = 'delete from oxobject2list where oxobjectid = :oxobjectid and oxlistid = :oxlistid';
 
             return $oDb->execute($sQ, [
                 'oxobjectid' => $sOXID,
-                'oxlistid' => $this->getId()
+                'oxlistid' => $this->getId(),
             ]);
         }
     }
@@ -219,22 +220,22 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
             $database = DatabaseProvider::getMaster();
 
-            $sql = "select oxid from oxobject2list 
+            $sql = 'select oxid from oxobject2list 
                 where oxobjectid = :oxobjectid 
-                    and oxlistid = :oxlistid";
+                    and oxlistid = :oxlistid';
             $params = [
                 'oxobjectid' => $sOXID,
-                'oxlistid' => $this->getId()
+                'oxlistid' => $this->getId(),
             ];
 
             if (!$database->getOne($sql, $params)) {
                 $sUid = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID();
-                $sQ = "insert into oxobject2list (oxid, oxobjectid, oxlistid, oxdesc) values (:oxid, :oxobjectid, :oxlistid, :oxdesc)";
+                $sQ = 'insert into oxobject2list (oxid, oxobjectid, oxlistid, oxdesc) values (:oxid, :oxobjectid, :oxlistid, :oxdesc)';
                 $blAdd = $database->execute($sQ, [
                     'oxid' => $sUid,
                     'oxobjectid' => $sOXID,
                     'oxlistid' => $this->getId(),
-                    'oxdesc' => $sDesc
+                    'oxdesc' => $sDesc,
                 ]);
             }
         }
@@ -257,7 +258,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         if (is_array($aArticleIds) && count($aArticleIds)) {
             startProfile(__FUNCTION__);
 
-            $sIds = implode(",", DatabaseProvider::getDb()->quoteArray($aArticleIds));
+            $sIds = implode(',', DatabaseProvider::getDb()->quoteArray($aArticleIds));
 
             $oRecommList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
             $oRecommList->init('oxrecommlist');
@@ -266,17 +267,17 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
 
             $oRecommList->setSqlLimit(0, $iCnt);
 
-            $sSelect = "SELECT distinct lists.* FROM oxobject2list AS o2l_lists";
-            $sSelect .= " LEFT JOIN oxobject2list AS o2l_count ON o2l_lists.oxlistid = o2l_count.oxlistid";
-            $sSelect .= " LEFT JOIN oxrecommlists as lists ON o2l_lists.oxlistid = lists.oxid";
+            $sSelect = 'SELECT distinct lists.* FROM oxobject2list AS o2l_lists';
+            $sSelect .= ' LEFT JOIN oxobject2list AS o2l_count ON o2l_lists.oxlistid = o2l_count.oxlistid';
+            $sSelect .= ' LEFT JOIN oxrecommlists as lists ON o2l_lists.oxlistid = lists.oxid';
             $sSelect .= " WHERE o2l_lists.oxobjectid IN ( $sIds ) and lists.oxshopid = :oxshopid";
-            $sSelect .= " GROUP BY lists.oxid order by (";
-            $sSelect .= " SELECT count( order1.oxobjectid ) FROM oxobject2list AS order1";
+            $sSelect .= ' GROUP BY lists.oxid order by (';
+            $sSelect .= ' SELECT count( order1.oxobjectid ) FROM oxobject2list AS order1';
             $sSelect .= " WHERE order1.oxobjectid IN ( $sIds ) AND o2l_lists.oxlistid = order1.oxlistid";
-            $sSelect .= " ) DESC, count( lists.oxid ) DESC";
+            $sSelect .= ' ) DESC, count( lists.oxid ) DESC';
 
             $oRecommList->selectString($sSelect, [
-                'oxshopid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId()
+                'oxshopid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId(),
             ]);
 
             stopProfile(__FUNCTION__);
@@ -305,7 +306,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     protected function loadFirstArticles(\OxidEsales\Eshop\Core\Model\ListModel $oRecommList, $aIds)
     {
         $aIds = DatabaseProvider::getDb()->quoteArray($aIds);
-        $sIds = implode(", ", $aIds);
+        $sIds = implode(', ', $aIds);
 
         $aPrevIds = [];
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
@@ -328,7 +329,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
                 $sId = $oArticle->getId();
                 $aPrevIds[$sId] = $sId;
                 unset($aIds[$sId]);
-                $sIds = implode(", ", $aIds);
+                $sIds = implode(', ', $aIds);
             } else {
                 unset($oRecommList[$key]);
             }
@@ -351,7 +352,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
 
             // load only lists which we show on screen
             $iNrofCatArticles = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-            $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
+            $iNrofCatArticles = $iNrofCatArticles ?: 10;
 
             $oRecommList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
             $oRecommList->init('oxrecommlist');
@@ -395,12 +396,11 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         $iShopId = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
         $sSearchStrQuoted = DatabaseProvider::getDb()->quote("%$sSearchStr%");
 
-        $sSelect = "select distinct rl.* from oxrecommlists as rl";
-        $sSelect .= " inner join oxobject2list as o2l on o2l.oxlistid = rl.oxid";
+        $sSelect = 'select distinct rl.* from oxrecommlists as rl';
+        $sSelect .= ' inner join oxobject2list as o2l on o2l.oxlistid = rl.oxid';
         $sSelect .= " where ( rl.oxtitle like $sSearchStrQuoted or rl.oxdesc like $sSearchStrQuoted";
-        $sSelect .= " or o2l.oxdesc like $sSearchStrQuoted ) and rl.oxshopid = '$iShopId'";
 
-        return $sSelect;
+        return $sSelect . " or o2l.oxdesc like $sSearchStrQuoted ) and rl.oxshopid = '$iShopId'";
     }
 
     /**
@@ -408,7 +408,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      *
      * @param integer $iRating new rating value
      */
-    public function addToRatingAverage($iRating)
+    public function addToRatingAverage($iRating): void
     {
         $dOldRating = $this->oxrecommlists__oxrating->value;
         $dOldCnt = $this->oxrecommlists__oxratingcnt->value;
@@ -510,7 +510,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
             $sUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        return $sUrl . "index.php?cl=recommlist" . ($blAddId ? "&amp;recommid=" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=recommlist' . ($blAddId ? '&amp;recommid=' . $this->getId() : '');
     }
 
     /**
@@ -518,7 +518,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      *
      * @param string $sArticlesFilter article filter
      */
-    public function setArticlesFilter($sArticlesFilter)
+    public function setArticlesFilter($sArticlesFilter): void
     {
         $this->_sArticlesFilter = $sArticlesFilter;
     }

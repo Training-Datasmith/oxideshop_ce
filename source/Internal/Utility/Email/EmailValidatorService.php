@@ -17,8 +17,6 @@ class EmailValidatorService implements EmailValidatorServiceInterface
 {
     /**
      * @param mixed $email
-     *
-     * @return bool
      */
     public function isEmailValid($email): bool
     {

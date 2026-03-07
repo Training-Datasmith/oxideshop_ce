@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\SettingNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\SettingNotValidException;
 
 class ModuleSettingBooleanValidator implements MetaDataValidatorInterface
 {
@@ -26,8 +26,6 @@ class ModuleSettingBooleanValidator implements MetaDataValidatorInterface
     ];
 
     /**
-     * @param array $metaData
-     *
      * @throws SettingNotValidException
      */
     public function validate(array $metaData): void
@@ -41,8 +39,6 @@ class ModuleSettingBooleanValidator implements MetaDataValidatorInterface
     }
 
     /**
-     * @param array $metaData
-     * @param array $setting
      * @throws SettingNotValidException
      */
     private function validateSetting(array $metaData, array $setting): void

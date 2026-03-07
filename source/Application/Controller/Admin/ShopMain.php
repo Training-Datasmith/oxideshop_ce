@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,14 +24,14 @@ use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
 {
     /** Identifies new shop. */
-    const NEW_SHOP_ID = "-1";
+    public const NEW_SHOP_ID = '-1';
 
     /**
      * Shop field set size, limited to 64bit by MySQL
      *
      * @var int
      */
-    const SHOP_FIELD_SET_SIZE = 64;
+    public const SHOP_FIELD_SET_SIZE = 64;
 
     /**
      * Controller render method, which returns the name of the template file.
@@ -41,7 +43,7 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         $config = Registry::getConfig();
         parent::render();
 
-        $shopId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $shopId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
         $templateName = $this->renderNewShop();
 
@@ -54,19 +56,19 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
 
         if (isset($shopId) && $shopId != self::NEW_SHOP_ID) {
             $shop = oxNew(Shop::class);
-            $subjLang = Registry::getRequest()->getRequestEscapedParameter("subjlang");
+            $subjLang = Registry::getRequest()->getRequestEscapedParameter('subjlang');
             if (!isset($subjLang)) {
                 $subjLang = $this->_iEditLang;
             }
 
             if ($subjLang && $subjLang > 0) {
-                $this->_aViewData["subjlang"] = $subjLang;
+                $this->_aViewData['subjlang'] = $subjLang;
             }
 
             $shop->loadInLang($subjLang, $shopId);
 
-            $this->_aViewData["edit"] = $shop;
-            Registry::getSession()->setVariable("shp", $shopId);
+            $this->_aViewData['edit'] = $shop;
+            Registry::getSession()->setVariable('shp', $shopId);
         }
 
         $this->checkParent($shop);
@@ -76,22 +78,20 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
             $this->_aViewData['updatenav'] = Registry::getRequest()->getRequestEscapedParameter('updatenav');
         }
 
-        return "shop_main";
+        return 'shop_main';
     }
 
     /**
      * Saves changed main shop configuration parameters.
-     *
-     * @return null
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $config = Registry::getConfig();
         $shopId = $this->getEditObjectId();
 
-        $parameters = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $parameters = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $user = $this->getUser();
         $shopId = $this->updateShopIdByUser($user, $shopId, false);
@@ -101,7 +101,7 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         $parameters['oxshops__oxactive'] = (isset($parameters['oxshops__oxactive']) && $parameters['oxshops__oxactive'] == true) ? 1 : 0;
         $parameters['oxshops__oxproductive'] = (isset($parameters['oxshops__oxproductive']) && $parameters['oxshops__oxproductive'] == true) ? 1 : 0;
 
-        $subjLang = Registry::getRequest()->getRequestEscapedParameter("subjlang");
+        $subjLang = Registry::getRequest()->getRequestEscapedParameter('subjlang');
         $shopLanguageId = ($subjLang && $subjLang > 0) ? $subjLang : 0;
 
         $shop = oxNew(Shop::class);
@@ -112,18 +112,18 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         }
 
         if (isset($parameters['oxshops__oxsmtp']) && $parameters['oxshops__oxsmtp']) {
-            $parameters['oxshops__oxsmtp'] = trim($parameters['oxshops__oxsmtp']);
+            $parameters['oxshops__oxsmtp'] = trim((string) $parameters['oxshops__oxsmtp']);
         }
 
         $shop->setLanguage(0);
         $shop->assign($parameters);
         $shop->setLanguage($shopLanguageId);
 
-        if (($newSMPTPass = Registry::getRequest()->getRequestEscapedParameter("oxsmtppwd"))) {
-            $shop->oxshops__oxsmtppwd->setValue($newSMPTPass == '-' ? "" : $newSMPTPass);
+        if (($newSMPTPass = Registry::getRequest()->getRequestEscapedParameter('oxsmtppwd'))) {
+            $shop->oxshops__oxsmtppwd->setValue($newSMPTPass == '-' ? '' : $newSMPTPass);
         }
 
-        $canCreateShop = $this->canCreateShop($shopId, $shop, $config);
+        $canCreateShop = $this->canCreateShop($shopId, $shop);
         if (!$canCreateShop) {
             return;
         }
@@ -135,17 +135,15 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
             return;
         }
 
-        $this->_aViewData["updatelist"] = "1";
+        $this->_aViewData['updatelist'] = '1';
 
         $this->updateShopInformation($config, $shop, $shopId);
 
-        Registry::getSession()->setVariable("actshop", $shopId);
+        Registry::getSession()->setVariable('actshop', $shopId);
     }
 
     /**
      * Returns array of config variables which cannot be copied
-     *
-     * @return array
      */
     protected function getNonCopyConfigVars(): array
     {
@@ -159,7 +157,7 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         ];
         $multiShopTables = ContainerFacade::getParameter('oxid_esales.multi_shop_tables');
         foreach ($multiShopTables as $multiShopTable) {
-            $nonCopyVars[] = 'blMallInherit_' . strtolower($multiShopTable);
+            $nonCopyVars[] = 'blMallInherit_' . strtolower((string) $multiShopTable);
         }
 
         return $nonCopyVars;
@@ -189,8 +187,8 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
                 if (!in_array($configName, $nonCopyVars)) {
                     $newId = $utilsObject->generateUID();
                     $insertNewConfigQuery =
-                        "insert into oxconfig (oxid, oxshopid, oxvarname, oxvartype, oxvarvalue, oxmodule)
-                         values (:oxid, :oxshopid, :oxvarname, :oxvartype, :value, :oxmodule)";
+                        'insert into oxconfig (oxid, oxshopid, oxvarname, oxvartype, oxvarvalue, oxmodule)
+                         values (:oxid, :oxshopid, :oxvarname, :oxvartype, :value, :oxmodule)';
                     $db->execute($insertNewConfigQuery, [
                         'oxid' => $newId,
                         'oxshopid' => $shop->getId(),
@@ -208,7 +206,7 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         foreach (ContainerFacade::getParameter('oxid_esales.multi_shop_tables') as $multiShopTable) {
             $config->saveShopConfVar(
                 'bool',
-                'blMallInherit_' . strtolower($multiShopTable),
+                'blMallInherit_' . strtolower((string) $multiShopTable),
                 $inheritAll,
                 $shop->getId()
             );

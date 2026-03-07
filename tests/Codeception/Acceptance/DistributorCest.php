@@ -26,14 +26,14 @@ final class DistributorCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $distributorListPage = new DistributorList($I);
@@ -41,14 +41,14 @@ final class DistributorCest
         $distributorListPage->seeDistributorData(
             [
                 'title' => 'Distributor [EN] šÄßüл',
-                'count' => '3'
+                'count' => '3',
             ],
             1
         )
             ->openDistributorPage(1)
             ->seePageInformation([
                 'title' => 'Distributor [EN] šÄßüл',
-                'description' => 'Distributor description [EN] šÄßüл'
+                'description' => 'Distributor description [EN] šÄßüл',
             ])->selectSorting('oxtitle', 'asc')
             ->seeProductData($productData, 1)
             ->seeProductData($productData2, 2)

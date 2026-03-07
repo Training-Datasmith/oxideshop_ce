@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,10 +23,8 @@ class RequiredFieldsValidator
 
     /**
      * Invalid fields array.
-     *
-     * @var array
      */
-    private $_aInvalidFields = [];
+    private array $_aInvalidFields = [];
 
     /**
      * Required Field validator.
@@ -61,7 +61,7 @@ class RequiredFieldsValidator
      *
      * @param array $aFields Fields
      */
-    public function setRequiredFields($aFields)
+    public function setRequiredFields($aFields): void
     {
         $this->_aRequiredFields = $aFields;
     }
@@ -81,7 +81,7 @@ class RequiredFieldsValidator
      *
      * @param \OxidEsales\Eshop\Application\Model\RequiredFieldValidator $oFieldValidator
      */
-    public function setFieldValidator($oFieldValidator)
+    public function setFieldValidator($oFieldValidator): void
     {
         $this->_oFieldValidator = $oFieldValidator;
     }
@@ -104,7 +104,7 @@ class RequiredFieldsValidator
      *
      * @return bool If any invalid field exist.
      */
-    public function validateFields($oObject)
+    public function validateFields($oObject): bool
     {
         $aRequiredFields = $this->getRequiredFields();
         $oFieldValidator = $this->getFieldValidator();
@@ -125,7 +125,7 @@ class RequiredFieldsValidator
      *
      * @param array $aFields Invalid field name.
      */
-    private function setInvalidFields($aFields)
+    private function setInvalidFields(array $aFields): void
     {
         $this->_aInvalidFields = $aFields;
     }

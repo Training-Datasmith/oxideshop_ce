@@ -24,27 +24,23 @@ class ModuleDeactivateCommand extends Command
     private const ARGUMENT_MODULE_ID = 'module-id';
 
     public function __construct(
-        private ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private ContextInterface $context,
-        private ModuleActivationServiceInterface $moduleActivationService
+        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
+        private readonly ContextInterface $context,
+        private readonly ModuleActivationServiceInterface $moduleActivationService
     ) {
-        parent::__construct(null);
+        parent::__construct();
     }
 
     /**
      * @inheritdoc
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Deactivates a module.')
             ->addArgument(static::ARGUMENT_MODULE_ID, InputArgument::REQUIRED, 'Module ID')
             ->setHelp('Command deactivates module by defined module ID.');
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $moduleId = $input->getArgument('module-id');
@@ -58,10 +54,6 @@ class ModuleDeactivateCommand extends Command
         return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $moduleId
-     */
     protected function deactivateModule(OutputInterface $output, string $moduleId)
     {
         $this->moduleActivationService->deactivate($moduleId, $this->context->getCurrentShopId());
@@ -70,10 +62,6 @@ class ModuleDeactivateCommand extends Command
         );
     }
 
-    /**
-     * @param string $moduleId
-     * @return bool
-     */
     private function isInstalled(string $moduleId): bool
     {
         return $this->moduleConfigurationDao->exists($moduleId, $this->context->getCurrentShopId());

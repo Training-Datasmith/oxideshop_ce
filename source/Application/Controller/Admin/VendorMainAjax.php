@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -33,7 +35,7 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
         ['oxmpn', 'oxarticles', 0, 0, 0],
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
+        ['oxid', 'oxarticles', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -42,8 +44,8 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
                                      ['oxmpn', 'oxarticles', 0, 0, 0],
                                      ['oxprice', 'oxarticles', 0, 0, 0],
                                      ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxarticles', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxarticles', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -102,9 +104,9 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
     /**
      * Removes article from Vendor
      */
-    public function removeVendor()
+    public function removeVendor(): void
     {
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
         $aRemoveArt = $this->getActionIds('oxarticles.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
@@ -113,11 +115,11 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
         }
 
         if (is_array($aRemoveArt)) {
-            $sSelect = "update oxarticles set oxvendorid = null where "
+            $sSelect = 'update oxarticles set oxvendorid = null where '
                 . $this->onVendorActionArticleUpdateConditions($aRemoveArt);
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sSelect);
 
-            $this->resetCounter("vendorArticle", Registry::getRequest()->getRequestEscapedParameter('oxid'));
+            $this->resetCounter('vendorArticle', Registry::getRequest()->getRequestEscapedParameter('oxid'));
 
             $this->onVendorAction(Registry::getRequest()->getRequestEscapedParameter('oxid'));
         }
@@ -126,9 +128,9 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
     /**
      * Adds article to Vendor config
      */
-    public function addVendor()
+    public function addVendor(): void
     {
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
 
         $aAddArticle = $this->getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -138,13 +140,13 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
             $aAddArticle = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aAddArticle)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddArticle)) {
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sSelect = "update oxarticles set oxvendorid = " . $oDb->quote($soxId) . " where "
+            $sSelect = 'update oxarticles set oxvendorid = ' . $oDb->quote($soxId) . ' where '
                 . $this->onVendorActionArticleUpdateConditions($aAddArticle);
 
             $oDb->Execute($sSelect);
-            $this->resetCounter("vendorArticle", $soxId);
+            $this->resetCounter('vendorArticle', $soxId);
 
             $this->onVendorAction($soxId);
         }
@@ -159,7 +161,7 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
      */
     protected function onVendorActionArticleUpdateConditions($articleIds)
     {
-        return 'oxid in (' . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articleIds)) . ')';
+        return 'oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articleIds)) . ')';
     }
 
     /**

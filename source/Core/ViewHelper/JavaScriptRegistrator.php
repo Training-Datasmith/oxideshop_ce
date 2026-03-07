@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,9 +16,9 @@ use OxidEsales\Eshop\Core\Registry;
  */
 class JavaScriptRegistrator extends BaseRegistrator
 {
-    const SNIPPETS_PARAMETER_NAME = 'scripts';
-    const FILES_PARAMETER_NAME = 'includes';
-    const TAG_NAME = 'oxscript';
+    public const SNIPPETS_PARAMETER_NAME = 'scripts';
+    public const FILES_PARAMETER_NAME = 'includes';
+    public const TAG_NAME = 'oxscript';
 
     /**
      * Register JavaScript code snippet for rendering.
@@ -24,7 +26,7 @@ class JavaScriptRegistrator extends BaseRegistrator
      * @param string $script
      * @param bool   $isDynamic
      */
-    public function addSnippet($script, $isDynamic = false)
+    public function addSnippet($script, $isDynamic = false): void
     {
         $suffix = $isDynamic ? '_dynamic' : '';
         $scriptsParameterName = static::SNIPPETS_PARAMETER_NAME . $suffix;
@@ -43,7 +45,7 @@ class JavaScriptRegistrator extends BaseRegistrator
      * @param int    $priority
      * @param bool   $isDynamic
      */
-    public function addFile($file, $priority, $isDynamic = false)
+    public function addFile($file, $priority, $isDynamic = false): void
     {
         $suffix = $isDynamic ? '_dynamic' : '';
         $filesParameterName = static::FILES_PARAMETER_NAME . $suffix;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,15 +9,16 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Application\Model\User;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-
 use function array_key_exists;
 use function in_array;
+
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\EshopCommunity\Application\Model\User;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+
+use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 
 /**
  * Server data manipulation class
@@ -59,7 +62,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
      */
     public function setOxCookie(
         $sName,
-        $sValue = "",
+        $sValue = '',
         $iExpire = 0,
         $sPath = '/',
         $sDomain = null,
@@ -81,15 +84,11 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         return setcookie(
             $sName,
             $sValue,
-            $iExpire,
-            $this->getCookiePath($sPath),
-            $this->getCookieDomain($sDomain),
-            $blSecure,
-            $blHttpOnly
+            ['expires' => $iExpire, 'path' => $this->getCookiePath($sPath), 'domain' => $this->getCookieDomain($sDomain), 'secure' => $blSecure, 'httponly' => $blHttpOnly]
         );
     }
 
-    protected $_blSaveToSession = null;
+    protected $_blSaveToSession;
 
     /**
      * Checks if cookie must be saved to session in order to transfer it to different domain
@@ -120,13 +119,12 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     protected function getSessionCookieKey($blGet)
     {
         $blSsl = Registry::getConfig()->isSsl();
-        $sKey = $blSsl ? 'nossl' : 'ssl';
 
         if ($blGet) {
-            $sKey = $blSsl ? 'ssl' : 'nossl';
+            return $blSsl ? 'ssl' : 'nossl';
         }
 
-        return $sKey;
+        return $blSsl ? 'nossl' : 'ssl';
     }
 
     /**
@@ -153,7 +151,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     /**
      * Stored all session cookie info to cookies
      */
-    public function loadSessionCookies()
+    public function loadSessionCookies(): void
     {
         $sessionCookies = Registry::getSession()->getVariable($this->_sSessionCookiesName);
         if ($sessionCookies) {
@@ -220,7 +218,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         if ($sName && isset($_COOKIE[$sName])) {
             $sValue = Registry::getConfig()->checkParamSpecialChars($_COOKIE[$sName]);
         } elseif ($sName && !isset($_COOKIE[$sName])) {
-            $sValue = isset($this->_sSessionCookies[$sName]) ? $this->_sSessionCookies[$sName] : null;
+            $sValue = $this->_sSessionCookies[$sName] ?? null;
         } elseif (!$sName && isset($_COOKIE)) {
             $sValue = $_COOKIE;
         }
@@ -237,7 +235,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $sIP = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            $sIP = preg_replace('/,.*$/', '', $sIP);
+            $sIP = preg_replace('/,.*$/', '', (string) $sIP);
         } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $sIP = $_SERVER['HTTP_CLIENT_IP'];
         } else {
@@ -257,12 +255,10 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     public function getServerVar($sServVar = null)
     {
         $sValue = null;
-        if (isset($_SERVER)) {
-            if ($sServVar && isset($_SERVER[$sServVar])) {
-                $sValue = $_SERVER[$sServVar];
-            } elseif (!$sServVar) {
-                $sValue = $_SERVER;
-            }
+        if ($sServVar && isset($_SERVER[$sServVar])) {
+            $sValue = $_SERVER[$sServVar];
+        } elseif (!$sServVar) {
+            $sValue = $_SERVER;
         }
 
         return $sValue;
@@ -274,9 +270,9 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         $shopId = null,
         $timeout = 31536000,
         $salt = User::USER_COOKIE_SALT
-    ) {
+    ): void {
         $myConfig = Registry::getConfig();
-        $shopId = $shopId ?? $myConfig->getShopId();
+        $shopId ??= $myConfig->getShopId();
         $sslUrl = $myConfig->getShopUrl();
         $passwordServiceBridge = ContainerFacade::get(PasswordServiceBridgeInterface::class);
 
@@ -288,7 +284,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
             '/',
             null,
             true,
-            strncasecmp($sslUrl, 'https', 5) === 0
+            strncasecmp((string) $sslUrl, 'https', 5) === 0
         );
         $this->setOxCookie(
             'oxid_' . $shopId . '_autologin',
@@ -297,7 +293,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         );
     }
 
-    public function deleteUserCookie($shopId = null)
+    public function deleteUserCookie($shopId = null): void
     {
         $myConfig = Registry::getConfig();
         $shopId = (!$shopId) ? Registry::getConfig()->getShopId() : $shopId;
@@ -310,7 +306,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
             '/',
             null,
             true,
-            strncasecmp($sslUrl, 'https', 5) === 0
+            strncasecmp((string) $sslUrl, 'https', 5) === 0
         );
         $this->setOxCookie(
             'oxid_' . $shopId . '_autologin',
@@ -332,7 +328,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         $sShopId = (!$sShopId) ? $myConfig->getShopId() : $sShopId;
         // check for SSL connection
         if (!$myConfig->isSsl() && $this->getOxCookie('oxid_' . $sShopId . '_autologin') == '1') {
-            $sslUrl = rtrim($myConfig->getShopUrl(), '/') . $_SERVER['REQUEST_URI'];
+            $sslUrl = rtrim((string) $myConfig->getShopUrl(), '/') . $_SERVER['REQUEST_URI'];
             if (strncasecmp($sslUrl, 'https', 5) === 0) {
                 Registry::getUtils()->redirect($sslUrl, true, 302);
             }
@@ -367,7 +363,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     public function processUserAgentInfo($sAgent)
     {
         if ($sAgent) {
-            $sAgent = Str::getStr()->preg_replace("/MSIE(\s)?(\S)*(\s)/", "", (string)$sAgent);
+            return Str::getStr()->preg_replace("/MSIE(\s)?(\S)*(\s)/", '', (string)$sAgent);
         }
 
         return $sAgent;
@@ -383,7 +379,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     public function isCurrentUrl($sURL)
     {
         // Missing protocol, cannot proceed, assuming true.
-        if (!$sURL || (strncmp($sURL, 'http', 4) !== 0)) {
+        if (!$sURL || (!str_starts_with($sURL, 'http'))) {
             return true;
         }
 
@@ -419,7 +415,6 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         preg_match("/^(https?:\/\/)?(www\.)?([^\/]+)/i", (string)$sServerHost, $matches);
         $sRealHost = $matches[3] ?? null;
 
-
         //fetch the path from SCRIPT_NAME and ad it to the $sServerHost
         $sScriptName = $this->getServerVar('SCRIPT_NAME');
         $sCurrentHost = preg_replace('/\/(modules\/[\w\/]*)?\w*\.php.*/', '', $sServerHost . $sScriptName);
@@ -427,12 +422,15 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         //remove double slashes all the way
         $sCurrentHost = str_replace('/', '', $sCurrentHost);
         $sURL = str_replace('/', '', $sURL);
-
-        if ($sURL && $sCurrentHost && strpos($sURL, $sCurrentHost) !== false) {
-            //bug fix #0002991
-            if ($sUrlHost == $sRealHost) {
-                return true;
-            }
+        if (!($sURL && $sCurrentHost)) {
+            return false;
+        }
+        if (!str_contains($sURL, $sCurrentHost)) {
+            return false;
+        }
+        //bug fix #0002991
+        if ($sUrlHost == $sRealHost) {
+            return true;
         }
 
         return false;
@@ -460,10 +458,8 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
 
     /**
      * Return server system parameter similar as unix uname.
-     *
-     * @return string
      */
-    private function getServerName()
+    private function getServerName(): string
     {
         return php_uname();
     }

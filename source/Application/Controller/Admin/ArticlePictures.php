@@ -19,10 +19,10 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
 
 class ArticlePictures extends AdminDetailsController
 {
-    private string $detailImageSize;
-    private string $zoomImageSize;
-    private MediaUrlGeneratorInterface $mediaUrlGenerator;
-    private ProductMediaDaoInterface $productMediaDao;
+    private readonly string $detailImageSize;
+    private readonly string $zoomImageSize;
+    private readonly MediaUrlGeneratorInterface $mediaUrlGenerator;
+    private readonly ProductMediaDaoInterface $productMediaDao;
 
     public function __construct()
     {
@@ -49,7 +49,7 @@ class ArticlePictures extends AdminDetailsController
             'thumbnail' => $thumbnail ? $this->buildImageData($thumbnail) : null,
             'detailImages' => $this->productMediaDao
                 ->getAllByRole($productId, ProductMediaRole::from(ProductMediaRole::DETAIL))
-                ->map(fn(ProductMedia $media) => $this->buildImageData($media))
+                ->map(fn (ProductMedia $media): array => $this->buildImageData($media))
                 ->toArray(),
         ];
 

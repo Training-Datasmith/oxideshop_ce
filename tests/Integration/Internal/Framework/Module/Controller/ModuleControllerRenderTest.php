@@ -20,15 +20,15 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 final class ModuleControllerRenderTest extends IntegrationTestCase
 {
-	private ShopControl $shopControl;
+    private ShopControl $shopControl;
 
-	public function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
-	    $_GET['searchparam'] = '';
-	    $_GET['page'] = '';
-	    $_GET['tpl'] = '';
+        $_GET['searchparam'] = '';
+        $_GET['page'] = '';
+        $_GET['tpl'] = '';
 
         $this->setupModuleFixture('module1');
 
@@ -45,10 +45,10 @@ final class ModuleControllerRenderTest extends IntegrationTestCase
     public function testRenderTraditionalController(): void
     {
         ob_start();
-	    $this->shopControl->start('module1_controller', '');
-	    $output = ob_get_clean();
+        $this->shopControl->start('module1_controller', '');
+        $output = ob_get_clean();
 
-	    $this->assertStringContainsString('module1/module_controller', $output);
+        $this->assertStringContainsString('module1/module_controller', $output);
     }
 
     public function testRenderServiceController(): void
@@ -111,6 +111,6 @@ final class ModuleControllerRenderTest extends IntegrationTestCase
 
     private function getFixturesDirectory(): string
     {
-        return __DIR__ . "/Fixtures";
+        return __DIR__ . '/Fixtures';
     }
 }

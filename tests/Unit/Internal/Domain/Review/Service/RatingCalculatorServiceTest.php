@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Review\Service;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Rating;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\RatingCalculatorService;
+use PHPUnit\Framework\TestCase;
 
 final class RatingCalculatorServiceTest extends TestCase
 {

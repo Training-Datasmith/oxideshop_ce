@@ -101,10 +101,9 @@ final class BcryptPasswordHashServiceTest extends TestCase
             [-5],
             [0],
             [3], // Cost must not be smaller than 4
-            [32] // Cost must not be bigger than 31
+            [32], // Cost must not be bigger than 31
         ];
     }
-
 
     private function getPasswordHashServiceMock(int $cost = 4): PasswordHashServiceInterface
     {

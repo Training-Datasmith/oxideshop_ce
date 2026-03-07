@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,19 +20,19 @@ class CompanyVatInCountryChecker extends \OxidEsales\Eshop\Core\CompanyVatInChec
     /**
      * Error string if country mismatch
      */
-    const ERROR_ID_NOT_VALID = 'ID_NOT_VALID';
+    public const ERROR_ID_NOT_VALID = 'ID_NOT_VALID';
 
     /**
      * Country
      *
      * @var Country
      */
-    private $_oCountry = null;
+    private $_oCountry;
 
     /**
      * Country setter
      */
-    public function setCountry(Country $country)
+    public function setCountry(Country $country): void
     {
         $this->_oCountry = $country;
     }

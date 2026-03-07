@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,12 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use function is_string;
-
 #[\AllowDynamicProperties]
-class Field
+class Field implements \Stringable
 {
     /**
      * escaping functionality type: expected value is escaped text.
@@ -32,16 +30,15 @@ class Field
         }
     }
 
-    public function __isset($name): bool
+    public function __isset(string $name): bool
     {
         return $this->{$name} !== null;
     }
 
     /**
-     * @param string $name
      * @return mixed|string|null
      */
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         if (!($name === 'value' || $name === 'rawValue')) {
             return null;
@@ -61,7 +58,6 @@ class Field
     /**
      * @param $value
      * @param $type
-     * @return void
      */
     public function setValue($value = null, $type = self::T_TEXT): void
     {
@@ -69,9 +65,6 @@ class Field
         $this->initValue($value, $type);
     }
 
-    /**
-     * @return mixed
-     */
     public function getRawValue(): mixed
     {
         return $this->rawValue ?? $this->value;
@@ -80,7 +73,6 @@ class Field
     /**
      * @param $value
      * @param $type
-     * @return void
      */
     protected function initValue($value = null, $type = self::T_TEXT): void
     {

@@ -48,7 +48,7 @@ final class DownloadableProductCest
                 'OXLINKEXPIRATIONTIME' => 240,
                 'OXRESETCOUNT' => 0,
                 'OXVALIDUNTIL' => (new DateTime())->modify('+1 week')->format('Y-m-d H:i:s'),
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s'),
             ]
         );
 
@@ -66,10 +66,10 @@ final class DownloadableProductCest
 
     public function _after(AcceptanceTester $I): void
     {
-        $I->updateConfigInDatabase('blEnableDownloads', "false", 'bool');
-        $I->updateConfigInDatabase('iMaxDownloadsCount', "0", 'str');
-        $I->updateConfigInDatabase('iLinkExpirationTime', "168", 'str');
-        $I->updateConfigInDatabase('iMaxDownloadsCountUnregistered', "1", 'str');
+        $I->updateConfigInDatabase('blEnableDownloads', 'false', 'bool');
+        $I->updateConfigInDatabase('iMaxDownloadsCount', '0', 'str');
+        $I->updateConfigInDatabase('iLinkExpirationTime', '168', 'str');
+        $I->updateConfigInDatabase('iMaxDownloadsCountUnregistered', '1', 'str');
     }
 
     public function downloadableFiles(AcceptanceTester $I): void
@@ -89,10 +89,10 @@ final class DownloadableProductCest
         $settingsTab = $coreSettings->openSettingsTab();
         $settingsTab->openDownloadableProducts();
         $I->checkOption('confbools[blEnableDownloads]');
-        $I->fillField("confstrs[iMaxDownloadsCount]", "2");
-        $I->fillField("confstrs[iLinkExpirationTime]", "240");
-        $I->fillField("confstrs[iDownloadExpirationTime]", "24");
-        $I->fillField("confstrs[iMaxDownloadsCountUnregistered]", "1");
+        $I->fillField('confstrs[iMaxDownloadsCount]', '2');
+        $I->fillField('confstrs[iLinkExpirationTime]', '240');
+        $I->fillField('confstrs[iDownloadExpirationTime]', '24');
+        $I->fillField('confstrs[iMaxDownloadsCountUnregistered]', '1');
         $I->clickAndWait(['name' => 'save']);
     }
 
@@ -114,10 +114,10 @@ final class DownloadableProductCest
 
         $I->assertEquals($this->productId, $I->grabTextFrom("{$firstDownloadableProductLocator}/td[1]"));
         $I->assertEquals($this->productTitle, $I->grabTextFrom("$firstDownloadableProductLocator/td[2]"));
-        $I->assertEquals("testFile3", $I->grabTextFrom("$firstDownloadableProductLocator/td[3]"));
-        $I->assertEquals("0000-00-00 00:00:00", $I->grabTextFrom("$firstDownloadableProductLocator/td[4]"));
-        $I->assertEquals("0000-00-00 00:00:00", $I->grabTextFrom("$firstDownloadableProductLocator/td[5]"));
-        $I->assertEquals("0", $I->grabTextFrom("$firstDownloadableProductLocator/td[6]"));
-        $I->assertEquals("2", $I->grabTextFrom("$firstDownloadableProductLocator/td[7]"));
+        $I->assertEquals('testFile3', $I->grabTextFrom("$firstDownloadableProductLocator/td[3]"));
+        $I->assertEquals('0000-00-00 00:00:00', $I->grabTextFrom("$firstDownloadableProductLocator/td[4]"));
+        $I->assertEquals('0000-00-00 00:00:00', $I->grabTextFrom("$firstDownloadableProductLocator/td[5]"));
+        $I->assertEquals('0', $I->grabTextFrom("$firstDownloadableProductLocator/td[6]"));
+        $I->assertEquals('2', $I->grabTextFrom("$firstDownloadableProductLocator/td[7]"));
     }
 }

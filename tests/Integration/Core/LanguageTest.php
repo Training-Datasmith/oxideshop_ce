@@ -14,10 +14,12 @@ use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Cache\ShopCacheCleanerInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 use function sprintf;
+
+use Symfony\Contracts\Cache\ItemInterface;
+
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 final class LanguageTest extends IntegrationTestCase
 {

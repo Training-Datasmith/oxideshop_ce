@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,7 +27,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     protected $_aSumType = [
         0 => 'abs',
         1 => '%',
-        2 => 'itm'
+        2 => 'itm',
     ];
 
     /**
@@ -33,7 +35,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @var string
      */
-    protected $_sThisTemplate = null;
+    protected $_sThisTemplate;
 
     /**
      * Override this in list class to show other tab from beginning
@@ -48,7 +50,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @var \OxidEsales\Eshop\Application\Controller\Admin\NavigationTree
      */
-    protected static $_oNaviTree = null;
+    protected static $_oNaviTree;
 
     /**
      * Objects editing language (default 0).
@@ -62,35 +64,35 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @var string
      */
-    protected $_sShopTitle = " - ";
+    protected $_sShopTitle = ' - ';
 
     /**
      * Session user rights
      *
      * @var string
      */
-    protected static $_sAuthUserRights = null;
+    protected static $_sAuthUserRights;
 
     /**
      * Active shop object
      *
      * @return
      */
-    protected $_oEditShop = null;
+    protected $_oEditShop;
 
     /**
      * Editable object id
      *
      * @var string
      */
-    protected $_sEditObjectId = null;
+    protected $_sEditObjectId;
 
     /**
      * Optional view id.
      *
      * @var string
      */
-    protected $viewId = null;
+    protected $viewId;
 
     /**
      * Creates oxshop object and loads shop data, sets title of shop
@@ -134,7 +136,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      * creates some list object (depends on subclass) and executes
      * parent method parent::Init().
      */
-    public function init()
+    public function init(): void
     {
         // authorization check
         if (!$this->authorize()) {
@@ -172,7 +174,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
         } else {
             $url = ContainerFacade::getParameter('oxid_esales.shop_url') .
                 $myConfig->getConfigParam('sAdminDir') .
-                "/";
+                '/';
         }
 
         $oViewConf = $this->getViewConfig();
@@ -203,7 +205,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
         $this->_aViewData['charset'] = $this->getCharSet();
 
         //setting active currency object
-        $this->_aViewData["oActCur"] = $myConfig->getActShopCurrencyObject();
+        $this->_aViewData['oActCur'] = $myConfig->getActShopCurrencyObject();
 
         return $oShop;
     }
@@ -231,7 +233,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
 
             // active tab
             $iActTab = Registry::getRequest()->getRequestEscapedParameter('actedit');
-            $iActTab = $iActTab ? $iActTab : $this->_iDefEdit;
+            $iActTab = $iActTab ?: $this->_iDefEdit;
 
             $sActTab = $iActTab ? "&actedit=$iActTab" : '';
 
@@ -279,7 +281,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         // active shop title
         $this->_aViewData['actshop'] = $this->_sShopTitle;
-        $this->_aViewData["shopid"] = $myConfig->getShopId();
+        $this->_aViewData['shopid'] = $myConfig->getShopId();
 
         // loading active shop
         if ($sActShopId = Registry::getSession()->getVariable('actshop')) {
@@ -293,7 +295,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
         $this->_aViewData['languages'] = $oLang->getLanguageArray($iLanguage);
 
         // setting maximum upload size
-        list($this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']) = $this->getMaxUploadFileInfo(@ini_get("upload_max_filesize"));
+        [$this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']] = $this->getMaxUploadFileInfo(@ini_get('upload_max_filesize'));
 
         // "save-on-tab"
         if (!isset($this->_aViewData['updatelist'])) {
@@ -323,10 +325,10 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
         switch ($sParam) {
             case 'g':
                 $intMaxFileSize *= 1024;
-            // no break
+                // no break
             case 'm':
                 $intMaxFileSize *= 1024;
-            // no break
+                // no break
             case 'k':
                 $intMaxFileSize *= 1024;
         }
@@ -337,7 +339,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         $size = floor($intMaxFileSize / 1024);
         while ($size && current($markers)) {
-            $sFormattedMaxSize = $size . " " . current($markers);
+            $sFormattedMaxSize = $size . ' ' . current($markers);
             $size = floor($size / 1024);
             next($markers);
         }
@@ -348,7 +350,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Clears cache
      */
-    public function save()
+    public function save(): void
     {
         $this->resetContentCache();
     }
@@ -358,7 +360,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @param bool $blForceReset if true, forces reset
      */
-    public function resetContentCache($blForceReset = null)
+    public function resetContentCache($blForceReset = null): void
     {
         $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
         if (!$blDeleteCacheOnLogout || $blForceReset) {
@@ -373,7 +375,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      * @param string $sCounterType counter type
      * @param string $sValue       reset value
      */
-    public function resetCounter($sCounterType, $sValue = null)
+    public function resetCounter($sCounterType, $sValue = null): void
     {
         $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
         $myUtilsCount = Registry::getUtilsCount();
@@ -431,30 +433,28 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         if (!empty($sCountryCode)) {
             $aLangIds = Registry::getLang()->getLanguageIds();
-            $iEnglishId = array_search("en", $aLangIds);
+            $iEnglishId = array_search('en', $aLangIds);
             if (false !== $iEnglishId) {
                 $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-                $sViewName = $tableViewNameGenerator->getViewName("oxcountry", $iEnglishId);
+                $sViewName = $tableViewNameGenerator->getViewName('oxcountry', $iEnglishId);
                 $sQ = "select oxtitle from {$sViewName} where oxisoalpha2 = :oxisoalpha2";
                 // Value does not change that often, reading from slave is ok here (see ESDEV-3804 and ESDEV-3822).
                 $sCountryName = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQ, [
-                    'oxisoalpha2' => $sCountryCode
+                    'oxisoalpha2' => $sCountryCode,
                 ]);
                 if ($sCountryName) {
                     $sCountry = $sCountryName;
                 }
             } else {
                 // handling when english language is deleted
-                switch ($sCountryCode) {
-                    case 'de':
-                        return 'germany';
-                    default:
-                        return 'international';
-                }
+                return match ($sCountryCode) {
+                    'de' => 'germany',
+                    default => 'international',
+                };
             }
         }
 
-        return strtolower($sCountry);
+        return strtolower((string) $sCountry);
     }
 
     /**
@@ -465,11 +465,9 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     protected function authorize()
     {
         $session = Registry::getSession();
-        return (bool) (
-            $session->checkSessionChallenge()
-            && count(Registry::getUtilsServer()->getOxCookie())
-            && Registry::getUtils()->checkAccessRights()
-        );
+        return $session->checkSessionChallenge()
+        && count(Registry::getUtilsServer()->getOxCookie())
+        && Registry::getUtils()->checkAccessRights();
     }
 
     /**
@@ -493,17 +491,17 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     public function getViewId()
     {
-        $viewId = is_null($this->viewId) ? strtolower($this->getControllerKey()) : $this->viewId;
+        $viewId = is_null($this->viewId) ? strtolower((string) $this->getControllerKey()) : $this->viewId;
         return $this->getNavigation()->getClassId($viewId);
     }
 
     /**
      * Changing active shop
      */
-    public function chshp()
+    public function chshp(): void
     {
         $sActShop = Registry::getRequest()->getRequestEscapedParameter('shp');
-        Registry::getSession()->setVariable("shp", $sActShop);
+        Registry::getSession()->setVariable('shp', $sActShop);
         Registry::getSession()->setVariable('currentadminshop', $sActShop);
     }
 
@@ -512,7 +510,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @param string $sShopId Shop id
      */
-    public function resetSeoData($sShopId)
+    public function resetSeoData($sShopId): void
     {
         $aTypes = ['oxarticle', 'oxcategory', 'oxvendor', 'oxcontent', 'dynamic', 'oxmanufacturer'];
         $oEncoder = Registry::getSeoEncoder();
@@ -539,8 +537,8 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     public function getEditObjectId()
     {
         if (null === ($sId = $this->_sEditObjectId)) {
-            if (null === ($sId = Registry::getRequest()->getRequestEscapedParameter("oxid"))) {
-                $sId = Registry::getSession()->getVariable("saved_oxid");
+            if (null === ($sId = Registry::getRequest()->getRequestEscapedParameter('oxid'))) {
+                $sId = Registry::getSession()->getVariable('saved_oxid');
             }
         }
 
@@ -552,10 +550,10 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @param string $sId object id
      */
-    public function setEditObjectId($sId)
+    public function setEditObjectId($sId): void
     {
         $this->_sEditObjectId = $sId;
-        $this->_aViewData["updatelist"] = 1;
+        $this->_aViewData['updatelist'] = 1;
     }
 
     /**
@@ -575,11 +573,11 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     protected function getControllerKey()
     {
-        $actualClass = get_class($this);
+        $actualClass = static::class;
         $controllerKey = Registry::getControllerClassNameResolver()->getIdByClassName($actualClass);
         if (is_null($controllerKey)) {
             //we might not have found a class key because class is a module chain extended class
-            $controllerKey = Registry::getControllerClassNameResolver()->getIdByClassName($this->getShopParentClass());
+            return Registry::getControllerClassNameResolver()->getIdByClassName($this->getShopParentClass());
         }
         return $controllerKey;
     }
@@ -591,7 +589,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     protected function getShopParentClass()
     {
-        $className = get_class($this); //actual class, might be shop class chain extended by module
+        $className = static::class; //actual class, might be shop class chain extended by module
         while ($className && !\OxidEsales\Eshop\Core\NamespaceInformationProvider::classBelongsToShopUnifiedNamespace($className)) {
             $className = get_parent_class($className);
         }

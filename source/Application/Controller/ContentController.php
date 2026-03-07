@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,12 +9,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use OxidEsales\Eshop\Core\Registry;
+use function basename;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
-use function basename;
 
 /**
  * CMS - loads pages and displays it
@@ -24,14 +26,14 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var string
      */
-    protected $_sContentId = null;
+    protected $_sContentId;
 
     /**
      * Content object
      *
      * @var object
      */
-    protected $_oContent = null;
+    protected $_oContent;
 
     /**
      * Current view template
@@ -50,21 +52,21 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * Current view content category (if available)
      */
-    protected $_oContentCat = null;
+    protected $_oContentCat;
 
     /**
      * Ids of contents which can be accessed without any restrictions when private sales is ON
      *
      * @var array
      */
-    protected $_aPsAllowedContents = ["oxagb", "oxrightofwithdrawal", "oximpressum"];
+    protected $_aPsAllowedContents = ['oxagb', 'oxrightofwithdrawal', 'oximpressum'];
 
     /**
      * Current view content title
      *
      * @var string
      */
-    protected $_sContentTitle = null;
+    protected $_sContentTitle;
 
     /**
      * Sign if to load and show bargain action
@@ -236,7 +238,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             }
         }
 
-        return (bool) $blPlain;
+        return $blPlain;
     }
 
     /**
@@ -324,7 +326,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             return null;
         }
         // security fix so that you can't access files from outside template dir
-        $baseName = basename($requestedTemplate);
+        $baseName = basename((string) $requestedTemplate);
         return "message/$baseName";
     }
 
@@ -453,7 +455,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $aDeliveryChargeSpecs = [];
         $oDeliveryChargeSpecs = $this->getDeliveryList();
         foreach ($oDeliveryChargeSpecs as $oDeliveryChargeSpec) {
-            if ($oDeliveryChargeSpec->oxdelivery__oxaddsumtype->value == "abs") {
+            if ($oDeliveryChargeSpec->oxdelivery__oxaddsumtype->value == 'abs') {
                 $oDelSets = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySetList::class);
                 $oDelSets->loadRDFaDeliverySetList($oDeliveryChargeSpec->getId());
                 $oDeliveryChargeSpec->deliverysetmethods = $oDelSets;
@@ -500,8 +502,8 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $iFrom = Registry::getUtilsDate()->getTime();
         $iThrough = $iFrom + ($iDays * 24 * 60 * 60);
         $oPriceValidity = [];
-        $oPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . "Z";
-        $oPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . "Z";
+        $oPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . 'Z';
+        $oPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . 'Z';
 
         return $oPriceValidity;
     }
@@ -549,8 +551,6 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
     /**
      * Terminates execution with exit() on no permissions
-     * @param string $contentId
-     * @return void
      */
     private function validateContentAccessPermissions(string $contentId): void
     {

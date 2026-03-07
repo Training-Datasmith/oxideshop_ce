@@ -13,12 +13,6 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Review;
 
 class ReviewDataMapper implements ReviewDataMapperInterface
 {
-    /**
-     * @param Review $review
-     * @param array  $data
-     *
-     * @return Review
-     */
     public function map(Review $review, array $data): Review
     {
         $review
@@ -33,11 +27,6 @@ class ReviewDataMapper implements ReviewDataMapperInterface
         return $review;
     }
 
-    /**
-     * @param Review $review
-     *
-     * @return array
-     */
     public function getData(Review $review): array
     {
         return [
@@ -51,11 +40,6 @@ class ReviewDataMapper implements ReviewDataMapperInterface
         ];
     }
 
-    /**
-     * @param Review $review
-     *
-     * @return array
-     */
     public function getPrimaryKey(Review $review): array
     {
         return [

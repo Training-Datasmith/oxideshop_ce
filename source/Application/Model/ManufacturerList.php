@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
-use oxField;
 
 /**
  * Manufacturer list manager.
@@ -21,7 +20,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var \stdClass
      */
-    protected $_oRoot = null;
+    protected $_oRoot;
 
     /**
      * Manufacturer tree path.
@@ -42,7 +41,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var \OxidEsales\Eshop\Application\Model\Manufacturer
      */
-    protected $_oClickedManufacturer = null;
+    protected $_oClickedManufacturer;
 
     /**
      * Calls parent constructor and defines if Article vendor count is shown
@@ -58,7 +57,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param bool $blShowManufacturerArticleCnt to show article count or not
      */
-    public function setShowManufacturerArticleCnt($blShowManufacturerArticleCnt = false)
+    public function setShowManufacturerArticleCnt($blShowManufacturerArticleCnt = false): void
     {
         $this->_blShowManufacturerArticleCnt = $blShowManufacturerArticleCnt;
     }
@@ -66,7 +65,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Loads simple manufacturer list
      */
-    public function loadManufacturerList()
+    public function loadManufacturerList(): void
     {
         $oBaseObject = $this->getBaseObject();
 
@@ -92,15 +91,14 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @param string $sActCat      Active category
      * @param string $sShopHomeUrl base shop url ($myConfig->getShopHomeUrl())
      */
-    public function buildManufacturerTree($sLinkTarget, $sActCat, $sShopHomeUrl)
+    public function buildManufacturerTree($sLinkTarget, $sActCat, $sShopHomeUrl): void
     {
         //Load manufacturer list
         $this->loadManufacturerList();
 
-
         //Create fake manufacturer root category
         $this->_oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
-        $this->_oRoot->load("root");
+        $this->_oRoot->load('root');
 
         //category fields
         $this->addCategoryFields($this->_oRoot);
@@ -162,7 +160,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer active manufacturer
      */
-    public function setClickManufacturer($oManufacturer)
+    public function setClickManufacturer($oManufacturer): void
     {
         $this->_oClickedManufacturer = $oManufacturer;
     }

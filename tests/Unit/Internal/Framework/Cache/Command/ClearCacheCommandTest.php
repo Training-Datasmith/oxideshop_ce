@@ -53,7 +53,7 @@ final class ClearCacheCommandTest extends TestCase
 
     private function getShopCacheCleanerMock(): ShopCacheCleanerInterface
     {
-        $shopCacheCleanerMock = $this->createMock(ShopCacheCleanerInterface ::class);
+        $shopCacheCleanerMock = $this->createMock(ShopCacheCleanerInterface::class);
         $shopCacheCleanerMock->expects($this->once())->method('clearAll');
 
         return $shopCacheCleanerMock;

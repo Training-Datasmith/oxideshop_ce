@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\RatingPermissionException;
 use OxidEsales\Eshop\Application\Model\Rating;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\RatingPermissionException;
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 
 class UserRatingBridge implements UserRatingBridgeInterface
 {
@@ -24,7 +24,7 @@ class UserRatingBridge implements UserRatingBridgeInterface
      * @throws RatingPermissionException
      * @throws EntryDoesNotExistDaoException
      */
-    public function deleteRating($userId, $ratingId)
+    public function deleteRating($userId, $ratingId): void
     {
         $rating = $this->getRatingById($ratingId);
 
@@ -34,12 +34,7 @@ class UserRatingBridge implements UserRatingBridgeInterface
         $rating->delete();
     }
 
-    /**
-     * @param Rating $rating
-     *
-     * @return Rating
-     */
-    private function disableSubShopDeleteProtectionForRating(Rating $rating)
+    private function disableSubShopDeleteProtectionForRating(Rating $rating): Rating
     {
         $rating->setIsDerived(false);
 
@@ -47,12 +42,10 @@ class UserRatingBridge implements UserRatingBridgeInterface
     }
 
     /**
-     * @param Rating $rating
      * @param string $userId
-     *
      * @throws RatingPermissionException
      */
-    private function validateUserPermissionsToManageRating(Rating $rating, $userId)
+    private function validateUserPermissionsToManageRating(Rating $rating, $userId): void
     {
         if ($rating->oxratings__oxuserid->value !== $userId) {
             throw new RatingPermissionException();

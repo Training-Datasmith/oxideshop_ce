@@ -9,11 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Legacy\Core\Database\Adapter\Doctrine;
 
-use oxDb;
-use OxidEsales\EshopCommunity\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\EshopCommunity\Core\Database\Adapter\ResultSetInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Legacy\Core\Database\Adapter\DatabaseInterfaceImplementationBase;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ResultSetTest extends DatabaseInterfaceImplementationBase
 {
@@ -222,7 +219,7 @@ final class ResultSetTest extends DatabaseInterfaceImplementationBase
         $expectedResults = [
             ['OXID' => self::FIXTURE_OXID_1],
             ['OXID' => self::FIXTURE_OXID_2],
-            ['OXID' => self::FIXTURE_OXID_3]
+            ['OXID' => self::FIXTURE_OXID_3],
         ];
 
         $this->assertSame($expectedResults[0], $resultSet->getFields());
@@ -239,7 +236,8 @@ final class ResultSetTest extends DatabaseInterfaceImplementationBase
         $this->loadFixtureToTestTable();
 
         $resultSet = $this->database->select(
-            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE OXID in (?, ?)', [self::FIXTURE_OXID_2, self::FIXTURE_OXID_3]
+            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE OXID in (?, ?)',
+            [self::FIXTURE_OXID_2, self::FIXTURE_OXID_3]
         );
         $this->assertSame([
             'oxid' => 'OXID_2',

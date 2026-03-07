@@ -20,9 +20,9 @@ use Symfony\Component\Filesystem\Path;
 class ClassExtensionsChainDao implements ClassExtensionsChainDaoInterface
 {
     public function __construct(
-        private BasicContextInterface $context,
-        private FileStorageFactoryInterface $fileStorageFactory,
-        private EventDispatcherInterface $eventDispatcher
+        private readonly BasicContextInterface $context,
+        private readonly FileStorageFactoryInterface $fileStorageFactory,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 

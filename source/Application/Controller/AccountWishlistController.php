@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -33,42 +35,42 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      *
      * @var bool
      */
-    protected $_blShowSuggest = null;
+    protected $_blShowSuggest;
 
     /**
      * Wheter the var is false the wishlist will be shown
      *
      * @var \OxidEsales\Eshop\Application\Model\UserBasket|bool|null
      */
-    protected $_oWishList = null;
+    protected $_oWishList;
 
     /**
      * list the wishlist items
      *
      * @var \OxidEsales\Eshop\Application\Model\UserBasket|bool|null
      */
-    protected $_aRecommList = null;
+    protected $_aRecommList;
 
     /**
      * Wheter the var is false the productlist will not be list
      *
      * @var \OxidEsales\Eshop\Application\Model\UserBasket|bool|null
      */
-    protected $_oEditval = null;
+    protected $_oEditval;
 
     /**
      * If sending failed give false back
      *
      * @var integer / bool
      */
-    protected $_iSendWishList = null;
+    protected $_iSendWishList;
 
     /**
      * Wishlist search param
      *
      * @var string
      */
-    protected $_sSearchParam = null;
+    protected $_sSearchParam;
 
     /**
      * List of users which were found according to search condition
@@ -96,7 +98,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds = null;
+    protected $_aSimilarRecommListIds;
 
     /**
      * Current view search engine indexing state
@@ -218,23 +220,22 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
                 !$aParams['rec_name'] || !$aParams['rec_email']
             ) {
                 return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_COMPLETE_FIELDS_CORRECTLY', false, true);
-            } else {
-                if ($oUser = $this->getUser()) {
-                    $sFirstName = 'oxuser__oxfname';
-                    $sLastName = 'oxuser__oxlname';
-                    $sSendEmail = 'send_email';
-                    $sUserNameField = 'oxuser__oxusername';
-                    $sSendName = 'send_name';
-                    $sSendId = 'send_id';
+            }
+            if ($oUser = $this->getUser()) {
+                $sFirstName = 'oxuser__oxfname';
+                $sLastName = 'oxuser__oxlname';
+                $sSendEmail = 'send_email';
+                $sUserNameField = 'oxuser__oxusername';
+                $sSendName = 'send_name';
+                $sSendId = 'send_id';
 
-                    $oParams->$sSendEmail = $oUser->$sUserNameField->value;
-                    $oParams->$sSendName = $oUser->$sFirstName->getRawValue() . ' ' . $oUser->$sLastName->getRawValue();
-                    $oParams->$sSendId = $oUser->getId();
+                $oParams->$sSendEmail = $oUser->$sUserNameField->value;
+                $oParams->$sSendName = $oUser->$sFirstName->getRawValue() . ' ' . $oUser->$sLastName->getRawValue();
+                $oParams->$sSendId = $oUser->getId();
 
-                    $this->_blEmailSent = oxNew(\OxidEsales\Eshop\Core\Email::class)->sendWishlistMail($oParams);
-                    if (!$this->_blEmailSent) {
-                        return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_CHECK_EMAIL', false, true);
-                    }
+                $this->_blEmailSent = oxNew(\OxidEsales\Eshop\Core\Email::class)->sendWishlistMail($oParams);
+                if (!$this->_blEmailSent) {
+                    return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_CHECK_EMAIL', false, true);
                 }
             }
         }
@@ -255,7 +256,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      *
      * @param object $oData suggest data object
      */
-    public function setEnteredData($oData)
+    public function setEnteredData($oData): void
     {
         $this->_aEditValues = $oData;
     }
@@ -294,7 +295,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      * Searches for wishlist of another user. Returns false if no
      * searching conditions set (no login name defined).
      */
-    public function searchForWishList()
+    public function searchForWishList(): void
     {
         if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('search')) {
             // search for baskets

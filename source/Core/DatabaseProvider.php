@@ -20,16 +20,15 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
  */
 class DatabaseProvider
 {
-
     /**
      * @var ?DatabaseProvider
      */
-    protected static $instance = null;
+    protected static $instance;
 
     /**
      * @var null|DatabaseInterface Database connection object
      */
-    protected static $db = null;
+    protected static $db;
 
     /**
      * @var array Database tables descriptions cache array
@@ -48,7 +47,7 @@ class DatabaseProvider
      */
     public function __clone()
     {
-        throw new Exception("This object is a singleton, thou shalt not clone.");
+        throw new Exception('This object is a singleton, thou shalt not clone.');
     }
 
     /**
@@ -137,7 +136,7 @@ class DatabaseProvider
      * @throws DatabaseConnectionException
      *
      */
-    protected function createDatabase()
+    protected function createDatabase(): \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database
     {
         $databaseAdapter = new Database();
         $databaseAdapter->connect();

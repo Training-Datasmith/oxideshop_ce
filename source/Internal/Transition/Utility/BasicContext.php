@@ -17,8 +17,10 @@ use OxidEsales\EshopCommunity\Internal\Framework\Edition\EditionPaths;
 use OxidEsales\EshopCommunity\Internal\Framework\Edition\EditionResolver;
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\ProjectDirectoriesLocator;
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\ProjectRootLocator;
-use Symfony\Component\Filesystem\Path;
+
 use function sprintf;
+
+use Symfony\Component\Filesystem\Path;
 
 class BasicContext implements BasicContextInterface
 {

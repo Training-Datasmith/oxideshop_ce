@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,7 +17,7 @@ class Maintenance
     /**
      * Executes maintenance tasks. Currently calls oxArticleList::updateUpcomingPrices()
      */
-    public function execute()
+    public function execute(): void
     {
         // updating upcoming prices
         oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class)->updateUpcomingPrices(true);

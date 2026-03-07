@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,11 +14,8 @@ namespace OxidEsales\EshopCommunity\Core\Contract;
  */
 interface ICountryAware
 {
-
     /**
      * Country setter
-     *
-     * @param \OxidEsales\Eshop\Application\Model\Country $oCountry
      */
     public function setCountry(\OxidEsales\Eshop\Application\Model\Country $oCountry);
 

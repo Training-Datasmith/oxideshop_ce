@@ -11,13 +11,10 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject
 
 class OxidEshopPackage
 {
-    public function __construct(private string $packagePath)
+    public function __construct(private readonly string $packagePath)
     {
     }
 
-    /**
-     * @return string
-     */
     public function getPackagePath(): string
     {
         return $this->packagePath;

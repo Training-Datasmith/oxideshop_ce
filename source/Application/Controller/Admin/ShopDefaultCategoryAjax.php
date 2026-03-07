@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,8 +25,8 @@ class ShopDefaultCategoryAjax extends \OxidEsales\Eshop\Application\Controller\A
         ['oxtitle', 'oxcategories', 1, 1, 0],
         ['oxdesc', 'oxcategories', 1, 1, 0],
         ['oxid', 'oxcategories', 0, 0, 0],
-        ['oxid', 'oxcategories', 0, 0, 1]
-    ]
+        ['oxid', 'oxcategories', 0, 0, 1],
+    ],
     ];
 
     /**
@@ -45,7 +47,7 @@ class ShopDefaultCategoryAjax extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Removing article from corssselling list
      */
-    public function unassignCat()
+    public function unassignCat(): void
     {
         $sShopId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
@@ -58,7 +60,7 @@ class ShopDefaultCategoryAjax extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Adding article to corssselling list
      */
-    public function assignCat()
+    public function assignCat(): void
     {
         $sChosenCat = Registry::getRequest()->getRequestEscapedParameter('oxcatid');
         $sShopId = Registry::getRequest()->getRequestEscapedParameter('oxid');

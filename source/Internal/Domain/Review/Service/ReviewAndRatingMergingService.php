@@ -19,8 +19,6 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
     /**
      * Merges Reviews and Ratings to Collection of ReviewAndRating view objects.
      *
-     * @param ArrayCollection $reviews
-     * @param ArrayCollection $ratings
      *
      * @return ArrayCollection
      */
@@ -34,13 +32,7 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
         return $this->mapReviewAndRatingList($ratingAndReviewList);
     }
 
-    /**
-     * @param ArrayCollection $reviews
-     * @param ArrayCollection $ratings
-     *
-     * @return array
-     */
-    private function getReviewDataWithRating(ArrayCollection $reviews, ArrayCollection $ratings)
+    private function getReviewDataWithRating(ArrayCollection $reviews, ArrayCollection $ratings): array
     {
         $reviewList = [];
 
@@ -70,13 +62,7 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
         return $reviewList;
     }
 
-    /**
-     * @param ArrayCollection $reviews
-     * @param ArrayCollection $ratings
-     *
-     * @return array
-     */
-    private function getRatingWithoutReviewData(ArrayCollection $reviews, ArrayCollection $ratings)
+    private function getRatingWithoutReviewData(ArrayCollection $reviews, ArrayCollection $ratings): array
     {
         $ratingList = [];
 
@@ -100,8 +86,6 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
     /**
      * Returns true if Rating doesn't belong to any review.
      *
-     * @param Rating          $rating
-     * @param ArrayCollection $reviews
      *
      * @return bool
      */
@@ -122,12 +106,9 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
     /**
      * Returns true if Rating belongs to Review.
      *
-     * @param Review $review
-     * @param Rating $rating
      *
-     * @return bool
      */
-    private function isReviewRating(Review $review, Rating $rating)
+    private function isReviewRating(Review $review, Rating $rating): bool
     {
         return $rating->getType() === $review->getType()
             && $rating->getObjectId() === $review->getObjectId()
@@ -138,11 +119,9 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
     /**
      * Maps Reviews and Ratings data to Collection of ReviewAndRating view objects.
      *
-     * @param array $reviewAndRatingDataList
      *
-     * @return ArrayCollection
      */
-    private function mapReviewAndRatingList($reviewAndRatingDataList)
+    private function mapReviewAndRatingList(array $reviewAndRatingDataList): \Doctrine\Common\Collections\ArrayCollection
     {
         $mappedReviewAndRating = new ArrayCollection();
 
@@ -156,11 +135,9 @@ class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInte
     /**
      * Maps Review and Rating data to ReviewAndRating view object.
      *
-     * @param array $reviewAndRatingData
      *
-     * @return ReviewAndRating
      */
-    private function mapReviewAndRating($reviewAndRatingData)
+    private function mapReviewAndRating(array $reviewAndRatingData): \OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRating
     {
         $reviewAndRating = new ReviewAndRating();
         $reviewAndRating

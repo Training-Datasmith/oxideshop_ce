@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,8 +10,8 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use Exception;
-use OxidEsales\Eshop\Core\Str;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Class controls article assignment to action
@@ -35,7 +37,7 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
         ['oxmpn', 'oxarticles', 0, 0, 0],
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
+        ['oxid', 'oxarticles', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -45,8 +47,8 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
                                      ['oxmpn', 'oxarticles', 0, 0, 0],
                                      ['oxprice', 'oxarticles', 0, 0, 0],
                                      ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxactions2article', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxactions2article', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -82,14 +84,14 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
             } else {
                 $sQAdd = " from {$sArtTable} left join oxactions2article " .
                          "on {$sArtTable}.oxid=oxactions2article.oxartid " .
-                         " where oxactions2article.oxactionid = " . $oDb->quote($sSelId) .
+                         ' where oxactions2article.oxactionid = ' . $oDb->quote($sSelId) .
                          " and oxactions2article.oxshopid = '" . $myConfig->getShopID() . "' ";
             }
         }
 
         if ($sSynchSelId && $sSynchSelId != $sSelId) {
             $sQAdd .= " and {$sArtTable}.oxid not in ( select oxactions2article.oxartid from oxactions2article " .
-                      " where oxactions2article.oxactionid = " . $oDb->quote($sSynchSelId) .
+                      ' where oxactions2article.oxactionid = ' . $oDb->quote($sSynchSelId) .
                       " and oxactions2article.oxshopid = '" . $myConfig->getShopID() . "' ) ";
         }
 
@@ -112,7 +114,7 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
             $sQ .= ' group by ' . $this->getViewName('oxarticles') . '.oxid ';
 
             $oStr = Str::getStr();
-            if ($oStr->strpos($sQ, "select count( * ) ") === 0) {
+            if ($oStr->strpos($sQ, 'select count( * ) ') === 0) {
                 $sQ = "select count( * ) from ( {$sQ} ) as _cnttable";
             }
         }
@@ -139,17 +141,17 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     /**
      * Removes article from Promotions list
      */
-    public function removeArtFromAct()
+    public function removeArtFromAct(): void
     {
         $aChosenArt = $this->getActionIds('oxactions2article.oxid');
-        $sOxid = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = parent::addFilter("delete oxactions2article.* " . $this->getQuery());
+            $sQ = parent::addFilter('delete oxactions2article.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
-            $sQ = "delete from oxactions2article where oxactions2article.oxid in (" . $sChosenArticles . ") ";
+            $sChosenArticles = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sQ = 'delete from oxactions2article where oxactions2article.oxid in (' . $sChosenArticles . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -177,19 +179,19 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
         $sArtTable = $this->getViewName('oxarticles');
         $sQ = "select max(oxactions2article.oxsort) from oxactions2article join {$sArtTable} " .
               "on {$sArtTable}.oxid=oxactions2article.oxartid " .
-              "where oxactions2article.oxactionid = :oxactionid " .
-              "and oxactions2article.oxshopid = :oxshopid " .
+              'where oxactions2article.oxactionid = :oxactionid ' .
+              'and oxactions2article.oxshopid = :oxshopid ' .
               "and $sArtTable.oxid is not null";
 
         $parameters = [
             'oxactionid' => $soxId,
-            'oxshopid' => $myConfig->getShopId()
+            'oxshopid' => $myConfig->getShopId(),
         ];
 
         $iSort = ((int) $database->getOne($sQ, $parameters)) + 1;
 
         $articleAdded = false;
-        if ($soxId && $soxId != "-1" && is_array($aArticles)) {
+        if ($soxId && $soxId != '-1' && is_array($aArticles)) {
             $sShopId = $myConfig->getShopId();
             foreach ($aArticles as $sAdd) {
                 $oNewGroup = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
@@ -209,20 +211,20 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     /**
      * Sets sorting position for current action article
      */
-    public function setSorting()
+    public function setSorting(): void
     {
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
         $sArtTable = $this->getViewName('oxarticles');
         $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSelect = "select * from $sArtTable left join oxactions2article on $sArtTable.oxid=oxactions2article.oxartid ";
-        $sSelect .= "where oxactions2article.oxactionid = :oxactionid " .
-                    "and oxactions2article.oxshopid = :oxshopid " . $this->getSorting();
+        $sSelect .= 'where oxactions2article.oxactionid = :oxactionid ' .
+                    'and oxactions2article.oxshopid = :oxshopid ' . $this->getSorting();
 
         $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $oList->init("oxbase", "oxactions2article");
+        $oList->init('oxbase', 'oxactions2article');
         $oList->selectString($sSelect, [
             'oxactionid' => $sSelId,
-            'oxshopid' => $myConfig->getShopID()
+            'oxshopid' => $myConfig->getShopID(),
         ]);
 
         // fixing indexes
@@ -239,7 +241,6 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
             $iSelCnt++;
         }
 
-        //
         if (($iKey = array_search(Registry::getRequest()->getRequestEscapedParameter('sortoxid'), $aIdx2Id)) !== false) {
             $iDir = (Registry::getRequest()->getRequestEscapedParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
             if (isset($aIdx2Id[$iDir])) {

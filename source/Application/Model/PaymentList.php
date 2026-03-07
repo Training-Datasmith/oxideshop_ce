@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
@@ -21,7 +22,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var string
      */
-    protected $_sHomeCountry = null;
+    protected $_sHomeCountry;
 
     /**
      * Class Constructor
@@ -37,7 +38,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sHomeCountry country id
      */
-    public function setHomeCountry($sHomeCountry)
+    public function setHomeCountry($sHomeCountry): void
     {
         if (is_array($sHomeCountry)) {
             $this->_sHomeCountry = current($sHomeCountry);
@@ -63,7 +64,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
         $sTable = $tableViewNameGenerator->getViewName('oxpayments');
         $sQ = "select {$sTable}.* from ( select distinct {$sTable}.* from {$sTable} ";
-        $sQ .= "inner join oxobject2payment ON oxobject2payment.oxobjectid = " . $oDb->quote($sShipSetId) . " and oxobject2payment.oxpaymentid = {$sTable}.oxid ";
+        $sQ .= 'inner join oxobject2payment ON oxobject2payment.oxobjectid = ' . $oDb->quote($sShipSetId) . " and oxobject2payment.oxpaymentid = {$sTable}.oxid ";
         $sQ .= "where {$sTable}.oxactive='1' ";
         $sQ .= " and {$sTable}.oxfromboni <= " . $oDb->quote($sBoni) . " and {$sTable}.oxfromamount <= " . $oDb->quote($dPrice) . " and {$sTable}.oxtoamount >= " . $oDb->quote($dPrice);
 
@@ -85,10 +86,10 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
         $sGroupTable = $tableViewNameGenerator->getViewName('oxgroups');
         $sCountryTable = $tableViewNameGenerator->getViewName('oxcountry');
 
-        $sCountrySql = $sCountryId ? "exists( select 1 from oxobject2payment as s1 where s1.oxpaymentid={$sTable}.OXID and s1.oxtype='oxcountry' and s1.OXOBJECTID=" . $oDb->quote($sCountryId) . " limit 1 )" : '0';
+        $sCountrySql = $sCountryId ? "exists( select 1 from oxobject2payment as s1 where s1.oxpaymentid={$sTable}.OXID and s1.oxtype='oxcountry' and s1.OXOBJECTID=" . $oDb->quote($sCountryId) . ' limit 1 )' : '0';
         $sGroupSql = $sGroupIds ? "exists( select 1 from oxobject2group as s3 where s3.OXOBJECTID={$sTable}.OXID and s3.OXGROUPSID in ( {$sGroupIds} ) limit 1 )" : '0';
 
-        $sQ .= "  order by {$sTable}.oxsort asc ) as $sTable where (
+        return $sQ . "  order by {$sTable}.oxsort asc ) as $sTable where (
                 if( exists( select 1 from oxobject2payment as ss1, $sCountryTable where $sCountryTable.oxid=ss1.oxobjectid and ss1.oxpaymentid={$sTable}.OXID and ss1.oxtype='oxcountry' limit 1 ),
                     {$sCountrySql},
                     1) &&
@@ -96,8 +97,6 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
                     {$sGroupSql},
                     1)
                 )  order by {$sTable}.oxsort asc ";
-
-        return $sQ;
     }
 
     /**
@@ -115,7 +114,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
         }
 
         if (!$sCountryId) {
-            $sCountryId = $this->_sHomeCountry;
+            return $this->_sHomeCountry;
         }
 
         return $sCountryId;
@@ -141,7 +140,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Loads an object including all payments which are not mapped to a
      * predefined GoodRelations payment method.
      */
-    public function loadNonRDFaPaymentList()
+    public function loadNonRDFaPaymentList(): void
     {
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
         $sTable = $tableViewNameGenerator->getViewName('oxpayments');
@@ -155,7 +154,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param double $dPrice product price
      */
-    public function loadRDFaPaymentList($dPrice = null)
+    public function loadRDFaPaymentList($dPrice = null): void
     {
         $oDb = DatabaseProvider::getDb();
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
@@ -166,7 +165,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
             $sQ .= "and $sTable.oxfromamount <= :amount and $sTable.oxtoamount >= :amount";
         }
         $rs = $oDb->select($sQ, [
-            'amount' => $dPrice
+            'amount' => $dPrice,
         ]);
         if ($rs != false && $rs->count() > 0) {
             $oSaved = clone $this->getBaseObject();

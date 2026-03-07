@@ -14,14 +14,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ViewRenderedEvent extends Event
 {
-    public function __construct(private ShopControl $shopControl)
+    public function __construct(private readonly ShopControl $shopControl)
     {
     }
 
     /**
      * Getter for ShopControl object.
-     *
-     * @return ShopControl
      */
     public function getShopControl(): ShopControl
     {

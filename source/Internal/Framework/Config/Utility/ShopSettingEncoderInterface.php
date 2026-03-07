@@ -12,14 +12,12 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Config\Utility;
 interface ShopSettingEncoderInterface
 {
     /**
-     * @param string $encodingType
      * @param mixed  $value
      * @return mixed
      */
     public function encode(string $encodingType, $value);
 
     /**
-     * @param string $encodingType
      * @param mixed  $value
      * @return mixed
      */

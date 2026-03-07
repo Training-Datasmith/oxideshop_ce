@@ -16,14 +16,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DispatchLegacyEventsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ModuleConfigurationDaoInterface $moduleConfigurationDao)
+    public function __construct(private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao)
     {
     }
 
-    /**
-     * @param FinalizingModuleActivationEvent $event
-     */
-    public function executeMetadataOnActivationEvent(FinalizingModuleActivationEvent $event)
+    public function executeMetadataOnActivationEvent(FinalizingModuleActivationEvent $event): void
     {
         $this->executeMetadataEvent(
             'onActivate',
@@ -32,10 +29,7 @@ class DispatchLegacyEventsSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param BeforeModuleDeactivationEvent $event
-     */
-    public function executeMetadataOnDeactivationEvent(BeforeModuleDeactivationEvent $event)
+    public function executeMetadataOnDeactivationEvent(BeforeModuleDeactivationEvent $event): void
     {
         $this->executeMetadataEvent(
             'onDeactivate',
@@ -44,12 +38,7 @@ class DispatchLegacyEventsSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param string $eventName
-     * @param string $moduleId
-     * @param int    $shopId
-     */
-    private function executeMetadataEvent(string $eventName, string $moduleId, int $shopId)
+    private function executeMetadataEvent(string $eventName, string $moduleId, int $shopId): void
     {
         $moduleConfiguration = $this->moduleConfigurationDao->get($moduleId, $shopId);
 
@@ -60,15 +49,12 @@ class DispatchLegacyEventsSubscriber implements EventSubscriberInterface
                 $events[$event->getAction()] = $event->getMethod();
             }
 
-            if (\is_array($events) && array_key_exists($eventName, $events)) {
+            if (array_key_exists($eventName, $events)) {
                 \call_user_func($events[$eventName]);
             }
         }
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [

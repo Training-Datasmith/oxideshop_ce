@@ -16,8 +16,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 class BeforeHeadersSendEvent extends Event
 {
     public function __construct(
-        private ShopControl $shopControl,
-        private ViewControllerInterface $controller
+        private readonly ShopControl $shopControl,
+        private readonly ViewControllerInterface $controller
     ) {
     }
 

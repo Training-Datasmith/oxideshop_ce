@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -50,13 +51,13 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         $oDb->execute('delete from oxobject2payment where oxobjectid = :oxid', [
-            'oxid' => $sOxId
+            'oxid' => $sOxId,
         ]);
         $oDb->execute('delete from oxobject2delivery where oxdeliveryid = :oxid', [
-            'oxid' => $sOxId
+            'oxid' => $sOxId,
         ]);
         $oDb->execute('delete from oxdel2delset where oxdelsetid = :oxid', [
-            'oxid' => $sOxId
+            'oxid' => $sOxId,
         ]);
 
         return parent::delete($sOxId);
@@ -73,12 +74,11 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sQ = "SELECT `oxid` FROM `" . $tableViewNameGenerator->getViewName('oxdeliveryset') . "` 
-            WHERE  `oxtitle` = :oxtitle";
-        $sId = $oDb->getOne($sQ, [
-            'oxtitle' => $sTitle
-        ]);
+        $sQ = 'SELECT `oxid` FROM `' . $tableViewNameGenerator->getViewName('oxdeliveryset') . '` 
+            WHERE  `oxtitle` = :oxtitle';
 
-        return $sId;
+        return $oDb->getOne($sQ, [
+            'oxtitle' => $sTitle,
+        ]);
     }
 }

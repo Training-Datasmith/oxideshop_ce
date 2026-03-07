@@ -20,8 +20,4 @@ final class Version20201103010101 extends AbstractMigration
             'ALTER TABLE `oxdeliveryset` ADD COLUMN `OXTRACKINGURL` VARCHAR(255) NOT NULL'
         );
     }
-
-    public function down(Schema $schema): void
-    {
-    }
 }

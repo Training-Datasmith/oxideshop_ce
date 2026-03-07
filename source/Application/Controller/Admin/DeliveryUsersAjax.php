@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -42,7 +44,7 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                                      ['oxfon', 'oxuser', 0, 0, 0],
                                      ['oxbirthdate', 'oxuser', 0, 0, 0],
                                      ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                 ]
+                                 ],
     ];
 
     /**
@@ -68,18 +70,18 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         } elseif ($sSynchId && $sSynchId != $sId) {
             // selected group ?
             $sQAdd = " from oxobject2group left join $sUserTable on $sUserTable.oxid = oxobject2group.oxobjectid ";
-            $sQAdd .= " where oxobject2group.oxgroupsid = " . $oDb->quote($sId);
+            $sQAdd .= ' where oxobject2group.oxgroupsid = ' . $oDb->quote($sId);
             if (!$myConfig->getConfigParam('blMallUsers')) {
                 $sQAdd .= " and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
             }
         } else {
             $sQAdd = " from oxobject2delivery left join $sUserTable on $sUserTable.oxid=oxobject2delivery.oxobjectid ";
-            $sQAdd .= " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ";
+            $sQAdd .= ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from oxobject2delivery left join $sUserTable on $sUserTable.oxid=oxobject2delivery.oxobjectid ";
-            $sQAdd .= " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ) ";
+            $sQAdd .= ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ) ";
         }
 
         return $sQAdd;
@@ -88,14 +90,14 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Removes user from delivery configuration
      */
-    public function removeUserFromDel()
+    public function removeUserFromDel(): void
     {
         $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -103,7 +105,7 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Adds user from delivery configuration
      */
-    public function addUserToDel()
+    public function addUserToDel(): void
     {
         $aChosenUsr = $this->getActionIds('oxuser.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -114,7 +116,7 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
             $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {
                 $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');

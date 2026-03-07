@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,8 +24,8 @@ class AttributeOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     protected $_aColumns = ['container1' => [
         ['oxtitle', 'oxattribute', 1, 1, 0],
         ['oxsort', 'oxcategory2attribute', 1, 0, 0],
-        ['oxid', 'oxcategory2attribute', 0, 0, 1]
-    ]
+        ['oxid', 'oxcategory2attribute', 0, 0, 1],
+    ],
     ];
 
     /**
@@ -37,7 +39,7 @@ class AttributeOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         return " from $sSelTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sSelTable.oxid " .
-                 "where oxobjectid = " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sArtId) . " ";
+                 'where oxobjectid = ' . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sArtId) . ' ';
     }
 
     /**
@@ -53,15 +55,15 @@ class AttributeOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Applies sorting for selection lists
      */
-    public function setSorting()
+    public function setSorting(): void
     {
         $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSelect = "select * from oxcategory2attribute where oxobjectid = :oxobjectid order by oxsort";
+        $sSelect = 'select * from oxcategory2attribute where oxobjectid = :oxobjectid order by oxsort';
 
         $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $oList->init("oxbase", "oxcategory2attribute");
+        $oList->init('oxbase', 'oxcategory2attribute');
         $oList->selectString($sSelect, [
-            'oxobjectid' => $sSelId
+            'oxobjectid' => $sSelId,
         ]);
 
         // fixing indexes
@@ -76,7 +78,7 @@ class AttributeOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             $aIdx2Id[$iSelCnt] = $sKey;
             $iSelCnt++;
         }
-        //
+
         if (($iKey = array_search(Registry::getRequest()->getRequestEscapedParameter('sortoxid'), $aIdx2Id)) !== false) {
             $iDir = (Registry::getRequest()->getRequestEscapedParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
             if (isset($aIdx2Id[$iDir])) {

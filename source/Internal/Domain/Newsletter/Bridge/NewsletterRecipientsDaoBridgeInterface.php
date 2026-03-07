@@ -11,10 +11,5 @@ namespace OxidEsales\EshopCommunity\Internal\Domain\Newsletter\Bridge;
 
 interface NewsletterRecipientsDaoBridgeInterface
 {
-    /**
-     * @param int $shopId
-     *
-     * @return array
-     */
     public function get(int $shopId): array;
 }

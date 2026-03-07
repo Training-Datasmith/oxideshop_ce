@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,20 +21,18 @@ class FieldNameHelper
      *
      * @param string $tableName
      * @param array  $fieldNames
-     *
-     * @return array
      */
-    public function getFullFieldNames($tableName, $fieldNames)
+    public function getFullFieldNames($tableName, $fieldNames): array
     {
         $combinedFields = [];
         $tablePrefix = strtolower($tableName) . '__';
         foreach ($fieldNames as $fieldName) {
-            $fieldName = strtolower($fieldName);
+            $fieldName = strtolower((string) $fieldName);
 
             $fieldNameWithoutTableName = str_replace($tablePrefix, '', $fieldName);
             $combinedFields[] = $fieldNameWithoutTableName;
 
-            if (strpos($fieldName, $tablePrefix) !== 0) {
+            if (!str_starts_with($fieldName, $tablePrefix)) {
                 $fieldName = $tablePrefix . $fieldName;
             }
 

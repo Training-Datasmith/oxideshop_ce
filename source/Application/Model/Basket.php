@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -269,7 +271,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     protected $_blDownloadableProducts = null;
 
-
     /**
      * Save basket to data base if user is logged in
      *
@@ -314,7 +315,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
         return $this->_blSaveToDataBase;
     }
-
 
     /**
      * Return true if calculation mode is netto
@@ -596,7 +596,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
         return $sItemKey;
     }
-
 
     /**
      * Removes item from basket
@@ -1001,7 +1000,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         return false;
     }
 
-
     //P
     /**
      * Performs final sum calculation and rounding.
@@ -1010,7 +1008,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         // 1. add products price
         $dPrice = $this->_dBruttoSum;
-
 
         /** @var \OxidEsales\Eshop\Core\Price $oTotalPrice */
         $oTotalPrice = oxNew(Price::class);
@@ -1293,7 +1290,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                 $oWrappingPrices->addToPriceList($oWrappingPrice);
             }
         }
-
 
         return $oWrappingPrices->calculateToPrice();
     }
@@ -1590,7 +1586,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
         // saving voucher info
         $this->_aVouchers[$oVoucher->oxvouchers__oxid->value] = $oVoucher->getSimpleVoucher();
-
 
         $this->onUpdate();
     }
@@ -1928,7 +1923,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         $this->_oPrice = $oPrice;
     }
-
 
     /**
      * Returns unique order ID assigned to current basket.
@@ -2416,7 +2410,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         return false;
     }
 
-
     /**
      * Returns VAT of wrapping costs
      *
@@ -2428,7 +2421,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         return $this->getCosts('oxwrapping')->getVat();
     }
-
 
     /**
      * Returns VAT of gift card costs
@@ -2673,7 +2665,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         return $dPrice;
     }
 
-
     /**
      * Returns ( current basket products sum - total discount - voucher discount )
      *
@@ -2846,8 +2837,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         $sCatTable = $tableViewNameGenerator->getViewName('oxcategories');
 
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sParentId = $oDb->getOne("select oxparentid from oxarticles where oxid = :oxid", [
-            'oxid' => $sProductId
+        $sParentId = $oDb->getOne('select oxparentid from oxarticles where oxid = :oxid', [
+            'oxid' => $sProductId,
         ]);
         $sProductId = $sParentId ? $sParentId : $sProductId;
 
@@ -2858,7 +2849,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
         return (bool) $oDb->getOne($sQ, [
             'oxobjectid' => $sProductId,
-            'oxrootid' => $sRootCatId
+            'oxrootid' => $sRootCatId,
         ]);
     }
 
@@ -2922,7 +2913,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         if (!$blOverride) {
             $this->_blNewITemAdded = null;
-            Registry::getSession()->setVariable("blAddedNewItem", true);
+            Registry::getSession()->setVariable('blAddedNewItem', true);
         }
     }
 
@@ -2943,8 +2934,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function isNewItemAdded()
     {
         if ($this->_blNewITemAdded == null) {
-            $this->_blNewITemAdded = (bool) Registry::getSession()->getVariable("blAddedNewItem");
-            Registry::getSession()->deleteVariable("blAddedNewItem");
+            $this->_blNewITemAdded = (bool) Registry::getSession()->getVariable('blAddedNewItem');
+            Registry::getSession()->deleteVariable('blAddedNewItem');
         }
 
         return $this->_blNewITemAdded;

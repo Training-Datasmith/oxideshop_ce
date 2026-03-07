@@ -14,7 +14,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ModuleConfigurationChangedEvent extends Event
 {
-    public function __construct(private ModuleConfiguration $moduleConfiguration, private int $shopId)
+    public function __construct(private readonly ModuleConfiguration $moduleConfiguration, private readonly int $shopId)
     {
     }
 

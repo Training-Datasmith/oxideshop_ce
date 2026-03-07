@@ -13,25 +13,20 @@ use OxidEsales\EshopCommunity\Internal\Domain\Admin\DataObject\Admin;
 use OxidEsales\EshopCommunity\Internal\Domain\Admin\Exception\InvalidEmailException;
 use OxidEsales\EshopCommunity\Internal\Domain\Admin\Exception\InvalidRightsException;
 use OxidEsales\EshopCommunity\Internal\Domain\Admin\Exception\InvalidShopException;
-use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
+use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\PasswordHashServiceInterface;
 
 class AdminFactory implements AdminFactoryInterface
 {
     public function __construct(
-        private ShopAdapterInterface $shopAdapter,
-        private EmailValidatorServiceInterface $emailValidatorService,
-        private PasswordHashServiceInterface $passwordHashService
+        private readonly ShopAdapterInterface $shopAdapter,
+        private readonly EmailValidatorServiceInterface $emailValidatorService,
+        private readonly PasswordHashServiceInterface $passwordHashService
     ) {
     }
 
     /**
-     * @param string $email
-     * @param string $password
-     * @param string $rights
-     * @param int $shopId
-     * @return Admin
      * @throws InvalidEmailException
      * @throws InvalidRightsException
      * @throws InvalidShopException

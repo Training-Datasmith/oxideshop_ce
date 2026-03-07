@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,6 +27,6 @@ class ModuleController extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
     {
         parent::render();
 
-        return "module";
+        return 'module';
     }
 }

@@ -243,7 +243,7 @@ final class ActiveModulesDataProviderTest extends IntegrationTestCase
 
     private function getDummyCache(): ModuleCacheInterface
     {
-        return new class implements ModuleCacheInterface {
+        return new class () implements ModuleCacheInterface {
             private array $cache;
 
             public function deleteItem(string $key): void

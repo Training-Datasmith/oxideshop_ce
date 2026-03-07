@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
 use Exception;
 
 /**
@@ -32,10 +32,8 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
 
     /**
      * Checks for Malladmin rights
-     *
-     * @return null
      */
-    public function deleteEntry()
+    public function deleteEntry(): void
     {
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
         $sOxId = $this->getEditObjectId();
@@ -85,7 +83,7 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
         parent::render();
         $this->_aViewData['mylist'] = $this->getLanguagesList();
 
-        return "language_list";
+        return 'language_list';
     }
 
     /**
@@ -101,9 +99,9 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
 
         foreach ($aLanguages as $sKey => $sValue) {
             $sOxId = $sValue->oxid;
-            $aLanguages[$sKey]->active = (!isset($aLangParams[$sOxId]["active"])) ? 1 : $aLangParams[$sOxId]["active"];
-            $aLanguages[$sKey]->default = ($aLangParams[$sOxId]["baseId"] == $sDefaultLang) ? true : false;
-            $aLanguages[$sKey]->sort = $aLangParams[$sOxId]["sort"];
+            $aLanguages[$sKey]->active = (!isset($aLangParams[$sOxId]['active'])) ? 1 : $aLangParams[$sOxId]['active'];
+            $aLanguages[$sKey]->default = ($aLangParams[$sOxId]['baseId'] == $sDefaultLang) ? true : false;
+            $aLanguages[$sKey]->sort = $aLangParams[$sOxId]['sort'];
         }
 
         if (is_array($aLangParams)) {
@@ -124,7 +122,7 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
                 }
             }
 
-            uasort($aLanguages, [$this, 'sortLanguagesCallback']);
+            uasort($aLanguages, $this->sortLanguagesCallback(...));
         }
 
         return $aLanguages;
@@ -147,9 +145,8 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
 
         if ($this->_sDefSortOrder == 'asc') {
             return ($sVal1 < $sVal2) ? -1 : 1;
-        } else {
-            return ($sVal1 > $sVal2) ? -1 : 1;
         }
+        return ($sVal1 > $sVal2) ? -1 : 1;
     }
 
     /**

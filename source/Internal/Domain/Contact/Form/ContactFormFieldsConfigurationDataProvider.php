@@ -13,10 +13,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormFieldsCon
 
 class ContactFormFieldsConfigurationDataProvider implements FormFieldsConfigurationDataProviderInterface
 {
-    /**
-     * @return array
-     */
-    public function getFormFieldsConfiguration()
+    public function getFormFieldsConfiguration(): array
     {
         return [
             [

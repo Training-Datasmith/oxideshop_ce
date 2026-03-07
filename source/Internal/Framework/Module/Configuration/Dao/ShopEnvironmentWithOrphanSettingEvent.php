@@ -23,19 +23,16 @@ class ShopEnvironmentWithOrphanSettingEvent extends Event
     ) {
     }
 
-    /** @return int */
     public function getShopId(): int
     {
         return $this->shopId;
     }
 
-    /** @return string */
     public function getModuleId(): string
     {
         return $this->moduleId;
     }
 
-    /** @return string */
     public function getSettingId(): string
     {
         return $this->settingId;

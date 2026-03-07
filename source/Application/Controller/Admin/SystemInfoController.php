@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -20,8 +22,6 @@ class SystemInfoController extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Executes parent method parent::render(), prints shop and
      * PHP configuration information.
-     *
-     * @return null
      */
     public function render()
     {
@@ -31,14 +31,14 @@ class SystemInfoController extends \OxidEsales\Eshop\Application\Controller\Admi
 
         $oAuthUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $oAuthUser->loadAdminUser();
-        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == "malladmin";
+        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == 'malladmin';
 
         if ($blisMallAdmin && !$myConfig->isDemoShop()) {
             $aClassVars = get_object_vars($myConfig);
             $aSystemInfo = [];
             $aSystemInfo['pkg.info'] = $myConfig->getPackageInfo();
             foreach ($aClassVars as $name => $value) {
-                if (gettype($value) == "object") {
+                if (gettype($value) == 'object') {
                     continue;
                 }
 
@@ -47,27 +47,27 @@ class SystemInfoController extends \OxidEsales\Eshop\Application\Controller\Admi
                 }
 
                 $value = var_export($value, true);
-                $value = str_replace("\n", "<br>", $value);
+                $value = str_replace("\n", '<br>', $value);
                 $aSystemInfo[$name] = $value;
             }
             $context = [
-                "oViewConf" => $this->_aViewData["oViewConf"],
-                "oView" => $this->_aViewData["oView"],
-                "shop" => $this->_aViewData["shop"] ?? 1,
-                "isdemo" => $myConfig->isDemoShop(),
-                "aSystemInfo" => $aSystemInfo
+                'oViewConf' => $this->_aViewData['oViewConf'],
+                'oView' => $this->_aViewData['oView'],
+                'shop' => $this->_aViewData['shop'] ?? 1,
+                'isdemo' => $myConfig->isDemoShop(),
+                'aSystemInfo' => $aSystemInfo,
             ];
 
             ob_start();
-            echo $this->getRenderer()->renderTemplate("systeminfo", $context);
-            echo("<br><br>");
+            echo $this->getRenderer()->renderTemplate('systeminfo', $context);
+            echo('<br><br>');
 
             phpinfo();
             $sMessage = ob_get_clean();
 
             \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit($sMessage);
         } else {
-            return \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Access denied !");
+            return \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit('Access denied !');
         }
     }
 
@@ -96,7 +96,7 @@ class SystemInfoController extends \OxidEsales\Eshop\Application\Controller\Admi
             'dbPwd',
             'oSerial',
             'aSerials',
-            'sSerialNr'
+            'sSerialNr',
         ]);
     }
 }

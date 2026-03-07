@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,10 +26,8 @@ class StyleLogic
 
     /**
      * @param array $params
-     *
-     * @return array
      */
-    private function fillDefaultParams($params)
+    private function fillDefaultParams($params): array
     {
         $defaults = [
             'widget'   => '',
@@ -40,12 +40,10 @@ class StyleLogic
     }
 
     /**
-     * @param array $params
      * @param bool  $isDynamic
-     *
      * @return string
      */
-    private function getOutput($params, $isDynamic)
+    private function getOutput(array $params, $isDynamic)
     {
         $output = '';
         $widget = $params['widget'];

@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxDb;
-use oxField;
 
 /**
  * Newsletter Subscriptions manager
@@ -92,13 +91,11 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $params = [
-            'oxemail' => (string) $email
+            'oxemail' => (string) $email,
         ];
 
-        $userOxid = $database->getOne("select oxid from oxnewssubscribed 
-            where oxemail = :oxemail ", $params);
-
-        return $userOxid;
+        return $database->getOne('select oxid from oxnewssubscribed 
+            where oxemail = :oxemail ', $params);
     }
 
     /**
@@ -113,11 +110,11 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $params = [
             'oxuserid' => $sOxUserId,
-            'oxshopid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId()
+            'oxshopid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId(),
         ];
 
-        $sOxId = $oDb->getOne("select oxid from oxnewssubscribed 
-            where oxuserid = :oxuserid and oxshopid = :oxshopid", $params);
+        $sOxId = $oDb->getOne('select oxid from oxnewssubscribed 
+            where oxuserid = :oxuserid and oxshopid = :oxshopid', $params);
 
         return $this->load($sOxId);
     }
@@ -175,7 +172,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param int $iStatus subscription status
      */
-    public function setOptInStatus($iStatus)
+    public function setOptInStatus($iStatus): void
     {
         $this->oxnewssubscribed__oxdboptin = new \OxidEsales\Eshop\Core\Field($iStatus, \OxidEsales\Eshop\Core\Field::T_RAW);
         $this->save();
@@ -196,7 +193,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param int $iStatus subscription status
      */
-    public function setOptInEmailStatus($iStatus)
+    public function setOptInEmailStatus($iStatus): void
     {
         $this->oxnewssubscribed__oxemailfailed = new \OxidEsales\Eshop\Core\Field($iStatus, \OxidEsales\Eshop\Core\Field::T_RAW);
         $this->save();

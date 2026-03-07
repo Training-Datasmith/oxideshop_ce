@@ -26,8 +26,6 @@ class NewsletterRecipientsDataMapper implements NewsletterRecipientsDataMapperIn
 
     /**
      * @param NewsletterRecipient[] $newsletterRecipient
-     *
-     * @return array
      */
     public function mapRecipientListDataToArray(array $newsletterRecipient): array
     {

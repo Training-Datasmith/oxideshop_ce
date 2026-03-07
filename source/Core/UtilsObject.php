@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -43,16 +45,14 @@ class UtilsObject
      *
      * @var UtilsObject instance
      */
-    protected static $_instance = null;
+    protected static $_instance;
 
-    /** @var BackwardsCompatibleClassNameProvider */
-    private $classNameProvider = null;
+    private ?\OxidEsales\EshopCommunity\Core\BackwardsCompatibleClassNameProvider $classNameProvider = null;
 
     /** @var ModuleChainsGenerator */
-    private $moduleChainsGenerator = null;
+    private $moduleChainsGenerator;
 
-    /** @var ShopIdCalculator */
-    private $shopIdCalculator = null;
+    private ?\OxidEsales\EshopCommunity\Core\ShopIdCalculator $shopIdCalculator = null;
 
     /**
      * This class is a singleton and should be instantiated with getInstance()
@@ -82,7 +82,7 @@ class UtilsObject
      * @param string $className Class name expected to be later supplied over oxNew
      * @param object $instance  Instance object
      */
-    public static function setClassInstance($className, $instance)
+    public static function setClassInstance($className, $instance): void
     {
         //Get storage key as the class might be aliased.
         $storageKey = Registry::getStorageKey($className);
@@ -93,7 +93,7 @@ class UtilsObject
     /**
      * Resets previously set instances
      */
-    public static function resetClassInstances()
+    public static function resetClassInstances(): void
     {
         static::$_aClassInstances = [];
     }
@@ -102,10 +102,8 @@ class UtilsObject
      * Resets instance cache
      *
      * @param string $className class name in the cache
-     *
-     * @return null
      */
-    public function resetInstanceCache($className = null)
+    public function resetInstanceCache($className = null): void
     {
         if ($className && isset(static::$_aInstanceCache[$className])) {
             unset(static::$_aInstanceCache[$className]);
@@ -186,10 +184,8 @@ class UtilsObject
      * Returns generated unique ID.
      *
      * @deprecated use Id::generate() instead
-     *
-     * @return string
      */
-    public function generateUId()
+    public function generateUId(): string
     {
         return md5(uniqid('', true) . '|' . microtime());
     }
@@ -271,11 +267,9 @@ class UtilsObject
      * Cache only when object has none or one scalar argument.
      *
      * @param string $className
-     * @param array  $arguments
      *
-     * @return bool
      */
-    protected function shouldCacheObject($className, $arguments)
+    protected function shouldCacheObject($className, array $arguments): bool
     {
         return count($arguments) < 2 && (!isset($arguments[0]) || is_scalar($arguments[0]));
     }

@@ -29,7 +29,7 @@ final class ProductPromotionCest
                 'OXACTIONID' => 'oxnewest',
                 'OXARTID' => '1001',
                 'OXSORT' => 2,
-                'OXTIMESTAMP' => '2023-01-12 11:45:28'
+                'OXTIMESTAMP' => '2023-01-12 11:45:28',
             ]
         );
 
@@ -41,7 +41,7 @@ final class ProductPromotionCest
                 'OXACTIONID' => 'oxnewest',
                 'OXARTID' => '1000',
                 'OXSORT' => 10,
-                'OXTIMESTAMP' => '2023-01-12 11:45:28'
+                'OXTIMESTAMP' => '2023-01-12 11:45:28',
             ]
         );
 
@@ -61,13 +61,13 @@ final class ProductPromotionCest
         $basketItemToCheck1 = [
             'title' => 'Test product 1 [EN] šÄßüл',
             'price' => '100,00 €',
-            'amount' => 1
+            'amount' => 1,
         ];
 
         $basketItemToCheck2 = [
             'title' => 'Test product 0 [EN] šÄßüл',
             'price' => '50,00 €',
-            'amount' => 3
+            'amount' => 3,
         ];
 
         $this->checkMiniBasket(
@@ -75,7 +75,7 @@ final class ProductPromotionCest
             $homePage,
             [
                 $basketItemToCheck1,
-                $basketItemToCheck2
+                $basketItemToCheck2,
             ],
             '250,00 €',
             '4'
@@ -96,7 +96,7 @@ final class ProductPromotionCest
                 'OXACTIONID' => 'oxtop5',
                 'OXARTID' => '1002',
                 'OXSORT' => 1,
-                'OXTIMESTAMP' => '2023-01-12 11:45:28'
+                'OXTIMESTAMP' => '2023-01-12 11:45:28',
             ]
         );
         $I->clearShopCache();
@@ -109,7 +109,7 @@ final class ProductPromotionCest
         $productToCheck = [
             'title' => 'Test product 2 [EN] šÄßüл',
             'price' => '55,00 €',
-            'amount' => 2
+            'amount' => 2,
         ];
         $this->checkDetails($I, $productToCheck);
     }
@@ -128,7 +128,7 @@ final class ProductPromotionCest
                 'OXACTIONID' => 'oxbargain',
                 'OXARTID' => '1001',
                 'OXSORT' => 1,
-                'OXTIMESTAMP' => '2023-01-12 11:45:28'
+                'OXTIMESTAMP' => '2023-01-12 11:45:28',
             ]
         );
 
@@ -137,7 +137,7 @@ final class ProductPromotionCest
         $productToCheck = [
             'title' => 'Test product 1 [EN] šÄßüл',
             'price' => '100,00 €',
-            'amount' => 1
+            'amount' => 1,
         ];
 
         $productsWidget = $homePage->getBargainArticleList();
@@ -149,7 +149,7 @@ final class ProductPromotionCest
             $I,
             $homePage,
             [
-                $productToCheck
+                $productToCheck,
             ],
             '100,00 €',
             '1'

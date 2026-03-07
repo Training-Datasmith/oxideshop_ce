@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core;
 
 use Generator;
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Country;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\InputValidator;
@@ -83,7 +83,7 @@ final class InputValidatorTest extends IntegrationTestCase
         $invAddress = [
             'oxuser__oxustid' => $this->invalidUstId,
             'oxuser__oxcountryid' => $this->countryId,
-            'oxuser__oxcompany' => null
+            'oxuser__oxcompany' => null,
         ];
 
         $this->inputValidator->checkVatId($user, $invAddress);
@@ -146,7 +146,6 @@ final class InputValidatorTest extends IntegrationTestCase
         );
     }
 
-
     #[DataProvider('provideCheckLoginReturnsUsername')]
     public function testCheckLoginReturnsUsername($userLogged, $inputPassword, $exception): void
     {
@@ -194,19 +193,19 @@ final class InputValidatorTest extends IntegrationTestCase
         yield 'User not logged in, no password provided' => [
             'userLogged'    => false,
             'inputPassword' => null,
-            'exception'     => false
+            'exception'     => false,
         ];
 
         yield 'User logged in, no password passed' => [
             'userLogged'    => true,
             'inputPassword' => null,
-            'exception'     => InputException::class
+            'exception'     => InputException::class,
         ];
 
         yield 'User logged in, password are different' => [
             'userLogged'    => true,
             'inputPassword' => md5(uniqid()),
-            'exception'     => UserException::class
+            'exception'     => UserException::class,
         ];
     }
 
@@ -230,7 +229,6 @@ final class InputValidatorTest extends IntegrationTestCase
             $this->inputValidator->getFieldValidationErrors()['oxuser__oxusername'][0]
         );
     }
-
 
     private function createCountry(): void
     {

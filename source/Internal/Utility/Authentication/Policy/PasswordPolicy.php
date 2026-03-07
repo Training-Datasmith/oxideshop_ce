@@ -16,11 +16,10 @@ class PasswordPolicy implements PasswordPolicyInterface
     /**
      * Enforces password policy
      *
-     * @param string $password
      *
      * @throws PasswordPolicyException
      */
-    public function enforcePasswordPolicy(string $password)
+    public function enforcePasswordPolicy(string $password): void
     {
         /**
          * A password policy should at least ensure, that the same character encoding is used for hashing and
@@ -32,11 +31,6 @@ class PasswordPolicy implements PasswordPolicyInterface
         }
     }
 
-    /**
-     * @param string $password
-     *
-     * @return bool
-     */
     private function isValidUtf8(string $password): bool
     {
         /**

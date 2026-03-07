@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,25 +17,17 @@ use OxidEsales\Eshop\Core\Str;
 class UtilsString
 {
     /**
-     * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Prepares passed string for CSV format
      *
      * @param string $sInField String to prepare
-     *
-     * @return string
      */
-    public function prepareCSVField($sInField)
+    public function prepareCSVField(string $sInField): string
     {
         $oStr = Str::getStr();
         if ($oStr->strstr($sInField, '"')) {
             return '"' . str_replace('"', '""', $sInField) . '"';
-        } elseif ($oStr->strstr($sInField, ';')) {
+        }
+        if ($oStr->strstr($sInField, ';')) {
             return '"' . $sInField . '"';
         }
 
@@ -57,12 +51,12 @@ class UtilsString
         $oStr = Str::getStr();
 
         //multiple whitespaces
-        $sString = $oStr->preg_replace("/[ \t\n\r]+/", " ", $sString);
+        $sString = $oStr->preg_replace("/[ \t\n\r]+/", ' ', $sString);
         if ($oStr->strlen($sString) > $iLength && $iLength != -1) {
             $sString = $oStr->substr($sString, 0, $iLength);
         }
 
-        return $oStr->preg_replace("/,+$/", "", $sString);
+        return $oStr->preg_replace('/,+$/', '', $sString);
     }
 
     /**

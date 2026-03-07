@@ -40,7 +40,7 @@ final class DIConfigWrapperTest extends TestCase
     {
         $configArray = ['imports' => [
             ['resource' => $this->servicePath1],
-            ['resource' => $this->servicePath2]
+            ['resource' => $this->servicePath2],
         ]];
 
         $wrapper = new DIConfigWrapper($configArray);
@@ -75,7 +75,7 @@ final class DIConfigWrapperTest extends TestCase
     {
         $configArray = ['imports' => [
             ['resource' => $this->servicePath1],
-            ['resource' => $this->servicePath2]
+            ['resource' => $this->servicePath2],
         ]];
 
         $wrapper = new DIConfigWrapper($configArray);

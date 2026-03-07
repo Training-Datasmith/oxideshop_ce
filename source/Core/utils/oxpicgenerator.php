@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 // checks if GD library version getter does not exist
-if (!function_exists("getGdVersion")) {
+if (!function_exists('getGdVersion')) {
     /**
      * Returns GD library version
      *
@@ -19,7 +21,7 @@ if (!function_exists("getGdVersion")) {
 }
 
 // checks if image creation function does not exist
-if (!function_exists("copyAlteredImage")) {
+if (!function_exists('copyAlteredImage')) {
     /**
      * Creates and copies the resized image
      *
@@ -30,17 +32,15 @@ if (!function_exists("copyAlteredImage")) {
      * @param array  $aImageInfo        additional info
      * @param string $sTarget           target file path @deprecated
      * @param int    $iGdVer            used gd version @deprecated
-     *
-     * @return bool
      */
-    function copyAlteredImage($sDestinationImage, $sSourceImage, $iNewWidth, $iNewHeight, $aImageInfo, $sTarget = null, $iGdVer = null)
+    function copyAlteredImage($sDestinationImage, $sSourceImage, $iNewWidth, $iNewHeight, array $aImageInfo, $sTarget = null, $iGdVer = null): bool
     {
         return imagecopyresampled($sDestinationImage, $sSourceImage, 0, 0, 0, 0, $iNewWidth, $iNewHeight, $aImageInfo[0], $aImageInfo[1]);
     }
 }
 
 // checks if image size calculator does nor exist
-if (!function_exists("calcImageSize")) {
+if (!function_exists('calcImageSize')) {
     /**
      * Calculates proportional new image size
      *
@@ -48,10 +48,8 @@ if (!function_exists("calcImageSize")) {
      * @param int $iDesiredHeight expected image height
      * @param int $iPrefWidth     original image width
      * @param int $iPrefHeight    original image height
-     *
-     * @return array
      */
-    function calcImageSize($iDesiredWidth, $iDesiredHeight, $iPrefWidth, $iPrefHeight)
+    function calcImageSize($iDesiredWidth, $iDesiredHeight, $iPrefWidth, $iPrefHeight): array
     {
         // #1837/1177M - do not resize smaller pictures
         if ($iDesiredWidth < $iPrefWidth || $iDesiredHeight < $iPrefHeight) {
@@ -71,7 +69,7 @@ if (!function_exists("calcImageSize")) {
     }
 }
 
-if (!function_exists("checkSizeAndCopy")) {
+if (!function_exists('checkSizeAndCopy')) {
     /**
      * Checks if preferred image dimensions size matches defined in config;
      * in case it matches - copies original image to new location, returns
@@ -84,22 +82,19 @@ if (!function_exists("checkSizeAndCopy")) {
      * @param int    $iHeight     preferred height
      * @param int    $iOrigWidth  original width
      * @param int    $iOrigHeight preferred height
-     *
-     * @return mixed
      */
-    function checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $iOrigWidth, $iOrigHeight)
+    function checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $iOrigWidth, $iOrigHeight): bool|array
     {
-        list($iNewWidth, $iNewHeight) = calcImageSize($iWidth, $iHeight, $iOrigWidth, $iOrigHeight);
+        [$iNewWidth, $iNewHeight] = calcImageSize($iWidth, $iHeight, $iOrigWidth, $iOrigHeight);
         if ($iNewWidth == $iOrigWidth && $iNewHeight == $iOrigHeight) {
             return copy($sSrc, $sTarget);
-        } else {
-            return [$iNewWidth, $iNewHeight];
         }
+        return [$iNewWidth, $iNewHeight];
     }
 }
 
 // checks if GIF resizer does not exist
-if (!function_exists("resizeGif")) {
+if (!function_exists('resizeGif')) {
     /**
      * Creates resized GIF image. Returns path of new file if creation
      * succeed. On error returns FALSE
@@ -118,7 +113,7 @@ if (!function_exists("resizeGif")) {
     {
         $aResult = checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $iOriginalWidth, $iOriginalHeight);
         if (is_array($aResult)) {
-            list($iNewWidth, $iNewHeight) = $aResult;
+            [$iNewWidth, $iNewHeight] = $aResult;
             $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
             $hSourceImage = imagecreatefromgif($sSrc);
 
@@ -136,7 +131,7 @@ if (!function_exists("resizeGif")) {
 }
 
 // checks if PNG resizer does not exist
-if (!function_exists("resizePng")) {
+if (!function_exists('resizePng')) {
     /**
      * Creates resized PNG image. Returns path of new file if creation
      * succeded. On error returns FALSE
@@ -151,11 +146,11 @@ if (!function_exists("resizePng")) {
      *
      * @return string|false
      */
-    function resizePng($sSrc, $sTarget, $iWidth, $iHeight, $aImageInfo, $iGdVer, $hDestinationImage)
+    function resizePng($sSrc, $sTarget, $iWidth, $iHeight, array $aImageInfo, $iGdVer, $hDestinationImage)
     {
         $aResult = checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $aImageInfo[0], $aImageInfo[1]);
         if (is_array($aResult)) {
-            list($iNewWidth, $iNewHeight) = $aResult;
+            [$iNewWidth, $iNewHeight] = $aResult;
             if ($hDestinationImage === null) {
                 $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
             }
@@ -166,7 +161,7 @@ if (!function_exists("resizePng")) {
                 $imgWhite = imagecolorallocate($hDestinationImage, 255, 255, 255);
                 imagefill($hDestinationImage, 0, 0, $imgWhite);
                 imagecolortransparent($hDestinationImage, $imgWhite);
-            //end of fix
+                //end of fix
             } else {
                 imagealphablending($hDestinationImage, false);
                 imagesavealpha($hDestinationImage, true);
@@ -191,7 +186,7 @@ if (!function_exists("resizePng")) {
 }
 
 // checks if JPG resizer does not exist
-if (!function_exists("resizeJpeg")) {
+if (!function_exists('resizeJpeg')) {
     /**
      * Creates resized JPG image. Returns path of new file if creation
      * succeed. On error returns FALSE
@@ -207,11 +202,11 @@ if (!function_exists("resizeJpeg")) {
      *
      * @return string|false
      */
-    function resizeJpeg($sSrc, $sTarget, $iWidth, $iHeight, $aImageInfo, $iGdVer, $hDestinationImage, $iDefQuality)
+    function resizeJpeg($sSrc, $sTarget, $iWidth, $iHeight, array $aImageInfo, $iGdVer, $hDestinationImage, $iDefQuality)
     {
         $aResult = checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $aImageInfo[0], $aImageInfo[1]);
         if (is_array($aResult)) {
-            list($iNewWidth, $iNewHeight) = $aResult;
+            [$iNewWidth, $iNewHeight] = $aResult;
             if ($hDestinationImage === null) {
                 $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
             }
@@ -236,14 +231,14 @@ if (!function_exists("resizeJpeg")) {
 }
 
 // checks if WebP resizer doesn't exist
-if (!function_exists("resizeWebp")) {
+if (!function_exists('resizeWebp')) {
     function resizeWebp(string $source, string $target, int $width, int $height, int $quality): string
     {
-        list($origWidth, $origHeight) = @getimagesize($source);
+        [$origWidth, $origHeight] = @getimagesize($source);
         $result = checkSizeAndCopy($source, $target, $width, $height, $origWidth, $origHeight);
 
         if (is_array($result)) {
-            list($newWidth, $newHeight) = $result;
+            [$newWidth, $newHeight] = $result;
             $destinationImage = imagecreatetruecolor($newWidth, $newHeight);
             $sourceImage = imagecreatefromwebp($source);
             imagealphablending($destinationImage, false);

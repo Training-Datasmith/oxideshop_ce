@@ -84,7 +84,6 @@ final class ModulePackageInstallerTest extends IntegrationTestCase
         );
     }
 
-
     private function getPackageInstaller(string $packageName, array $extra = []): ModulePackageInstaller
     {
         $package = new Package($packageName, '1.0.0', '1.0.0');

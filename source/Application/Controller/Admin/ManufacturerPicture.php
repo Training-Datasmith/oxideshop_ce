@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -30,7 +32,7 @@ class ManufacturerPicture extends AdminDetailsController
             $manufacturer->load($oxid);
         }
 
-        return "manufacturer_picture";
+        return 'manufacturer_picture';
     }
 
     public function save(): void
@@ -51,7 +53,7 @@ class ManufacturerPicture extends AdminDetailsController
         $manufacturer = oxNew(Manufacturer::class);
         if ($manufacturer->load($this->getEditObjectId())) {
             $this->fetchChanges($manufacturer);
-            $manufacturer->assign(Registry::getRequest()->getRequestEscapedParameter("editval"));
+            $manufacturer->assign(Registry::getRequest()->getRequestEscapedParameter('editval'));
             $manufacturer = Registry::getUtilsFile()->processFiles($manufacturer);
 
             $this->checkNewImagesCount();
@@ -92,7 +94,7 @@ class ManufacturerPicture extends AdminDetailsController
     {
         $changes = [];
 
-        foreach (Registry::getRequest()->getRequestEscapedParameter("editval") as $fieldName => $value) {
+        foreach (Registry::getRequest()->getRequestEscapedParameter('editval') as $fieldName => $value) {
             if ($manufacturer->$fieldName->value !== $value) {
                 $changes[] = $manufacturer->$fieldName->value;
             }

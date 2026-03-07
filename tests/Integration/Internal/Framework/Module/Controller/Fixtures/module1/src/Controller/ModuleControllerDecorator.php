@@ -21,7 +21,7 @@ class ModuleControllerDecorator extends AbstractControllerDecorator
 
     public function init()
     {
-        echo "Init Decorator";
+        echo 'Init Decorator';
         $this->controller->init();
     }
 }

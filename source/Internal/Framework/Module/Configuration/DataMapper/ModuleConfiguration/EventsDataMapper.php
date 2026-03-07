@@ -36,10 +36,6 @@ class EventsDataMapper implements ModuleConfigurationDataMapperInterface
         return $moduleConfiguration;
     }
 
-    /**
-     * @param ModuleConfiguration $moduleConfiguration
-     * @param array               $event
-     */
     private function setEvents(ModuleConfiguration $moduleConfiguration, array $event): void
     {
         foreach ($event as $action => $method) {
@@ -50,11 +46,6 @@ class EventsDataMapper implements ModuleConfigurationDataMapperInterface
         }
     }
 
-    /**
-     * @param ModuleConfiguration $configuration
-     *
-     * @return array
-     */
     private function getEvents(ModuleConfiguration $configuration): array
     {
         $events = [];

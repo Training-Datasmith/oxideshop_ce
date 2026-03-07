@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,16 +17,13 @@ class SmartWordwrapLogic
      * @param string $break
      * @param int    $cutRows
      * @param int    $tolerance
-     * @param string $etc
      *
-     * @return string
      */
-    public function wrapWords($string, $length, $break, $cutRows, $tolerance, $etc)
+    public function wrapWords($string, $length, $break, $cutRows, $tolerance, string $etc): string
     {
-        $wrapTag = "<wrap>";
-        $wrapChars = ["-"];
-        $afterWrapChars = ["-" . $wrapTag];
-
+        $wrapTag = '<wrap>';
+        $wrapChars = ['-'];
+        $afterWrapChars = ['-' . $wrapTag];
 
         $string = trim($string);
 

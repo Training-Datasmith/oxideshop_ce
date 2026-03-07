@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
 
 /**
  * Defines an element of multidimentional variant name tree structure. Contains article id, variant name, URL, price, price text, and a subset of MD variants.
@@ -54,7 +54,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @var double
      */
-    protected $_dPrice = null;
+    protected $_dPrice;
 
     /**
      * Variant Price text represenatation. Eg. "10,00 EUR" or "from 8,00 EUR"
@@ -75,7 +75,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sId New id
      */
-    public function setId($sId)
+    public function setId($sId): void
     {
         $this->_sId = $sId;
     }
@@ -95,7 +95,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sParentId Parent id
      */
-    public function setParentId($sParentId)
+    public function setParentId($sParentId): void
     {
         $this->_sParentId = $sParentId;
     }
@@ -115,7 +115,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @param \OxidEsales\Eshop\Application\Model\MdVariant[] $aSubvariants Subvariants
      */
-    public function setMdSubvariants($aSubvariants)
+    public function setMdSubvariants($aSubvariants): void
     {
         $this->_aSubvariants = $aSubvariants;
     }
@@ -156,7 +156,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     {
         $aSubvariants = $this->getMdSubvariants();
         foreach ($aSubvariants as $oMdSubvariant) {
-            if (strcasecmp($oMdSubvariant->getName(), $sName) == 0) {
+            if (strcasecmp((string) $oMdSubvariant->getName(), $sName) == 0) {
                 return $oMdSubvariant;
             }
         }
@@ -190,7 +190,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sName New name
      */
-    public function setName($sName)
+    public function setName($sName): void
     {
         $this->_sName = $sName;
     }
@@ -299,7 +299,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      * @param double $dPrice Price as double
      * @param string $sUrl   Article URL
      */
-    public function addNames($sArtId, $aNames, $dPrice, $sUrl)
+    public function addNames($sArtId, $aNames, $dPrice, $sUrl): void
     {
         $iCount = count($aNames);
         $sName = array_shift($aNames);

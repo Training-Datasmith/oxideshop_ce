@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,7 +26,6 @@ class ModuleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLis
      */
     protected $_aModules = [];
 
-
     /**
      * Calls parent::render() and returns name of template to render
      *
@@ -39,9 +40,6 @@ class ModuleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLis
         return 'module_list';
     }
 
-    /**
-     * @return array
-     */
     private function getInstalledModules(): array
     {
         $shopConfiguration = ContainerFacade::get(ShopConfigurationDaoBridgeInterface::class)
@@ -56,28 +54,17 @@ class ModuleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLis
         }
 
         $modules = $this->sortModulesByTitleAlphabetically($modules);
-        $modules = $this->convertModulesToAssociativeArray($modules);
 
-        return $modules;
+        return $this->convertModulesToAssociativeArray($modules);
     }
 
-    /**
-     * @param array $modules
-     * @return array
-     */
     private function sortModulesByTitleAlphabetically(array $modules): array
     {
-        usort($modules, function ($a, $b) {
-            return strcmp($a->getTitle(), $b->getTitle());
-        });
+        usort($modules, fn ($a, $b) => strcmp((string) $a->getTitle(), (string) $b->getTitle()));
 
         return $modules;
     }
 
-    /**
-     * @param array $modules
-     * @return array
-     */
     private function convertModulesToAssociativeArray(array $modules): array
     {
         $modulesAssociativeArray = [];

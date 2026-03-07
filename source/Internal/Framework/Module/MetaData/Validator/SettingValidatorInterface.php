@@ -14,9 +14,5 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator
  */
 interface SettingValidatorInterface
 {
-    /**
-     * @param string $metadataVersion
-     * @param array  $moduleSettings
-     */
     public function validate(string $metadataVersion, array $moduleSettings);
 }

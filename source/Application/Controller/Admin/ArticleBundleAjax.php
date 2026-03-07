@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -33,8 +35,8 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         ['oxmpn', 'oxarticles', 0, 0, 0],
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ]
+        ['oxid', 'oxarticles', 0, 0, 1],
+    ],
     ];
 
     /**
@@ -66,14 +68,14 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                 $sVariantsSqlSnippet = $blVariantsSelectionParameter ? $sSqlIfTrue : $sSqlIfFalse;
 
                 $sQAdd = " from {$sView} as oxobject2category left join {$sArticleTable} on {$sVariantsSqlSnippet}" .
-                         " where oxobject2category.oxcatnid = " . $oDb->quote($sSelId) . " ";
+                         ' where oxobject2category.oxcatnid = ' . $oDb->quote($sSelId) . ' ';
             }
         }
         // #1513C/#1826C - skip references, to not existing articles
         $sQAdd .= " and $sArticleTable.oxid IS NOT NULL ";
 
         // skipping self from list
-        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . " ";
+        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . ' ';
 
         return $sQAdd;
     }
@@ -99,7 +101,7 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Removing article from corssselling list
      */
-    public function removeArticleBundle()
+    public function removeArticleBundle(): void
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
@@ -113,17 +115,17 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Adding article to corssselling list
      */
-    public function addArticleBundle()
+    public function addArticleBundle(): void
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        $sQ = "update oxarticles set oxarticles.oxbundleid = :oxbundleid " .
-              "where oxarticles.oxid  = :oxid ";
+        $sQ = 'update oxarticles set oxarticles.oxbundleid = :oxbundleid ' .
+              'where oxarticles.oxid  = :oxid ';
         $oDb->Execute(
             $sQ,
             [
                 'oxbundleid' => Registry::getRequest()->getRequestEscapedParameter('oxbundleid'),
-                'oxid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
+                'oxid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
             ]
         );
     }

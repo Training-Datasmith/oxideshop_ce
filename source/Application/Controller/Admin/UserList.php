@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use oxRegistry;
-use oxUser;
 
 /**
  * Admin user list manager.
@@ -29,7 +28,7 @@ class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
      *
      * @var string
      */
-    protected $_sDefSortField = "oxusername";
+    protected $_sDefSortField = 'oxusername';
 
     /**
      * Type of list.
@@ -47,15 +46,13 @@ class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
 
     /**
      * Executes parent::render(), sets blacklist and preventdelete flag
-     *
-     * @return null
      */
     public function render()
     {
         foreach ($this->getItemList() as $itemId => $user) {
             /** @var \OxidEsales\Eshop\Application\Model\User $user */
-            if ($user->inGroup("oxidblacklist") || $user->inGroup("oxidblocked")) {
-                $user->blacklist = "1";
+            if ($user->inGroup('oxidblacklist') || $user->inGroup('oxidblocked')) {
+                $user->blacklist = '1';
             }
             $user->blPreventDelete = false;
             if (!$this->allowAdminEdit($itemId)) {
@@ -68,8 +65,6 @@ class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
 
     /**
      * Admin user is allowed to be deleted only by mall admin
-     *
-     * @return null
      */
     public function deleteEntry()
     {

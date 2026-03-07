@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,9 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
-use oxManufacturer;
-use oxRegistry;
-use oxUBase;
 
 /**
  * List of articles for a selected Manufacturer.
@@ -32,14 +31,14 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @var string
      */
-    protected $_blVisibleSubCats = null;
+    protected $_blVisibleSubCats;
 
     /**
      * List type
      *
      * @var string
      */
-    protected $_oSubCatList = null;
+    protected $_oSubCatList;
 
     /**
      * Recommlist
@@ -48,28 +47,28 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @var object
      */
-    protected $_oRecommList = null;
+    protected $_oRecommList;
 
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sTplLocation = null;
+    protected $_sTplLocation;
 
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sCatTitle = null;
+    protected $_sCatTitle;
 
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /**
      * Marked which defines if current view is sortable or not
@@ -141,7 +140,7 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
 
         // load only articles which we show on screen
         $iNrofCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-        $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 1;
+        $iNrofCatArticles = $iNrofCatArticles ?: 1;
 
         $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
         $oArtList->setSqlLimit($iNrofCatArticles * $this->getRequestPageNr(), $iNrofCatArticles);
@@ -180,13 +179,16 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      */
     protected function addPageNrParam($sUrl, $iPage, $iLang = null)
     {
-        if (Registry::getUtils()->seoIsActive() && ($oManufacturer = $this->getActManufacturer())) {
-            if ($iPage) {
-                // only if page number > 0
-                return $oManufacturer->getBaseSeoLink($iLang, $iPage);
-            }
+        if (!Registry::getUtils()->seoIsActive()) {
+            return parent::addPageNrParam($sUrl, $iPage, $iLang);
         }
-
+        if (!$oManufacturer = $this->getActManufacturer()) {
+            return parent::addPageNrParam($sUrl, $iPage, $iLang);
+        }
+        if ($iPage) {
+            // only if page number > 0
+            return $oManufacturer->getBaseSeoLink($iLang, $iPage);
+        }
         return parent::addPageNrParam($sUrl, $iPage, $iLang);
     }
 
@@ -199,9 +201,8 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
     {
         if ((Registry::getUtils()->seoIsActive() && ($oManufacturer = $this->getActManufacturer()))) {
             return $oManufacturer->getLink();
-        } else {
-            return parent::generatePageNavigationUrl();
         }
+        return parent::generatePageNavigationUrl();
     }
 
     /**
@@ -252,7 +253,7 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
             if (($oManufacturerTree = $this->getManufacturerTree())) {
                 $oManufacturer = $this->getActManufacturer();
                 if ($oManufacturer && ($oManufacturer->getId() != 'root') && $oManufacturer->getIsVisible()) {
-                    list($aArticleList, $iAllArtCnt) = $this->loadArticles($oManufacturer);
+                    [$aArticleList, $iAllArtCnt] = $this->loadArticles($oManufacturer);
                     if ($iAllArtCnt) {
                         $this->_aArticleList = $aArticleList;
                     }
@@ -397,7 +398,7 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
         $sAddParams = parent::getAddUrlParams();
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
         if ($oManufacturer = $this->getActManufacturer()) {
-            $sAddParams .= "&amp;mnid=" . $oManufacturer->getId();
+            $sAddParams .= '&amp;mnid=' . $oManufacturer->getId();
         }
 
         return $sAddParams;

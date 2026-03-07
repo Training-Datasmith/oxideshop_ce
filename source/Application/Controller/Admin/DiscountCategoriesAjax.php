@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,7 +17,7 @@ use OxidEsales\Eshop\Core\Registry;
 class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
 {
     /** If this discount id comes from request, it means that new discount should be created. */
-    const NEW_DISCOUNT_ID = "-1";
+    public const NEW_DISCOUNT_ID = '-1';
 
     /**
      * Columns array
@@ -28,14 +30,14 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
             ['oxtitle', 'oxcategories', 1, 1, 0],
             ['oxdesc', 'oxcategories', 1, 1, 0],
             ['oxid', 'oxcategories', 0, 0, 0],
-            ['oxid', 'oxcategories', 0, 0, 1]
+            ['oxid', 'oxcategories', 0, 0, 1],
         ],
          'container2' => [
              ['oxtitle', 'oxcategories', 1, 1, 0],
              ['oxdesc', 'oxcategories', 1, 1, 0],
              ['oxid', 'oxcategories', 0, 0, 0],
              ['oxid', 'oxobject2discount', 0, 0, 1],
-             ['oxid', 'oxcategories', 0, 0, 1]
+             ['oxid', 'oxcategories', 0, 0, 1],
          ],
     ];
 
@@ -47,7 +49,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     protected function getQuery()
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
@@ -59,7 +61,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         } else {
             $sQAdd = " from oxobject2discount, {$sCategoryTable} " .
                      "where {$sCategoryTable}.oxid=oxobject2discount.oxobjectid " .
-                     " and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) .
+                     ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) .
                      " and oxobject2discount.oxtype = 'oxcategories' ";
         }
 
@@ -67,7 +69,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
             // performance
             $sSubSelect = " select {$sCategoryTable}.oxid from oxobject2discount, {$sCategoryTable} " .
                           "where {$sCategoryTable}.oxid=oxobject2discount.oxobjectid " .
-                          " and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) .
+                          ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) .
                           " and oxobject2discount.oxtype = 'oxcategories' ";
             if (stristr($sQAdd, 'where') === false) {
                 $sQAdd .= ' where ';
@@ -83,16 +85,16 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Removes selected category (categories) from discount list
      */
-    public function removeDiscCat()
+    public function removeDiscCat(): void
     {
         $categoryIds = $this->getActionIds('oxobject2discount.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $query = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $query = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
         } elseif (is_array($categoryIds)) {
-            $chosenCategories = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($categoryIds));
-            $query = "delete from oxobject2discount where oxobject2discount.oxid in (" . $chosenCategories . ") ";
+            $chosenCategories = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($categoryIds));
+            $query = 'delete from oxobject2discount where oxobject2discount.oxid in (' . $chosenCategories . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
         }
     }
@@ -100,7 +102,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Adds selected category (categories) to discount list
      */
-    public function addDiscCat()
+    public function addDiscCat(): void
     {
         $categoryIds = $this->getActionIds('oxcategories.oxid');
         $discountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -128,7 +130,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         $object2Discount->init('oxobject2discount');
         $object2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($discountId);
         $object2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($categoryId);
-        $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxcategories");
+        $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field('oxcategories');
 
         $object2Discount->save();
     }

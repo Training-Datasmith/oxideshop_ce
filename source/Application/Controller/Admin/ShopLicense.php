@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -60,8 +62,6 @@ class ShopLicense extends \OxidEsales\Eshop\Application\Controller\Admin\ShopCon
 
     /**
      * Checks if the license key update is allowed.
-     *
-     * @return bool
      */
     protected function canUpdate(): bool
     {
@@ -82,8 +82,6 @@ class ShopLicense extends \OxidEsales\Eshop\Application\Controller\Admin\ShopCon
      * Fetch current shop version information from url
      *
      * @param string $sUrl current version info fetching url by edition
-     *
-     * @return string
      */
     protected function fetchCurVersionInfo($sUrl): string
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,7 +17,7 @@ use OxidEsales\EshopCommunity\Core\Registry;
  */
 abstract class BaseRegistrator
 {
-    const TAG_NAME = 'base';
+    public const TAG_NAME = 'base';
 
     /** @var \OxidEsales\Eshop\Core\Config */
     protected $config;
@@ -53,7 +55,7 @@ abstract class BaseRegistrator
         }
 
         if (empty($url) && ContainerFacade::getParameter('oxid_esales.debug_mode')) {
-            $error = "{" . static::TAG_NAME . "} resource not found: " . \OxidEsales\Eshop\Core\Str::getStr()->htmlspecialchars($url);
+            $error = '{' . static::TAG_NAME . '} resource not found: ' . \OxidEsales\Eshop\Core\Str::getStr()->htmlspecialchars($url);
             trigger_error($error, E_USER_WARNING);
         }
 
@@ -69,12 +71,11 @@ abstract class BaseRegistrator
      */
     protected function getFileModificationTime($file)
     {
-        $result = '';
         if (file_exists($file)) {
-            $result = filemtime($file);
+            return filemtime($file);
         }
 
-        return $result;
+        return '';
     }
 
     /**
@@ -88,8 +89,8 @@ abstract class BaseRegistrator
     {
         $config = Registry::getConfig();
         return str_replace(
-            rtrim($config->getCurrentShopUrl(false), '/'),
-            rtrim(ContainerFacade::getParameter('oxid_esales.shop_source_directory'), '/'),
+            rtrim((string) $config->getCurrentShopUrl(false), '/'),
+            rtrim((string) ContainerFacade::getParameter('oxid_esales.shop_source_directory'), '/'),
             $url
         );
     }

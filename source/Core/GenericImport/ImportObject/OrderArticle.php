@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,7 +37,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\Imp
         $persParamValues = @unserialize($data['OXPERSPARAM']);
         if (!is_array($persParamValues)) {
             // data is a string with | separation, prepare for oxid
-            $persParamValues = explode("|", $data['OXPERSPARAM']);
+            $persParamValues = explode('|', (string) $data['OXPERSPARAM']);
             $data['OXPERSPARAM'] = serialize($persParamValues);
         }
         if (array_key_exists('OXORDERSHOPID', $data)) {

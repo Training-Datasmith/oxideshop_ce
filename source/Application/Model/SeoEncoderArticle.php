@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,11 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxView;
-use oxRegistry;
-use oxUBase;
-use oxDb;
-use oxCategory;
 
 /**
  * Seo encoder for articles
@@ -117,7 +114,7 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
         $oList = null;
         $oView = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView();
         if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController) {
-            $oList = $oView->getActiveRecommList();
+            return $oView->getActiveRecommList();
         }
 
         return $oList;
@@ -257,18 +254,18 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
 
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $categoryViewName = $tableViewNameGenerator->getViewName("oxobject2category");
+        $categoryViewName = $tableViewNameGenerator->getViewName('oxobject2category');
 
         // add main category caching;
-        $sQ = "select oxcatnid from " . $categoryViewName . " where oxobjectid = :oxobjectid order by oxtime";
+        $sQ = 'select oxcatnid from ' . $categoryViewName . ' where oxobjectid = :oxobjectid order by oxtime';
         $sIdent = md5($categoryViewName . $sArtId);
 
-        if (($sMainCatId = $this->loadFromCache($sIdent, "oxarticle")) === false) {
+        if (($sMainCatId = $this->loadFromCache($sIdent, 'oxarticle')) === false) {
             $sMainCatId = $oDb->getOne($sQ, [
-                'oxobjectid' => $sArtId
+                'oxobjectid' => $sArtId,
             ]);
             // storing in cache
-            $this->saveInCache($sIdent, $sMainCatId, "oxarticle");
+            $this->saveInCache($sIdent, $sMainCatId, 'oxarticle');
         }
 
         if ($sMainCatId) {
@@ -342,9 +339,9 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
                 // looking in cache ..
                 if (!isset(self::$_aTitleCache[$sParentId])) {
                     $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-                    $sQ = "select oxtitle from " . $oArticle->getViewName() . " where oxid = :oxid";
+                    $sQ = 'select oxtitle from ' . $oArticle->getViewName() . ' where oxid = :oxid';
                     self::$_aTitleCache[$sParentId] = $oDb->getOne($sQ, [
-                        'oxid' => $sParentId
+                        'oxid' => $sParentId,
                     ]);
                 }
                 $sTitle = self::$_aTitleCache[$sParentId];
@@ -388,7 +385,7 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
                 $sSeoUri = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class)->getVendorUri($oVendor, $iLang);
                 $sSeoUri = $this->processSeoUrl($sSeoUri . $sTitle, $oArticle->getId(), $iLang);
 
-                $aStdParams = ['cnid' => "v_" . $oVendor->getId(), 'listtype' => $this->getListType()];
+                $aStdParams = ['cnid' => 'v_' . $oVendor->getId(), 'listtype' => $this->getListType()];
                 $this->saveToDb(
                     'oxarticle',
                     $oArticle->getId(),
@@ -549,25 +546,12 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
         if (!isset($iLang)) {
             $iLang = $oArticle->getLanguage();
         }
-
-        $sUri = null;
-        switch ($iType) {
-            case OXARTICLE_LINKTYPE_VENDOR:
-                $sUri = $this->getArticleVendorUri($oArticle, $iLang);
-                break;
-            case OXARTICLE_LINKTYPE_MANUFACTURER:
-                $sUri = $this->getArticleManufacturerUri($oArticle, $iLang);
-                break;
-            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-            case OXARTICLE_LINKTYPE_RECOMM:
-                $sUri = $this->getArticleRecommUri($oArticle, $iLang);
-                break;
-            // END deprecated
-            case OXARTICLE_LINKTYPE_PRICECATEGORY: // goes price category urls to default (category urls)
-            default:
-                $sUri = $this->getArticleUri($oArticle, $iLang);
-                break;
-        }
+        $sUri = match ($iType) {
+            OXARTICLE_LINKTYPE_VENDOR => $this->getArticleVendorUri($oArticle, $iLang),
+            OXARTICLE_LINKTYPE_MANUFACTURER => $this->getArticleManufacturerUri($oArticle, $iLang),
+            OXARTICLE_LINKTYPE_RECOMM => $this->getArticleRecommUri($oArticle, $iLang),
+            default => $this->getArticleUri($oArticle, $iLang),
+        };
 
         // if was unable to fetch type uri - returning main
         if (!$sUri) {
@@ -582,17 +566,17 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article to remove
      */
-    public function onDeleteArticle($oArticle)
+    public function onDeleteArticle($oArticle): void
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxarticle'", [
-            'oxobjectid' => $oArticle->getId()
+            'oxobjectid' => $oArticle->getId(),
         ]);
-        $oDb->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $oArticle->getId()
+        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $oArticle->getId(),
         ]);
-        $oDb->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $oArticle->getId()
+        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $oArticle->getId(),
         ]);
     }
 
@@ -611,17 +595,11 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
         $oArticle->setSkipAssign(true);
         if ($oArticle->loadInLang($iLang, $sObjectId)) {
             // choosing URI type to generate
-            switch ($this->getListType()) {
-                case 'vendor':
-                    $sSeoUrl = $this->getArticleVendorUri($oArticle, $iLang, true);
-                    break;
-                case 'manufacturer':
-                    $sSeoUrl = $this->getArticleManufacturerUri($oArticle, $iLang, true);
-                    break;
-                default:
-                    $sSeoUrl = $this->getArticleUri($oArticle, $iLang, true);
-                    break;
-            }
+            return match ($this->getListType()) {
+                'vendor' => $this->getArticleVendorUri($oArticle, $iLang, true),
+                'manufacturer' => $this->getArticleManufacturerUri($oArticle, $iLang, true),
+                default => $this->getArticleUri($oArticle, $iLang, true),
+            };
         }
 
         return $sSeoUrl;

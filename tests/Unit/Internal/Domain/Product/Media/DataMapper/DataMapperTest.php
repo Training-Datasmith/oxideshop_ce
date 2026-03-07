@@ -59,7 +59,7 @@ final class DataMapperTest extends TestCase
         $this->assertEquals(
             [
                 'icon',
-                'custom'
+                'custom',
             ],
             $data['roles']
         );

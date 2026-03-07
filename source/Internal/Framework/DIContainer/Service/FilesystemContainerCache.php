@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class FilesystemContainerCache implements ContainerCacheInterface
 {
-    public function __construct(private BasicContextInterface $context, private Filesystem $filesystem)
+    public function __construct(private readonly BasicContextInterface $context, private readonly Filesystem $filesystem)
     {
     }
 

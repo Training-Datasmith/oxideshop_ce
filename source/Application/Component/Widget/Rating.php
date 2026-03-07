@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,14 +36,14 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      *
      * @var double
      */
-    protected $_dRatingValue = null;
+    protected $_dRatingValue;
 
     /**
      * Rating count
      *
      * @var integer
      */
-    protected $_iRatingCnt = null;
+    protected $_iRatingCnt;
 
     /**
      * Executes parent::render().
@@ -65,7 +67,7 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
     {
         if ($this->_dRatingValue === null) {
             $this->_dRatingValue = 0.0;
-            $dValue = $this->getViewParameter("dRatingValue");
+            $dValue = $this->getViewParameter('dRatingValue');
             if ($dValue) {
                 $this->_dRatingValue = round($dValue, 1);
             }
@@ -81,7 +83,7 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      */
     public function getRatingCount()
     {
-        return $dCount = $this->getViewParameter("dRatingCount");
+        return $dCount = $this->getViewParameter('dRatingCount');
     }
 
     /**
@@ -91,7 +93,7 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      */
     public function getRateUrl()
     {
-        return $this->getViewParameter("sRateUrl");
+        return $this->getViewParameter('sRateUrl');
     }
 
     /**
@@ -101,7 +103,7 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      */
     public function canRate()
     {
-        return $this->getViewParameter("blCanRate");
+        return $this->getViewParameter('blCanRate');
     }
 
     /**

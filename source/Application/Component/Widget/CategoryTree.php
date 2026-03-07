@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
-namespace  OxidEsales\EshopCommunity\Application\Component\Widget;
+namespace OxidEsales\EshopCommunity\Application\Component\Widget;
+
+use function basename;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 
-use function basename;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 
 class CategoryTree extends \OxidEsales\Eshop\Application\Component\Widget\WidgetController
 {
@@ -58,12 +61,10 @@ class CategoryTree extends \OxidEsales\Eshop\Application\Component\Widget\Widget
 
     /**
      * Returns the deep level of category tree
-     *
-     * @return null
      */
     public function getDeepLevel()
     {
-        return $this->getViewParameter("deepLevel");
+        return $this->getViewParameter('deepLevel');
     }
 
     /**

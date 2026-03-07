@@ -9,32 +9,22 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge;
 
-use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\PasswordHashServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\PasswordVerificationServiceInterface;
+use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\PasswordHashServiceInterface;
 
 class PasswordServiceBridge implements PasswordServiceBridgeInterface
 {
     public function __construct(
-        private PasswordHashServiceInterface $passwordHashService,
-        private PasswordVerificationServiceInterface $passwordVerificationService
+        private readonly PasswordHashServiceInterface $passwordHashService,
+        private readonly PasswordVerificationServiceInterface $passwordVerificationService
     ) {
     }
 
-    /**
-     * @param string $password
-     *
-     * @return string
-     */
     public function hash(string $password): string
     {
         return $this->passwordHashService->hash($password);
     }
 
-    /**
-     * @param string $passwordHash
-     *
-     * @return bool
-     */
     public function passwordNeedsRehash(string $passwordHash): bool
     {
         return $this->passwordHashService->passwordNeedsRehash($passwordHash);
@@ -43,10 +33,7 @@ class PasswordServiceBridge implements PasswordServiceBridgeInterface
     /**
      * Verify that a given password matches a given hash
      *
-     * @param string $password
-     * @param string $passwordHash
      *
-     * @return bool
      */
     public function verifyPassword(string $password, string $passwordHash): bool
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,15 +16,11 @@ namespace OxidEsales\EshopCommunity\Core;
  */
 class BackwardsCompatibleClassNameProvider
 {
-    /** @var array */
-    private $classMap;
-
     /**
      * @param array $classMap
      */
-    public function __construct($classMap)
+    public function __construct(private $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     /**
@@ -35,12 +33,11 @@ class BackwardsCompatibleClassNameProvider
      */
     public function getClassName($classAlias)
     {
-        $className = $classAlias;
         if (array_key_exists($classAlias, $this->classMap)) {
-            $className = $this->classMap[$classAlias];
+            return $this->classMap[$classAlias];
         }
 
-        return $className;
+        return $classAlias;
     }
 
     /**
@@ -50,7 +47,7 @@ class BackwardsCompatibleClassNameProvider
      *
      * @return string|null
      */
-    public function getClassAliasName($className)
+    public function getClassAliasName($className): int|string|null
     {
         /*
          * Sanitize input: class names in namespaces should not, but may include a leading backslash
@@ -59,7 +56,7 @@ class BackwardsCompatibleClassNameProvider
         $classAlias = array_search($className, $this->classMap);
 
         if ($classAlias === false) {
-            $classAlias = null;
+            return null;
         }
 
         return $classAlias;

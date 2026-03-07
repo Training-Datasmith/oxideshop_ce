@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 $sMetadataVersion = '2.1';
 
-$aModule = array(
+$aModule = [
     'id'          => 'withCustomSource',
     'title'       => 'withCustomSource',
     'description' => 'withCustomSource',
     'thumbnail'   => 'picture.png',
     'version'     => '1.0',
-    'author'      => 'OXID eSales AG'
-);
+    'author'      => 'OXID eSales AG',
+];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -10,8 +12,6 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxRegistry;
-use oxDb;
 
 /**
  * Payment manager.
@@ -24,42 +24,42 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_ALLGOODS = 1;
+    public const PAYMENT_ADDSUMRULE_ALLGOODS = 1;
 
     /**
      * Consider for calculation of base sum - Discounts
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_DISCOUNTS = 2;
+    public const PAYMENT_ADDSUMRULE_DISCOUNTS = 2;
 
     /**
      * Consider for calculation of base sum - Vouchers
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_VOUCHERS = 4;
+    public const PAYMENT_ADDSUMRULE_VOUCHERS = 4;
 
     /**
      * Consider for calculation of base sum - Shipping costs
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_SHIPCOSTS = 8;
+    public const PAYMENT_ADDSUMRULE_SHIPCOSTS = 8;
 
     /**
      * Consider for calculation of base sum - Gift Wrapping/Greeting Card
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_GIFTS = 16;
+    public const PAYMENT_ADDSUMRULE_GIFTS = 16;
 
     /**
      * User groups object (default null).
      *
      * @var object
      */
-    protected $_oGroups = null;
+    protected $_oGroups;
 
     /**
      * Countries assigned to current payment. Value from outside accessible
@@ -67,7 +67,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @var array
      */
-    protected $_aCountries = null;
+    protected $_aCountries;
 
     /**
      * Current class name
@@ -81,14 +81,14 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @var array
      */
-    protected $_aDynValues = null;
+    protected $_aDynValues;
 
     /**
      * payment error type
      *
      * @var int
      */
-    protected $_iPaymentError = null;
+    protected $_iPaymentError;
 
     /**
      * Payment VAT config
@@ -102,7 +102,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice = null;
+    protected $_oPrice;
 
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
@@ -119,7 +119,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param bool $blOnTop Payment vat config
      */
-    public function setPaymentVatOnTop($blOnTop)
+    public function setPaymentVatOnTop($blOnTop): void
     {
         $this->_blPaymentVatOnTop = $blOnTop;
     }
@@ -135,14 +135,14 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             // user groups
             $this->_oGroups = oxNew(ListModel::class, 'oxgroups');
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sViewName = $tableViewNameGenerator->getViewName("oxgroups", $this->getLanguage());
+            $sViewName = $tableViewNameGenerator->getViewName('oxgroups', $this->getLanguage());
 
             // performance
             $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group
                         where oxobject2group.oxobjectid = :oxobjectid
                         and oxobject2group.oxgroupsid = {$sViewName}.oxid ";
             $this->_oGroups->selectString($sSelect, [
-                'oxobjectid' => $sOxid
+                'oxobjectid' => $sOxid,
             ]);
         }
 
@@ -154,7 +154,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param array $aDynValues the array of dy values
      */
-    public function setDynValues($aDynValues)
+    public function setDynValues($aDynValues): void
     {
         $this->_aDynValues = $aDynValues;
     }
@@ -165,7 +165,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @param mixed $oKey the key
      * @param mixed $oVal the value
      */
-    public function setDynValue($oKey, $oVal)
+    public function setDynValue($oKey, $oVal): void
     {
         $this->_aDynValues[$oKey] = $oVal;
     }
@@ -198,7 +198,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function getPaymentValue($dBasePrice)
     {
-        if ($this->oxpayments__oxaddsumtype->value == "%") {
+        if ($this->oxpayments__oxaddsumtype->value == '%') {
             $dRet = $dBasePrice * $this->oxpayments__oxaddsum->value / 100;
         } else {
             $oCur = \OxidEsales\Eshop\Core\Registry::getConfig()->getActShopCurrencyObject();
@@ -206,7 +206,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         }
 
         if (($dRet * -1) > $dBasePrice) {
-            $dRet = $dBasePrice;
+            return $dBasePrice;
         }
 
         return $dRet;
@@ -287,7 +287,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param \OxidEsales\Eshop\Application\Model\UserBasket $oBasket session basket
      */
-    public function calculate($oBasket)
+    public function calculate($oBasket): void
     {
         //getting basket price with applied discounts and vouchers
         $dPrice = $this->getPaymentValue($this->getBaseBasketPriceForPaymentCostCalc($oBasket));
@@ -373,7 +373,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
                 where oxpaymentid = :oxpaymentid and oxtype = :oxtype ';
             $rs = $oDb->getCol($sSelect, [
                 'oxpaymentid' => $this->getId(),
-                'oxtype' => 'oxcountry'
+                'oxtype' => 'oxcountry',
             ]);
             $this->_aCountries = $rs;
         }
@@ -396,7 +396,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             $deletedRows = DatabaseProvider::getDb()->execute(
                 'delete from oxobject2payment where oxpaymentid = :oxpaymentid',
                 [
-                'oxpaymentid' => $id
+                'oxpaymentid' => $id,
                 ]
             );
 
@@ -422,7 +422,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
         if ($this->oxpayments__oxid->value == 'oxempty') {
             // inactive or blOtherCountryOrder is off
-            if (!$this->oxpayments__oxactive->value || !$myConfig->getConfigParam("blOtherCountryOrder")) {
+            if (!$this->oxpayments__oxactive->value || !$myConfig->getConfigParam('blOtherCountryOrder')) {
                 $this->_iPaymentError = -2;
 
                 return false;
@@ -445,14 +445,13 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         }
 
         $mxValidationResult = \OxidEsales\Eshop\Core\Registry::getInputValidator()->validatePaymentInputData($this->oxpayments__oxid->value, $aDynValue);
-
         if (is_integer($mxValidationResult)) {
             $this->_iPaymentError = $mxValidationResult;
-
             return false;
-        } elseif ($mxValidationResult === false) {
-            $this->_iPaymentError = 1;
+        }
 
+        if ($mxValidationResult === false) {
+            $this->_iPaymentError = 1;
             return false;
         }
 

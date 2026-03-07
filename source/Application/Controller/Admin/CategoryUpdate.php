@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,14 +19,14 @@ class CategoryUpdate extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      *
      * @var string
      */
-    protected $_sThisTemplate = "category_update";
+    protected $_sThisTemplate = 'category_update';
 
     /**
      * Category list object
      *
      * @var \OxidEsales\Eshop\Application\Model\CategoryList
      */
-    protected $_oCatList = null;
+    protected $_oCatList;
 
     /**
      * Returns category list object

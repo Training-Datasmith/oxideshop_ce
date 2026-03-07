@@ -38,8 +38,4 @@ final class Version20231128113123 extends AbstractMigration
             'ALTER TABLE `oxarticles` ADD column `OXLOWSTOCKACTIVE` TINYINT(1)'
         );
     }
-
-    public function down(Schema $schema): void
-    {
-    }
 }

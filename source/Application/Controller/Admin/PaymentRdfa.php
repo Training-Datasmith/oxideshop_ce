@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,7 +26,7 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @var string
      */
-    protected $_sThisTemplate = "payment_rdfa";
+    protected $_sThisTemplate = 'payment_rdfa';
 
     /**
      * Predefined RDFa payment methods
@@ -33,21 +35,21 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * @var array
      */
     protected $_aRDFaPayments = [
-        "ByBankTransferInAdvance" => 0,
-        "ByInvoice" => 0,
-        "Cash" => 0,
-        "CheckInAdvance" => 0,
-        "COD" => 0,
-        "DirectDebit" => 0,
-        "GoogleCheckout" => 0,
-        "PayPal" => 0,
-        "PaySwarm" => 0,
-        "AmericanExpress" => 1,
-        "DinersClub" => 1,
-        "Discover" => 1,
-        "JCB" => 1,
-        "MasterCard" => 1,
-        "VISA" => 1,
+        'ByBankTransferInAdvance' => 0,
+        'ByInvoice' => 0,
+        'Cash' => 0,
+        'CheckInAdvance' => 0,
+        'COD' => 0,
+        'DirectDebit' => 0,
+        'GoogleCheckout' => 0,
+        'PayPal' => 0,
+        'PaySwarm' => 0,
+        'AmericanExpress' => 1,
+        'DinersClub' => 1,
+        'Discover' => 1,
+        'JCB' => 1,
+        'MasterCard' => 1,
+        'VISA' => 1,
     ];
 
     public function render()
@@ -62,21 +64,21 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Saves changed mapping configurations
      */
-    public function save()
+    public function save(): void
     {
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
-        $aRDFaPayments = (array) Registry::getRequest()->getRequestEscapedParameter("ardfapayments");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aRDFaPayments = (array) Registry::getRequest()->getRequestEscapedParameter('ardfapayments');
 
         // Delete old mappings
         $oDb = DatabaseProvider::getDb();
         $oDb->execute("DELETE FROM oxobject2payment WHERE oxpaymentid = :oxpaymentid AND OXTYPE = 'rdfapayment'", [
-            'oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter("oxid")
+            'oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
         ]);
 
         // Save new mappings
         foreach ($aRDFaPayments as $sPayment) {
             $oMapping = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-            $oMapping->init("oxobject2payment");
+            $oMapping->init('oxobject2payment');
             $oMapping->assign($aParams);
             $oMapping->oxobject2payment__oxobjectid = new \OxidEsales\Eshop\Core\Field($sPayment);
             $oMapping->save();
@@ -113,15 +115,11 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         return DatabaseProvider::getDb()->getCol(
             'select oxobjectid from oxobject2payment where oxpaymentid = :oxpaymentid and oxtype = "rdfapayment"',
             [
-                'oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter("oxid")
+                'oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
             ]
         );
     }
 
-    /**
-     * @param string $paymentId
-     * @return Payment
-     */
     private function getPayment(string $paymentId): Payment
     {
         $payment = oxNew(Payment::class);

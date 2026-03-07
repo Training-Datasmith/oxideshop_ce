@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,7 +36,7 @@ class FileCollector
      *
      * @param string $sDir Directory
      */
-    public function setBaseDirectory($sDir)
+    public function setBaseDirectory($sDir): void
     {
         if (!empty($sDir)) {
             $this->_sBaseDirectory = $sDir;
@@ -57,9 +59,8 @@ class FileCollector
      * @param string $sFile file name to add to collection
      *
      * @throws Exception
-     * @return null
      */
-    public function addFile($sFile)
+    public function addFile(?string $sFile): bool
     {
         if (empty($sFile)) {
             throw new Exception('Parameter $sFile is empty!');
@@ -78,7 +79,6 @@ class FileCollector
         return false;
     }
 
-
     /**
      * browse all folders and sub-folders after files which have given extensions
      *
@@ -87,9 +87,8 @@ class FileCollector
      * @param boolean $blRecursive should directories be checked in recursive manner
      *
      * @throws exception
-     * @return null
      */
-    public function addDirectoryFiles($sFolder, $aExtensions = [], $blRecursive = false)
+    public function addDirectoryFiles(?string $sFolder, $aExtensions = [], $blRecursive = false): void
     {
         if (empty($sFolder)) {
             throw new Exception('Parameter $sFolder is empty!');
@@ -108,7 +107,7 @@ class FileCollector
         $handle = opendir($this->_sBaseDirectory . $sFolder);
 
         while ($sFile = readdir($handle)) {
-            if ($sFile != "." && $sFile != "..") {
+            if ($sFile != '.' && $sFile != '..') {
                 if (is_dir($this->_sBaseDirectory . $sFolder . $sFile)) {
                     if ($blRecursive) {
                         $aResultList = $this->addDirectoryFiles($sFolder . $sFile . '/', $aExtensions, $blRecursive);

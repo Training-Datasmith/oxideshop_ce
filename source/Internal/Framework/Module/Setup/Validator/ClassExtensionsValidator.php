@@ -9,19 +9,17 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\InvalidClassExtensionNamespaceException;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 
 class ClassExtensionsValidator implements ModuleConfigurationValidatorInterface
 {
-    public function __construct(private ShopAdapterInterface $shopAdapter)
+    public function __construct(private readonly ShopAdapterInterface $shopAdapter)
     {
     }
 
     /**
-     * @param ModuleConfiguration $configuration
-     * @param int                 $shopId
      *
      * @throws InvalidClassExtensionNamespaceException
      */
@@ -37,10 +35,9 @@ class ClassExtensionsValidator implements ModuleConfigurationValidatorInterface
     }
 
     /**
-     * @param string $namespace
      * @throws InvalidClassExtensionNamespaceException
      */
-    private function validateClassToBePatchedNamespace(string $namespace)
+    private function validateClassToBePatchedNamespace(string $namespace): void
     {
         if ($this->shopAdapter->isShopEditionNamespace($namespace)) {
             throw new InvalidClassExtensionNamespaceException(

@@ -15,12 +15,11 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 
 class AdminDao implements AdminDaoInterface
 {
-    public function __construct(private QueryBuilderFactoryInterface $queryBuilderFactory)
+    public function __construct(private readonly QueryBuilderFactoryInterface $queryBuilderFactory)
     {
     }
 
     /**
-     * @param Admin $admin
      * @throws EmailAlreadyTakenException
      */
     public function create(Admin $admin): void

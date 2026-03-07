@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,8 +25,6 @@ trait ModelChangeEventTrait
 
     /**
      * Getter for model class name.
-     *
-     * @return \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function getModel(): \OxidEsales\Eshop\Core\Model\BaseModel
     {

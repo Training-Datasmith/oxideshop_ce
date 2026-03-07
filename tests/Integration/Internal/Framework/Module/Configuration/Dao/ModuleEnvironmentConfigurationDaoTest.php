@@ -32,8 +32,8 @@ final class ModuleEnvironmentConfigurationDaoTest extends IntegrationTestCase
             ModuleSettingsDataMapper::MAPPING_KEY => [
                 'settingToOverwrite' => [
                     'value' => 'overwrittenValue',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertEquals($expectedEnvironmentConfiguration, $environmentConfiguration);
@@ -87,8 +87,8 @@ final class ModuleEnvironmentConfigurationDaoTest extends IntegrationTestCase
             ModuleSettingsDataMapper::MAPPING_KEY => [
                 'settingToOverwrite' => [
                     'value' => 'overwrittenValue',
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

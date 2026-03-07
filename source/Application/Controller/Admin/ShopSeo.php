@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,7 +21,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
     /**
      * Active seo url id
      */
-    protected $_sActSeoObject = null;
+    protected $_sActSeoObject;
 
     /**
      * Executes parent method parent::render() and returns name of template
@@ -40,12 +42,12 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
 
         // loading static seo urls
         $sQ = "select oxstdurl, oxobjectid from oxseo where oxtype='static' and oxshopid = :oxshopid"
-            . " group by oxobjectid order by oxstdurl";
+            . ' group by oxobjectid order by oxstdurl';
 
         $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
         $oList->init('oxbase', 'oxseo');
         $oList->selectString($sQ, [
-            'oxshopid' => $oShop->getId()
+            'oxshopid' => $oShop->getId(),
         ]);
 
         $this->_aViewData['aStaticUrls'] = $oList;
@@ -53,7 +55,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
         // loading active url info
         $this->loadActiveUrl($oShop->getId());
 
-        return "shop_seo";
+        return 'shop_seo';
     }
 
     /**
@@ -74,10 +76,10 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
             $this->_aViewData['sActSeoObject'] = $sActObject;
 
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sQ = "select oxseourl, oxlang from oxseo where oxobjectid = :oxobjectid and oxshopid = :oxshopid";
+            $sQ = 'select oxseourl, oxlang from oxseo where oxobjectid = :oxobjectid and oxshopid = :oxshopid';
             $oRs = $oDb->select($sQ, [
                 'oxobjectid' => $sActObject,
-                'oxshopid' => $iShopId
+                'oxshopid' => $iShopId,
             ]);
             if ($oRs != false && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
@@ -92,7 +94,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
     /**
      * Saves changed shop configuration parameters.
      */
-    public function save()
+    public function save(): void
     {
         // saving config params
         $this->saveConfVars();
@@ -160,7 +162,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
     /**
      * Resetting SEO ids
      */
-    public function dropSeoIds()
+    public function dropSeoIds(): void
     {
         $this->resetSeoData(Registry::getConfig()->getShopId());
     }
@@ -168,7 +170,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
     /**
      * Deletes static url.
      */
-    public function deleteStaticUrl()
+    public function deleteStaticUrl(): void
     {
         $aStaticUrl = Registry::getRequest()->getRequestEscapedParameter('aStaticUrl');
         if (is_array($aStaticUrl)) {
@@ -191,7 +193,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $db->execute("delete from oxseo where oxtype='static' and oxobjectid = :oxobjectid and oxshopid = :oxshopid", [
             'oxobjectid' => $staticUrlId,
-            'oxshopid' => $shopId
+            'oxshopid' => $shopId,
         ]);
     }
 }

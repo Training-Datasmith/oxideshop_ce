@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,8 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxRegistry;
-use oxDb;
 
 /**
  * DeliverySet list manager.
@@ -21,28 +21,28 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var string
      */
-    protected $_sUserId = null;
+    protected $_sUserId;
 
     /**
      * Country Id
      *
      * @var string
      */
-    protected $_sCountryId = null;
+    protected $_sCountryId;
 
     /**
      * User object
      *
      * @var \OxidEsales\Eshop\Application\Model\User
      */
-    protected $_oUser = null;
+    protected $_oUser;
 
     /**
      * Home country info id
      *
      * @var array
      */
-    protected $_sHomeCountry = null;
+    protected $_sHomeCountry;
 
     /**
      * Calls parent constructor and sets home country
@@ -58,7 +58,7 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sHomeCountry home country id
      */
-    public function setHomeCountry($sHomeCountry)
+    public function setHomeCountry($sHomeCountry): void
     {
         if (is_array($sHomeCountry)) {
             $this->_sHomeCountry = current($sHomeCountry);
@@ -112,7 +112,6 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
         return $this;
     }
 
-
     /**
      * Creates delivery set list filter SQL to load current state delivery set list
      *
@@ -126,7 +125,7 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
         $sTable = $tableViewNameGenerator->getViewName('oxdeliveryset');
         $sQ = "select $sTable.* from $sTable ";
-        $sQ .= "where " . $this->getBaseObject()->getSqlActiveSnippet() . ' ';
+        $sQ .= 'where ' . $this->getBaseObject()->getSqlActiveSnippet() . ' ';
 
         // defining initial filter parameters
         $sUserId = null;
@@ -154,9 +153,9 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sCountryId) . ")" : '0';
-        $sUserSql = $sUserId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetu' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sUserId) . ")" : '0';
-        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetg' and oxobject2delivery.OXOBJECTID in (" . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . ") )" : '0';
+        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sCountryId) . ')' : '0';
+        $sUserSql = $sUserId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetu' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sUserId) . ')' : '0';
+        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetg' and oxobject2delivery.OXOBJECTID in (" . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . ') )' : '0';
 
         $sQ .= "and (
                 if(EXISTS(select 1 from oxobject2delivery, $sCountryTable where $sCountryTable.oxid=oxobject2delivery.oxobjectid and oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' LIMIT 1),
@@ -281,7 +280,7 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
      */
-    public function setUser($oUser)
+    public function setUser($oUser): void
     {
         $this->_oUser = $oUser;
     }
@@ -290,7 +289,7 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Loads an object including all delivery sets which are not mapped to a
      * predefined GoodRelations delivery method.
      */
-    public function loadNonRDFaDeliverySetList()
+    public function loadNonRDFaDeliverySetList(): void
     {
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
         $sTable = $tableViewNameGenerator->getViewName('oxdeliveryset');
@@ -304,7 +303,7 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sDelId delivery set id
      */
-    public function loadRDFaDeliverySetList($sDelId = null)
+    public function loadRDFaDeliverySetList($sDelId = null): void
     {
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
         $sTable = $tableViewNameGenerator->getViewName('oxdeliveryset');
@@ -314,9 +313,9 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
         } else {
             $sSubSql = $sTable;
         }
-        $sQ = "select $sTable.*, oxobject2delivery.oxobjectid from $sSubSql left join (select oxobject2delivery.* from oxobject2delivery where oxobject2delivery.oxtype = 'rdfadeliveryset' ) as oxobject2delivery on oxobject2delivery.oxdeliveryid=$sTable.oxid where " . $this->getBaseObject()->getSqlActiveSnippet() . " ";
+        $sQ = "select $sTable.*, oxobject2delivery.oxobjectid from $sSubSql left join (select oxobject2delivery.* from oxobject2delivery where oxobject2delivery.oxtype = 'rdfadeliveryset' ) as oxobject2delivery on oxobject2delivery.oxdeliveryid=$sTable.oxid where " . $this->getBaseObject()->getSqlActiveSnippet() . ' ';
         $this->selectString($sQ, [
-            'oxdelid' => $sDelId
+            'oxdelid' => $sDelId,
         ]);
     }
 }

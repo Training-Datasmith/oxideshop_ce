@@ -16,12 +16,11 @@ use Symfony\Component\Filesystem\Path;
 
 class ModulesMenuFileLocator implements NavigationFileLocatorInterface
 {
-    /** @var string */
-    private $fileName = 'menu.xml';
+    private string $fileName = 'menu.xml';
 
     public function __construct(
-        private ActiveModulesDataProviderInterface $activeModulesDataProvider,
-        private Filesystem $filesystem
+        private readonly ActiveModulesDataProviderInterface $activeModulesDataProvider,
+        private readonly Filesystem $filesystem
     ) {
     }
 

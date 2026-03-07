@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -9,10 +11,9 @@
 if (isset($_REQUEST['mod_rewrite_module_is'])) {
     $sMode = $_REQUEST['mod_rewrite_module_is'];
     if ($sMode == 'on') {
-        die("mod_rewrite_on");
-    } else {
-        die("mod_rewrite_off");
+        die('mod_rewrite_on');
     }
+    die('mod_rewrite_off');
 }
 
 /**
@@ -20,7 +21,7 @@ if (isset($_REQUEST['mod_rewrite_module_is'])) {
  *
  * @return bool true
  */
-function isSearchEngineUrl()
+function isSearchEngineUrl(): bool
 {
     return true;
 }

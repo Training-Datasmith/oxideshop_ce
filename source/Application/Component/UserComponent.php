@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use function array_key_exists;
+
 use Exception;
+
+use function is_array;
+
 use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\User\UserShippingAddressUpdatableFields;
@@ -23,11 +30,9 @@ use OxidEsales\Eshop\Core\Form\FormFields;
 use OxidEsales\Eshop\Core\Form\FormFieldsTrimmer;
 use OxidEsales\Eshop\Core\Form\UpdatableFieldsConstructor;
 use OxidEsales\Eshop\Core\Registry;
+
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
-
-use function array_key_exists;
-use function is_array;
 
 // defining login/logout states
 define('USER_LOGIN_SUCCESS', 1);
@@ -61,7 +66,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @var bool
      */
-    protected $_blNewsSubscriptionStatus = null;
+    protected $_blNewsSubscriptionStatus;
 
     /**
      * User login state marker:
@@ -71,14 +76,14 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @var int
      */
-    protected $_iLoginStatus = null;
+    protected $_iLoginStatus;
 
     /**
      * Terms/conditions version number
      *
      * @var string
      */
-    protected $_sTermsVer = null;
+    protected $_sTermsVer;
 
     /**
      * View classes accessible for not logged in customers
@@ -102,7 +107,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * Session variable:
      * <b>usr_err</b>
      */
-    public function init()
+    public function init(): void
     {
         $this->saveDeliveryAddressState();
         $this->loadSessionUser();
@@ -156,8 +161,6 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
     /**
      * Tries to load user ID from session.
-     *
-     * @return null
      */
     protected function loadSessionUser()
     {
@@ -269,7 +272,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * Executes oxcmp_user::login() method. After loggin user will not be
      * redirected to user or payment screens.
      */
-    public function login_noredirect() //phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
+    public function login_noredirect(): void //phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     {
         $blAgb = Registry::getRequest()->getRequestEscapedParameter('ord_agb');
 
@@ -287,7 +290,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
                     if ($oBasket = $session->getBasket()) {
                         $oBasket->load();
                     }
-                } catch (Exception $oE) {
+                } catch (Exception) {
                     //just ignore it
                 }
             }
@@ -370,8 +373,6 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Executes oxcmp_user::changeUserWithoutRedirect().
      * returns "account_user" (this redirects to billing and shipping settings page) on success
-     *
-     * @return null
      */
     public function changeuser_testvalues() //phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     {
@@ -468,8 +469,8 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
                 throw $exception;
             }
 
-            $invitationSenderUserId = Registry::getSession()->getVariable("su");
-            $invitationRecipientEmail = Registry::getSession()->getVariable("re");
+            $invitationSenderUserId = Registry::getSession()->getVariable('su');
+            $invitationRecipientEmail = Registry::getSession()->getVariable('re');
             if (
                 $invitationSenderUserId
                 && $invitationRecipientEmail
@@ -550,19 +551,17 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         if ($this->createUser() != false && $this->_blIsNewUser) {
             if ($this->_blNewsSubscriptionStatus === null || $this->_blNewsSubscriptionStatus) {
                 return 'register?success=1';
-            } else {
-                return 'register?success=1&newslettererror=4';
             }
-        } else {
-            // problems with registration ...
-            $this->logout();
+            return 'register?success=1&newslettererror=4';
         }
+        // problems with registration ...
+        $this->logout();
     }
 
     /**
      * Deletes user shipping address.
      */
-    public function deleteShippingAddress()
+    public function deleteShippingAddress(): void
     {
         $session = Registry::getSession();
 
@@ -586,7 +585,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $canDelete = false;
         $user = $this->getUser();
         if ($address->oxaddress__oxuserid->value === $user->getId()) {
-            $canDelete = true;
+            return true;
         }
 
         return $canDelete;
@@ -748,7 +747,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         if ($sParam = Registry::getRequest()->getRequestEscapedParameter('mnid')) {
             $sLogoutLink .= '&amp;mnid=' . $sParam;
         }
-        if ($sParam = basename(Registry::getRequest()->getRequestEscapedParameter('tpl'))) {
+        if ($sParam = basename((string) Registry::getRequest()->getRequestEscapedParameter('tpl'))) {
             $sLogoutLink .= '&amp;tpl=' . $sParam;
         }
         if ($sParam = Registry::getRequest()->getRequestEscapedParameter('oxloadid')) {
@@ -768,7 +767,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @param int $iStatus login state (USER_LOGIN_SUCCESS/USER_LOGIN_FAIL/USER_LOGOUT)
      */
-    public function setLoginStatus($iStatus)
+    public function setLoginStatus($iStatus): void
     {
         $this->_iLoginStatus = $iStatus;
     }
@@ -789,7 +788,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Sets invitor id to session from URL
      */
-    public function getInvitor()
+    public function getInvitor(): void
     {
         $sSu = Registry::getSession()->getVariable('su');
 
@@ -801,7 +800,7 @@ class UserComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * sets from URL invitor id
      */
-    public function setRecipient()
+    public function setRecipient(): void
     {
         $sRe = Registry::getSession()->getVariable('re');
         if (!$sRe && ($sReNew = Registry::getRequest()->getRequestEscapedParameter('re'))) {

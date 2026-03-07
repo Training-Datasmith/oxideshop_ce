@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,7 +14,6 @@ namespace OxidEsales\EshopCommunity\Core\Contract;
  */
 interface IUrl
 {
-
     /**
      * Returns object URL. If SEO if ON returned link will be in SEO form,
      * else URL will have dynamic form

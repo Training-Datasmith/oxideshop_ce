@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,42 +9,23 @@
 
 namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 
+use function is_array;
+
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\Exception\TranslationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\Translator\TranslatorInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-use OxidEsales\Eshop\Core\Exception\StandardException;
 
-use function is_array;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 
 class TranslateFunctionLogic
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ContextInterface
-     */
-    private $context;
-
-    /**
      * TranslateFunctionLogic constructor.
-     * @param ContextInterface $context
-     * @param TranslatorInterface           $translator
      */
-    public function __construct(ContextInterface $context, TranslatorInterface $translator)
+    public function __construct(private readonly ContextInterface $context, private readonly TranslatorInterface $translator)
     {
-        $this->context = $context;
-        $this->translator = $translator;
     }
 
-    /**
-     * @param array $params
-     *
-     * @return string
-     */
     public function getTranslation(array $params): string
     {
         $ident = $params['ident'] ?? 'IDENT MISSING';
@@ -56,7 +39,7 @@ class TranslateFunctionLogic
             if ($this->isTranslatableSuffix($suffix)) {
                 $suffixTranslation = $this->translator->translate($suffix);
             }
-        } catch (TranslationNotFoundException $exception) {
+        } catch (TranslationNotFoundException) {
             $translationFound = false;
         }
 
@@ -92,23 +75,18 @@ class TranslateFunctionLogic
     private function assignArgumentsToTranslation(string $translation, array $params): string
     {
         if (isset($params['args']) && $params['args'] !== false) {
-            $translation = is_array($params['args']) ?
+            return is_array($params['args']) ?
                 vsprintf($translation, $params['args']) :
                 sprintf($translation, $params['args']);
         }
         return $translation;
     }
 
-    /**
-     * @param array $params
-     * @return bool
-     */
     private function showError(array $params): bool
     {
-        $showError = isset($params['noerror']) ? !$params['noerror'] : true;
         if (!$this->context->isAdmin() && $this->context->isShopInProductiveMode()) {
-            $showError = false;
+            return false;
         }
-        return $showError;
+        return isset($params['noerror']) ? !$params['noerror'] : true;
     }
 }

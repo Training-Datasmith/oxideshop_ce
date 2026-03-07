@@ -27,14 +27,14 @@ final class ManufacturerCest
             ->seeManufacturerData(
                 [
                     'title' => 'Manufacturer [EN] šÄßüл',
-                    'count' => '3'
+                    'count' => '3',
                 ],
                 1
             )
             ->openManufacturerPage(1)
             ->seePageInformation([
                 'title' => 'Manufacturer [EN] šÄßüл',
-                'description' => 'Manufacturer description [EN] šÄßüл'
+                'description' => 'Manufacturer description [EN] šÄßüл',
             ]);
     }
 
@@ -51,21 +51,21 @@ final class ManufacturerCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $homePage = $I->openShop();
         $productList = $homePage->openManufacturerFromStarPage('Manufacturer [EN] šÄßüл')
         ->seePageInformation([
             'title' => 'Manufacturer [EN] šÄßüл',
-            'description' => 'Manufacturer description [EN] šÄßüл'
+            'description' => 'Manufacturer description [EN] šÄßüл',
         ]);
 
         $productList->selectSorting('oxtitle', 'asc')

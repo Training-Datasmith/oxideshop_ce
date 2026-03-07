@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 $sMetadataVersion = '2.1';
 
-$aModule = array(
+$aModule = [
     'id'           => 'testModule',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
     'extend'       => [
         'shopClass' => 'testModuleClassExtendsShopClass',
-    ]
-);
+    ],
+];

@@ -16,9 +16,7 @@ class MetaDataNormalizer implements MetaDataNormalizerInterface
     /**
      * Normalize the array aModule in metadata.php
      *
-     * @param array $data
      *
-     * @return array
      */
     public function normalizeData(array $data): array
     {
@@ -38,7 +36,7 @@ class MetaDataNormalizer implements MetaDataNormalizerInterface
         }
 
         if (isset($normalizedMetaData[MetaDataProvider::METADATA_DESCRIPTION])) {
-            $normalizedMetaData = $this->normalizeMultiLanguageField(
+            return $this->normalizeMultiLanguageField(
                 $normalizedMetaData,
                 MetaDataProvider::METADATA_DESCRIPTION
             );
@@ -47,10 +45,6 @@ class MetaDataNormalizer implements MetaDataNormalizerInterface
         return $normalizedMetaData;
     }
 
-    /**
-     * @param array $metadataModuleSettings
-     * @return array
-     */
     private function convertModuleSettingConstraintsToArray(array $metadataModuleSettings): array
     {
         foreach ($metadataModuleSettings as $key => $setting) {
@@ -62,11 +56,6 @@ class MetaDataNormalizer implements MetaDataNormalizerInterface
         return $metadataModuleSettings;
     }
 
-    /**
-     * @param array  $normalizedMetaData
-     * @param string $fieldName
-     * @return array
-     */
     private function normalizeMultiLanguageField(array $normalizedMetaData, string $fieldName): array
     {
         $title = $normalizedMetaData[$fieldName];

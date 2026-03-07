@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -46,7 +48,7 @@ class ClearCookiesController extends \OxidEsales\Eshop\Application\Controller\Fr
     {
         $oUtilsServer = Registry::getUtilsServer();
         if (isset($_SERVER['HTTP_COOKIE'])) {
-            $aCookies = explode(';', $_SERVER['HTTP_COOKIE']);
+            $aCookies = explode(';', (string) $_SERVER['HTTP_COOKIE']);
             foreach ($aCookies as $sCookie) {
                 $sRawCookie = explode('=', $sCookie);
                 $oUtilsServer->setOxCookie(trim($sRawCookie[0]), '', time() - 10000, '/');

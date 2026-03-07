@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,7 +14,6 @@ interface SystemSecurityCheckerInterface
     /**
      * Checks whether system is configured to access an appropriate source of randomness for
      * Cryptographically-Secure PseudoRandom Number Generators.
-     * @return bool
      */
     public function isCryptographicallySecure(): bool;
 }

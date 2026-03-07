@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -29,11 +31,11 @@ class DeliverySetUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
         $oGroups = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
         $oGroups->init('oxgroups');
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $oGroups->selectString("select * from " . $tableViewNameGenerator->getViewName("oxgroups", $this->_iEditLang));
+        $oGroups->selectString('select * from ' . $tableViewNameGenerator->getViewName('oxgroups', $this->_iEditLang));
 
         $oRoot = new \OxidEsales\Eshop\Application\Model\Groups();
-        $oRoot->oxgroups__oxid = new \OxidEsales\Eshop\Core\Field("");
-        $oRoot->oxgroups__oxtitle = new \OxidEsales\Eshop\Core\Field("-- ");
+        $oRoot->oxgroups__oxid = new \OxidEsales\Eshop\Core\Field('');
+        $oRoot->oxgroups__oxtitle = new \OxidEsales\Eshop\Core\Field('-- ');
         // rebuild list as we need the "no value" entry at the first position
         $aNewList = [];
         $aNewList[] = $oRoot;
@@ -46,7 +48,7 @@ class DeliverySetUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
 
         $oGroups = $aNewList;
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oDelivery = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySet::class);
             $oDelivery->load($soxId);
 
@@ -56,21 +58,20 @@ class DeliverySetUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             }
         }
 
-        $this->_aViewData["allgroups2"] = $oGroups;
+        $this->_aViewData['allgroups2'] = $oGroups;
 
-        $iAoc = Registry::getRequest()->getRequestEscapedParameter("aoc");
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDeliverysetGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetGroupsAjax->getColumns();
-
-            return "popups/deliveryset_groups";
-        } elseif ($iAoc == 2) {
+            return 'popups/deliveryset_groups';
+        }
+        if ($iAoc == 2) {
             $oDeliverysetUsersAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetUsersAjax->getColumns();
-
-            return "popups/deliveryset_users";
+            return 'popups/deliveryset_users';
         }
 
-        return "deliveryset_users";
+        return 'deliveryset_users';
     }
 }

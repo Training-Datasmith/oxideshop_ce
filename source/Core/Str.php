@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,15 +24,6 @@ class Str
      * @var \OxidEsales\Eshop\Core\StrMb|\OxidEsales\Eshop\Core\StrRegular
      */
     protected static $_oHandler;
-
-    /**
-     * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     *
-     * @return null
-     */
-    public function __construct()
-    {
-    }
 
     /**
      * Static method initializing new string handler or returning the existing one.

@@ -15,8 +15,8 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleServ
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Yaml\Yaml;
 
 final class ModuleServicesImporterTest extends IntegrationTestCase
 {

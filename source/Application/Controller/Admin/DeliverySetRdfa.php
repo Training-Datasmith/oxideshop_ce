@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,7 +25,7 @@ class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\Pay
      *
      * @var string
      */
-    protected $_sThisTemplate = "deliveryset_rdfa";
+    protected $_sThisTemplate = 'deliveryset_rdfa';
 
     /**
      * Predefined delivery methods
@@ -31,36 +33,36 @@ class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\Pay
      * @var array
      */
     protected $_aRDFaDeliveries = [
-        "DeliveryModeDirectDownload" => 0,
-        "DeliveryModeFreight"        => 0,
-        "DeliveryModeMail"           => 0,
-        "DeliveryModeOwnFleet"       => 0,
-        "DeliveryModePickUp"         => 0,
-        "DHL"                        => 1,
-        "FederalExpress"             => 1,
-        "UPS"                        => 1
+        'DeliveryModeDirectDownload' => 0,
+        'DeliveryModeFreight'        => 0,
+        'DeliveryModeMail'           => 0,
+        'DeliveryModeOwnFleet'       => 0,
+        'DeliveryModePickUp'         => 0,
+        'DHL'                        => 1,
+        'FederalExpress'             => 1,
+        'UPS'                        => 1,
     ];
 
     /**
      * Saves changed mapping configurations
      */
-    public function save()
+    public function save(): void
     {
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
-        $aRDFaDeliveries = (array) Registry::getRequest()->getRequestEscapedParameter("ardfadeliveries");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aRDFaDeliveries = (array) Registry::getRequest()->getRequestEscapedParameter('ardfadeliveries');
 
         // Delete old mappings
         $oDb = DatabaseProvider::getDb();
-        $sOxIdParameter = Registry::getRequest()->getRequestEscapedParameter("oxid");
+        $sOxIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSql = "DELETE FROM oxobject2delivery WHERE oxdeliveryid = :oxdeliveryid AND OXTYPE = 'rdfadeliveryset'";
         $oDb->execute($sSql, [
-            'oxdeliveryid' => $sOxIdParameter
+            'oxdeliveryid' => $sOxIdParameter,
         ]);
 
         // Save new mappings
         foreach ($aRDFaDeliveries as $sDelivery) {
             $oMapping = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-            $oMapping->init("oxobject2delivery");
+            $oMapping->init('oxobject2delivery');
             $oMapping->assign($aParams);
             $oMapping->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sDelivery);
             $oMapping->save();
@@ -98,7 +100,7 @@ class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\Pay
             'select oxobjectid from oxobject2delivery where oxdeliveryid = :oxdeliveryid'
             . ' and oxtype = "rdfadeliveryset" ',
             [
-                'oxdeliveryid' => Registry::getRequest()->getRequestEscapedParameter("oxid")
+                'oxdeliveryid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
             ]
         );
     }

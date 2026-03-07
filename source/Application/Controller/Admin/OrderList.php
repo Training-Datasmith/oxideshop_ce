@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,7 +37,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      *
      * @var string
      */
-    protected $_sDefSortField = "oxorderdate";
+    protected $_sDefSortField = 'oxorderdate';
 
     /**
      * Executes parent method parent::render() and returns name of template
@@ -48,7 +50,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         parent::render();
 
         $folders = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('aOrderfolder');
-        $folder = Registry::getRequest()->getRequestEscapedParameter("folder");
+        $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // first display new orders
         if (!$folder && is_array($folders)) {
             $names = array_keys($folders);
@@ -56,23 +58,23 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         }
 
         $search = ['oxorderarticles' => 'ARTID', 'oxpayments' => 'PAYMENT'];
-        $searchQuery = Registry::getRequest()->getRequestEscapedParameter("addsearch");
-        $searchField = Registry::getRequest()->getRequestEscapedParameter("addsearchfld");
+        $searchQuery = Registry::getRequest()->getRequestEscapedParameter('addsearch');
+        $searchField = Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
-        $this->_aViewData["folder"] = $folder ? $folder : -1;
-        $this->_aViewData["addsearchfld"] = $searchField ? $searchField : -1;
-        $this->_aViewData["asearch"] = $search;
-        $this->_aViewData["addsearch"] = $searchQuery;
-        $this->_aViewData["afolder"] = $folders;
+        $this->_aViewData['folder'] = $folder ?: -1;
+        $this->_aViewData['addsearchfld'] = $searchField ?: -1;
+        $this->_aViewData['asearch'] = $search;
+        $this->_aViewData['addsearch'] = $searchQuery;
+        $this->_aViewData['afolder'] = $folders;
 
-        return "order_list";
+        return 'order_list';
     }
 
     /**
      * Cancels order and its order articles
      * Calls init() to reload list items after cancellation.
      */
-    public function cancelOrder()
+    public function cancelOrder(): void
     {
         $order = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         if ($order->load($this->getEditObjectId())) {
@@ -92,7 +94,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
     public function getListSorting()
     {
         $sorting = parent::getListSorting();
-        if (isset($sorting["oxorder"]["oxbilllname"])) {
+        if (isset($sorting['oxorder']['oxbilllname'])) {
             $this->_blDesc = false;
         }
 
@@ -116,10 +118,10 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder != '-1') {
-            $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";
+            $query .= ' and ( oxorder.oxfolder = ' . $database->quote($folder) . ' )';
         } elseif (!$folder && is_array($folders)) {
             $folderNames = array_keys($folders);
-            $query .= " and ( oxorder.oxfolder = " . $database->quote($folderNames[0]) . " )";
+            $query .= ' and ( oxorder.oxfolder = ' . $database->quote($folderNames[0]) . ' )';
         }
 
         return $query;
@@ -138,21 +140,15 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         $searchQuery = Registry::getRequest()->getRequestEscapedParameter('addsearch');
-        $searchQuery = trim($searchQuery);
+        $searchQuery = trim((string) $searchQuery);
         $searchField = Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
         if ($searchQuery) {
-            switch ($searchField) {
-                case 'oxorderarticles':
-                    $queryPart = "oxorder left join oxorderarticles on oxorderarticles.oxorderid=oxorder.oxid where ( oxorderarticles.oxartnum like " . $database->quote("%{$searchQuery}%") . " or oxorderarticles.oxtitle like " . $database->quote("%{$searchQuery}%") . " ) and ";
-                    break;
-                case 'oxpayments':
-                    $queryPart = "oxorder left join oxpayments on oxpayments.oxid=oxorder.oxpaymenttype where oxpayments.oxdesc like " . $database->quote("%{$searchQuery}%") . " and ";
-                    break;
-                default:
-                    $queryPart = "oxorder where oxorder.oxpaid like " . $database->quote("%{$searchQuery}%") . " and ";
-                    break;
-            }
+            $queryPart = match ($searchField) {
+                'oxorderarticles' => 'oxorder left join oxorderarticles on oxorderarticles.oxorderid=oxorder.oxid where ( oxorderarticles.oxartnum like ' . $database->quote("%{$searchQuery}%") . ' or oxorderarticles.oxtitle like ' . $database->quote("%{$searchQuery}%") . ' ) and ',
+                'oxpayments' => 'oxorder left join oxpayments on oxpayments.oxid=oxorder.oxpaymenttype where oxpayments.oxdesc like ' . $database->quote("%{$searchQuery}%") . ' and ',
+                default => 'oxorder where oxorder.oxpaid like ' . $database->quote("%{$searchQuery}%") . ' and ',
+            };
             $query = str_replace('oxorder where', $queryPart, $query);
         }
 

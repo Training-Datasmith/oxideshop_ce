@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -27,17 +29,17 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
      *
      * @var array
      */
-    protected $_aBasketItemList = null;
+    protected $_aBasketItemList;
 
     /**
      * Wrapping objects list
      */
-    protected $_oWrappings = null;
+    protected $_oWrappings;
 
     /**
      * Card objects list
      */
-    protected $_oCards = null;
+    protected $_oCards;
 
     /**
      * Returns array of shopping basket articles

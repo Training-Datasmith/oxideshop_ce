@@ -130,19 +130,19 @@ final class TemplateRendererTest extends TestCase
             ],
             [
                 'template.html.twig',
-                'template.html.twig'
+                'template.html.twig',
             ],
             [
                 'some/path/template_name.html.twig',
-                'some/path/template_name.html.twig'
+                'some/path/template_name.html.twig',
             ],
             [
                 'some/path/template.name.html.twig',
-                'some/path/template.name.html.twig'
+                'some/path/template.name.html.twig',
             ],
             [
                 'some/path/template.name',
-                'some/path/template.name.html.twig'
+                'some/path/template.name.html.twig',
             ],
         ];
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,9 +18,6 @@ use Doctrine\Migrations\AbstractMigration;
  */
 class Version20170718124421 extends AbstractMigration
 {
-    /**
-     * @param Schema $schema
-     */
     public function up(Schema $schema): void
     {
         $this->addSql("ALTER TABLE `oxtplblocks` 
@@ -27,9 +26,6 @@ class Version20170718124421 extends AbstractMigration
           COMMENT 'Module, which uses this template';");
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function down(Schema $schema): void
     {
     }

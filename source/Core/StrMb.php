@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,20 +36,11 @@ class StrMb
     protected $_aUmlEntities = ['&auml;', '&ouml;', '&uuml;', '&Auml;', '&Ouml;', '&Uuml;', '&szlig;'];
 
     /**
-     * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * PHP  multi byte compliant strlen() function wrapper
      *
      * @param string $sStr string to measure its length
-     *
-     * @return int
      */
-    public function strlen($sStr)
+    public function strlen($sStr): int
     {
         return mb_strlen($sStr ?? '', $this->_sEncoding);
     }
@@ -58,10 +51,8 @@ class StrMb
      * @param string $sStr    value to truncate
      * @param int    $iStart  start position
      * @param int    $iLength length
-     *
-     * @return string
      */
-    public function substr($sStr, $iStart, $iLength = null)
+    public function substr($sStr, $iStart, $iLength = null): string
     {
         $iLength = is_null($iLength) ? $this->strlen($sStr) : $iLength;
 
@@ -74,10 +65,8 @@ class StrMb
      * @param string $sHaystack value to search in
      * @param string $sNeedle   value to search for
      * @param int    $iOffset   initial search position
-     *
-     * @return string
      */
-    public function strpos($sHaystack, $sNeedle, $iOffset = null)
+    public function strpos($sHaystack, $sNeedle, $iOffset = null): int|false
     {
         $iPos = false;
         if ($sHaystack && $sNeedle) {
@@ -96,7 +85,7 @@ class StrMb
      *
      * @return string
      */
-    public function strstr($sHaystack, $sNeedle)
+    public function strstr($sHaystack, $sNeedle): false|string
     {
         // additional check according to bug in PHP 5.2.0 version
         if (!$sHaystack) {
@@ -110,10 +99,8 @@ class StrMb
      * PHP multi byte compliant strtolower() function wrapper
      *
      * @param string $sString string being lower cased
-     *
-     * @return string
      */
-    public function strtolower($sString)
+    public function strtolower($sString): string
     {
         return mb_strtolower($sString, $this->_sEncoding);
     }
@@ -122,10 +109,8 @@ class StrMb
      * PHP multi byte compliant strtoupper() function wrapper
      *
      * @param string $sString string being lower cased
-     *
-     * @return string
      */
-    public function strtoupper($sString)
+    public function strtoupper($sString): string
     {
         return mb_strtoupper($sString, $this->_sEncoding);
     }
@@ -135,10 +120,8 @@ class StrMb
      *
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
-     *
-     * @return string
      */
-    public function htmlspecialchars($sString, $iQuotStyle = ENT_QUOTES)
+    public function htmlspecialchars($sString, $iQuotStyle = ENT_QUOTES): string
     {
         return htmlspecialchars($sString, $iQuotStyle, $this->_sEncoding);
     }
@@ -148,10 +131,8 @@ class StrMb
      *
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
-     *
-     * @return string
      */
-    public function htmlentities($sString, $iQuotStyle = ENT_QUOTES)
+    public function htmlentities($sString, $iQuotStyle = ENT_QUOTES): string
     {
         return htmlentities($sString, $iQuotStyle, $this->_sEncoding);
     }
@@ -162,10 +143,8 @@ class StrMb
      *
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
-     *
-     * @return string
      */
-    public function html_entity_decode($sString, $iQuotStyle = ENT_QUOTES)
+    public function html_entity_decode($sString, $iQuotStyle = ENT_QUOTES): string
     {
         return html_entity_decode($sString, $iQuotStyle, $this->_sEncoding);
     }
@@ -180,7 +159,7 @@ class StrMb
      *
      * @return string
      */
-    public function preg_split($sPattern, $sString, $iLimit = -1, $iFlag = 0)
+    public function preg_split(string $sPattern, $sString, $iLimit = -1, $iFlag = 0)
     {
         return preg_split($sPattern . 'u', $sString, $iLimit, $iFlag);
     }
@@ -196,7 +175,7 @@ class StrMb
      *
      * @return string
      */
-    public function preg_replace($aPattern, $sString, $sSubject, $iLimit = -1, $iCount = null)
+    public function preg_replace($aPattern, $sString, $sSubject, $iLimit = -1, $iCount = null): ?string
     {
         if (is_array($aPattern)) {
             foreach ($aPattern as &$sPattern) {
@@ -206,7 +185,7 @@ class StrMb
             $aPattern = $aPattern . 'u';
         }
 
-        return preg_replace($aPattern, $sString, $sSubject, $iLimit, $iCount);
+        return preg_replace($aPattern, (string) $sString, $sSubject, $iLimit, $iCount);
     }
 
     /**
@@ -220,7 +199,7 @@ class StrMb
      *
      * @return string
      */
-    public function preg_replace_callback($pattern, $callback, $subject, $limit = -1, &$count = null)
+    public function preg_replace_callback($pattern, $callback, $subject, $limit = -1, &$count = null): ?string
     {
         if (is_array($pattern)) {
             foreach ($pattern as &$item) {
@@ -241,10 +220,8 @@ class StrMb
      * @param array  $aMatches is filled with the results of search
      * @param int    $iFlags   flags
      * @param int    $iOffset  place from which to start the search
-     *
-     * @return string
      */
-    public function preg_match($sPattern, $sSubject, &$aMatches = null, $iFlags = 0, $iOffset = 0)
+    public function preg_match(string $sPattern, $sSubject, &$aMatches = null, $iFlags = 0, $iOffset = 0): int|false
     {
         return preg_match($sPattern . 'u', $sSubject, $aMatches, $iFlags, $iOffset);
     }
@@ -257,23 +234,18 @@ class StrMb
      * @param array  $aMatches is filled with the results of search
      * @param int    $iFlags   flags
      * @param int    $iOffset  place from which to start the search
-     *
-     * @return string
      */
-    public function preg_match_all($sPattern, $sSubject, &$aMatches = null, $iFlags = null, $iOffset = null)
+    public function preg_match_all(string $sPattern, $sSubject, &$aMatches = null, $iFlags = null, $iOffset = null): int|false
     {
         return preg_match_all($sPattern . 'u', $sSubject, $aMatches, $iFlags, $iOffset);
     }
     // @codingStandardsIgnoreEnd
-
     /**
      * PHP ucfirst() function wrapper
      *
      * @param string $sSubject input string
-     *
-     * @return string
      */
-    public function ucfirst($sSubject)
+    public function ucfirst($sSubject): string
     {
         $sString = $this->strtoupper($this->substr($sSubject, 0, 1));
 
@@ -290,7 +262,7 @@ class StrMb
      *
      * @return string
      */
-    public function wordwrap($sString, $iLength = 75, $sBreak = "\n", $blCut = null)
+    public function wordwrap($sString, $iLength = 75, string $sBreak = "\n", $blCut = null)
     {
         if (!$blCut) {
             $sRegexp = "/^(.{1,{$iLength}}\r?(\s|$|\n)|.{1,{$iLength}}[^\r\s\n]*\r?(\n|\s|$))/u";
@@ -337,7 +309,7 @@ class StrMb
      *
      * @return string
      */
-    public function recodeEntities($sInput, $blToHtmlEntities = false, $aUmls = [], $aUmlEntities = [])
+    public function recodeEntities($sInput, $blToHtmlEntities = false, $aUmls = [], $aUmlEntities = []): string|array
     {
         $aUmls = (count($aUmls) > 0) ? array_merge($this->_aUmls, $aUmls) : $this->_aUmls;
         $aUmlEntities = (count($aUmlEntities) > 0) ? array_merge($this->_aUmlEntities, $aUmlEntities) : $this->_aUmlEntities;
@@ -354,7 +326,7 @@ class StrMb
      */
     public function hasSpecialChars($sStr)
     {
-        return $this->preg_match("/(" . implode("|", $this->_aUmls) . "|(&amp;))/", $sStr);
+        return $this->preg_match('/(' . implode('|', $this->_aUmls) . '|(&amp;))/', $sStr);
     }
 
     /**
@@ -389,10 +361,8 @@ class StrMb
      *
      * @param string $sString        the input string
      * @param string $sAllowableTags an optional parameter to specify tags which should not be stripped
-     *
-     * @return string
      */
-    public function strip_tags($sString, $sAllowableTags = '')
+    public function strip_tags($sString, $sAllowableTags = ''): string
     {
         if (stripos($sAllowableTags, '<style>') === false) {
             // strip style tags with definitions within
@@ -412,7 +382,7 @@ class StrMb
      *
      * @return int > 0 if str1 is less than str2; < 0 if str1 is greater than str2, and 0 if they are equal.
      */
-    public function strrcmp($sStr1, $sStr2)
+    public function strrcmp($sStr1, $sStr2): int
     {
         return -strcmp($sStr1, $sStr2);
     }

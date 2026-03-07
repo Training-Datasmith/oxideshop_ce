@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -36,14 +38,12 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      *
      * @var BaseModel
      */
-    private $_oBaseObject = null;
+    private $_oBaseObject;
 
     /**
      * Flag if array is ok or not
-     *
-     * @var boolean $_blValid
      */
-    private $_blValid = true;
+    private bool $_blValid = true;
 
     /**
      * -----------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      * @param BaseModel $oBase  Array element
      */
     #[ReturnTypeWillChange]
-    public function offsetSet($offset, $oBase)
+    public function offsetSet($offset, $oBase): void
     {
         if (isset($offset)) {
             $this->_aArray[$offset] = & $oBase;
@@ -114,7 +114,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      * @param mixed $offset SPL array offset
      */
     #[ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         if ((string)$offset === (string)$this->key()) {
             // #0002184: active element removed, next element will be prev / first
@@ -138,7 +138,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      * rewind for SPL
      */
     #[ReturnTypeWillChange]
-    public function rewind()
+    public function rewind(): void
     {
         $this->_blRemovedActive = false;
         $this->_blValid = (false !== reset($this->_aArray));
@@ -146,8 +146,6 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
 
     /**
      * current for SPL
-     *
-     * @return null
      */
     #[ReturnTypeWillChange]
     public function current()
@@ -187,7 +185,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      * next for SPL
      */
     #[ReturnTypeWillChange]
-    public function next()
+    public function next(): void
     {
         if ($this->_blRemovedActive === true && current($this->_aArray)) {
             $oVar = $this->prev();
@@ -223,7 +221,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
     /**
      * clears/destroys list contents
      */
-    public function clear()
+    public function clear(): void
     {
         /*
         foreach ( $this->_aArray as $key => $sValue) {
@@ -238,7 +236,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      *
      * @param array $aArray array of list items
      */
-    public function assign($aArray)
+    public function assign($aArray): void
     {
         $this->_aArray = $aArray;
     }
@@ -271,12 +269,12 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      *
      * @var string
      */
-    protected $_sCoreTable = null;
+    protected $_sCoreTable;
 
     /**
      * @var string ShopID
      */
-    protected $_sShopID = null;
+    protected $_sShopID;
 
     /**
      * @var array SQL Limit, 0 => Start, 1 => Records
@@ -330,7 +328,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      * @param string $sObjectName List item object type
      * @param string $sCoreTable  Db table name this list s selected from
      */
-    public function init($sObjectName, $sCoreTable = null)
+    public function init($sObjectName, $sCoreTable = null): void
     {
         $this->_sObjectsInListName = $sObjectName;
         if ($sCoreTable) {
@@ -359,7 +357,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      *
      * @param object $oObject Base object
      */
-    public function setBaseObject($oObject)
+    public function setBaseObject($oObject): void
     {
         $this->_oBaseObject = $oObject;
     }
@@ -375,7 +373,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      * @param string $sql        SQL select statement or prepared statement
      * @param array  $parameters Parameters to be used in a prepared statement
      */
-    public function selectString($sql, array $parameters = [])
+    public function selectString($sql, array $parameters = []): void
     {
         $this->clear();
 
@@ -406,7 +404,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      *
      * @param object $oObject Object to be added.
      */
-    public function add($oObject)
+    public function add($oObject): void
     {
         if ($oObject->getId()) {
             $this->_aArray[$oObject->getId()] = $oObject;
@@ -420,7 +418,7 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
      *
      * @param array $aData data for list
      */
-    public function assignArray($aData)
+    public function assignArray($aData): void
     {
         $this->clear();
         if (count($aData)) {
@@ -438,14 +436,13 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
         }
     }
 
-
     /**
      * Sets SQL Limit
      *
      * @param integer $iStart   Start e.g. limit Start,xxxx
      * @param integer $iRecords Nr of Records e.g. limit xxx,Records
      */
-    public function setSqlLimit($iStart, $iRecords)
+    public function setSqlLimit($iStart, $iRecords): void
     {
         $this->_aSqlLimit[0] = $iStart;
         $this->_aSqlLimit[1] = $iRecords;
@@ -473,8 +470,6 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
 
     /**
      * Generic function for loading the list
-     *
-     * @return null
      */
     public function getList()
     {

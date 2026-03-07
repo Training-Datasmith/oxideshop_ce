@@ -18,11 +18,11 @@ use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMe
 use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRole;
 use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaView;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Dao\ShopConfigurationSettingDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Theme\Config\Dao\ThemeSettingDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
+use OxidEsales\EshopCommunity\Internal\Framework\Theme\Config\Dao\ThemeSettingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use Symfony\Component\Filesystem\Path;
 
 readonly class ProductMediaViewService implements ProductMediaViewServiceInterface
@@ -133,7 +133,7 @@ readonly class ProductMediaViewService implements ProductMediaViewServiceInterfa
                 $this->context->getCurrentShopId(),
                 $this->shopAdapter->getActiveThemeId()
             );
-        } catch (EntryDoesNotExistDaoException $e) {
+        } catch (EntryDoesNotExistDaoException) {
             $setting = $this->shopConfigurationSettingDao->get(
                 $sizeConfigKey,
                 $this->context->getCurrentShopId()

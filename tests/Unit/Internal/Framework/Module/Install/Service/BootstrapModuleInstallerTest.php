@@ -35,7 +35,6 @@ final class BootstrapModuleInstallerTest extends TestCase
             ->method('install')
             ->with($path);
 
-
         $moduleInstaller = new BootstrapModuleInstaller($moduleFilesInstaller, $moduleProjectConfigurationInstaller);
         $moduleInstaller->install($package);
     }

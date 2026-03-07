@@ -124,13 +124,13 @@ final class MultiLanguageModelTest extends TestCase
     {
         $connection = $this->get(ConnectionFactoryInterface::class)->create();
 
-        $createTableQuery = "CREATE TABLE IF NOT EXISTS " . $this->testTableName . " (
+        $createTableQuery = 'CREATE TABLE IF NOT EXISTS ' . $this->testTableName . ' (
             OXID char(32) NOT NULL,
             TEST_FIELD varchar(10),
             TEST_FIELD_1 varchar(10),
             TEST_FIELD_2 varchar(10),
             PRIMARY KEY (OXID)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8';
 
         $connection->executeStatement($createTableQuery);
     }
@@ -139,13 +139,13 @@ final class MultiLanguageModelTest extends TestCase
     {
         $connection = $this->get(ConnectionFactoryInterface::class)->create();
 
-        $createTableQuery = "CREATE TABLE IF NOT EXISTS " . $this->testTableName . " (
+        $createTableQuery = 'CREATE TABLE IF NOT EXISTS ' . $this->testTableName . ' (
             oxid char(32) NOT NULL,
             test_field varchar(10),
             test_field_1 varchar(10),
             test_field_2 varchar(10),
             PRIMARY KEY (oxid)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8';
 
         $connection->executeStatement($createTableQuery);
     }
@@ -153,7 +153,7 @@ final class MultiLanguageModelTest extends TestCase
     private function removeTestTable(): void
     {
         $connection = $this->get(ConnectionFactoryInterface::class)->create();
-        $connection->executeStatement("DROP TABLE IF EXISTS " . $this->testTableName);
+        $connection->executeStatement('DROP TABLE IF EXISTS ' . $this->testTableName);
     }
 
     private function addTableToMultilanguageConfiguration(): void

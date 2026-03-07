@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,7 +30,7 @@ class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
      * Sets SQL query parameters (such as sorting),
      * executes parent method parent::Init().
      */
-    public function init()
+    public function init(): void
     {
         oxAdminList::init();
     }
@@ -37,8 +39,8 @@ class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
     public function render()
     {
         parent::render();
-        $this->_aViewData["menustructure"] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
+        $this->_aViewData['menustructure'] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
 
-        return "list_user";
+        return 'list_user';
     }
 }

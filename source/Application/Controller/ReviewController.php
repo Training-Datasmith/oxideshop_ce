@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,14 +21,14 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
     /**
      * Review user object
      */
-    protected $_oRevUser = null;
+    protected $_oRevUser;
 
     /**
      * Active object ($_oProduct or $_oActiveRecommList)
      *
      * @var object
      */
-    protected $_oActObject = null;
+    protected $_oActObject;
 
     /**
      * Active recommendations list
@@ -35,7 +37,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
      *
      * @var object
      */
-    protected $_oActiveRecommList = null;
+    protected $_oActiveRecommList;
 
     /**
      * Active recommlist's items
@@ -44,56 +46,56 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
      *
      * @var object
      */
-    protected $_oActiveRecommItems = null;
+    protected $_oActiveRecommItems;
 
     /**
      * Can user rate
      *
      * @var bool
      */
-    protected $_blRate = null;
+    protected $_blRate;
 
     /**
      * Array of reviews
      *
      * @var array
      */
-    protected $_aReviews = null;
+    protected $_aReviews;
 
     /**
      * CrossSelling articlelist
      *
      * @var object
      */
-    protected $_oCrossSelling = null;
+    protected $_oCrossSelling;
 
     /**
      * Similar products articlelist
      *
      * @var object
      */
-    protected $_oSimilarProducts = null;
+    protected $_oSimilarProducts;
 
     /**
      * Recommlist
      *
      * @var object
      */
-    protected $_oRecommList = null;
+    protected $_oRecommList;
 
     /**
      * Review send status
      *
      * @var bool
      */
-    protected $_blReviewSendStatus = null;
+    protected $_blReviewSendStatus;
 
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /**
      * Current class template name.
@@ -129,7 +131,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
     /**
      * Executes parent::init(), Loads user chosen product object (with all data).
      */
-    public function init()
+    public function init(): void
     {
         // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
         if (Registry::getRequest()->getRequestEscapedParameter('recommid') && !$this->getActiveRecommList()) {
@@ -153,7 +155,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
     {
         $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
 
-        if (!$oConfig->getConfigParam("bl_perfLoadReviews")) {
+        if (!$oConfig->getConfigParam('bl_perfLoadReviews')) {
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
         }
 
@@ -171,7 +173,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
                 }
                 // load only lists which we show on screen
                 $iNrofCatArticles = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-                $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
+                $iNrofCatArticles = $iNrofCatArticles ?: 10;
                 $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
             }
             // END deprecated
@@ -182,10 +184,8 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
 
     /**
      * Saves user review text (oxreview object)
-     *
-     * @return null
      */
-    public function saveReview()
+    public function saveReview(): void
     {
         if (!Registry::getSession()->checkSessionChallenge()) {
             return;
@@ -224,7 +224,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
                     $oReview->oxreviews__oxtext = new Field($sReviewText, Field::T_RAW);
                     $oReview->oxreviews__oxlang = new Field(Registry::getLang()->getBaseLanguage());
                     $oReview->oxreviews__oxuserid = new Field($oRevUser->getId());
-                    $oReview->oxreviews__oxrating = new Field(($dRating !== null) ? $dRating : null);
+                    $oReview->oxreviews__oxrating = new Field($dRating ?? null);
                     $oReview->save();
 
                     $this->_blReviewSendStatus = true;
@@ -280,7 +280,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
 
             if (($oProduct = $this->getProduct())) {
                 $this->_oActObject = $oProduct;
-            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+                // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
             } elseif (($oRecommList = $this->getActiveRecommList())) {
                 $this->_oActObject = $oRecommList;
                 // END deprecated
@@ -299,7 +299,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
     {
         if ($this->getProduct()) {
             return 'oxarticle';
-        // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
         } elseif ($this->getActiveRecommList()) {
             return 'oxrecommlist';
             // END deprecated
@@ -410,7 +410,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
 
                 // load only lists which we show on screen
                 $iNrofCatArticles = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-                $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
+                $iNrofCatArticles = $iNrofCatArticles ?: 10;
 
                 $oList = $oActiveRecommList->getArticles($iNrofCatArticles * $iActPage, $iNrofCatArticles);
 

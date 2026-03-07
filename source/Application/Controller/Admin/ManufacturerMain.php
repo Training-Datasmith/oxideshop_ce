@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,8 +30,8 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
             $oManufacturer->loadInLang($this->_iEditLang, $soxId);
@@ -38,10 +40,10 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             if (!isset($oOtherLang[$this->_iEditLang])) {
                 $oManufacturer->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oManufacturer;
+            $this->_aViewData['edit'] = $oManufacturer;
 
             // category tree
-            $this->createCategoryTree("artcattree");
+            $this->createCategoryTree('artcattree');
 
             //Disable editing for derived articles
             if ($oManufacturer->isDerived()) {
@@ -51,42 +53,40 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
         if ($this->getViewConfig()->isAltImageServerConfigured()) {
-            $this->_aViewData["imageUrl"] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
+            $this->_aViewData['imageUrl'] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
         }
 
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oManufacturerMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerMainAjax::class);
             $this->_aViewData['oxajax'] = $oManufacturerMainAjax->getColumns();
 
-            return "popups/manufacturer_main";
+            return 'popups/manufacturer_main';
         }
 
-        return "manufacturer_main";
+        return 'manufacturer_main';
     }
 
     /**
      * Saves selection list parameters changes.
-     *
-     * @return mixed
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxmanufacturers__oxactive'])) {
             $aParams['oxmanufacturers__oxactive'] = 0;
@@ -94,7 +94,7 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
 
         $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oManufacturer->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxmanufacturers__oxid'] = null;
@@ -116,13 +116,11 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
 
     /**
      * Saves selection list parameters changes in different language (eg. english).
-     *
-     * @return mixed
      */
-    public function saveInnLang()
+    public function saveInnLang(): void
     {
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxmanufacturers__oxactive'])) {
             $aParams['oxmanufacturers__oxactive'] = 0;
@@ -130,7 +128,7 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
 
         $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oManufacturer->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxmanufacturers__oxid'] = null;

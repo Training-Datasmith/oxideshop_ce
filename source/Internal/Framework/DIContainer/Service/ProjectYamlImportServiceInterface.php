@@ -15,15 +15,10 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service;
 interface ProjectYamlImportServiceInterface
 {
     /**
-     * @param string $serviceDir
-     *
      * @return void
      */
     public function addImport(string $serviceDir);
 
-    /**
-     * @param string $serviceDir
-     */
     public function removeImport(string $serviceDir);
 
     /**

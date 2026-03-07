@@ -14,13 +14,8 @@ namespace OxidEsales\EshopCommunity\Core\Autoload;
  */
 class BackwardsCompatibilityClassMapProvider
 {
-    /**
-     * @return array
-     */
     public function getMap(): array
     {
-        $classMap = include __DIR__ . DIRECTORY_SEPARATOR . 'BackwardsCompatibilityClassMap.php';
-
-        return $classMap;
+        return include __DIR__ . DIRECTORY_SEPARATOR . 'BackwardsCompatibilityClassMap.php';
     }
 }

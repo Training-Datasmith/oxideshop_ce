@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,13 +9,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxRegistry;
-use oxField;
 use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Article attributes manager.
@@ -33,14 +32,14 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @var string
      */
-    protected $_sActiveValue = null;
+    protected $_sActiveValue;
 
     /**
      * Attribute values
      *
      * @var array
      */
-    protected $_aValues = null;
+    protected $_aValues;
 
     /**
      * Class constructor, initiates parent constructor (parent::oxBase()).
@@ -70,15 +69,15 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
 
         // remove attributes from articles also
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sDelete = "delete from oxobject2attribute where oxattrid = :oxattrid";
+        $sDelete = 'delete from oxobject2attribute where oxattrid = :oxattrid';
         $oDb->execute($sDelete, [
-            'oxattrid' => $sOXID
+            'oxattrid' => $sOXID,
         ]);
 
         // #657 ADDITIONAL removes attribute connection to category
-        $sDelete = "delete from oxcategory2attribute where oxattrid = :oxattrid";
+        $sDelete = 'delete from oxcategory2attribute where oxattrid = :oxattrid';
         $oDb->execute($sDelete, [
-            'oxattrid' => $sOXID
+            'oxattrid' => $sOXID,
         ]);
 
         return parent::delete($sOXID);
@@ -90,7 +89,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @param array $aMDVariants article ids with selectionlist values
      * @param array $aSelTitle   selection list titles
      */
-    public function assignVarToAttribute($aMDVariants, $aSelTitle)
+    public function assignVarToAttribute($aMDVariants, $aSelTitle): void
     {
         $myLang = \OxidEsales\Eshop\Core\Registry::getLang();
         $aConfLanguages = $myLang->getLanguageIds();
@@ -99,11 +98,11 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             $sAttrId = $this->createAttribute($aSelTitle);
         }
         foreach ($aMDVariants as $sVarId => $oValue) {
-            if (strpos($sVarId, "mdvar_") === 0) {
+            if (str_starts_with((string) $sVarId, 'mdvar_')) {
                 foreach ($oValue as $sId) {
-                    $sVarId = substr($sVarId, 6);
+                    $sVarId = substr((string) $sVarId, 6);
                     $oNewAssign = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                    $oNewAssign->init("oxobject2attribute");
+                    $oNewAssign->init('oxobject2attribute');
                     $sNewId = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID();
                     if ($oNewAssign->load($sId)) {
                         $oNewAssign->oxobject2attribute__oxobjectid = new Field($sVarId);
@@ -114,7 +113,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             } else {
                 $oNewAssign = oxNew(\OxidEsales\Eshop\Core\Model\MultiLanguageModel::class);
                 $oNewAssign->setEnableMultilang(false);
-                $oNewAssign->init("oxobject2attribute");
+                $oNewAssign->init('oxobject2attribute');
                 $oNewAssign->oxobject2attribute__oxobjectid = new Field($sVarId);
                 $oNewAssign->oxobject2attribute__oxattrid = new Field($sAttrId);
                 foreach ($aConfLanguages as $sKey => $sLang) {
@@ -140,7 +139,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $sAttViewName = $tableViewNameGenerator->getViewName('oxattribute');
 
         return $oDb->getOne("select oxid from $sAttViewName where LOWER(oxtitle) = :oxtitle ", [
-            'oxtitle' => Str::getStr()->strtolower($sSelTitle)
+            'oxtitle' => Str::getStr()->strtolower($sSelTitle),
         ]);
     }
 
@@ -171,28 +170,25 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * Returns all oxobject2attribute Ids of article
      *
      * @param string $sArtId article ids
-     *
-     * @return null
      */
     public function getAttributeAssigns($sArtId)
     {
         if ($sArtId) {
-            $sSelect = "select o2a.oxid from oxobject2attribute as o2a "
-            . "where o2a.oxobjectid = :oxobjectid order by o2a.oxpos";
+            $sSelect = 'select o2a.oxid from oxobject2attribute as o2a '
+            . 'where o2a.oxobjectid = :oxobjectid order by o2a.oxpos';
 
             return DatabaseProvider::getDb()->getCol($sSelect, [
-                'oxobjectid' => $sArtId
+                'oxobjectid' => $sArtId,
             ]);
         }
     }
-
 
     /**
      * Set attribute title
      *
      * @param string $sTitle - attribute title
      */
-    public function setTitle($sTitle)
+    public function setTitle($sTitle): void
     {
         $this->setFieldData('oxtitle', Str::getStr()->htmlspecialchars($sTitle));
     }
@@ -212,7 +208,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param string $sValue - attribute value
      */
-    public function addValue($sValue)
+    public function addValue($sValue): void
     {
         $this->_aValues[] = Str::getStr()->htmlspecialchars($sValue);
     }
@@ -222,7 +218,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param string $sValue - attribute value
      */
-    public function setActiveValue($sValue)
+    public function setActiveValue($sValue): void
     {
         $this->_sActiveValue = Str::getStr()->htmlspecialchars($sValue);
     }
@@ -256,11 +252,10 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     protected function canDeleteAttribute($oxId)
     {
-        $canDelete = true;
         if (!$oxId) {
-            $canDelete = false;
+            return false;
         }
 
-        return $canDelete;
+        return true;
     }
 }

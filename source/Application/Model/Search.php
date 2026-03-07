@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -36,7 +38,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $iLanguage string (default null)
      */
-    public function setLanguage($iLanguage = null)
+    public function setLanguage($iLanguage = null): void
     {
         if (!isset($iLanguage)) {
             $this->_iLanguage = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
@@ -65,7 +67,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
         // load only articles which we show on screen
         //setting default values to avoid possible errors showing article list
         $iNrofCatArticles = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-        $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
+        $iNrofCatArticles = $iNrofCatArticles ?: 10;
 
         $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
         $oArtList->setSqlLimit($iNrofCatArticles * $this->iActPage, $iNrofCatArticles);
@@ -95,7 +97,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
         if ($sSelect) {
             $sPartial = substr($sSelect, strpos($sSelect, ' from '));
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sSelect = "select count( " . $tableViewNameGenerator->getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
+            $sSelect = 'select count( ' . $tableViewNameGenerator->getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
 
             $iCnt = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSelect);
         }
@@ -131,10 +133,10 @@ class Search extends \OxidEsales\Eshop\Core\Base
 
             $sQ = "select 1 from $sCatTable 
                 where $sCatTable.oxid = :oxid ";
-            $sQ .= "and " . $oCategory->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oCategory->getSqlActiveSnippet();
 
             $params = [
-                'oxid' => $sInitialSearchCat
+                'oxid' => $sInitialSearchCat,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -150,10 +152,10 @@ class Search extends \OxidEsales\Eshop\Core\Base
 
             $sQ = "select 1 from $sVndTable 
                 where $sVndTable.oxid = :oxid ";
-            $sQ .= "and " . $oVendor->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oVendor->getSqlActiveSnippet();
 
             $params = [
-                'oxid' => $sInitialSearchVendor
+                'oxid' => $sInitialSearchVendor,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -169,10 +171,10 @@ class Search extends \OxidEsales\Eshop\Core\Base
 
             $sQ = "select 1 from $sManTable 
                 where $sManTable.oxid = :oxid ";
-            $sQ .= "and " . $oManufacturer->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oManufacturer->getSqlActiveSnippet();
 
             $params = [
-                'oxid' => $sInitialSearchManufacturer
+                'oxid' => $sInitialSearchManufacturer,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -219,11 +221,11 @@ class Search extends \OxidEsales\Eshop\Core\Base
         $sSelect .= " and {$sArticleTable}.oxparentid = '' and {$sArticleTable}.oxissearch = 1 ";
 
         if ($sInitialSearchVendor) {
-            $sSelect .= " and {$sArticleTable}.oxvendorid = " . $oDb->quote($sInitialSearchVendor) . " ";
+            $sSelect .= " and {$sArticleTable}.oxvendorid = " . $oDb->quote($sInitialSearchVendor) . ' ';
         }
 
         if ($sInitialSearchManufacturer) {
-            $sSelect .= " and {$sArticleTable}.oxmanufacturerid = " . $oDb->quote($sInitialSearchManufacturer) . " ";
+            $sSelect .= " and {$sArticleTable}.oxmanufacturerid = " . $oDb->quote($sInitialSearchManufacturer) . ' ';
         }
 
         $sSelect .= $sWhere;
@@ -294,9 +296,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
             $blSep = true;
         }
 
-        $sSearch .= ' ) ';
-
-        return $sSearch;
+        return $sSearch . ' ) ';
     }
 
     /**
@@ -332,10 +332,8 @@ class Search extends \OxidEsales\Eshop\Core\Base
     {
         if ($field == 'oxlongdesc') {
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $searchField = $tableViewNameGenerator->getViewName('oxartextends', $this->_iLanguage) . ".{$field}";
-        } else {
-            $searchField = "{$table}.{$field}";
+            return $tableViewNameGenerator->getViewName('oxartextends', $this->_iLanguage) . ".{$field}";
         }
-        return $searchField;
+        return "{$table}.{$field}";
     }
 }

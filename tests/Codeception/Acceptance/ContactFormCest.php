@@ -23,7 +23,7 @@ final class ContactFormCest
         $contactPage = $I
             ->openShop()
             ->openContactPage();
-        $I->seeText(Translator::translate("COMPLETE_MARKED_FIELDS"));
+        $I->seeText(Translator::translate('COMPLETE_MARKED_FIELDS'));
 
         $I->amGoingTo('provide invalid form data and submit');
         $contactData = $this->getContactData();
@@ -33,7 +33,7 @@ final class ContactFormCest
 
         $I->expect('validation fails with empty default required field');
         $I->seeText(Translator::translate('DD_FORM_VALIDATION_REQUIRED'));
-        $I->dontSee(Translator::translate("THANK_YOU"));
+        $I->dontSee(Translator::translate('THANK_YOU'));
 
         $I->amGoingTo('provide valid form data and submit');
         $contactData = $this->getContactData();
@@ -66,7 +66,7 @@ final class ContactFormCest
         $contactPage->sendContactData();
         $I->expect('form submit doesn\'t work without first name');
         $I->seeText(Translator::translate('DD_FORM_VALIDATION_REQUIRED'));
-        $I->dontSee(Translator::translate("THANK_YOU"));
+        $I->dontSee(Translator::translate('THANK_YOU'));
     }
 
     private function getContactData(): ContactData

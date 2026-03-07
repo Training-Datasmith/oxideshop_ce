@@ -19,19 +19,11 @@ class UrlParser implements UrlParserInterface
         );
     }
 
-    /**
-     * @param string $url
-     * @return string
-     */
     private function getPath(string $url): string
     {
         return (string)parse_url($url, PHP_URL_PATH);
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     private function removeTrailingSlash(string $path): string
     {
         return rtrim($path, '/');

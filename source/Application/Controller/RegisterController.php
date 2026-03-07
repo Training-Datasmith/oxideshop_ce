@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -127,13 +129,11 @@ class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserCo
 
             // redirecting to confirmation page
             return 'register?confirmstate=1';
-        } else {
-            // confirmation failed
-            Registry::getUtilsView()->addErrorToDisplay('REGISTER_ERRLINKEXPIRED', false, true);
-
-            // redirecting to confirmation page
-            return 'account';
         }
+        // confirmation failed
+        Registry::getUtilsView()->addErrorToDisplay('REGISTER_ERRLINKEXPIRED', false, true);
+        // redirecting to confirmation page
+        return 'account';
     }
 
     /**
@@ -153,7 +153,7 @@ class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserCo
      */
     public function isConfirmed()
     {
-        return (bool) Registry::getRequest()->getRequestEscapedParameter("confirmstate");
+        return (bool) Registry::getRequest()->getRequestEscapedParameter('confirmstate');
     }
 
     /**

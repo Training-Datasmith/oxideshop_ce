@@ -59,7 +59,7 @@ final class MetaDataSchemataProviderTest extends TestCase
             '20only'    => 0,
             'subSchema' => [
                 'subKey1' => 0,
-                'subKey2' => 1
+                'subKey2' => 1,
             ],
         ];
         $metaDataSchema = new MetaDataSchemataProvider($this->metaDataSchemata);

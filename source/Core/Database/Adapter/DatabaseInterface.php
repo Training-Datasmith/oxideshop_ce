@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -33,8 +35,6 @@ interface DatabaseInterface
      *      'connectionCharset' => '', // string Optional, defaults to the servers connection character set
      *      ]
      * ]
-     *
-     * @param array $connectionParameters
      */
     public function setConnectionParameters(array $connectionParameters);
 
@@ -47,8 +47,6 @@ interface DatabaseInterface
 
     /**
      * Force database master connection.
-     *
-     * @return null
      */
     public function forceMasterConnection();
 
@@ -57,15 +55,11 @@ interface DatabaseInterface
      * you know exactly what you are doing. Usage of this function
      * can lead to write access to a MySQL slave and getting replication out
      * of sync.
-     *
-     * @return null
      */
     public function forceSlaveConnection();
 
     /**
      * Closes an open connection
-     *
-     * @return null
      */
     public function closeConnection();
 

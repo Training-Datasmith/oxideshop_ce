@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -27,6 +29,6 @@ class NoArticleException extends \OxidEsales\Eshop\Core\Exception\ArticleExcepti
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString();
+        return self::class . '-' . parent::getString();
     }
 }

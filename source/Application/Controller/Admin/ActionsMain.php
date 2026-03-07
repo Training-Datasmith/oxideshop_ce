@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,11 +9,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use stdClass;
 use OxidEsales\Eshop\Application\Model\Actions;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use stdClass;
 
 /**
  * Admin article main actions manager.
@@ -26,7 +28,7 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
         if ($this->isNewEditObject() !== true) {
             $oAction = oxNew(Actions::class);
@@ -37,46 +39,45 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                 $oAction->loadInLang(key($oOtherLang), $soxId);
             }
 
-            $this->_aViewData["edit"] = $oAction;
+            $this->_aViewData['edit'] = $oAction;
 
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
 
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
         if ($this->getViewConfig()->isAltImageServerConfigured()) {
-            $this->_aViewData["imageUrl"] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
+            $this->_aViewData['imageUrl'] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
         }
 
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             // generating category tree for select list
-            $this->createCategoryTree("artcattree", $soxId);
+            $this->createCategoryTree('artcattree', $soxId);
 
             $oActionsMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class);
             $this->_aViewData['oxajax'] = $oActionsMainAjax->getColumns();
 
-            return "popups/actions_main";
+            return 'popups/actions_main';
         }
 
-
-        if (($oPromotion = $this->getViewDataElement("edit"))) {
+        if (($oPromotion = $this->getViewDataElement('edit'))) {
             if (($oPromotion->oxactions__oxtype->value == 2) || ($oPromotion->oxactions__oxtype->value == 3)) {
-                if ($iAoc = Registry::getRequest()->getRequestEscapedParameter("oxpromotionaoc")) {
+                if ($iAoc = Registry::getRequest()->getRequestEscapedParameter('oxpromotionaoc')) {
                     $sPopup = false;
                     switch ($iAoc) {
                         case 'article':
                             // generating category tree for select list
-                            $this->createCategoryTree("artcattree", $soxId);
+                            $this->createCategoryTree('artcattree', $soxId);
 
                             if ($oArticle = $oPromotion->getBannerArticle()) {
                                 $this->_aViewData['actionarticle_artnum'] = $oArticle->oxarticles__oxartnum->value;
@@ -98,25 +99,25 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                     }
                 } else {
                     if ($oPromotion->oxactions__oxtype->value == 2) {
-                        $this->_aViewData["editor"] = $this->generateTextEditor(
-                            "100%",
+                        $this->_aViewData['editor'] = $this->generateTextEditor(
+                            '100%',
                             300,
                             $oPromotion,
-                            "oxactions__oxlongdesc",
-                            "details.css"
+                            'oxactions__oxlongdesc',
+                            'details.css'
                         );
                     }
                 }
             }
         }
 
-        return "actions_main";
+        return 'actions_main';
     }
 
     /**
      * Saves Promotions
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
@@ -139,7 +140,7 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Saves changed selected action parameters in different language.
      */
-    public function saveinnlang()
+    public function saveinnlang(): void
     {
         $this->save();
     }
@@ -147,7 +148,6 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Checks access to edit Action.
      *
-     * @param Actions $action
      *
      * @return bool
      */
@@ -164,20 +164,17 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     private function getActionFormData()
     {
         $request    = oxNew(Request::class);
-        $formData   = $request->getRequestEscapedParameter("editval");
-        $formData   = $this->normalizeActionFormData($formData);
+        $formData   = $request->getRequestEscapedParameter('editval');
 
-        return $formData;
+        return $this->normalizeActionFormData($formData);
     }
 
     /**
      * Normalizes form data for Action.
      *
-     * @param   array $formData
      *
-     * @return  array
      */
-    private function normalizeActionFormData($formData)
+    private function normalizeActionFormData(array $formData): array
     {
         if ($this->isNewEditObject() === true) {
             $formData['oxactions__oxid'] = null;

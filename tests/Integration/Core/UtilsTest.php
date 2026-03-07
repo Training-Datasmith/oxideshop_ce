@@ -20,8 +20,8 @@ class UtilsTest extends IntegrationTestCase
     public function testToFileCache(): void
     {
         $utils = Registry::getUtils();
-        $key = "testCacheKey";
-        $value = "testCacheValue";
+        $key = 'testCacheKey';
+        $value = 'testCacheValue';
 
         $utils->toFileCache($key, $value);
 
@@ -31,9 +31,9 @@ class UtilsTest extends IntegrationTestCase
     public function testToFileCacheOverrideValue(): void
     {
         $utils = Registry::getUtils();
-        $Key = "testCacheKey";
-        $value1 = "testCacheFirstValue";
-        $value2 = "testCacheSecondValue";
+        $Key = 'testCacheKey';
+        $value1 = 'testCacheFirstValue';
+        $value2 = 'testCacheSecondValue';
 
         $utils->toFileCache($Key, $value1);
 

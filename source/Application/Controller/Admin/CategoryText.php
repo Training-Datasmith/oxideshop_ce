@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,16 +26,16 @@ class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         $this->_aViewData['edit'] = $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
-            $iCatLang = Registry::getRequest()->getRequestEscapedParameter("catlang");
+            $iCatLang = Registry::getRequest()->getRequestEscapedParameter('catlang');
 
             if (!isset($iCatLang)) {
                 $iCatLang = $this->_iEditLang;
             }
 
-            $this->_aViewData["catlang"] = $iCatLang;
+            $this->_aViewData['catlang'] = $iCatLang;
 
             $oCategory->loadInLang($iCatLang, $soxId);
 
@@ -46,32 +48,30 @@ class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        $this->_aViewData["editor"] = $this->generateTextEditor("100%", 300, $oCategory, "oxcategories__oxlongdesc", "list.css");
+        $this->_aViewData['editor'] = $this->generateTextEditor('100%', 300, $oCategory, 'oxcategories__oxlongdesc', 'list.css');
 
-        return "category_text";
+        return 'category_text';
     }
 
     /**
      * Saves category description text to DB.
-     *
-     * @return mixed
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $iCatLang = Registry::getRequest()->getRequestEscapedParameter("catlang");
-        $iCatLang = $iCatLang ? $iCatLang : 0;
+        $iCatLang = Registry::getRequest()->getRequestEscapedParameter('catlang');
+        $iCatLang = $iCatLang ?: 0;
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oCategory->loadInLang($iCatLang, $soxId);
         } else {
             $aParams['oxcategories__oxid'] = null;

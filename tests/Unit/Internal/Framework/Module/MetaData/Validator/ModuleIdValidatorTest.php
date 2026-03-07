@@ -24,7 +24,7 @@ final class ModuleIdValidatorTest extends TestCase
     public function testValidateWhenValid(): void
     {
         $metaData = [
-            MetaDataProvider::METADATA_ID => 'some_id'
+            MetaDataProvider::METADATA_ID => 'some_id',
         ];
 
         $validator = new ModuleIdValidator();
@@ -44,7 +44,7 @@ final class ModuleIdValidatorTest extends TestCase
     {
         $this->expectException(ModuleIdNotValidException::class);
         $metaData = [
-            MetaDataProvider::METADATA_ID => $moduleId
+            MetaDataProvider::METADATA_ID => $moduleId,
         ];
 
         $validator = new ModuleIdValidator();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxDb;
 use OxidEsales\Eshop\Core\Str;
 
 /**
@@ -21,7 +21,7 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
      *
      * @var array
      */
-    protected $_aFieldList = null;
+    protected $_aFieldList;
 
     /**
      * Current class name
@@ -35,21 +35,21 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
      *
      * @var array
      */
-    protected $_aList = null;
+    protected $_aList;
 
     /**
      * Product VAT
      *
      * @var float
      */
-    protected $_dVat = null;
+    protected $_dVat;
 
     /**
      * Active selection object
      *
      * @var \OxidEsales\Eshop\Application\Model\Selection
      */
-    protected $_oActiveSelection = null;
+    protected $_oActiveSelection;
 
     /**
      * Calls parent constructor and initializes selection list
@@ -98,8 +98,8 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
         // remove selectlists from articles also
         if ($blRemove = parent::delete($sOXID)) {
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $oDb->execute("delete from oxobject2selectlist where oxselnid = :oxselnid", [
-                'oxselnid' => $sOXID
+            $oDb->execute('delete from oxobject2selectlist where oxselnid = :oxselnid', [
+                'oxselnid' => $sOXID,
             ]);
         }
 
@@ -111,7 +111,7 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
      *
      * @param float $dVat product VAT
      */
-    public function setVat($dVat)
+    public function setVat($dVat): void
     {
         $this->_dVat = $dVat;
     }
@@ -178,7 +178,7 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
      *
      * @param int $iIdx selection index
      */
-    public function setActiveSelectionByIndex($iIdx)
+    public function setActiveSelectionByIndex($iIdx): void
     {
         if (($aSelections = $this->getSelections())) {
             $iSelIdx = 0;

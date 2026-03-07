@@ -9,11 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Authentication\Generator;
 
+use function base64_encode;
+use function bin2hex;
+
 use Exception;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\UnavailableSourceOfRandomnessException;
 
-use function base64_encode;
-use function bin2hex;
 use function random_bytes;
 use function str_replace;
 use function strlen;

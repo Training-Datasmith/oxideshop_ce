@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,11 +37,11 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
 
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
 
-        ini_set("session.gc_maxlifetime", 36000);
+        ini_set('session.gc_maxlifetime', 36000);
 
-        $start = (int) Registry::getRequest()->getRequestEscapedParameter("iStart");
+        $start = (int) Registry::getRequest()->getRequestEscapedParameter('iStart');
         $limit = $config->getConfigParam('iCntofMails');
-        $activeAlertsAmount = Registry::getRequest()->getRequestEscapedParameter("iAllCnt");
+        $activeAlertsAmount = Registry::getRequest()->getRequestEscapedParameter('iAllCnt');
         if (!isset($activeAlertsAmount)) {
             $activeAlertsAmount = $this->countActivePriceAlerts();
         }
@@ -49,17 +51,15 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         // Advance mail pointer and set parameter
         $start += $limit;
 
-        $this->_aViewData["iStart"] = $start;
-        $this->_aViewData["iAllCnt"] = $activeAlertsAmount;
-        $this->_aViewData["actlang"] = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+        $this->_aViewData['iStart'] = $start;
+        $this->_aViewData['iAllCnt'] = $activeAlertsAmount;
+        $this->_aViewData['actlang'] = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
 
         if ($start < $activeAlertsAmount) {
-            $template = "pricealarm_send";
-        } else {
-            $template = "pricealarm_done";
+            return 'pricealarm_send';
         }
 
-        return $template;
+        return 'pricealarm_done';
     }
 
     /**
@@ -87,7 +87,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
             "SELECT oxprice, oxartid FROM oxpricealarm
                     WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
         $result = $database->select($activeAlarmsQuery, [
-            'oxshopid' => $shopId
+            'oxshopid' => $shopId,
         ]);
         $count = 0;
         while ($result != false && !$result->EOF) {
@@ -119,7 +119,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
             "SELECT oxid, oxemail, oxartid, oxprice FROM oxpricealarm
             WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
         $result = $database->selectLimit($alarmsQuery, $limit, $start, [
-            'oxshopid' => $shopId
+            'oxshopid' => $shopId,
         ]);
         while ($result != false && !$result->EOF) {
             $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
@@ -144,7 +144,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      * @param string $priceAlarmId Price alarm id
      * @param string $bidPrice     Bid price
      */
-    public function sendeMail($emailAddress, $productID, $priceAlarmId, $bidPrice)
+    public function sendeMail($emailAddress, $productID, $priceAlarmId, $bidPrice): void
     {
         $alarm = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
         $alarm->load($priceAlarmId);
@@ -161,7 +161,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         $language->setTplLanguage($oldLanguageId);
 
         if ($success) {
-            $alarm->oxpricealarm__oxsended = new \OxidEsales\Eshop\Core\Field(date("Y-m-d H:i:s"));
+            $alarm->oxpricealarm__oxsended = new \OxidEsales\Eshop\Core\Field(date('Y-m-d H:i:s'));
             $alarm->save();
         }
     }

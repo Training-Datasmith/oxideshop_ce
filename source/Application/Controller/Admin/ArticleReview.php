@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -30,11 +32,11 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         parent::render();
 
         $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $this->_aViewData["edit"] = $article;
+        $this->_aViewData['edit'] = $article;
 
         $articleId = $this->getEditObjectId();
         $reviewId = Registry::getRequest()->getRequestEscapedParameter('rev_oxid');
-        if (isset($articleId) && $articleId != "-1") {
+        if (isset($articleId) && $articleId != '-1') {
             // load object
             $article->load($articleId);
 
@@ -50,23 +52,23 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                     break;
                 }
             }
-            $this->_aViewData["allreviews"] = $reviewList;
-            $this->_aViewData["editlanguage"] = $this->_iEditLang;
+            $this->_aViewData['allreviews'] = $reviewList;
+            $this->_aViewData['editlanguage'] = $this->_iEditLang;
 
             if (isset($reviewId)) {
                 $reviewForEditing = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
                 $reviewForEditing->load($reviewId);
-                $this->_aViewData["editreview"] = $reviewForEditing;
+                $this->_aViewData['editreview'] = $reviewForEditing;
 
                 $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
                 $user->load($reviewForEditing->oxreviews__oxuserid->value);
-                $this->_aViewData["user"] = $user;
+                $this->_aViewData['user'] = $user;
             }
             //show "active" checkbox if moderating is active
-            $this->_aViewData["blShowActBox"] = $config->getConfigParam('blGBModerate');
+            $this->_aViewData['blShowActBox'] = $config->getConfigParam('blGBModerate');
         }
 
-        return "article_review";
+        return 'article_review';
     }
 
     /**
@@ -79,8 +81,8 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     protected function getReviewList($article)
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $query = "select oxreviews.* from oxreviews
-                     where oxreviews.OXOBJECTID = " . $database->quote($article->oxarticles__oxid->value) . "
+        $query = 'select oxreviews.* from oxreviews
+                     where oxreviews.OXOBJECTID = ' . $database->quote($article->oxarticles__oxid->value) . "
                      and oxreviews.oxtype = 'oxarticle'";
 
         $variantList = $article->getVariants();
@@ -88,7 +90,7 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowVariantReviews') && count($variantList)) {
             // verifying rights
             foreach ($variantList as $variant) {
-                $query .= "or oxreviews.oxobjectid = " . $database->quote($variant->oxarticles__oxid->value) . " ";
+                $query .= 'or oxreviews.oxobjectid = ' . $database->quote($variant->oxarticles__oxid->value) . ' ';
             }
         }
 
@@ -98,7 +100,7 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
 
         // all reviews
         $reviewList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $reviewList->init("oxreview");
+        $reviewList->init('oxreview');
         $reviewList->selectString($query);
 
         return $reviewList;
@@ -107,18 +109,18 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     /**
      * Saves article review information changes.
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
-        $parameters = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $parameters = Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blGBModerate') && !isset($parameters['oxreviews__oxactive'])) {
             $parameters['oxreviews__oxactive'] = 0;
         }
 
         $review = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
-        $review->load(Registry::getRequest()->getRequestEscapedParameter("rev_oxid"));
+        $review->load(Registry::getRequest()->getRequestEscapedParameter('rev_oxid'));
         $review->assign($parameters);
         $review->save();
     }
@@ -126,11 +128,11 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     /**
      * Deletes selected article review information.
      */
-    public function delete()
+    public function delete(): void
     {
         $this->resetContentCache();
 
-        $reviewId = Registry::getRequest()->getRequestEscapedParameter("rev_oxid");
+        $reviewId = Registry::getRequest()->getRequestEscapedParameter('rev_oxid');
         $review = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
         $review->load($reviewId);
         $review->delete();

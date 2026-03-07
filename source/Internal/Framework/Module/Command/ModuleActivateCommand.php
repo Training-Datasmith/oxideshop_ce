@@ -26,27 +26,23 @@ class ModuleActivateCommand extends Command
     public const MESSAGE_MODULE_NOT_FOUND = 'Module - "%s" not found.';
 
     public function __construct(
-        private ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private ContextInterface $context,
-        private ModuleActivationServiceInterface $moduleActivationService
+        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
+        private readonly ContextInterface $context,
+        private readonly ModuleActivationServiceInterface $moduleActivationService
     ) {
-        parent::__construct(null);
+        parent::__construct();
     }
 
     /**
      * @inheritdoc
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Activates a module.')
             ->addArgument('module-id', InputArgument::REQUIRED, 'Module ID')
             ->setHelp('Command activates module by defined module ID.');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $moduleId = $input->getArgument('module-id');
@@ -60,20 +56,12 @@ class ModuleActivateCommand extends Command
         return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $moduleId
-     */
     protected function activateModule(OutputInterface $output, string $moduleId)
     {
         $this->moduleActivationService->activate($moduleId, $this->context->getCurrentShopId());
         $output->writeLn('<info>' . sprintf(static::MESSAGE_MODULE_ACTIVATED, $moduleId) . '</info>');
     }
 
-    /**
-     * @param string $moduleId
-     * @return bool
-     */
     private function isInstalled(string $moduleId): bool
     {
         return $this->moduleConfigurationDao->exists($moduleId, $this->context->getCurrentShopId());

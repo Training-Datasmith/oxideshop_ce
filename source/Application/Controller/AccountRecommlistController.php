@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -39,21 +41,21 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
      *
      * @var object
      */
-    protected $_oActRecommListArticles = null;
+    protected $_oActRecommListArticles;
 
     /**
      * returns the recomm list article. Whether the variable is empty, it list nothing
      *
      * @var array
      */
-    protected $_aUserRecommLists = null;
+    protected $_aUserRecommLists;
 
     /**
      * returns the recomm list articles
      *
      * @var object
      */
-    protected $_oActRecommList = null;
+    protected $_oActRecommList;
 
     /**
      * List items count
@@ -67,7 +69,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
      *
      * @var object
      */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /**
      * If user is logged in loads his wishlist articles (articles may be accessed by
@@ -93,7 +95,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
         if (!$oActList && $oLists->count()) {
             $this->_iAllArtCnt = $oUser->getRecommListsCount();
             $iNrofCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-            $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
+            $iNrofCatArticles = $iNrofCatArticles ?: 10;
             $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
         }
 
@@ -137,8 +139,6 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
     /**
      * return all articles in the recomm list
-     *
-     * @return null
      */
     public function getArticleList()
     {
@@ -168,8 +168,6 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
     /**
      * return the active entrys
-     *
-     * @return null
      */
     public function getActiveRecommList()
     {
@@ -200,17 +198,15 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
      *
      * @param object $oRecommList Recommendation list
      */
-    public function setActiveRecommList($oRecommList)
+    public function setActiveRecommList($oRecommList): void
     {
         $this->_oActRecommList = $oRecommList;
     }
 
     /**
      * add new recommlist
-     *
-     * @return null
      */
-    public function saveRecommList()
+    public function saveRecommList(): void
     {
         if (!Registry::getSession()->checkSessionChallenge()) {
             return;
@@ -260,10 +256,8 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
     /**
      * Delete recommlist
-     *
-     * @return null
      */
-    public function editList()
+    public function editList(): void
     {
         if (!Registry::getSession()->checkSessionChallenge()) {
             return;
@@ -287,10 +281,8 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
     /**
      * Delete recommlist
-     *
-     * @return null
      */
-    public function removeArticle()
+    public function removeArticle(): void
     {
         if (!Registry::getSession()->checkSessionChallenge()) {
             return;

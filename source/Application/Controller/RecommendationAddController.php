@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -30,7 +32,7 @@ class RecommendationAddController extends \OxidEsales\Eshop\Application\Controll
      *
      * @var array
      */
-    protected $_aUserRecommList = null;
+    protected $_aUserRecommList;
 
     /**
      * Renders the view

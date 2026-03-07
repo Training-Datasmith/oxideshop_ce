@@ -69,7 +69,7 @@ final class MetaDataSchemaValidatorTest extends TestCase
                     'subkey1'        => 'value2',
                     'unsupportedKey' => 'value2',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -99,7 +99,7 @@ final class MetaDataSchemaValidatorTest extends TestCase
             MetaDataProvider::METADATA_EXTEND                    => [
                 'excludedsubkey1' => 'value2',
                 'excludedsubkey2' => 'value2',
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -123,7 +123,7 @@ final class MetaDataSchemaValidatorTest extends TestCase
                     'subkey1' => 'value2',
                     'subkey2' => 'value2',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -154,9 +154,9 @@ final class MetaDataSchemaValidatorTest extends TestCase
             'section1' => [
                 [
                     'subKey1' => 'value1',
-                    'subKey2' => 'value1'
+                    'subKey2' => 'value1',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -173,9 +173,9 @@ final class MetaDataSchemaValidatorTest extends TestCase
             'section1' => [
                 [
                     // missing 'subKey1' => 'value1',
-                    'subKey2' => 'value1'
+                    'subKey2' => 'value1',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);

@@ -98,7 +98,7 @@ final class ArticleTest extends IntegrationTestCase
         return [
             [$past->format(self::$timeFormat), $future->format(self::$timeFormat)],
             [self::$defaultTimestamp, $future->format(self::$timeFormat)],
-            [$now->format(self::$timeFormat), $future->format(self::$timeFormat)]
+            [$now->format(self::$timeFormat), $future->format(self::$timeFormat)],
         ];
     }
 
@@ -125,7 +125,7 @@ final class ArticleTest extends IntegrationTestCase
             [self::$defaultTimestamp, self::$defaultTimestamp],
             [$future->format(self::$timeFormat), self::$defaultTimestamp],
             [$future->format(self::$timeFormat), $past->format(self::$timeFormat)],
-            [self::$defaultTimestamp, $past->format(self::$timeFormat)]
+            [self::$defaultTimestamp, $past->format(self::$timeFormat)],
         ];
     }
 
@@ -199,7 +199,7 @@ final class ArticleTest extends IntegrationTestCase
         return [
             'Product in low stock: Shop limit reached, Product limit undefined' => [5, 0.0, 10, false],
             'Product in low stock: Shop limit exceeded, Product limit ignored' => [11, 20.0, 10, true],
-            'Product in low stock: Product limit reached' => [5, 10.0, 0, true]
+            'Product in low stock: Product limit reached' => [5, 10.0, 0, true],
         ];
     }
 
@@ -222,7 +222,7 @@ final class ArticleTest extends IntegrationTestCase
             'oxarticles__oxstockflag' => 1,
             'oxarticles__oxshopid' => 1,
             'oxarticles__oxvarstock' => $productStock,
-            'oxarticles__oxvarcount' => 0
+            'oxarticles__oxvarcount' => 0,
         ]);
 
         $this->assertEquals(1, $product->getStockStatus());
@@ -242,7 +242,7 @@ final class ArticleTest extends IntegrationTestCase
             'oxarticles__oxstockflag' => 1,
             'oxarticles__oxshopid' => 1,
             'oxarticles__oxvarstock' => 5,
-            'oxarticles__oxvarcount' => 0
+            'oxarticles__oxvarcount' => 0,
         ]);
 
         $this->assertEquals(0, $product->getStockStatus());
@@ -262,7 +262,7 @@ final class ArticleTest extends IntegrationTestCase
             'oxarticles__oxstockflag' => 1,
             'oxarticles__oxshopid' => 1,
             'oxarticles__oxvarstock' => -1,
-            'oxarticles__oxvarcount' => 0
+            'oxarticles__oxvarcount' => 0,
         ]);
 
         $this->assertEquals(-1, $product->getStockStatus());
@@ -300,7 +300,6 @@ final class ArticleTest extends IntegrationTestCase
 
         $this->assertSame($expectedUrl, $article->getMedia(1)->getDetailUrl());
     }
-
 
     private function createArticleWithMedia(): array
     {

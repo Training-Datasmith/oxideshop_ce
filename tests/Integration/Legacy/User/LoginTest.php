@@ -45,7 +45,7 @@ final class LoginTest extends IntegrationTestCase
         $login = oxNew(UserComponent::class)->login();
 
         $this->assertEquals('payment', $login);
-        $this->assertEquals($user->getId(), Registry::getSession()->getVariable('usr'),);
+        $this->assertEquals($user->getId(), Registry::getSession()->getVariable('usr'), );
         $this->assertEquals($hash, $user->getFieldData('oxpassword'));
         $this->assertEquals($this->getSalt(), $user->getFieldData('oxpasssalt'));
     }

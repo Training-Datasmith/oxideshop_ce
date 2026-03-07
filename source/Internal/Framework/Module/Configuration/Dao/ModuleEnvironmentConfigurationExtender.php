@@ -16,8 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ModuleEnvironmentConfigurationExtender implements ModuleConfigurationExtenderInterface
 {
     public function __construct(
-        private ModuleEnvironmentConfigurationDaoInterface $moduleEnvironmentConfigurationDao,
-        private EventDispatcherInterface $eventDispatcher
+        private readonly ModuleEnvironmentConfigurationDaoInterface $moduleEnvironmentConfigurationDao,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 

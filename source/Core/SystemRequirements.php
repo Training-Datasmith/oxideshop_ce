@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,28 +19,28 @@ use OxidEsales\EshopCommunity\Internal\Framework\SystemRequirements\SystemSecuri
  */
 class SystemRequirements
 {
-    const MODULE_STATUS_UNABLE_TO_DETECT = -1;
-    const MODULE_STATUS_BLOCKS_SETUP = 0;
-    const MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS = 1;
-    const MODULE_STATUS_OK = 2;
+    public const MODULE_STATUS_UNABLE_TO_DETECT = -1;
+    public const MODULE_STATUS_BLOCKS_SETUP = 0;
+    public const MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS = 1;
+    public const MODULE_STATUS_OK = 2;
 
-    const MODULE_GROUP_ID_SERVER_CONFIG = 'server_config';
-    const MODULE_ID_MOD_REWRITE = 'mod_rewrite';
-    const MODULE_ID_MYSQL_VERSION = 'mysql_version';
+    public const MODULE_GROUP_ID_SERVER_CONFIG = 'server_config';
+    public const MODULE_ID_MOD_REWRITE = 'mod_rewrite';
+    public const MODULE_ID_MYSQL_VERSION = 'mysql_version';
 
     /**
      * System required modules
      *
      * @var array
      */
-    protected $_aRequiredModules = null;
+    protected $_aRequiredModules;
 
     /**
      * System requirements status
      *
      * @var bool
      */
-    protected $_blSysReqStatus = null;
+    protected $_blSysReqStatus;
 
     /**
      * Columns that should not be check for collation
@@ -106,14 +108,14 @@ class SystemRequirements
      *
      * @var string
      */
-    protected $_sReqInfoUrl = "https://docs.oxid-esales.com/eshop/en/latest/installation/new-installation/server-and-system-requirements.html";
+    protected $_sReqInfoUrl = 'https://docs.oxid-esales.com/eshop/en/latest/installation/new-installation/server-and-system-requirements.html';
 
     /**
      * Installation preparation info url
      *
      * @var string
      */
-    protected $_sPreparationInfoUrl = "https://docs.oxid-esales.com/eshop/en/latest/installation/new-installation/preparing-for-installation.html";
+    protected $_sPreparationInfoUrl = 'https://docs.oxid-esales.com/eshop/en/latest/installation/new-installation/preparing-for-installation.html';
 
     /**
      * Module or system configuration mapping with installation requirements info url anchor
@@ -121,28 +123,28 @@ class SystemRequirements
      * @var array
      */
     protected $_aInfoMap = [
-        "php_version"        => "php",
-        "mod_rewrite"        => "web-server",
-        "mysql_version"      => "database",
+        'php_version'        => 'php',
+        'mod_rewrite'        => 'web-server',
+        'mysql_version'      => 'database',
 
-        "allow_url_fopen"    => "php",
-        "request_uri"        => "php",
-        "ini_set"            => "php",
-        "memory_limit"       => "php",
-        "file_uploads"       => "php",
-        "session_autostart"  => "php",
+        'allow_url_fopen'    => 'php',
+        'request_uri'        => 'php',
+        'ini_set'            => 'php',
+        'memory_limit'       => 'php',
+        'file_uploads'       => 'php',
+        'session_autostart'  => 'php',
 
-        "php_xml"            => "php",
-        "j_son"              => "php",
-        "i_conv"             => "php",
-        "tokenizer"          => "php",
-        "mysql_connect"      => "php",
-        "gd_info"            => "php",
-        "mb_string"          => "php",
-        "curl"               => "php",
-        "bc_math"            => "php",
-        "open_ssl"           => "openssl",
-        "soap"               => "php",
+        'php_xml'            => 'php',
+        'j_son'              => 'php',
+        'i_conv'             => 'php',
+        'tokenizer'          => 'php',
+        'mysql_connect'      => 'php',
+        'gd_info'            => 'php',
+        'mb_string'          => 'php',
+        'curl'               => 'php',
+        'bc_math'            => 'php',
+        'open_ssl'           => 'openssl',
+        'soap'               => 'php',
     ];
 
     /**
@@ -151,13 +153,11 @@ class SystemRequirements
      * @var array
      */
     protected $_aPreparationInfoMap = [
-        "server_permissions" => "schritt-customising-file-and-directory-permissions",
+        'server_permissions' => 'schritt-customising-file-and-directory-permissions',
     ];
 
     /**
      * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     *
-     * @return null
      */
     public function __construct()
     {
@@ -172,22 +172,20 @@ class SystemRequirements
      * @return false|mixed
      * @throws SystemComponentException
      */
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments)
     {
         if (method_exists($this, $method)) {
             return call_user_func_array([& $this, $method], $arguments);
         }
         throw new SystemComponentException(
-            "Function '$method' does not exist or is not accessible! (" . get_class($this) . ")" . PHP_EOL
+            "Function '$method' does not exist or is not accessible! (" . static::class . ')' . PHP_EOL
         );
     }
 
     /**
      * Possibility to mock isAdmin() function as we do not extend oxsuperconfig.
-     *
-     * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return isAdmin();
     }
@@ -241,20 +239,16 @@ class SystemRequirements
 
     /**
      * Checks if curl extension is loaded
-     *
-     * @return integer
      */
-    public function checkCurl()
+    public function checkCurl(): int
     {
         return extension_loaded('curl') ? 2 : 1;
     }
 
     /**
      * Checks if mbstring extension is loaded
-     *
-     * @return integer
      */
-    public function checkMbString()
+    public function checkMbString(): int
     {
         return extension_loaded('mbstring') ? 2 : 1;
     }
@@ -264,17 +258,15 @@ class SystemRequirements
      *
      * @param string $path    check path [optional]
      * @param int    $minPerm min permission level, default 777 [optional]
-     *
-     * @return int
      */
-    public function checkServerPermissions($path = null, $minPerm = 777)
+    public function checkServerPermissions($path = null, $minPerm = 777): int
     {
         clearstatcache();
         $path = $path ?: getShopBasePath();
         $modStat = 2;
         $permissionIssues = $this->getPermissionIssuesList($path, $minPerm);
         if (count($permissionIssues['missing']) + count($permissionIssues['not_writable'])) {
-            $modStat = 0;
+            return 0;
         }
 
         return $modStat;
@@ -282,7 +274,6 @@ class SystemRequirements
 
     /**
      * @see cryptographically_sufficient_configuration
-     * @return int
      */
     public function checkCryptographicallySufficientConfiguration(): int
     {
@@ -297,22 +288,20 @@ class SystemRequirements
      *
      * @param string $shopPath
      * @param int $minPerm
-     *
-     * @return array
      */
-    public function getPermissionIssuesList($shopPath = null, $minPerm = 777)
+    public function getPermissionIssuesList($shopPath = null, $minPerm = 777): array
     {
         clearstatcache();
         $shopPath = $shopPath ?: getShopBasePath();
         $pathCheckResults = [
             'missing' => [],
-            'not_writable' => []
+            'not_writable' => [],
         ];
 
         $buildDirectory = ContainerFacade::getParameter('oxid_esales.build_directory');
 
         $pathsToCheck = [
-            $buildDirectory
+            $buildDirectory,
         ];
 
         $onePathToCheck = reset($pathsToCheck);
@@ -348,10 +337,10 @@ class SystemRequirements
      *
      * @return array|false
      */
-    protected function getShopSSLHostInfoFromConfig()
+    protected function getShopSSLHostInfoFromConfig(): false|array
     {
         $sslShopURL = ContainerFacade::getParameter('oxid_esales.shop_url');
-        if (!preg_match('#^(https?://)?([^/:]+)(:(\d+))?(/.*)?$#i', $sslShopURL, $shopUrlComponents)) {
+        if (!preg_match('#^(https?://)?([^/:]+)(:(\d+))?(/.*)?$#i', (string) $sslShopURL, $shopUrlComponents)) {
             return false;
         }
         $host = $shopUrlComponents[2];
@@ -388,21 +377,21 @@ class SystemRequirements
     /**
      * Checks if mod_rewrite extension is loaded.
      * Checks for all address.
-     *
-     * @return integer
      */
-    public function checkModRewrite()
+    public function checkModRewrite(): int
     {
         $sslHostInfo = $this->getShopSSLHostInfo();
         $modStat = $this->isModeRewriteExtensionLoaded($sslHostInfo);
 
         if (0 != $modStat && $sslHostInfo) {
             $sslModStat = $this->isModeRewriteExtensionLoaded($sslHostInfo);
-
             // Send if failed, even if you couldn't check another
             if (0 == $sslModStat) {
                 return 0;
-            } elseif (1 == $sslModStat || 1 == $modStat) {
+            }
+
+            // Send if failed, even if you couldn't check another
+            if (1 == $sslModStat || 1 == $modStat) {
                 return 1;
             }
 
@@ -417,8 +406,6 @@ class SystemRequirements
      * Checks for one address.
      *
      * @param array $aHostInfo host info to open socket
-     *
-     * @return integer
      */
     protected function isModeRewriteExtensionLoaded(array $aHostInfo): int
     {
@@ -438,7 +425,7 @@ class SystemRequirements
             }
             fclose($rFp);
 
-            $iModStat = (strpos($sOut, 'mod_rewrite_on') !== false) ? 2 : 0;
+            $iModStat = (str_contains($sOut, 'mod_rewrite_on')) ? 2 : 0;
         } else {
             if (function_exists('apache_get_modules')) {
                 // it does not assure that mod_rewrite is enabled on current host, so setting 1
@@ -453,10 +440,8 @@ class SystemRequirements
 
     /**
      * Checks if activated allow_url_fopen and fsockopen on port 80 possible
-     *
-     * @return integer
      */
-    public function checkAllowUrlFopen()
+    public function checkAllowUrlFopen(): int
     {
         $resultAllowUrlFopen = @ini_get('allow_url_fopen');
         $resultAllowUrlFopen = strcasecmp('1', $resultAllowUrlFopen);
@@ -469,10 +454,8 @@ class SystemRequirements
 
     /**
      * Check if fsockopen on port 80 possible
-     *
-     * @return integer
      */
-    public function checkFsockopen()
+    public function checkFsockopen(): int
     {
         $result = 1;
         $iErrNo = 0;
@@ -486,127 +469,101 @@ class SystemRequirements
 
     /**
      * Gets PHP version.
-     *
-     * @return float|string
      */
-    public function getPhpVersion()
+    public function getPhpVersion(): string
     {
         return PHP_VERSION;
     }
 
     /**
      * Checks if apache server variables REQUEST_URI or SCRIPT_URI are set
-     *
-     * @return integer
      */
-    public function checkRequestUri()
+    public function checkRequestUri(): int
     {
         return (isset($_SERVER['REQUEST_URI']) || isset($_SERVER['SCRIPT_URI'])) ? 2 : 0;
     }
 
     /**
      * Check if DOM extension is loaded
-     *
-     * @return integer
      */
-    public function checkPhpXml()
+    public function checkPhpXml(): int
     {
         return extension_loaded('dom') ? 2 : 0;
     }
 
     /**
      * Checks if JSON extension is loaded
-     *
-     * @return integer
      */
-    public function checkJSon()
+    public function checkJSon(): int
     {
         return extension_loaded('json') ? 2 : 0;
     }
 
     /**
      * Checks if iconv extension is loaded
-     *
-     * @return integer
      */
-    public function checkIConv()
+    public function checkIConv(): int
     {
         return extension_loaded('iconv') ? 2 : 0;
     }
 
     /**
      * Checks if tokenizer extension is loaded
-     *
-     * @return integer
      */
-    public function checkTokenizer()
+    public function checkTokenizer(): int
     {
         return extension_loaded('tokenizer') ? 2 : 0;
     }
 
     /**
      * Checks if bcmath extension is loaded
-     *
-     * @return integer
      */
-    public function checkBcMath()
+    public function checkBcMath(): int
     {
         return extension_loaded('bcmath') ? 2 : 1;
     }
 
     /**
      * Checks if openssl extension is loaded
-     *
-     * @return integer
      */
-    public function checkOpenSsl()
+    public function checkOpenSsl(): int
     {
         return extension_loaded('openssl') ? 2 : 1;
     }
 
     /**
      * Checks if SOAP extension is loaded
-     *
-     * @return integer
      */
-    public function checkSoap()
+    public function checkSoap(): int
     {
         return extension_loaded('soap') ? 2 : 1;
     }
 
     /**
      * Checks if mysql5 extension is loaded.
-     *
-     * @return integer
      */
-    public function checkMysqlConnect()
+    public function checkMysqlConnect(): int
     {
-        $iModStat = extension_loaded('pdo_mysql') ? 2 : 0;
-        return $iModStat;
+        return extension_loaded('pdo_mysql') ? 2 : 0;
     }
 
     /**
      * Checks if GDlib extension is loaded
-     *
-     * @return integer
      */
-    public function checkGdInfo()
+    public function checkGdInfo(): int
     {
         $iModStat = extension_loaded('gd') ? 1 : 0;
         $iModStat = function_exists('imagecreatetruecolor') ? 2 : $iModStat;
         $iModStat = function_exists('imagecreatefromgif') ? $iModStat : 0;
         $iModStat = function_exists('imagecreatefromjpeg') ? $iModStat : 0;
-        $iModStat = function_exists('imagecreatefrompng') ? $iModStat : 0;
 
-        return $iModStat;
+        return function_exists('imagecreatefrompng') ? $iModStat : 0;
     }
 
     /**
      * Checks if ini set is allowed
-     *
-     * @return integer
      */
-    public function checkIniSet()
+    public function checkIniSet(): int
     {
         return (@ini_set('memory_limit', @ini_get('memory_limit')) !== false) ? 2 : 0;
     }
@@ -615,10 +572,8 @@ class SystemRequirements
      * Checks memory limit.
      *
      * @param string $sMemLimit memory limit to compare with requirements
-     *
-     * @return integer
      */
-    public function checkMemoryLimit($sMemLimit = null)
+    public function checkMemoryLimit($sMemLimit = null): int
     {
         if ($sMemLimit === null) {
             $sMemLimit = @ini_get('memory_limit');
@@ -646,10 +601,8 @@ class SystemRequirements
 
     /**
      * Additional sql: do not check collation for \OxidEsales\Eshop\Core\SystemRequirements::$_aException columns
-     *
-     * @return string
      */
-    protected function getAdditionalCheck()
+    protected function getAdditionalCheck(): string
     {
         $sSelect = '';
         foreach ($this->_aException as $sTable => $sColumn) {
@@ -661,10 +614,8 @@ class SystemRequirements
 
     /**
      * Checks tables and columns (\OxidEsales\Eshop\Core\SystemRequirements::$_aColumns) collation
-     *
-     * @return array
      */
-    public function checkCollation()
+    public function checkCollation(): array
     {
         $myConfig = Registry::getConfig();
 
@@ -697,30 +648,24 @@ class SystemRequirements
 
     /**
      * Checks if database cluster is installed
-     *
-     * @return integer
      */
-    public function checkDatabaseCluster()
+    public function checkDatabaseCluster(): int
     {
         return 2;
     }
 
     /**
      * Checks if PCRE unicode support is turned off/on. Should be on.
-     *
-     * @return integer
      */
-    public function checkUnicodeSupport()
+    public function checkUnicodeSupport(): int
     {
         return (@preg_match('/\pL/u', 'a') == 1) ? 2 : 1;
     }
 
     /**
      * Checks if php_admin_flag file_uploads is ON
-     *
-     * @return integer
      */
-    public function checkFileUploads()
+    public function checkFileUploads(): int
     {
         $dUploadFile = -1;
         $sFileUploads = @ini_get('file_uploads');
@@ -765,7 +710,7 @@ class SystemRequirements
      *
      * @return array $aSysInfo
      */
-    public function getSystemInfo()
+    public function getSystemInfo(): array
     {
         $aSysInfo = [];
         $aRequiredModules = $this->getRequiredModules();
@@ -785,14 +730,12 @@ class SystemRequirements
     /**
      * Apply given filter function to all iterations of SystemRequirementInfo array.
      *
-     * @param array    $systemRequirementsInfo
      * @param \Closure $filterFunction         Filter function used for the update of actual values; Function will
      *                                         receive the same arguments as provided from
      *                                         `iterateThroughSystemRequirementsInfo` method.
-     *
      * @return array An array which is in the same format as the main input argument but with updated data.
      */
-    public static function filter($systemRequirementsInfo, $filterFunction)
+    public static function filter(array $systemRequirementsInfo, $filterFunction): array
     {
         $iterator = static::iterateThroughSystemRequirementsInfo($systemRequirementsInfo);
 
@@ -814,10 +757,9 @@ class SystemRequirements
     {
         if ($sModule) {
             $iModStat = null;
-            $sCheckFunction = "check" . str_replace(" ", "", ucwords(str_replace("_", " ", $sModule)));
-            $iModStat = $this->$sCheckFunction();
+            $sCheckFunction = 'check' . str_replace(' ', '', ucwords(str_replace('_', ' ', $sModule)));
 
-            return $iModStat;
+            return $this->$sCheckFunction();
         }
     }
 
@@ -825,9 +767,8 @@ class SystemRequirements
      * Returns true if given module state is acceptable for setup process to continue.
      *
      * @param array $systemRequirementsInfo
-     * @return bool
      */
-    public static function canSetupContinue($systemRequirementsInfo)
+    public static function canSetupContinue($systemRequirementsInfo): bool
     {
         $iterator = static::iterateThroughSystemRequirementsInfo($systemRequirementsInfo);
 
@@ -874,9 +815,9 @@ class SystemRequirements
 
         // only known will be anchored
         if (isset($aInfoMap[$sIdent])) {
-            $sUrl .= "#" . $aInfoMap[$sIdent];
+            $sUrl .= '#' . $aInfoMap[$sIdent];
         } elseif (isset($aPreparationInfoMap[$sIdent])) {
-            $sUrl = $this->_sPreparationInfoUrl . "#" . $aPreparationInfoMap[$sIdent];
+            $sUrl = $this->_sPreparationInfoUrl . '#' . $aPreparationInfoMap[$sIdent];
         }
 
         return $sUrl;
@@ -886,10 +827,8 @@ class SystemRequirements
      * Parses and calculates given string form byte size value
      *
      * @param string $bytes string form byte value (64M, 32K etc)
-     *
-     * @return int
      */
-    protected function getBytes($sBytes)
+    protected function getBytes($sBytes): int
     {
         $sBytes = trim($sBytes);
         $sLast = strtolower($sBytes[strlen($sBytes) - 1]);
@@ -899,12 +838,12 @@ class SystemRequirements
             // gigabytes
             case 'g':
                 $sBytes *= 1024;
-            // megabytes
-            // no break
+                // megabytes
+                // no break
             case 'm':
                 $sBytes *= 1024;
-            // kilobytes
-            // no break
+                // kilobytes
+                // no break
             case 'k':
                 $sBytes *= 1024;
                 break;
@@ -915,10 +854,8 @@ class SystemRequirements
 
     /**
      * Check if correct AutoStart setting.
-     *
-     * @return bool
      */
-    public function checkSessionAutostart()
+    public function checkSessionAutostart(): int
     {
         $sStatus = (strtolower((string) @ini_get('session.auto_start')));
 
@@ -927,20 +864,16 @@ class SystemRequirements
 
     /**
      * Return minimum memory limit by edition.
-     *
-     * @return string
      */
-    protected function getMinimumMemoryLimit()
+    protected function getMinimumMemoryLimit(): string
     {
         return '32M';
     }
 
     /**
      * Return recommend memory limit by edition.
-     *
-     * @return string
      */
-    protected function getRecommendMemoryLimit()
+    protected function getRecommendMemoryLimit(): string
     {
         return '60M';
     }

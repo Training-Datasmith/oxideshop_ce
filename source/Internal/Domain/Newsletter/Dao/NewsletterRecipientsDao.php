@@ -15,12 +15,11 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 
 class NewsletterRecipientsDao implements NewsletterRecipientsDaoInterface
 {
-    public function __construct(private QueryBuilderFactoryInterface $queryBuilderFactory)
+    public function __construct(private readonly QueryBuilderFactoryInterface $queryBuilderFactory)
     {
     }
 
     /**
-     * @param int $shopId
      *
      * @return NewsletterRecipient[]
      * @throws Exception
@@ -33,7 +32,7 @@ class NewsletterRecipientsDao implements NewsletterRecipientsDaoInterface
 
         foreach ($subscribersList as $row) {
             $recipient = new NewsletterRecipient();
-            $recipient->setSalutation(trim($row['Salutation']));
+            $recipient->setSalutation(trim((string) $row['Salutation']));
             $recipient->setFistName($this->decodeHtmlEntities($row['Firstname']));
             $recipient->setLastName($this->decodeHtmlEntities($row['Lastname']));
             $recipient->setEmail($row['Email']);
@@ -46,20 +45,12 @@ class NewsletterRecipientsDao implements NewsletterRecipientsDaoInterface
         return $recipientList;
     }
 
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
     private function decodeHtmlEntities(string $value): string
     {
         return html_entity_decode($value, ENT_QUOTES, 'utf-8');
     }
 
     /**
-     * @param int $shopId
-     *
-     * @return array
      * @throws Exception
      */
     private function getSubscribersList(int $shopId): array
@@ -81,7 +72,7 @@ class NewsletterRecipientsDao implements NewsletterRecipientsDaoInterface
             ->leftJoin('u', 'oxobject2group', 'o2g', 'u.oxid=o2g.oxobjectid')
             ->leftJoin('o2g', 'oxgroups', 'g', 'o2g.oxgroupsid=g.oxid')
             ->where('n.oxshopid = :shopId')
-            ->setParameters(["shopId" => $shopId])
+            ->setParameters(['shopId' => $shopId])
             ->groupBy('n.oxsal, n.oxfname, n.oxlname, u.oxusername, n.oxdboptin, c.oxtitle, u.oxcreate')
             ->addOrderBy('u.oxcreate', 'ASC');
 

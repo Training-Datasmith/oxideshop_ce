@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -10,10 +12,8 @@ namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 abstract class AbstractInsertNewBasketItemLogic
 {
     /**
-     * @param array  $params
      * @param object $templateEngine
      *
-     * @return string
      */
     public function getNewBasketItemTemplate(array $params, $templateEngine): string
     {
@@ -38,7 +38,7 @@ abstract class AbstractInsertNewBasketItemLogic
         }
 
         // name of template file where is stored message text
-        $templateName = $params['tpl'] ? $params['tpl'] : 'inc_newbasketitem.snippet.html.twig';
+        $templateName = $params['tpl'] ?: 'inc_newbasketitem.snippet.html.twig';
 
         // always render for ajaxstyle popup
         $render = isset($params['ajax']) && $params['ajax'] && ($newBasketItemMessage == 2);
@@ -53,7 +53,7 @@ abstract class AbstractInsertNewBasketItemLogic
 
         // returning generated message content
         if ($render && $correctMessageType) {
-            $renderedTemplate = $this->renderTemplate($templateName, $templateEngine);
+            return $this->renderTemplate($templateName, $templateEngine);
         }
 
         return $renderedTemplate;
@@ -75,9 +75,7 @@ abstract class AbstractInsertNewBasketItemLogic
     abstract protected function loadArticleObject($newItem, $templateEngine);
 
     /**
-     * @param string $templateName
      * @param object $templateEngine
-     *
      * @return mixed
      */
     abstract protected function renderTemplate(string $templateName, $templateEngine);

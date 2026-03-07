@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,14 +17,12 @@ class CompanyVatInValidator
     /**
      * @var \OxidEsales\Eshop\Application\Model\Country
      */
-    private $_oCountry = null;
+    private $_oCountry;
 
     /**
      * Array of validators (checkers)
-     *
-     * @var array
      */
-    private $_aCheckers = [];
+    private array $_aCheckers = [];
 
     /**
      * Error message
@@ -33,10 +33,8 @@ class CompanyVatInValidator
 
     /**
      * Country setter
-     *
-     * @param \OxidEsales\Eshop\Application\Model\Country $country
      */
-    public function setCountry(\OxidEsales\Eshop\Application\Model\Country $country)
+    public function setCountry(\OxidEsales\Eshop\Application\Model\Country $country): void
     {
         $this->_oCountry = $country;
     }
@@ -56,7 +54,7 @@ class CompanyVatInValidator
      *
      * @param string $error
      */
-    public function setError($error)
+    public function setError($error): void
     {
         $this->_sError = $error;
     }
@@ -73,8 +71,6 @@ class CompanyVatInValidator
 
     /**
      * Constructor
-     *
-     * @param \OxidEsales\Eshop\Application\Model\Country $country
      */
     public function __construct(\OxidEsales\Eshop\Application\Model\Country $country)
     {
@@ -83,10 +79,8 @@ class CompanyVatInValidator
 
     /**
      * Adds validator
-     *
-     * @param \OxidEsales\Eshop\Core\CompanyVatInChecker $validator
      */
-    public function addChecker(\OxidEsales\Eshop\Core\CompanyVatInChecker $validator)
+    public function addChecker(\OxidEsales\Eshop\Core\CompanyVatInChecker $validator): void
     {
         $this->_aCheckers[] = $validator;
     }
@@ -104,7 +98,6 @@ class CompanyVatInValidator
     /**
      * Validate company VAT identification number.
      *
-     * @param \OxidEsales\Eshop\Application\Model\CompanyVatIn $companyVatNumber
      *
      * @return bool
      */

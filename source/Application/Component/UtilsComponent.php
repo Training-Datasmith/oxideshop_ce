@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -40,13 +42,13 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $aSel = null,
         $blOverride = false,
         $blBundle = false
-    ) {
+    ): void {
         // only if enabled and not search engine..
         if ($this->getViewConfig()->getShowCompareList() && !Registry::getUtils()->isSearchEngine()) {
             // #657 special treatment if we want to put on comparelist
             $blAddCompare = Registry::getRequest()->getRequestEscapedParameter('addcompare');
             $blRemoveCompare = Registry::getRequest()->getRequestEscapedParameter('removecompare');
-            $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
+            $sProductId = $sProductId ?: Registry::getRequest()->getRequestEscapedParameter('aid');
             if (($blAddCompare || $blRemoveCompare) && $sProductId) {
                 // toggle state in session array
                 $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
@@ -92,7 +94,7 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * @param double $dAmount    amount of good (default null)
      * @param array  $aSel       product selection list (default null)
      */
-    public function toNoticeList($sProductId = null, $dAmount = null, $aSel = null)
+    public function toNoticeList($sProductId = null, $dAmount = null, $aSel = null): void
     {
         if (!Registry::getSession()->checkSessionChallenge()) {
             return;
@@ -109,7 +111,7 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * @param double $dAmount    amount of good (default null)
      * @param array  $aSel       product selection list (default null)
      */
-    public function toWishList($sProductId = null, $dAmount = null, $aSel = null)
+    public function toWishList($sProductId = null, $dAmount = null, $aSel = null): void
     {
         if (!Registry::getSession()->checkSessionChallenge()) {
             return;
@@ -133,10 +135,10 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     {
         // only if user is logged in
         if ($oUser = $this->getUser()) {
-            $sProductId = ($sProductId) ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('itmid');
-            $sProductId = ($sProductId) ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
-            $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
-            $aSel = $aSel ? $aSel : Registry::getRequest()->getRequestEscapedParameter('sel');
+            $sProductId = $sProductId ?: Registry::getRequest()->getRequestEscapedParameter('itmid');
+            $sProductId = $sProductId ?: Registry::getRequest()->getRequestEscapedParameter('aid');
+            $dAmount ??= Registry::getRequest()->getRequestEscapedParameter('am');
+            $aSel = $aSel ?: Registry::getRequest()->getRequestEscapedParameter('sel');
 
             // processing amounts
             $dAmount = str_replace(',', '.', $dAmount);
@@ -154,10 +156,8 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
     /**
      *  Set view data, call parent::render
-     *
-     * @return null
      */
-    public function render()
+    public function render(): void
     {
         parent::render();
 
@@ -167,7 +167,5 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
         $oContentList->loadMainMenulist();
         $oParentView->setMenueList($oContentList);
-
-        return;
     }
 }

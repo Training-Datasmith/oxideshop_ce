@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 
@@ -51,7 +52,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var string
      */
-    protected $_sActCat = null;
+    protected $_sActCat;
 
     /**
      * Active category path array
@@ -83,7 +84,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param boolean $blForceFull - true to load full
      */
-    public function setLoadFull($blForceFull)
+    public function setLoadFull($blForceFull): void
     {
         $this->_blForceFull = $blForceFull;
     }
@@ -103,7 +104,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param int $iForceLevel - level number
      */
-    public function setLoadLevel($iForceLevel)
+    public function setLoadLevel($iForceLevel): void
     {
         if ($iForceLevel > 2) {
             $iForceLevel = 2;
@@ -151,9 +152,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
                       . " $sTable.oxicon as oxicon, $sTable.oxextlink as oxextlink,"
                       . " $sTable.oxthumb as oxthumb, $sTable.oxpromoicon as oxpromoicon";
 
-        $sFieldList .= $this->getActivityFieldsSql($sTable);
-
-        return $sFieldList;
+        return $sFieldList . $this->getActivityFieldsSql($sTable);
     }
 
     /**
@@ -222,7 +221,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
         if ($oCat) {
             // select children here, siblings will be selected from union
             $depthSnippet .= " or ($sViewName.oxparentid = "
-                . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxid->value) . ")";
+                . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxid->value) . ')';
         }
 
         // load 1'st category level (roots)
@@ -256,12 +255,12 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         $sViewName = $this->getBaseObject()->getViewName();
 
-        return "UNION SELECT " . $this->getSqlSelectFieldsForTree('maincats', $aColumns)
-               . " FROM oxcategories AS subcats"
+        return 'UNION SELECT ' . $this->getSqlSelectFieldsForTree('maincats', $aColumns)
+               . ' FROM oxcategories AS subcats'
                . " LEFT JOIN $sViewName AS maincats on maincats.oxparentid = subcats.oxparentid"
-               . " WHERE subcats.oxrootid = " . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxrootid->value)
-               . " AND subcats.oxleft <= " . (int) $oCat->oxcategories__oxleft->value
-               . " AND subcats.oxright >= " . (int) $oCat->oxcategories__oxright->value;
+               . ' WHERE subcats.oxrootid = ' . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxrootid->value)
+               . ' AND subcats.oxleft <= ' . (int) $oCat->oxcategories__oxleft->value
+               . ' AND subcats.oxright >= ' . (int) $oCat->oxcategories__oxright->value;
     }
 
     /**
@@ -272,15 +271,14 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     protected function loadFromDb()
     {
         $sSql = $this->getSelectString(false, null, 'oxparentid, oxsort, oxtitle');
-        $aData = DatabaseProvider::getDb()->getAll($sSql);
 
-        return $aData;
+        return DatabaseProvider::getDb()->getAll($sSql);
     }
 
     /**
      * Load category list data
      */
-    public function load()
+    public function load(): void
     {
         $aData = $this->loadFromDb();
         $this->assignArray($aData);
@@ -293,9 +291,9 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sActCat Active category (default null)
      */
-    public function buildTree($sActCat)
+    public function buildTree($sActCat): void
     {
-        startProfile("buildTree");
+        startProfile('buildTree');
 
         $this->_sActCat = $sActCat;
         $this->load();
@@ -318,7 +316,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
             $this->ppBuildTree();
         }
 
-        stopProfile("buildTree");
+        stopProfile('buildTree');
     }
 
     /**
@@ -342,7 +340,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Fetches raw categories and does postprocessing for adding depth information
      */
-    public function loadList()
+    public function loadList(): void
     {
         startProfile('buildCategoryList');
 
@@ -363,7 +361,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param int $sShopId ShopID
      */
-    public function setShopID($sShopId)
+    public function setShopID($sShopId): void
     {
         $this->_sShopID = $sShopId;
     }
@@ -444,8 +442,6 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
 
     /**
      * Category list postprocessing routine, responsible for generation of active category path
-     *
-     * @return null
      */
     protected function ppAddPathInfo()
     {
@@ -530,9 +526,9 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return array $aTree
      */
-    protected function addDepthInfo($aTree, $oCat, $sDepth = "")
+    protected function addDepthInfo($aTree, $oCat, $sDepth = '')
     {
-        $sDepth .= "-";
+        $sDepth .= '-';
         $oCat->oxcategories__oxtitle->setValue($sDepth . ' ' . $oCat->oxcategories__oxtitle->value);
         $aTree[$oCat->getId()] = $oCat;
         $aSubCats = $oCat->getSubCats();
@@ -551,7 +547,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @param bool   $blVerbose Set to true for output the update status for user,
      * @param string $sShopID   the shop id
      */
-    public function updateCategoryTree($blVerbose = true, $sShopID = null)
+    public function updateCategoryTree($blVerbose = true, $sShopID = null): void
     {
         // Only called from admin and admin mode reads from master (see ESDEV-3804 and ESDEV-3822).
         $database = DatabaseProvider::getDb();
@@ -572,8 +568,8 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
             );
             if ($categories != false && $categories->count() > 0) {
                 while (!$categories->EOF) {
-                    $this->_aUpdateInfo[] = "<b>Processing : " . $categories->fields['oxtitle']
-                        . "</b>(" . $categories->fields['oxid'] . ")<br>";
+                    $this->_aUpdateInfo[] = '<b>Processing : ' . $categories->fields['oxtitle']
+                        . '</b>(' . $categories->fields['oxid'] . ')<br>';
                     if ($blVerbose) {
                         echo next($this->_aUpdateInfo);
                     }
@@ -639,12 +635,12 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         $database->execute('update oxcategories set oxrootid = :oxrootid where oxparentid = :oxparentid', [
             'oxrootid' => $thisRoot,
-            'oxparentid' => $oxRootId
+            'oxparentid' => $oxRootId,
         ]);
         $childCategories = $database->select(
             'select oxid, oxparentid from oxcategories where oxparentid = :oxparentid order by oxsort',
             [
-                'oxparentid' => $oxRootId
+                'oxparentid' => $oxRootId,
             ]
         );
         if ($childCategories != false && $childCategories->count() > 0) {
@@ -655,7 +651,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
                 $parentCategory = $database->select(
                     'select oxrootid, oxright from oxcategories where oxid = :oxid',
                     [
-                        'oxid' => $parentId
+                        'oxid' => $parentId,
                     ]
                 );
                 if ($parentCategory != false && $parentCategory->count() > 0) {
@@ -671,7 +667,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
                 $database->execute($query, [
                     'oxrootid' => $parentOxRootId,
                     'parentRight' => $parentRight,
-                    'oxid' => $actOxid
+                    'oxid' => $actOxid,
                 ]);
 
                 $query = 'update oxcategories set oxright = oxright + 2 where oxrootid = :oxrootid and'
@@ -679,14 +675,14 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
                 $database->execute($query, [
                     'oxrootid' => $parentOxRootId,
                     'oxright' => $parentRight,
-                    'oxid' => $actOxid
+                    'oxid' => $actOxid,
                 ]);
 
                 $query = 'update oxcategories set oxleft = :parentRight, oxright = (:parentRight + 1)'
                     . ' where oxid = :oxid';
                 $database->execute($query, [
                     'parentRight' => $parentRight,
-                    'oxid' => $actOxid
+                    'oxid' => $actOxid,
                 ]);
                 $this->updateNodes($actOxid, false, $thisRoot);
                 $childCategories->fetchRow();
@@ -703,12 +699,9 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __get($sName)
     {
-        switch ($sName) {
-            case 'aPath':
-            case 'aFullPath':
-                return $this->getPath();
-                break;
-        }
-        return parent::__get($sName);
+        return match ($sName) {
+            'aPath', 'aFullPath' => $this->getPath(),
+            default => parent::__get($sName),
+        };
     }
 }

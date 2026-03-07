@@ -30,7 +30,7 @@ final class ClassExtensionsChainTest extends TestCase
                 new ClassExtension(
                     'anotherExtendedClass',
                     'someExtension'
-                )
+                ),
             ]
         );
 
@@ -68,7 +68,7 @@ final class ClassExtensionsChainTest extends TestCase
                 new ClassExtension(
                     'extendedClass',
                     'firstExtension'
-                )
+                ),
             ]
         );
 
@@ -87,7 +87,7 @@ final class ClassExtensionsChainTest extends TestCase
                 ],
                 'anotherExtendedClass' => [
                     'someExtension',
-                ]
+                ],
             ],
             $chain->getChain()
         );
@@ -106,8 +106,8 @@ final class ClassExtensionsChainTest extends TestCase
                     'extension3',
                 ],
                 'extendedClass3' => [
-                    'extension4'
-                ]
+                    'extension4',
+                ],
             ]
         );
         $chain->removeExtension(
@@ -129,13 +129,12 @@ final class ClassExtensionsChainTest extends TestCase
                     'extension2',
                 ],
                 'extendedClass3' => [
-                    'extension4'
-                ]
+                    'extension4',
+                ],
             ],
             $chain->getChain()
         );
     }
-
 
     #[DataProvider('invalidExtensionProvider')]
     public function testRemoveExtensionThrowsExceptionIfClassNotExistsInChain(ClassExtension $extension): void
@@ -147,7 +146,7 @@ final class ClassExtensionsChainTest extends TestCase
                 'extendedClass1' => [
                     'extension1',
                     'extension2',
-                ]
+                ],
             ]
         );
         $this->expectException(
@@ -163,13 +162,13 @@ final class ClassExtensionsChainTest extends TestCase
                 new ClassExtension(
                     'notExistingExtended',
                     'notExistingExtension'
-                )
+                ),
             ],
             [
                 new ClassExtension(
                     'extendedClass1',
                     'notExistingExtension'
-                )
+                ),
             ],
         ];
     }

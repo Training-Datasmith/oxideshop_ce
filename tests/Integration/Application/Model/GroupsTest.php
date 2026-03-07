@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,7 +20,7 @@ class GroupsTest extends IntegrationTestCase
         'oxobject2delivery' => ['oxobjectid', ''],
         'oxobject2discount' => ['oxobjectid', ''],
         'oxobject2group' => ['oxgroupsid', ''],
-        'oxobject2payment' => ['oxobjectid', '']
+        'oxobject2payment' => ['oxobjectid', ''],
     ];
 
     public function setUp(): void

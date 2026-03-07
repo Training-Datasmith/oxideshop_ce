@@ -47,7 +47,7 @@ final class MetaDataNormalizerTest extends TestCase
             'settings' => [
                 ['constraints' => '1|2|3'],
                 ['constraints' => 'le|la|les'],
-            ]
+            ],
         ];
 
         $this->assertSame(
@@ -55,7 +55,7 @@ final class MetaDataNormalizerTest extends TestCase
                 'settings' => [
                     ['constraints' => ['1', '2', '3']],
                     ['constraints' => ['le', 'la', 'les']],
-                ]
+                ],
             ],
             (new MetaDataNormalizer())->normalizeData($metadata)
         );
@@ -72,7 +72,7 @@ final class MetaDataNormalizerTest extends TestCase
             [
                 $fieldName => [
                     'en' => $value,
-                ]
+                ],
             ],
             (new MetaDataNormalizer())->normalizeData($metadata)
         );

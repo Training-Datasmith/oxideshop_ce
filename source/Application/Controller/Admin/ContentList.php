@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -37,7 +39,7 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      *
      * @var string
      */
-    protected $_sThisTemplate = "content_list";
+    protected $_sThisTemplate = 'content_list';
 
     /**
      * Executes parent method parent::render() and returns current class template
@@ -49,11 +51,11 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     {
         parent::render();
 
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter("folder");
-        $sFolder = $sFolder ? $sFolder : -1;
+        $sFolder = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('folder');
+        $sFolder = $sFolder ?: -1;
 
-        $this->_aViewData["folder"] = $sFolder;
-        $this->_aViewData["afolder"] = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('aCMSfolder');
+        $this->_aViewData['folder'] = $sFolder;
+        $this->_aViewData['afolder'] = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('aCMSfolder');
 
         return $this->_sThisTemplate;
     }
@@ -71,7 +73,7 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $sQ = parent::prepareWhereQuery($aWhere, $sqlFull);
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sViewName = $tableViewNameGenerator->getViewName("oxcontents");
+        $sViewName = $tableViewNameGenerator->getViewName('oxcontents');
 
         //searchong for empty oxfolder fields
         if ($sFolder == 'CMSFOLDER_NONE' || $sFolder == 'CMSFOLDER_NONE_RR') {

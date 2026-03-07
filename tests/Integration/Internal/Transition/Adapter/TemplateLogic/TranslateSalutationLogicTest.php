@@ -23,10 +23,9 @@ final class TranslateSalutationLogicTest extends IntegrationTestCase
             ['MR', 0, 'Herr'],
             ['MRS', 0, 'Frau'],
             ['MR', 1, 'Mr'],
-            ['MRS', 1, 'Mrs']
+            ['MRS', 1, 'Mrs'],
         ];
     }
-
 
     #[DataProvider('translateSalutationProvider')]
     public function testTranslateSalutation(string $ident, int $languageId, string $expected): void

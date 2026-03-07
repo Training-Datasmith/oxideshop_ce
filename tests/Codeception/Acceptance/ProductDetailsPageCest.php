@@ -52,7 +52,7 @@ final class ProductDetailsPageCest
             'id' => '10014',
             'title' => '14 EN product šÄßüл',
             'description' => '13 EN description šÄßüл',
-            'price' => 'from 15,00 €'
+            'price' => 'from 15,00 €',
         ];
 
         //open details page
@@ -71,7 +71,7 @@ final class ProductDetailsPageCest
             'id' => '10014-1-3',
             'title' => '14 EN product šÄßüл S | white',
             'description' => '',
-            'price' => '15,00 €'
+            'price' => '15,00 €',
         ];
         $detailsPage->seeProductData($productData3)
             ->checkIfProductIsBuyable();
@@ -94,7 +94,7 @@ final class ProductDetailsPageCest
             'id' => '10014-1-1',
             'title' => '14 EN product šÄßüл S | black | lether',
             'description' => '',
-            'price' => '25,00 €'
+            'price' => '25,00 €',
         ];
         $detailsPage->seeProductData($productData2)
             ->checkIfProductIsBuyable();
@@ -113,7 +113,7 @@ final class ProductDetailsPageCest
         $basketItem = [
             'title' => '14 EN product šÄßüл, S | black | lether',
             'price' => '50,00 €',
-            'amount' => 2
+            'amount' => 2,
         ];
         $detailsPage->seeMiniBasketContains([$basketItem], '50,00 €', '2');
     }
@@ -127,7 +127,7 @@ final class ProductDetailsPageCest
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $I->updateConfigInDatabase('aSortCols', 'a:2:{i:0;s:7:"oxtitle";i:1;s:13:"oxvarminprice";}', 'arr');
@@ -166,7 +166,7 @@ final class ProductDetailsPageCest
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $data = [
@@ -206,7 +206,7 @@ final class ProductDetailsPageCest
             'id' => '1002',
             'title' => 'Test product 2 [EN] šÄßüл',
             'description' => 'Test product 2 short desc [EN] šÄßüл',
-            'price' => 'from 55,00 €'
+            'price' => 'from 55,00 €',
         ];
 
         $variantData1 = [
@@ -214,7 +214,7 @@ final class ProductDetailsPageCest
             'title' => 'Test product 2 [EN] šÄßüл var1 [EN] šÄßüл',
             'variantName' => 'var1 [EN] šÄßüл',
             'description' => '',
-            'price' => '55,00 €'
+            'price' => '55,00 €',
         ];
 
         //open details page
@@ -229,7 +229,7 @@ final class ProductDetailsPageCest
         $basketItemToCheck1 = [
             'title' => 'Test product 2 [EN] šÄßüл, var1 [EN] šÄßüл',
             'price' => '165,00 €',
-            'amount' => 3
+            'amount' => 3,
         ];
 
         $detailsPage = $detailsPage->addProductToBasket(3)
@@ -242,7 +242,7 @@ final class ProductDetailsPageCest
             'title' => 'Test product 2 [EN] šÄßüл var2 [EN] šÄßüл',
             'variantName' => 'var2 [EN] šÄßüл',
             'description' => '',
-            'price' => '67,00 €'
+            'price' => '67,00 €',
         ];
 
         $detailsPage = $detailsPage->selectVariant(1, $variantData2['variantName'])
@@ -251,7 +251,7 @@ final class ProductDetailsPageCest
         $basketItemToCheck2 = [
             'title' => 'Test product 2 [EN] šÄßüл, var2 [EN] šÄßüл',
             'price' => '201,00 €',
-            'amount' => 3
+            'amount' => 3,
         ];
         $detailsPage->addProductToBasket(3)
             ->seeMiniBasketContains([$basketItemToCheck1, $basketItemToCheck2], '366,00 €', '6');
@@ -305,14 +305,14 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $accessoryData = [
             'id' => '1002',
             'title' => 'Test product 2 [EN] šÄßüл',
             'description' => 'Test product 2 short desc [EN] šÄßüл',
-            'price' => 'from 55,00 €'
+            'price' => 'from 55,00 €',
         ];
 
         $this->prepareAccessoriesDataForProduct($I, $productData['id'], $accessoryData['id']);
@@ -339,14 +339,14 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $similarProductData = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         //open details page
@@ -371,14 +371,14 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $crossSellingProductData = [
             'id' => '1002',
             'title' => 'Test product 2 [EN] šÄßüл',
             'description' => 'Test product 2 short desc [EN] šÄßüл',
-            'price' => 'from 55,00 €'
+            'price' => 'from 55,00 €',
         ];
 
         $this->prepareCrossSellingDataForProduct($I, $productData['id'], $crossSellingProductData['id']);
@@ -408,14 +408,14 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         //option "Use normal article price instead of zero A, B, C price" is ON
@@ -428,7 +428,7 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '35,00 €'
+            'price' => '35,00 €',
         ];
 
         $productDetailsPage = $productListPage->loginUser($userData['userLoginName'], $userData['userPassword'])
@@ -449,14 +449,14 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 3,
-            'totalPrice' => '105,00 €'
+            'totalPrice' => '105,00 €',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '100,00 €'
+            'totalPrice' => '100,00 €',
         ];
 
         $basketPage->seeBasketContains([$productData1, $productData2], '205,00 €');
@@ -478,14 +478,14 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
         $amountPrices = [
             'priceCase1' => [
                 'amountFrom' => 4,
                 'amountTo' => 9_999_999,
                 'discount' => 20,
-            ]
+            ],
         ];
         $this->prepareAmountPriceDataForProduct($I, $productData['id'], $amountPrices['priceCase1']);
 
@@ -497,7 +497,7 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '55,00 €'
+            'price' => '55,00 €',
         ];
 
         $basketPage = $productListPage->loginUser($userData['userLoginName'], $userData['userPassword'])
@@ -513,7 +513,7 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 5,
-            'totalPrice' => '220,00 €'
+            'totalPrice' => '220,00 €',
         ];
 
         $basketPage->seeBasketContains([$productData], '220,00 €');
@@ -533,7 +533,7 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productListPage = $I->openShop()
@@ -544,7 +544,7 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '45,00 €'
+            'price' => '45,00 €',
         ];
 
         $basketPage = $productListPage->loginUser($userData['userLoginName'], $userData['userPassword'])
@@ -559,7 +559,7 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 2,
-            'totalPrice' => '90,00 €'
+            'totalPrice' => '90,00 €',
         ];
 
         $basketPage->seeBasketContains([$productData], '90,00 €');
@@ -576,7 +576,7 @@ final class ProductDetailsPageCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
         $amountPrices = [
             'priceCase1' => [
@@ -588,7 +588,7 @@ final class ProductDetailsPageCest
                 'amountFrom' => 4,
                 'amountTo' => 9_999_999,
                 'discount' => 20,
-            ]
+            ],
         ];
 
         $this->prepareAmountPriceDataForProduct($I, $productData['id'], $amountPrices['priceCase1']);
@@ -607,10 +607,10 @@ final class ProductDetailsPageCest
         $I->updateInDatabase(
             'oxarticles',
             [
-                'OXSTOCK' => 1
+                'OXSTOCK' => 1,
             ],
             [
-                'OXID' => $this->productId
+                'OXID' => $this->productId,
             ]
         );
 
@@ -619,24 +619,22 @@ final class ProductDetailsPageCest
 
         $I->seeText(Translator::translate('LOW_STOCK'));
 
-
         $I->amGoingTo('Test product low stock label with deactivated default option');
 
         $I->updateConfigInDatabase('blStockLowDefaultMessage', '0', 'bool');
         $I->updateInDatabase(
             'oxarticles',
             [
-                'OXLOWSTOCKACTIVE' => 0
+                'OXLOWSTOCKACTIVE' => 0,
             ],
             [
-                'OXID' => $this->productId
+                'OXID' => $this->productId,
             ]
         );
         $I->reloadPage();
         $product = $this->getProductData($this->productId);
 
         $I->dontSee($product['OXSTOCKTEXT_1']);
-
 
         $I->amGoingTo('Test product low stock label with product flag enabled');
 
@@ -647,10 +645,10 @@ final class ProductDetailsPageCest
             [
                 'OXREMINDAMOUNT' => 20,
                 'OXLOWSTOCKTEXT_1' => $lowStockMessage,
-                'OXLOWSTOCKACTIVE' => 1
+                'OXLOWSTOCKACTIVE' => 1,
             ],
             [
-                'OXID' => $this->productId
+                'OXID' => $this->productId,
             ]
         );
         $I->reloadPage();
@@ -676,14 +674,13 @@ final class ProductDetailsPageCest
         $I->updateInDatabase(
             'oxarticles',
             [
-                'OXLOWSTOCKACTIVE' => 0
+                'OXLOWSTOCKACTIVE' => 0,
             ],
             [
-                'OXID' => $this->productVariantId
+                'OXID' => $this->productVariantId,
             ]
         );
         $I->seeText(Translator::translate('LOW_STOCK'));
-
 
         $I->amGoingTo('Test product low stock label with product flag enabled');
 
@@ -694,10 +691,10 @@ final class ProductDetailsPageCest
             [
                 'OXREMINDAMOUNT' => 20,
                 'OXLOWSTOCKTEXT_1' => $lowStockMessage,
-                'OXLOWSTOCKACTIVE' => 1
+                'OXLOWSTOCKACTIVE' => 1,
             ],
             [
-                'OXID' => $this->productVariantId
+                'OXID' => $this->productVariantId,
             ]
         );
         $I->reloadPage();
@@ -731,7 +728,7 @@ final class ProductDetailsPageCest
             'id' => $productId,
             'title' => 'Test product 0 [EN] šÄßüл',
             'totalPrice' => '50,00 €',
-            'amount' => 1
+            'amount' => 1,
         ];
 
         $basketPage = $I->openShop()->openBasket();

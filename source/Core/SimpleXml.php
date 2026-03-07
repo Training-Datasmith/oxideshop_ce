@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -40,7 +42,7 @@ class SimpleXml
      *
      * @return string
      */
-    public function objectToXml($oInput, $sDocument)
+    public function objectToXml($oInput, $sDocument): string|false
     {
         $oXml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"utf-8\"?><$sDocument/>");
         $this->addSimpleXmlElement($oXml, $oInput);
@@ -55,7 +57,7 @@ class SimpleXml
      *
      * @return SimpleXMLElement
      */
-    public function xmlToObject($sXml)
+    public function xmlToObject($sXml): \SimpleXMLElement|false
     {
         return simplexml_load_string($sXml);
     }
@@ -102,12 +104,12 @@ class SimpleXml
             if (is_array($mElement) && is_int(key($mElement))) {
                 $this->addSimpleXmlElement($oXml, $mElement, $sKey);
             } else {
-                $oChildNode = $oXml->addChild($sPreferredKey ? $sPreferredKey : $sKey);
+                $oChildNode = $oXml->addChild($sPreferredKey ?: $sKey);
                 $this->addNodeAttributes($oChildNode, $aAttributes);
                 $this->addSimpleXmlElement($oChildNode, $mElement);
             }
         } else {
-            $oChildNode = $oXml->addChild($sPreferredKey ? $sPreferredKey : $sKey);
+            $oChildNode = $oXml->addChild($sPreferredKey ?: $sKey);
             $oChildNode[0] = $mElement; // $oChildNode[0] is the inner text-node
             $this->addNodeAttributes($oChildNode, $aAttributes);
         }

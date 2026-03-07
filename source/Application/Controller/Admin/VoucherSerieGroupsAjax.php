@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,7 +30,7 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
                                      ['oxtitle', 'oxgroups', 1, 0, 0],
                                      ['oxid', 'oxgroups', 0, 0, 0],
                                      ['oxid', 'oxobject2group', 0, 0, 1],
-                                 ]
+                                 ],
     ];
 
     /**
@@ -49,12 +51,12 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
             $sQAdd = " from $sGroupTable where 1 ";
         } else {
             $sQAdd = " from $sGroupTable, oxobject2group where ";
-            $sQAdd .= " oxobject2group.oxobjectid = " . $oDb->quote($sVoucherId) . " and $sGroupTable.oxid = oxobject2group.oxgroupsid ";
+            $sQAdd .= ' oxobject2group.oxobjectid = ' . $oDb->quote($sVoucherId) . " and $sGroupTable.oxid = oxobject2group.oxgroupsid ";
         }
 
         if ($sSynchVoucherId && $sSynchVoucherId != $sVoucherId) {
             $sQAdd .= " and $sGroupTable.oxid not in ( select $sGroupTable.oxid from $sGroupTable, oxobject2group where ";
-            $sQAdd .= " oxobject2group.oxobjectid = " . $oDb->quote($sSynchVoucherId) . " and $sGroupTable.oxid = oxobject2group.oxgroupsid ) ";
+            $sQAdd .= ' oxobject2group.oxobjectid = ' . $oDb->quote($sSynchVoucherId) . " and $sGroupTable.oxid = oxobject2group.oxgroupsid ) ";
         }
 
         return $sQAdd;
@@ -63,14 +65,14 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Removes selected user group(s) from Voucher serie list.
      */
-    public function removeGroupFromVoucher()
+    public function removeGroupFromVoucher(): void
     {
         $aRemoveGroups = $this->getActionIds('oxobject2group.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2group.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2group.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2group where oxobject2group.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -78,7 +80,7 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Adds selected user group(s) to Voucher serie list.
      */
-    public function addGroupToVoucher()
+    public function addGroupToVoucher(): void
     {
         $aChosenCat = $this->getActionIds('oxgroups.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -87,7 +89,7 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
             $sGroupTable = $this->getViewName('oxgroups');
             $aChosenCat = $this->getAll($this->addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenCat)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCat)) {
             foreach ($aChosenCat as $sChosenCat) {
                 $oNewGroup = oxNew(\OxidEsales\Eshop\Application\Model\Object2Group::class);
                 $oNewGroup->oxobject2group__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);

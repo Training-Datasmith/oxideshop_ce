@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -29,33 +31,33 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         $oLang = Registry::getLang();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oOrder->load($soxId);
 
-            $this->_aViewData["edit"] = $oOrder;
-            $this->_aViewData["aProductVats"] = $oOrder->getProductVats();
-            $this->_aViewData["orderArticles"] = $oOrder->getOrderArticles();
-            $this->_aViewData["giftCard"] = $oOrder->getGiftCard();
-            $this->_aViewData["paymentType"] = $this->getPaymentType($oOrder);
-            $this->_aViewData["deliveryType"] = $oOrder->getDelSet();
+            $this->_aViewData['edit'] = $oOrder;
+            $this->_aViewData['aProductVats'] = $oOrder->getProductVats();
+            $this->_aViewData['orderArticles'] = $oOrder->getOrderArticles();
+            $this->_aViewData['giftCard'] = $oOrder->getGiftCard();
+            $this->_aViewData['paymentType'] = $this->getPaymentType($oOrder);
+            $this->_aViewData['deliveryType'] = $oOrder->getDelSet();
             if ($oOrder->getFieldData('oxtsprotectcosts')) {
-                $this->_aViewData["tsprotectcosts"] = $oLang->formatCurrency($oOrder->getFieldData('oxtsprotectcosts'), $oCur);
+                $this->_aViewData['tsprotectcosts'] = $oLang->formatCurrency($oOrder->getFieldData('oxtsprotectcosts'), $oCur);
             }
         }
 
         $todaySum = Price::getPriceInActCurrency($oOrder->getOrderSum(true));
-        $this->_aViewData["ordersum"] = $oLang->formatCurrency($todaySum, $oCur);
-        $this->_aViewData["ordercnt"] = $oOrder->getOrderCnt(true);
+        $this->_aViewData['ordersum'] = $oLang->formatCurrency($todaySum, $oCur);
+        $this->_aViewData['ordercnt'] = $oOrder->getOrderCnt(true);
 
         $totalSum = Price::getPriceInActCurrency($oOrder->getOrderSum());
-        $this->_aViewData["ordertotalsum"] = $oLang->formatCurrency($totalSum, $oCur);
-        $this->_aViewData["ordertotalcnt"] = $oOrder->getOrderCnt();
-        $this->_aViewData["afolder"] = $myConfig->getConfigParam('aOrderfolder');
-        $this->_aViewData["alangs"] = $oLang->getLanguageNames();
+        $this->_aViewData['ordertotalsum'] = $oLang->formatCurrency($totalSum, $oCur);
+        $this->_aViewData['ordertotalcnt'] = $oOrder->getOrderCnt();
+        $this->_aViewData['afolder'] = $myConfig->getConfigParam('aOrderfolder');
+        $this->_aViewData['alangs'] = $oLang->getLanguageNames();
 
-        $this->_aViewData["currency"] = $oCur;
+        $this->_aViewData['currency'] = $oCur;
 
-        return "order_overview";
+        return 'order_overview';
     }
 
     /**
@@ -90,7 +92,7 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     public function makeValidFileName($sFilename)
     {
         $sFilename = preg_replace('/[\s]+/', '_', $sFilename);
-        $sFilename = preg_replace('/[^a-zA-Z0-9_\.-]/', '', $sFilename);
+        $sFilename = preg_replace('/[^a-zA-Z0-9_\.-]/', '', (string) $sFilename);
 
         return str_replace(' ', '_', $sFilename);
     }
@@ -98,11 +100,11 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     /**
      * Sends order.
      */
-    public function sendorder()
+    public function sendorder(): void
     {
         $oOrder = oxNew(Order::class);
         if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field(date("Y-m-d H:i:s", Registry::getUtilsDate()->getTime()));
+            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
             $oOrder->save();
 
             // #1071C
@@ -114,7 +116,7 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                 }
             }
 
-            if (($blMail = Registry::getRequest()->getRequestEscapedParameter("sendmail"))) {
+            if (($blMail = Registry::getRequest()->getRequestEscapedParameter('sendmail'))) {
                 // send eMail
                 $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
                 $oEmail->sendSendedNowMail($oOrder);
@@ -125,11 +127,11 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     /**
      * Resets order shipping date.
      */
-    public function resetorder()
+    public function resetorder(): void
     {
         $oOrder = oxNew(Order::class);
         if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field("0000-00-00 00:00:00");
+            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field('0000-00-00 00:00:00');
             $oOrder->save();
         }
     }
@@ -142,12 +144,11 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     public function canResetShippingDate()
     {
         $oOrder = oxNew(Order::class);
-        $blCan = false;
         if ($oOrder->load($this->getEditObjectId())) {
-            $blCan = $oOrder->oxorder__oxstorno->value == "0" &&
-                     !($oOrder->oxorder__oxsenddate->value == "0000-00-00 00:00:00" || $oOrder->oxorder__oxsenddate->value == "-");
+            return $oOrder->oxorder__oxstorno->value == '0' &&
+                     !($oOrder->oxorder__oxsenddate->value == '0000-00-00 00:00:00' || $oOrder->oxorder__oxsenddate->value == '-');
         }
 
-        return $blCan;
+        return false;
     }
 }

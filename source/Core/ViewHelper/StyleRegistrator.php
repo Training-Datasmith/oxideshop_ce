@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,9 +16,9 @@ use OxidEsales\Eshop\Core\Registry;
  */
 class StyleRegistrator extends BaseRegistrator
 {
-    const CONDITIONAL_STYLES_PARAMETER_NAME = 'conditional_styles';
-    const STYLES_PARAMETER_NAME = 'styles';
-    const TAG_NAME = 'oxstyle';
+    public const CONDITIONAL_STYLES_PARAMETER_NAME = 'conditional_styles';
+    public const STYLES_PARAMETER_NAME = 'styles';
+    public const TAG_NAME = 'oxstyle';
 
     /**
      * Separate query part #3305.
@@ -25,7 +27,7 @@ class StyleRegistrator extends BaseRegistrator
      * @param string $condition
      * @param bool   $isDynamic
      */
-    public function addFile($style, $condition, $isDynamic)
+    public function addFile($style, $condition, $isDynamic): void
     {
         $suffix = $isDynamic ? '_dynamic' : '';
 

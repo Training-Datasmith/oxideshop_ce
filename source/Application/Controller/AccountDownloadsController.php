@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -32,8 +34,7 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
     /**
      * @var \OxidEsales\Eshop\Application\Model\OrderFileList
      */
-    protected $_oOrderFilesList = null;
-
+    protected $_oOrderFilesList;
 
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
@@ -49,7 +50,7 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
         /** @var \OxidEsales\Eshop\Core\SeoEncoder $oSeoEncoder */
         $oSeoEncoder = Registry::getSeoEncoder();
         $aPath['title'] = Registry::getLang()->translateString('MY_ACCOUNT', $iBaseLanguage, false);
-        $aPath['link'] = $oSeoEncoder->getStaticUrl($this->getViewConfig()->getSelfLink() . "cl=account");
+        $aPath['link'] = $oSeoEncoder->getStaticUrl($this->getViewConfig()->getSelfLink() . 'cl=account');
         $aPaths[] = $aPath;
 
         $aPath['title'] = Registry::getLang()->translateString('MY_DOWNLOADS', $iBaseLanguage, false);
@@ -96,7 +97,7 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
             $sOrderTitleField = 'oxorderfiles__oxarticletitle';
             $sOrderArticleId = $oOrderFile->$sOrderArticleIdField->value;
             $oOrderArticles[$sOrderArticleId]['oxordernr'] = $oOrderFile->$sOrderNumberField->value;
-            $oOrderArticles[$sOrderArticleId]['oxorderdate'] = substr($oOrderFile->$sOrderDateField->value, 0, 16);
+            $oOrderArticles[$sOrderArticleId]['oxorderdate'] = substr((string) $oOrderFile->$sOrderDateField->value, 0, 16);
             $oOrderArticles[$sOrderArticleId]['oxarticletitle'] = $oOrderFile->$sOrderTitleField->value;
             $oOrderArticles[$sOrderArticleId]['oxorderfiles'][] = $oOrderFile;
         }

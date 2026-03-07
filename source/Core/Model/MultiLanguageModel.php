@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,7 +30,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @var int
      */
-    protected $_iLanguage = null;
+    protected $_iLanguage;
 
     /**
      * Sometimes you need to deal with all fields not only with active
@@ -49,7 +51,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
         //lets try to differentiate cache keys for oxI18n and oxBase
         //in order not to load cached structure for the instances of oxbase classe called on same table
         if ($this->_sCacheKey) {
-            $this->_sCacheKey .= "_i18n";
+            $this->_sCacheKey .= '_i18n';
         }
     }
 
@@ -58,7 +60,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param string $lang string (default null)
      */
-    public function setLanguage($lang = null)
+    public function setLanguage($lang = null): void
     {
         $this->_iLanguage = (int) $lang;
         // reset
@@ -85,13 +87,13 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param bool $employMultilanguage New $this->_blEmployMultilanguage value
      */
-    public function setEnableMultilang($employMultilanguage)
+    public function setEnableMultilang($employMultilanguage): void
     {
         if ($this->_blEmployMultilanguage != $employMultilanguage) {
             $this->_blEmployMultilanguage = $employMultilanguage;
             if (!$employMultilanguage) {
                 //#63T
-                $this->modifyCacheKey("_nonml");
+                $this->modifyCacheKey('_nonml');
             }
             // reset
             $this->_sViewTable = false;
@@ -122,7 +124,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
         $isMultilang = (bool) $this->getFieldStatus($fieldName);
         stopProfile('!__CACHABLE2__!');
 
-        return (bool) $isMultilang;
+        return $isMultilang;
     }
 
     /**
@@ -160,10 +162,10 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string $cacheKey kache  key
      * @param bool   $override marker to force override cache key
      */
-    public function modifyCacheKey($cacheKey, $override = false)
+    public function modifyCacheKey($cacheKey, $override = false): void
     {
         if ($override) {
-            $this->_sCacheKey = $cacheKey . "|i18n";
+            $this->_sCacheKey = $cacheKey . '|i18n';
         } else {
             $this->_sCacheKey .= $cacheKey;
         }
@@ -212,9 +214,9 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         // select from non-multilanguage core view (all ml tables joined to one)
         $db = DatabaseProvider::getDb();
-        $query = "select * from " . $tableViewNameGenerator->getViewName($this->_sCoreTable, -1, -1) . " where oxid = :oxid";
+        $query = 'select * from ' . $tableViewNameGenerator->getViewName($this->_sCoreTable, -1, -1) . ' where oxid = :oxid';
         $rs = $db->getAll($query, [
-            'oxid' => $this->getId()
+            'oxid' => $this->getId(),
         ]);
 
         $notInLang = $languages;
@@ -248,7 +250,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function getFieldStatus($fieldName)
     {
         $allField = $this->getAllFields(true);
-        if (isset($allField[strtolower($fieldName) . "_1"])) {
+        if (isset($allField[strtolower($fieldName) . '_1'])) {
             return 1;
         }
 
@@ -306,14 +308,13 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function getFieldLang($fieldName)
     {
-        if (false === strpos($fieldName, '_')) {
+        if (!str_contains($fieldName, '_')) {
             return 0;
         }
         if (preg_match('/_(\d{1,2})$/', $fieldName, $regs)) {
             return $regs[1];
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     /**
@@ -327,7 +328,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $lang = $this->getLanguage();
         if ($lang && $this->_blEmployMultilanguage && $this->isMultilingualField($field)) {
-            $field .= "_" . $lang;
+            $field .= '_' . $lang;
         }
 
         return $field;
@@ -345,7 +346,6 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         parent::setUpdateSeoOnFieldChange($this->getUpdateSqlFieldName($field));
     }
-
 
     /**
      * return update fields SQL part
@@ -374,7 +374,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sql = '';
         $sep = false;
         foreach (array_keys($this->_aFieldNames) as $key) {
-            $keyLowercase = strtolower($key);
+            $keyLowercase = strtolower((string) $key);
             if ($keyLowercase != 'oxid') {
                 if ($this->_blEmployMultilanguage) {
                     if ($skipMultilingual && $this->isMultilingualField($key)) {
@@ -405,7 +405,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
 
             if (!$useSkipSaveFields || ($useSkipSaveFields && !in_array($keyLowercase, $this->_aSkipSaveFields))) {
                 $key = $this->getUpdateSqlFieldName($key);
-                $sql .= (($sep) ? ',' : '') . $key . " = " . $this->getUpdateFieldValue($key, $field);
+                $sql .= (($sep) ? ',' : '') . $key . ' = ' . $this->getUpdateFieldValue($key, $field);
                 $sep = true;
             }
         }
@@ -455,7 +455,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
             }
             foreach ($updateTables as $langTable) {
                 $insertSql = "insert into $langTable set " . $this->getUpdateFieldsForTable($langTable, $this->getUseSkipSaveFields()) .
-                             " on duplicate key update " . $this->getUpdateFieldsForTable($langTable);
+                             ' on duplicate key update ' . $this->getUpdateFieldsForTable($langTable);
 
                 $this->executeDatabaseQuery($insertSql);
             }
@@ -480,7 +480,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function getLanguageSetTables($coreTableName = null)
     {
-        $coreTableName = $coreTableName ? $coreTableName : $this->getCoreTableName();
+        $coreTableName = $coreTableName ?: $this->getCoreTableName();
 
         return oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class)->getAllMultiTables($coreTableName);
     }
@@ -541,14 +541,12 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         if ($this->_blEmployMultilanguage) {
             return parent::getAllFields($returnSimple);
-        } else {
-            $viewName = $this->getViewName();
-            if (!$viewName) {
-                return [];
-            }
-
-            return $this->getTableFields($viewName, $returnSimple);
         }
+        $viewName = $this->getViewName();
+        if (!$viewName) {
+            return [];
+        }
+        return $this->getTableFields($viewName, $returnSimple);
     }
 
     /**
@@ -558,8 +556,6 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string $status Field status (0-non multilang field, 1-multilang field)
      * @param string $type   Field type
      * @param string $length Field Length
-     *
-     * @return null
      */
     protected function addField($name, $status, $type = null, $length = null)
     {
@@ -604,7 +600,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
             //delete the record
             foreach ($this->getLanguageSetTables() as $setTbl) {
                 $db->execute("delete from {$setTbl} where oxid = :oxid", [
-                    'oxid' => $oxid
+                    'oxid' => $oxid,
                 ]);
             }
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,46 +9,36 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxStr;
-
 /**
  * Company VAT identification number (VATIN)
  */
-class CompanyVatIn
+class CompanyVatIn implements \Stringable
 {
-    /**
-     * VAT identification number
-     *
-     * @var string
-     */
-    private $_sCompanyVatNumber;
-
     /**
      * Constructor
      *
-     * @param string $sCompanyVatNumber - company vat identification number.
+     * @param string $_sCompanyVatNumber - company vat identification number.
      */
-    public function __construct($sCompanyVatNumber)
-    {
-        $this->_sCompanyVatNumber = $sCompanyVatNumber;
+    public function __construct(
+        /**
+         * VAT identification number
+         */
+        private $_sCompanyVatNumber
+    ) {
     }
 
     /**
      * Returns country code from number.
-     *
-     * @return string
      */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         return (string) \OxidEsales\Eshop\Core\Str::getStr()->strtoupper(\OxidEsales\Eshop\Core\Str::getStr()->substr($this->cleanUp($this->_sCompanyVatNumber), 0, 2));
     }
 
     /**
      * Returns country code from number.
-     *
-     * @return string
      */
-    public function getNumbers()
+    public function getNumbers(): string
     {
         return (string) \OxidEsales\Eshop\Core\Str::getStr()->substr($this->cleanUp($this->_sCompanyVatNumber), 2);
     }
@@ -55,21 +47,16 @@ class CompanyVatIn
      * Removes spaces and symbols: '-',',','.' from string
      *
      * @param string $sValue Value.
-     *
-     * @return string
      */
-    protected function cleanUp($sValue)
+    protected function cleanUp($sValue): string
     {
         return (string) \OxidEsales\Eshop\Core\Str::getStr()->preg_replace("/\s|-/", '', $sValue);
     }
 
-
     /**
      * Cast to string
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->_sCompanyVatNumber;
     }

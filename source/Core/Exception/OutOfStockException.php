@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,24 +23,22 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
 
     /**
      * Maximal possible amount (e.g. 2 if two items of the article are left).
-     *
-     * @var integer
      */
-    private $_iRemainingAmount = 0;
+    private int $_iRemainingAmount = 0;
 
     /**
      * Basket index value
      *
      * @var string
      */
-    private $_sBasketIndex = null;
+    private $_sBasketIndex;
 
     /**
      * Sets the amount of the article remaining in stock.
      *
      * @param integer $iRemainingAmount Articles remaining in stock
      */
-    public function setRemainingAmount($iRemainingAmount)
+    public function setRemainingAmount($iRemainingAmount): void
     {
         $this->_iRemainingAmount = (int) $iRemainingAmount;
     }
@@ -58,7 +58,7 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
      *
      * @param string $sBasketIndex Basket index for the faulty article
      */
-    public function setBasketIndex($sBasketIndex)
+    public function setBasketIndex($sBasketIndex): void
     {
         $this->_sBasketIndex = $sBasketIndex;
     }
@@ -81,7 +81,7 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Remaining Amount --> " . $this->_iRemainingAmount;
+        return self::class . '-' . parent::getString() . ' Remaining Amount --> ' . $this->_iRemainingAmount;
     }
 
     /**
@@ -113,13 +113,13 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
      *
      * @param string $sDestination name of the view variable
      */
-    public function setDestination($sDestination)
+    public function setDestination($sDestination): void
     {
         // in case destination not set, overriding default error message
         if (!$sDestination) {
-            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ": " . $this->getRemainingAmount();
+            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ': ' . $this->getRemainingAmount();
         } else {
-            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ": ";
+            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ': ';
         }
     }
 }

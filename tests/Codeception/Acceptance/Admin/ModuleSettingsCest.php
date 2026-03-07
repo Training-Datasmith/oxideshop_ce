@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Codeception\Acceptance\Admin;
 
-use Codeception\Attribute\Group;
-use Facebook\WebDriver\WebDriverElement;
-use OxidEsales\Codeception\Module\Translation\Translator;
-use OxidEsales\EshopCommunity\Tests\Codeception\Support\AcceptanceTester;
-
 use function codecept_data_dir;
+
+use Codeception\Attribute\Group;
+use OxidEsales\Codeception\Module\Translation\Translator;
+
+use OxidEsales\EshopCommunity\Tests\Codeception\Support\AcceptanceTester;
 
 #[Group('admin', 'moduleInstall')]
 final class ModuleSettingsCest

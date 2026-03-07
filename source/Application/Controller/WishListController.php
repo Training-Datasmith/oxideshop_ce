@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -26,21 +28,21 @@ class WishListController extends \OxidEsales\Eshop\Application\Controller\Fronte
      *
      * @return object
      */
-    protected $_oWishUser = null;
+    protected $_oWishUser;
 
     /**
      * wishlist object list
      *
      * @return object
      */
-    protected $_oWishList = null;
+    protected $_oWishList;
 
     /**
      * Wishlist search param
      *
      * @var string
      */
-    protected $_sSearchParam = null;
+    protected $_sSearchParam;
 
     /**
      * List of users which were found according to search condition
@@ -67,7 +69,7 @@ class WishListController extends \OxidEsales\Eshop\Application\Controller\Fronte
             $this->_oWishUser = false;
 
             $sWishIdParameter = Registry::getRequest()->getRequestEscapedParameter('wishid');
-            $sUserId = $sWishIdParameter ? $sWishIdParameter : Registry::getSession()->getVariable('wishid');
+            $sUserId = $sWishIdParameter ?: Registry::getSession()->getVariable('wishid');
             if ($sUserId) {
                 $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
                 if ($oUser->load($sUserId)) {
@@ -114,7 +116,7 @@ class WishListController extends \OxidEsales\Eshop\Application\Controller\Fronte
      * Template variables:
      * <b>wish_result</b>, <b>search</b>
      */
-    public function searchForWishList()
+    public function searchForWishList(): void
     {
         if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('search')) {
             // search for baskets

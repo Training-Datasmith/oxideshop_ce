@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxRegistry;
-use oxField;
 
 /**
  * PriceAlarm manager.
@@ -28,49 +27,49 @@ class PriceAlarm extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @var object
      */
-    protected $_oArticle = null;
+    protected $_oArticle;
 
     /**
      * Formatted original article price
      *
      * @var string
      */
-    protected $_fPrice = null;
+    protected $_fPrice;
 
     /**
      * Original article price
      *
      * @var double
      */
-    protected $_dPrice = null;
+    protected $_dPrice;
 
     /**
      * Full article title
      *
      * @var string
      */
-    protected $_sTitle = null;
+    protected $_sTitle;
 
     /**
      * Currency object
      *
      * @var object
      */
-    protected $_oCurrency = null;
+    protected $_oCurrency;
 
     /**
      * Customer proposed price
      *
      * @var string
      */
-    protected $_fProposedPrice = null;
+    protected $_fProposedPrice;
 
     /**
      * PriceAlarm status
      *
      * @var int
      */
-    protected $_iStatus = null;
+    protected $_iStatus;
 
     /**
      * Class constructor, initiates parent constructor (parent::oxBase()), loads
@@ -171,7 +170,7 @@ class PriceAlarm extends \OxidEsales\Eshop\Core\Model\BaseModel
                 if ($oArticle->oxarticles__oxparentid->value && !$oArticle->oxarticles__oxtitle->value) {
                     $oParent = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
                     $oParent->load($oArticle->oxarticles__oxparentid->value);
-                    $this->_sTitle = $oParent->oxarticles__oxtitle->value . " " . $oArticle->oxarticles__oxvarselect->value;
+                    $this->_sTitle = $oParent->oxarticles__oxtitle->value . ' ' . $oArticle->oxarticles__oxvarselect->value;
                 }
             }
         }
@@ -240,7 +239,7 @@ class PriceAlarm extends \OxidEsales\Eshop\Core\Model\BaseModel
             }
 
             // suggestion to user is sent
-            if ($this->oxpricealarm__oxsended->value != "0000-00-00 00:00:00") {
+            if ($this->oxpricealarm__oxsended->value != '0000-00-00 00:00:00') {
                 $this->_iStatus = 2;
             }
         }

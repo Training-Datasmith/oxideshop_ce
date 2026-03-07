@@ -9,13 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Password\Service;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Exception\PasswordPolicyException;
 use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicyInterface;
 use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\Argon2IPasswordHashService;
 use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\BcryptPasswordHashService;
 use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\PasswordHashServiceInterface;
 use OxidEsales\EshopCommunity\Tests\ContainerTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class PasswordHashServiceTest extends TestCase
@@ -79,7 +79,6 @@ final class PasswordHashServiceTest extends TestCase
             PASSWORD_ARGON2_DEFAULT_THREADS
         );
     }
-
 
     /**
      * @return PasswordPolicyInterface|MockObject

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -44,133 +46,133 @@ class Email extends PHPMailer
      *
      * @var string
      */
-    protected $_sForgotPwdTemplate = "email/html/forgotpwd";
+    protected $_sForgotPwdTemplate = 'email/html/forgotpwd';
 
     /**
      * Password reminder plain mail template
      *
      * @var string
      */
-    protected $_sForgotPwdTemplatePlain = "email/plain/forgotpwd";
+    protected $_sForgotPwdTemplatePlain = 'email/plain/forgotpwd';
 
     /**
      * Newsletter registration mail template
      *
      * @var string
      */
-    protected $_sNewsletterOptInTemplate = "email/html/newsletteroptin";
+    protected $_sNewsletterOptInTemplate = 'email/html/newsletteroptin';
 
     /**
      * Newsletter registration plain mail template
      *
      * @var string
      */
-    protected $_sNewsletterOptInTemplatePlain = "email/plain/newsletteroptin";
+    protected $_sNewsletterOptInTemplatePlain = 'email/plain/newsletteroptin';
 
     /**
      * Product suggest mail template
      *
      * @var string
      */
-    protected $_sInviteTemplate = "email/html/invite";
+    protected $_sInviteTemplate = 'email/html/invite';
 
     /**
      * Product suggest plain mail template
      *
      * @var string
      */
-    protected $_sInviteTemplatePlain = "email/plain/invite";
+    protected $_sInviteTemplatePlain = 'email/plain/invite';
 
     /**
      * Send order notification mail template
      *
      * @var string
      */
-    protected $_sSenedNowTemplate = "email/html/ordershipped";
+    protected $_sSenedNowTemplate = 'email/html/ordershipped';
 
     /**
      * Send order notification plain mail template
      *
      * @var string
      */
-    protected $_sSenedNowTemplatePlain = "email/plain/ordershipped";
+    protected $_sSenedNowTemplatePlain = 'email/plain/ordershipped';
 
     /**
      * Send ordered download links mail template
      *
      * @var string
      */
-    protected $_sSendDownloadsTemplate = "email/html/senddownloadlinks";
+    protected $_sSendDownloadsTemplate = 'email/html/senddownloadlinks';
 
     /**
      * Send ordered download links plain mail template
      *
      * @var string
      */
-    protected $_sSendDownloadsTemplatePlain = "email/plain/senddownloadlinks";
+    protected $_sSendDownloadsTemplatePlain = 'email/plain/senddownloadlinks';
 
     /**
      * Wishlist mail template
      *
      * @var string
      */
-    protected $_sWishListTemplate = "email/html/wishlist";
+    protected $_sWishListTemplate = 'email/html/wishlist';
 
     /**
      * Wishlist plain mail template
      *
      * @var string
      */
-    protected $_sWishListTemplatePlain = "email/plain/wishlist";
+    protected $_sWishListTemplatePlain = 'email/plain/wishlist';
 
     /**
      * Name of template used during registration
      *
      * @var string
      */
-    protected $_sRegisterTemplate = "email/html/register";
+    protected $_sRegisterTemplate = 'email/html/register';
 
     /**
      * Name of plain template used during registration
      *
      * @var string
      */
-    protected $_sRegisterTemplatePlain = "email/plain/register";
+    protected $_sRegisterTemplatePlain = 'email/plain/register';
 
     /**
      * Name of template used by reminder function (article).
      *
      * @var string
      */
-    protected $_sReminderMailTemplate = "email/html/owner_reminder";
+    protected $_sReminderMailTemplate = 'email/html/owner_reminder';
 
     /**
      * Order e-mail for customer HTML template
      *
      * @var string
      */
-    protected $_sOrderUserTemplate = "email/html/order_cust";
+    protected $_sOrderUserTemplate = 'email/html/order_cust';
 
     /**
      * Order e-mail for customer plain text template
      *
      * @var string
      */
-    protected $_sOrderUserPlainTemplate = "email/plain/order_cust";
+    protected $_sOrderUserPlainTemplate = 'email/plain/order_cust';
 
     /**
      * Order e-mail for shop owner HTML template
      *
      * @var string
      */
-    protected $_sOrderOwnerTemplate = "email/html/order_owner";
+    protected $_sOrderOwnerTemplate = 'email/html/order_owner';
 
     /**
      * Order e-mail for shop owner plain text template
      *
      * @var string
      */
-    protected $_sOrderOwnerPlainTemplate = "email/plain/order_owner";
+    protected $_sOrderOwnerPlainTemplate = 'email/plain/order_owner';
 
     // #586A - additional templates for more customizable subjects
 
@@ -179,28 +181,28 @@ class Email extends PHPMailer
      *
      * @var string
      */
-    protected $_sOrderUserSubjectTemplate = "email/html/order_cust_subj";
+    protected $_sOrderUserSubjectTemplate = 'email/html/order_cust_subj';
 
     /**
      * Order e-mail subject for shop owner template
      *
      * @var string
      */
-    protected $_sOrderOwnerSubjectTemplate = "email/html/order_owner_subj";
+    protected $_sOrderOwnerSubjectTemplate = 'email/html/order_owner_subj';
 
     /**
      * Price alarm e-mail for shop owner template
      *
      * @var string
      */
-    protected $_sOwnerPricealarmTemplate = "email/html/pricealarm_owner";
+    protected $_sOwnerPricealarmTemplate = 'email/html/pricealarm_owner';
 
     /**
      * Price alarm e-mail for shop owner template
      *
      * @var string
      */
-    protected $_sPricealamrCustomerTemplate = "email_pricealarm_customer";
+    protected $_sPricealamrCustomerTemplate = 'email_pricealarm_customer';
 
     /**
      * Language specific viewconfig object array containing view data, view config and shop object
@@ -214,7 +216,7 @@ class Email extends PHPMailer
      *
      * @var bool
      */
-    protected $_blInlineImgEmail = null;
+    protected $_blInlineImgEmail;
 
     /**
      * Array of recipient email addresses
@@ -242,14 +244,14 @@ class Email extends PHPMailer
      *
      * @var \OxidEsales\Eshop\Application\Model\Shop
      */
-    protected $_oShop = null;
+    protected $_oShop;
 
     /**
      * Email charset
      *
      * @var string
      */
-    protected $_sCharSet = null;
+    protected $_sCharSet;
 
     public function __construct()
     {
@@ -258,9 +260,7 @@ class Email extends PHPMailer
         $myConfig = Registry::getConfig();
 
         $this->setSmtp();
-        $this::$validator = static function ($email) {
-            return filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) !== false;
-        };
+        $this::$validator = (static fn ($email) => filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) !== false);
 
         $this->setUseInlineImages($myConfig->getConfigParam('blInlineImgEmail'));
         $this->setMailWordWrap(100);
@@ -289,7 +289,7 @@ class Email extends PHPMailer
             return call_user_func_array([&$this, $method], $arguments);
         }
         throw new SystemComponentException(
-            "Function '$method' does not exist or is not accessible! (" . get_class($this) . ")" . PHP_EOL
+            "Function '$method' does not exist or is not accessible! (" . static::class . ')' . PHP_EOL
         );
     }
 
@@ -376,7 +376,7 @@ class Email extends PHPMailer
         if (Str::getStr()->preg_match('@^([0-9a-z]+://)?(.*)$@i', $url, $match)) {
             if ($match[1]) {
                 if (($match[1] == 'ssl://') || ($match[1] == 'tls://')) {
-                    $this->set("SMTPSecure", substr($match[1], 0, 3));
+                    $this->set('SMTPSecure', substr($match[1], 0, 3));
                 } else {
                     $protocol = $match[1];
                 }
@@ -391,23 +391,21 @@ class Email extends PHPMailer
      * Sets SMTP mailer parameters, such as user name, password, location.
      *
      * @param \OxidEsales\Eshop\Application\Model\Shop $shop Object, that keeps base shop info
-     *
-     * @return null
      */
-    public function setSmtp($shop = null)
+    public function setSmtp($shop = null): void
     {
         $shop = ($shop) ?: $this->getShop();
 
         $smtpUrl = $this->setSmtpProtocol($shop->oxshops__oxsmtp->value);
 
         if (!$this->isValidSmtpHost($smtpUrl)) {
-            $this->setMailer("mail");
+            $this->setMailer('mail');
 
             return;
         }
 
         $this->setHost($smtpUrl);
-        $this->setMailer("smtp");
+        $this->setMailer('smtp');
 
         if ($shop->oxshops__oxsmtpuser->value) {
             $this->setSmtpAuthInfo($shop->oxshops__oxsmtpuser->value, $shop->oxshops__oxsmtppwd->getRawValue());
@@ -470,9 +468,9 @@ class Email extends PHPMailer
         $this->setUser($user);
 
         $renderer = $this->getRenderer();
-        $this->setViewData("order", $order);
+        $this->setViewData('order', $order);
 
-        $this->setViewData("blShowReviewLink", $this->shouldProductReviewLinksBeIncluded());
+        $this->setViewData('blShowReviewLink', $this->shouldProductReviewLinksBeIncluded());
 
         $this->processViewArray();
 
@@ -485,13 +483,13 @@ class Email extends PHPMailer
                 $subject = $renderer->renderTemplate($this->_sOrderUserSubjectTemplate, $this->getViewData());
             } else {
                 $subject = $shop->oxshops__oxordersubject->getRawValue()
-                    . " (#" . $order->oxorder__oxordernr->value . ")";
+                    . ' (#' . $order->oxorder__oxordernr->value . ')';
             }
         }
 
         $this->setSubject($subject);
 
-        $fullName = $user->oxuser__oxfname->getRawValue() . " " . $user->oxuser__oxlname->getRawValue();
+        $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
 
         $this->setRecipient($user->oxuser__oxusername->value, $fullName);
         $this->setReplyTo($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
@@ -515,7 +513,7 @@ class Email extends PHPMailer
                 ->notice('Order email not sent to owner due to disabled configuration option');
             return true;
         }
-        $config = Registry::getConfig();
+        Registry::getConfig();
 
         $shop = $this->getShop();
 
@@ -538,7 +536,7 @@ class Email extends PHPMailer
         $this->setSmtp($shop);
 
         $renderer = $this->getRenderer();
-        $this->setViewData("order", $order);
+        $this->setViewData('order', $order);
 
         $this->processViewArray();
 
@@ -551,15 +549,15 @@ class Email extends PHPMailer
                 $subject = $renderer->renderTemplate($this->_sOrderOwnerSubjectTemplate, $this->getViewData());
             } else {
                 $subject = $shop->oxshops__oxordersubject->getRawValue()
-                    . " (#" . $order->oxorder__oxordernr->value . ")";
+                    . ' (#' . $order->oxorder__oxordernr->value . ')';
             }
         }
 
         $this->setSubject($subject);
-        $this->setRecipient($shop->oxshops__oxowneremail->value, $language->translateString("order"));
+        $this->setRecipient($shop->oxshops__oxowneremail->value, $language->translateString('order'));
 
-        if ($user->oxuser__oxusername->value != "admin") {
-            $fullName = $user->oxuser__oxfname->getRawValue() . " " . $user->oxuser__oxlname->getRawValue();
+        if ($user->oxuser__oxusername->value != 'admin') {
+            $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
             $this->setReplyTo($user->oxuser__oxusername->value, $fullName);
         }
 
@@ -581,7 +579,7 @@ class Email extends PHPMailer
         $remark = oxNew(\OxidEsales\Eshop\Application\Model\Remark::class);
         $remark->oxremark__oxtext = new OxidEsalesField($this->getAltBody(), OxidEsalesField::T_RAW);
         $remark->oxremark__oxparentid = new OxidEsalesField($user->getId(), OxidEsalesField::T_RAW);
-        $remark->oxremark__oxtype = new OxidEsalesField("o", OxidEsalesField::T_RAW);
+        $remark->oxremark__oxtype = new OxidEsalesField('o', OxidEsalesField::T_RAW);
         $remark->save();
     }
 
@@ -596,8 +594,8 @@ class Email extends PHPMailer
      */
     public function sendRegisterConfirmEmail($user, $subject = null)
     {
-        $this->setViewData("contentident", "oxregisteraltemail");
-        $this->setViewData("contentplainident", "oxregisterplainaltemail");
+        $this->setViewData('contentident', 'oxregisteraltemail');
+        $this->setViewData('contentplainident', 'oxregisterplainaltemail');
 
         return $this->sendRegisterEmail($user, $subject);
     }
@@ -627,9 +625,9 @@ class Email extends PHPMailer
         $this->setBody($renderer->renderTemplate($this->_sRegisterTemplate, $this->getViewData()));
         $this->setAltBody($renderer->renderTemplate($this->_sRegisterTemplatePlain, $this->getViewData()));
 
-        $this->setSubject(($subject !== null) ? $subject : $shop->oxshops__oxregistersubject->getRawValue());
+        $this->setSubject($subject ?? $shop->oxshops__oxregistersubject->getRawValue());
 
-        $fullName = $user->oxuser__oxfname->getRawValue() . " " . $user->oxuser__oxlname->getRawValue();
+        $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
 
         $this->setRecipient($user->oxuser__oxusername->value, $fullName);
         $this->setReplyTo($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
@@ -660,9 +658,9 @@ class Email extends PHPMailer
             $this->setMailParams($shop);
             $this->setBody($renderer->renderTemplate($this->_sForgotPwdTemplate, $this->getViewData()));
             $this->setAltBody($renderer->renderTemplate($this->_sForgotPwdTemplatePlain, $this->getViewData()));
-            $this->setSubject(($subject !== null) ? $subject : $shop->oxshops__oxforgotpwdsubject->getRawValue());
+            $this->setSubject($subject ?? $shop->oxshops__oxforgotpwdsubject->getRawValue());
 
-            $fullName = $user->oxuser__oxfname->getRawValue() . " " . $user->oxuser__oxlname->getRawValue();
+            $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
             $recipientAddress = $user->oxuser__oxusername->getRawValue();
 
             $this->setRecipient($recipientAddress, $fullName);
@@ -697,9 +695,9 @@ class Email extends PHPMailer
         $this->setBody($message);
         $this->setSubject($subject);
 
-        $this->setRecipient($shop->oxshops__oxinfoemail->value, "");
+        $this->setRecipient($shop->oxshops__oxinfoemail->value, '');
         $this->setFrom($shop->oxshops__oxowneremail->value, $shop->oxshops__oxname->getRawValue());
-        $this->setReplyTo($emailAddress, "");
+        $this->setReplyTo($emailAddress, '');
 
         return $this->send();
     }
@@ -724,7 +722,7 @@ class Email extends PHPMailer
 
         $renderer = $this->getRenderer();
         $confirmCode = md5($user->oxuser__oxusername->value . $user->oxuser__oxpasssalt->value);
-        $this->setViewData("subscribeLink", $this->getNewsSubsLink($user->oxuser__oxid->value, $confirmCode));
+        $this->setViewData('subscribeLink', $this->getNewsSubsLink($user->oxuser__oxid->value, $confirmCode));
         $this->setUser($user);
 
         $this->processViewArray();
@@ -732,14 +730,10 @@ class Email extends PHPMailer
         $this->setBody($renderer->renderTemplate($this->_sNewsletterOptInTemplate, $this->getViewData()));
         $this->setAltBody($renderer->renderTemplate($this->_sNewsletterOptInTemplatePlain, $this->getViewData()));
         $this->setSubject(
-            ($subject !== null)
-                ? $subject
-                : Registry::getLang()->translateString("NEWSLETTER")
-                . ' '
-                . $shop->oxshops__oxname->getRawValue()
+            $subject ?? Registry::getLang()->translateString('NEWSLETTER') . ' ' . $shop->oxshops__oxname->getRawValue()
         );
 
-        $fullName = $user->oxuser__oxfname->getRawValue() . " " . $user->oxuser__oxlname->getRawValue();
+        $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
 
         $this->setRecipient($user->oxuser__oxusername->value, $fullName);
         $this->setFrom($shop->oxshops__oxinfoemail->value, $shop->oxshops__oxname->getRawValue());
@@ -755,7 +749,7 @@ class Email extends PHPMailer
 
         $url = $myConfig->getShopHomeUrl() . 'cl=newsletter&amp;fnc=addme&amp;uid=' . $id;
         $url .= '&amp;lang=' . $actShopLang;
-        $url .= ($confirmCode) ? '&amp;confirm=' . $confirmCode : "";
+        $url .= ($confirmCode) ? '&amp;confirm=' . $confirmCode : '';
 
         return $url;
     }
@@ -788,15 +782,15 @@ class Email extends PHPMailer
 
         if ($myConfig->getActiveView()->isActive('Invitations') && $activeUser = $shop->getUser()) {
             $homeUrl = Registry::getUtilsUrl()->appendParamSeparator($homeUrl);
-            $homeUrl .= "su=" . $activeUser->getId();
+            $homeUrl .= 'su=' . $activeUser->getId();
         }
 
         if (is_array($user->rec_email) && count($user->rec_email) > 0) {
             foreach ($user->rec_email as $email) {
                 if (!empty($email)) {
                     $registerUrl = Registry::getUtilsUrl()->appendParamSeparator($homeUrl);
-                    $registerUrl .= "re=" . md5($email);
-                    $this->setViewData("sHomeUrl", $registerUrl);
+                    $registerUrl .= 're=' . md5((string) $email);
+                    $this->setViewData('sHomeUrl', $registerUrl);
 
                     // Process view data array through oxoutput processor
                     $this->processViewArray();
@@ -832,7 +826,7 @@ class Email extends PHPMailer
     {
         $myConfig = Registry::getConfig();
 
-        $orderLang = (int) (isset($order->oxorder__oxlang->value) ? $order->oxorder__oxlang->value : 0);
+        $orderLang = (int) ($order->oxorder__oxlang->value ?? 0);
 
         $shop = $this->getShop($orderLang);
 
@@ -840,15 +834,15 @@ class Email extends PHPMailer
 
         $lang = Registry::getLang();
         $renderer = $this->getRenderer();
-        $this->setViewData("order", $order);
-        $this->setViewData("shopTemplateDir", $myConfig->getTemplateDir(false));
+        $this->setViewData('order', $order);
+        $this->setViewData('shopTemplateDir', $myConfig->getTemplateDir(false));
 
         if ($myConfig->getConfigParam('bl_perfLoadReviews', false)) {
-            $this->setViewData("blShowReviewLink", true);
+            $this->setViewData('blShowReviewLink', true);
             $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-            $this->setViewData("reviewuserhash", $user->getReviewUserHash($order->oxorder__oxuserid->value));
+            $this->setViewData('reviewuserhash', $user->getReviewUserHash($order->oxorder__oxuserid->value));
         } else {
-            $this->setViewData("blShowReviewLink", false);
+            $this->setViewData('blShowReviewLink', false);
         }
 
         $this->processViewArray();
@@ -865,9 +859,9 @@ class Email extends PHPMailer
         $lang->setTplLanguage($oldTplLang);
         $lang->setBaseLanguage($oldBaseLang);
 
-        $this->setSubject(($subject !== null) ? $subject : $shop->oxshops__oxsendednowsubject->getRawValue());
+        $this->setSubject($subject ?? $shop->oxshops__oxsendednowsubject->getRawValue());
 
-        $fullName = $order->oxorder__oxbillfname->getRawValue() . " " . $order->oxorder__oxbilllname->getRawValue();
+        $fullName = $order->oxorder__oxbillfname->getRawValue() . ' ' . $order->oxorder__oxbilllname->getRawValue();
 
         $this->setRecipient($order->oxorder__oxbillemail->value, $fullName);
         $this->setReplyTo($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
@@ -888,7 +882,7 @@ class Email extends PHPMailer
     {
         $myConfig = Registry::getConfig();
 
-        $orderLang = (int) (isset($order->oxorder__oxlang->value) ? $order->oxorder__oxlang->value : 0);
+        $orderLang = (int) ($order->oxorder__oxlang->value ?? 0);
 
         $shop = $this->getShop($orderLang);
 
@@ -896,11 +890,11 @@ class Email extends PHPMailer
 
         $lang = Registry::getLang();
         $renderer = $this->getRenderer();
-        $this->setViewData("order", $order);
-        $this->setViewData("shopTemplateDir", $myConfig->getTemplateDir(false));
+        $this->setViewData('order', $order);
+        $this->setViewData('shopTemplateDir', $myConfig->getTemplateDir(false));
 
         $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        $this->setViewData("reviewuserhash", $user->getReviewUserHash($order->oxorder__oxuserid->value));
+        $this->setViewData('reviewuserhash', $user->getReviewUserHash($order->oxorder__oxuserid->value));
 
         $this->processViewArray();
 
@@ -916,9 +910,9 @@ class Email extends PHPMailer
         $lang->setTplLanguage($oldTplLang);
         $lang->setBaseLanguage($oldBaseLang);
 
-        $this->setSubject(($subject !== null) ? $subject : $lang->translateString("DOWNLOAD_LINKS", null, false));
+        $this->setSubject($subject ?? $lang->translateString('DOWNLOAD_LINKS', null, false));
 
-        $fullName = $order->oxorder__oxbillfname->getRawValue() . " " . $order->oxorder__oxbilllname->getRawValue();
+        $fullName = $order->oxorder__oxbillfname->getRawValue() . ' ' . $order->oxorder__oxbilllname->getRawValue();
 
         $this->setRecipient($order->oxorder__oxbillemail->value, $fullName);
         $this->setReplyTo($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
@@ -942,12 +936,12 @@ class Email extends PHPMailer
 
         if (is_array($to)) {
             foreach ($to as $address) {
-                $this->setRecipient($address, "");
-                $this->setReplyTo($address, "");
+                $this->setRecipient($address, '');
+                $this->setReplyTo($address, '');
             }
         } else {
-            $this->setRecipient($to, "");
-            $this->setReplyTo($to, "");
+            $this->setRecipient($to, '');
+            $this->setReplyTo($to, '');
         }
 
         $this->isHTML(false);
@@ -981,15 +975,15 @@ class Email extends PHPMailer
             $lang = Registry::getLang();
 
             $renderer = $this->getRenderer();
-            $this->setViewData("articles", $articleList);
+            $this->setViewData('articles', $articleList);
 
             $this->processViewArray();
 
             $this->setRecipient($shop->oxshops__oxowneremail->value, $shop->oxshops__oxname->getRawValue());
             $this->setFrom($shop->oxshops__oxowneremail->value, $shop->oxshops__oxname->getRawValue());
             $this->setBody($renderer->renderTemplate($this->_sReminderMailTemplate, $this->getViewData()));
-            $this->setAltBody("");
-            $this->setSubject(($subject !== null) ? $subject : $lang->translateString('STOCK_LOW'));
+            $this->setAltBody('');
+            $this->setSubject($subject ?? $lang->translateString('STOCK_LOW'));
 
             $send = $this->send();
         }
@@ -1051,23 +1045,19 @@ class Email extends PHPMailer
         $lang = Registry::getLang();
 
         $renderer = $this->getRenderer();
-        $this->setViewData("product", $article);
-        $this->setViewData("email", $params['email']);
-        $this->setViewData("bidprice", $lang->formatCurrency($alarm->oxpricealarm__oxprice->value));
+        $this->setViewData('product', $article);
+        $this->setViewData('email', $params['email']);
+        $this->setViewData('bidprice', $lang->formatCurrency($alarm->oxpricealarm__oxprice->value));
 
         $this->processViewArray();
 
         $this->setRecipient($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
         $this->setSubject(
-            ($subject !== null)
-                ? $subject
-                : $lang->translateString('PRICE_ALERT_FOR_PRODUCT', $alarmLang)
-                . ' '
-                . $article->oxarticles__oxtitle->getRawValue()
+            $subject ?? $lang->translateString('PRICE_ALERT_FOR_PRODUCT', $alarmLang) . ' ' . $article->oxarticles__oxtitle->getRawValue()
         );
         $this->setBody($renderer->renderTemplate($this->_sOwnerPricealarmTemplate, $this->getViewData()));
-        $this->setFrom($params['email'], "");
-        $this->setReplyTo($params['email'], "");
+        $this->setFrom($params['email'], '');
+        $this->setReplyTo($params['email'], '');
 
         return $this->send();
     }
@@ -1088,10 +1078,10 @@ class Email extends PHPMailer
 
         $renderer = $this->getRenderer();
 
-        $this->setViewData("product", $alarm->getArticle());
-        $this->setViewData("oPriceAlarm", $alarm);
-        $this->setViewData("bidprice", $alarm->getFProposedPrice());
-        $this->setViewData("currency", $alarm->getPriceAlarmCurrency());
+        $this->setViewData('product', $alarm->getArticle());
+        $this->setViewData('oPriceAlarm', $alarm);
+        $this->setViewData('bidprice', $alarm->getFProposedPrice());
+        $this->setViewData('currency', $alarm->getPriceAlarmCurrency());
 
         $this->processViewArray();
 
@@ -1108,9 +1098,8 @@ class Email extends PHPMailer
 
         if ($returnMailBody) {
             return $this->getBody();
-        } else {
-            return $this->send();
         }
+        return $this->send();
     }
 
     protected function includeImages(
@@ -1124,7 +1113,7 @@ class Email extends PHPMailer
         if (
             preg_match_all(
                 '/<\s*img\s+[^>]*?src[\s]*=[\s]*[\'"]?([^[\'">]]+|.*?)?[\'">]/i',
-                $body,
+                (string) $body,
                 $matches,
                 PREG_SET_ORDER
             )
@@ -1137,7 +1126,7 @@ class Email extends PHPMailer
             $imageDir = $fileUtils->normalizeDir($imageDir);
             $imageDirNoSSL = $fileUtils->normalizeDir($imageDirNoSSL);
 
-            if (is_array($matches) && count($matches)) {
+            if (count($matches)) {
                 $imageCache = [];
                 $myUtils = Registry::getUtils();
                 $myUtilsObject = $this->getUtilsObjectInstance();
@@ -1149,9 +1138,9 @@ class Email extends PHPMailer
                     if (is_string($dynImageDir) && str_starts_with($imageName, $dynImageDir)) {
                         $fileName = $fileUtils->normalizeDir($absDynImageDir)
                             . str_replace($dynImageDir, '', $imageName);
-                    } elseif (str_starts_with($imageName, $imageDir)) {
+                    } elseif (str_starts_with($imageName, (string) $imageDir)) {
                         $fileName = $fileUtils->normalizeDir($absImageDir) . str_replace($imageDir, '', $imageName);
-                    } elseif (str_starts_with($imageName, $imageDirNoSSL)) {
+                    } elseif (str_starts_with($imageName, (string) $imageDirNoSSL)) {
                         $fileName = $fileUtils->normalizeDir($absImageDir)
                             . str_replace($imageDirNoSSL, '', $imageName);
                     }
@@ -1167,7 +1156,7 @@ class Email extends PHPMailer
                             $cId = $myUtilsObject->generateUId();
                             $mIME = $myUtils->oxMimeContentType($fileName);
                             if (in_array($mIME, ['image/jpeg', 'image/gif', 'image/png', 'image/webp'])) {
-                                if ($this->addEmbeddedImage($fileName, $cId, "image", "base64", $mIME)) {
+                                if ($this->addEmbeddedImage($fileName, $cId, 'image', 'base64', $mIME)) {
                                     $imageCache[$fileName] = $cId;
                                 } else {
                                     $cId = '';
@@ -1190,12 +1179,12 @@ class Email extends PHPMailer
         }
     }
 
-    public function setSubject($subject = null)
+    public function setSubject($subject = null): void
     {
         // A. HTML entities in subjects must be replaced
         $subject = str_replace(['&amp;', '&quot;', '&#039;', '&lt;', '&gt;'], ['&', '"', "'", '<', '>'], $subject);
 
-        $this->set("Subject", $subject);
+        $this->set('Subject', $subject);
     }
 
     public function getSubject()
@@ -1203,13 +1192,13 @@ class Email extends PHPMailer
         return $this->Subject;
     }
 
-    public function setBody($body = null, $clearSid = true)
+    public function setBody($body = null, $clearSid = true): void
     {
         if ($clearSid) {
             $body = $this->clearSidFromBody($body);
         }
 
-        $this->set("Body", $body);
+        $this->set('Body', $body);
     }
 
     public function getBody()
@@ -1217,7 +1206,7 @@ class Email extends PHPMailer
         return $this->Body;
     }
 
-    public function setAltBody($altBody = null, $clearSid = true)
+    public function setAltBody($altBody = null, $clearSid = true): void
     {
         if ($clearSid) {
             $altBody = $this->clearSidFromBody($altBody);
@@ -1226,7 +1215,7 @@ class Email extends PHPMailer
         // A. alt body is used for plain text emails so we should eliminate HTML entities
         $altBody = str_replace(['&amp;', '&quot;', '&#039;', '&lt;', '&gt;'], ['&', '"', "'", '<', '>'], $altBody);
 
-        $this->set("AltBody", $altBody);
+        $this->set('AltBody', $altBody);
     }
 
     public function getAltBody()
@@ -1234,7 +1223,7 @@ class Email extends PHPMailer
         return $this->AltBody;
     }
 
-    public function setRecipient($address = null, $name = null)
+    public function setRecipient($address = null, $name = null): void
     {
         try {
             $address = $this->idnToAscii($address);
@@ -1243,7 +1232,7 @@ class Email extends PHPMailer
 
             // copying values as original class does not allow to access recipients array
             $this->_aRecipients[] = [$address, $name];
-        } catch (Exception $exception) {
+        } catch (Exception) {
         }
     }
 
@@ -1262,13 +1251,13 @@ class Email extends PHPMailer
         return $this->bcc;
     }
 
-    public function clearAllRecipients()
+    public function clearAllRecipients(): void
     {
         $this->_aRecipients = [];
         parent::clearAllRecipients();
     }
 
-    public function setReplyTo($email = null, $name = null)
+    public function setReplyTo($email = null, $name = null): void
     {
         $emailValidator = ContainerFacade::get(EmailValidatorServiceBridgeInterface::class);
         if (!$emailValidator->isEmailValid($email)) {
@@ -1279,7 +1268,7 @@ class Email extends PHPMailer
 
         try {
             parent::addReplyTo($email, $name);
-        } catch (Exception $ex) {
+        } catch (Exception) {
         }
     }
 
@@ -1288,7 +1277,7 @@ class Email extends PHPMailer
         return $this->_aReplies;
     }
 
-    public function clearReplyTos()
+    public function clearReplyTos(): void
     {
         $this->_aReplies = [];
         parent::clearReplyTos();
@@ -1297,12 +1286,12 @@ class Email extends PHPMailer
     public function setFrom($address, $name = '', $auto = true)
     {
         $address = substr($address, 0, 150);
-        $name = substr($name, 0, 150);
+        $name = substr((string) $name, 0, 150);
 
         $success = false;
         try {
             $success = parent::setFrom($address, $name, $auto);
-        } catch (Exception $exception) {
+        } catch (Exception) {
         }
 
         return $success;
@@ -1318,19 +1307,19 @@ class Email extends PHPMailer
         return $this->FromName;
     }
 
-    public function setCharSet($charSet = null)
+    public function setCharSet($charSet = null): void
     {
         if ($charSet) {
             $this->_sCharSet = $charSet;
         } else {
-            $this->_sCharSet = Registry::getLang()->translateString("charset");
+            $this->_sCharSet = Registry::getLang()->translateString('charset');
         }
-        $this->set("CharSet", $this->_sCharSet);
+        $this->set('CharSet', $this->_sCharSet);
     }
 
-    public function setMailer($mailer = null)
+    public function setMailer($mailer = null): void
     {
-        $this->set("Mailer", $mailer);
+        $this->set('Mailer', $mailer);
     }
 
     public function getMailer()
@@ -1338,9 +1327,9 @@ class Email extends PHPMailer
         return $this->Mailer;
     }
 
-    public function setHost($host = null)
+    public function setHost($host = null): void
     {
-        $this->set("Host", $host);
+        $this->set('Host', $host);
     }
 
     public function getErrorInfo()
@@ -1348,19 +1337,19 @@ class Email extends PHPMailer
         return $this->ErrorInfo;
     }
 
-    public function setMailWordWrap($wordWrap = null)
+    public function setMailWordWrap($wordWrap = null): void
     {
-        $this->set("WordWrap", $wordWrap);
+        $this->set('WordWrap', $wordWrap);
     }
 
-    public function setUseInlineImages($useImages = null)
+    public function setUseInlineImages($useImages = null): void
     {
         $this->_blInlineImgEmail = $useImages;
     }
 
     public function headerLine($name, $value)
     {
-        if (stripos($name, 'X-') !== false) {
+        if (stripos((string) $name, 'X-') !== false) {
             return null;
         }
 
@@ -1376,7 +1365,7 @@ class Email extends PHPMailer
     {
         $recipients = $this->getRecipient();
 
-        $ownerMessage = "Error sending eMail(" . $this->getSubject() . ") to: \n\n";
+        $ownerMessage = 'Error sending eMail(' . $this->getSubject() . ") to: \n\n";
 
         foreach ($recipients as $eMail) {
             $ownerMessage .= $eMail[0];
@@ -1387,7 +1376,7 @@ class Email extends PHPMailer
 
         $shop = $this->getShop();
 
-        return @mail($shop->oxshops__oxorderemail->value, "eMail problem in shop!", $ownerMessage);
+        return @mail((string) $shop->oxshops__oxorderemail->value, 'eMail problem in shop!', $ownerMessage);
     }
 
     protected function addUserInfoOrderEMail($order)
@@ -1434,11 +1423,7 @@ class Email extends PHPMailer
     public function getShop($langId = null, $shopId = null)
     {
         if ($langId === null && $shopId === null) {
-            if (isset($this->_oShop)) {
-                return $this->_oShop;
-            } else {
-                return $this->_oShop = Registry::getConfig()->getActiveShop();
-            }
+            return $this->_oShop ?? $this->_oShop = Registry::getConfig()->getActiveShop();
         }
 
         $myConfig = Registry::getConfig();
@@ -1457,21 +1442,21 @@ class Email extends PHPMailer
 
     protected function setSmtpAuthInfo($userName = null, $userPassword = null)
     {
-        $this->set("SMTPAuth", true);
-        $this->set("Username", $userName);
-        $this->set("Password", $userPassword);
+        $this->set('SMTPAuth', true);
+        $this->set('Username', $userName);
+        $this->set('Password', $userPassword);
     }
 
     protected function setSmtpDebug($debug = null)
     {
-        $this->set("SMTPDebug", $debug);
+        $this->set('SMTPDebug', $debug);
     }
 
     protected function makeOutputProcessing()
     {
         $output = oxNew(\OxidEsales\Eshop\Core\Output::class);
-        $this->setBody($output->process($this->getBody(), "oxemail"));
-        $this->setAltBody($output->process($this->getAltBody(), "oxemail"));
+        $this->setBody($output->process($this->getBody(), 'oxemail'));
+        $this->setAltBody($output->process($this->getAltBody(), 'oxemail'));
         $output->processEmail($this);
     }
 
@@ -1485,9 +1470,8 @@ class Email extends PHPMailer
             $ex->setMessage($exception->getMessage());
             if ($this->isDebugModeEnabled()) {
                 throw $ex;
-            } else {
-                Registry::getLogger()->error($ex->getMessage(), [$ex]);
             }
+            Registry::getLogger()->error($ex->getMessage(), [$ex]);
         }
 
         return $result;
@@ -1498,7 +1482,7 @@ class Email extends PHPMailer
         $outputProcessor = oxNew(\OxidEsales\Eshop\Core\Output::class);
 
         // processing assigned template variables
-        $newArray = $outputProcessor->processViewArray($this->_aViewData, "oxemail");
+        $newArray = $outputProcessor->processViewArray($this->_aViewData, 'oxemail');
 
         $this->_aViewData = array_merge($this->_aViewData, $newArray);
     }
@@ -1506,13 +1490,12 @@ class Email extends PHPMailer
     public function getCharset()
     {
         if (!$this->_sCharSet) {
-            return Registry::getLang()->translateString("charset");
-        } else {
-            return $this->CharSet;
+            return Registry::getLang()->translateString('charset');
         }
+        return $this->CharSet;
     }
 
-    public function setShop($shop)
+    public function setShop($shop): void
     {
         $this->_oShop = $shop;
     }
@@ -1534,7 +1517,7 @@ class Email extends PHPMailer
         return $config->getActShopCurrencyObject();
     }
 
-    public function setViewData($key, $value)
+    public function setViewData($key, $value): void
     {
         $this->_aViewData[$key] = $value;
     }
@@ -1551,14 +1534,14 @@ class Email extends PHPMailer
         }
     }
 
-    public function setUser($user)
+    public function setUser($user): void
     {
-        $this->_aViewData["oUser"] = $user;
+        $this->_aViewData['oUser'] = $user;
     }
 
     public function getUser()
     {
-        return $this->_aViewData["oUser"];
+        return $this->_aViewData['oUser'];
     }
 
     public function getOrderFileList($orderId)
@@ -1587,7 +1570,7 @@ class Email extends PHPMailer
         return Registry::getUtilsObject();
     }
 
-    private function isDebugModeEnabled()
+    private function isDebugModeEnabled(): mixed
     {
         return ContainerFacade::getParameter('oxid_esales.debug_mode');
     }
@@ -1600,17 +1583,15 @@ class Email extends PHPMailer
           AND `OXUSERNAME` = :oxusername 
           AND `OXPASSWORD` != ''";
         if (Registry::getConfig()->getConfigParam('blMallUsers')) {
-            $select .= " ORDER BY OXSHOPID = :oxshopid DESC";
+            $select .= ' ORDER BY OXSHOPID = :oxshopid DESC';
         } else {
-            $select .= " AND OXSHOPID = :oxshopid";
+            $select .= ' AND OXSHOPID = :oxshopid';
         }
 
-        $sOxId = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($select, [
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($select, [
             'oxusername' => $userName,
-            'oxshopid'   => $shopId
+            'oxshopid'   => $shopId,
         ]);
-
-        return $sOxId;
     }
 
     private function shouldProductReviewLinksBeIncluded(): bool
@@ -1626,7 +1607,7 @@ class Email extends PHPMailer
     private function idnToAscii($idn)
     {
         if (function_exists('idn_to_ascii')) {
-            $parts = explode('@', $idn);
+            $parts = explode('@', (string) $idn);
             return $parts[0] . '@' . idn_to_ascii($parts[1]);
         }
 

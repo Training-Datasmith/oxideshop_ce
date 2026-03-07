@@ -16,7 +16,7 @@ use Symfony\Component\Filesystem\Path;
 
 class EditionUserFileLocator implements NavigationFileLocatorInterface
 {
-    private string $themeName;
+    private readonly string $themeName;
     private string $fileName = 'user.xml';
 
     public function __construct(

@@ -11,64 +11,38 @@ namespace OxidEsales\EshopCommunity\Internal\Domain\Newsletter\DataObject;
 
 class NewsletterRecipient
 {
-    /**
-     * @var string
-     */
-    private $salutation;
+    private ?string $salutation = null;
 
-    /**
-     * @var string
-     */
-    private $fistName;
+    private ?string $fistName = null;
 
-    /**
-     * @var string
-     */
-    private $lastName;
+    private ?string $lastName = null;
 
-    /**
-     * @var string
-     */
-    private $email;
+    private ?string $email = null;
 
     /**
      * @var string
      */
     private $otpInState;
 
-    /**
-     * @var string
-     */
-    private $country;
+    private ?string $country = null;
 
-    /**
-     * @var string
-     */
-    private $userGroups;
+    private ?string $userGroups = null;
 
     private const OPT_IN_STATE_SUBSCRIBED = 'subscribed';
     private const OPT_IN_STATE_NOT_CONFIRMED = 'not confirmed';
     private const OPT_IN_STATE_NOT_SUBSCRIBED = 'not subscribed';
 
-    private $otpInStateList = [
+    private array $otpInStateList = [
         0 => self::OPT_IN_STATE_NOT_SUBSCRIBED,
         1 => self::OPT_IN_STATE_SUBSCRIBED,
         2 => self::OPT_IN_STATE_NOT_CONFIRMED,
     ];
 
-    /**
-     * @return string
-     */
     public function getSalutation(): string
     {
         return $this->salutation;
     }
 
-    /**
-     * @param string $salutation
-     *
-     * @return NewsletterRecipient
-     */
     public function setSalutation(string $salutation): NewsletterRecipient
     {
         $this->salutation = $salutation;
@@ -76,19 +50,11 @@ class NewsletterRecipient
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getFistName(): string
     {
         return $this->fistName;
     }
 
-    /**
-     * @param string $fistName
-     *
-     * @return NewsletterRecipient
-     */
     public function setFistName(string $fistName): NewsletterRecipient
     {
         $this->fistName = $fistName;
@@ -96,19 +62,11 @@ class NewsletterRecipient
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getLastName(): string
     {
         return $this->lastName;
     }
 
-    /**
-     * @param string $lastName
-     *
-     * @return NewsletterRecipient
-     */
     public function setLastName(string $lastName): NewsletterRecipient
     {
         $this->lastName = $lastName;
@@ -116,19 +74,11 @@ class NewsletterRecipient
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     *
-     * @return NewsletterRecipient
-     */
     public function setEmail(string $email): NewsletterRecipient
     {
         $this->email = $email;
@@ -136,19 +86,11 @@ class NewsletterRecipient
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getOtpInState(): string
     {
         return $this->otpInState;
     }
 
-    /**
-     * @param string $otpInState
-     *
-     * @return NewsletterRecipient
-     */
     public function setOtpInState(string $otpInState): NewsletterRecipient
     {
         $this->otpInState = self::OPT_IN_STATE_NOT_SUBSCRIBED;
@@ -159,19 +101,11 @@ class NewsletterRecipient
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCountry(): string
     {
         return $this->country;
     }
 
-    /**
-     * @param string $country
-     *
-     * @return NewsletterRecipient
-     */
     public function setCountry(string $country): NewsletterRecipient
     {
         $this->country = $country;
@@ -179,19 +113,11 @@ class NewsletterRecipient
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUserGroups(): string
     {
         return $this->userGroups;
     }
 
-    /**
-     * @param string $userGroups
-     *
-     * @return NewsletterRecipient
-     */
     public function setUserGroups(string $userGroups): NewsletterRecipient
     {
         $this->userGroups = $userGroups;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,9 +17,6 @@ use Doctrine\Migrations\AbstractMigration;
  */
 class Version20180703135728 extends AbstractMigration
 {
-    /**
-     * @param Schema $schema
-     */
     public function up(Schema $schema): void
     {
         $varName = 'contactFormRequiredFields';
@@ -51,9 +50,6 @@ class Version20180703135728 extends AbstractMigration
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs

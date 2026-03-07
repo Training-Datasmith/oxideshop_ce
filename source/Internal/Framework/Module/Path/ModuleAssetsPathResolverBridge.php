@@ -11,7 +11,7 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Path;
 
 class ModuleAssetsPathResolverBridge implements ModuleAssetsPathResolverInterface
 {
-    public function __construct(private ModuleAssetsPathResolverInterface $moduleAssetsPathResolver)
+    public function __construct(private readonly ModuleAssetsPathResolverInterface $moduleAssetsPathResolver)
     {
     }
 

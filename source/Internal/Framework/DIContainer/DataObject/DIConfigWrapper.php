@@ -23,10 +23,6 @@ class DIConfigWrapper
     {
     }
 
-    /**
-     * @param string $importFilePath
-     * @return void
-     */
     public function addImport(string $importFilePath): void
     {
         $this->addSectionIfMissing(static::IMPORTS_SECTION);
@@ -38,9 +34,6 @@ class DIConfigWrapper
         $this->configArray[static::IMPORTS_SECTION][] = [static::RESOURCE_KEY => $importFilePath];
     }
 
-    /**
-     * @return array
-     */
     public function getImportFileNames(): array
     {
         $importFileNames = [];
@@ -50,10 +43,7 @@ class DIConfigWrapper
         return $importFileNames;
     }
 
-    /**
-     * @param string $importFilePath
-     */
-    public function removeImport(string $importFilePath)
+    public function removeImport(string $importFilePath): void
     {
         $imports = [];
         foreach ($this->getImports() as $import) {
@@ -64,9 +54,6 @@ class DIConfigWrapper
         $this->configArray[static::IMPORTS_SECTION] = $imports;
     }
 
-    /**
-     * @return array
-     */
     public function getConfigAsArray(): array
     {
         $this->cleanUpConfig();
@@ -74,9 +61,6 @@ class DIConfigWrapper
         return $this->configArray;
     }
 
-    /**
-     * @return array
-     */
     private function getImports(): array
     {
         if (!array_key_exists(static::IMPORTS_SECTION, $this->configArray)) {
@@ -90,7 +74,7 @@ class DIConfigWrapper
      * Removes not activated services and
      * empty import or service sections from the array
      */
-    private function cleanUpConfig()
+    private function cleanUpConfig(): void
     {
         $this->removeEmptySections();
     }
@@ -98,7 +82,7 @@ class DIConfigWrapper
     /**
      * Removes section entries when they are empty
      */
-    private function removeEmptySections()
+    private function removeEmptySections(): void
     {
         $sections = [static::IMPORTS_SECTION];
         foreach ($sections as $section) {
@@ -114,7 +98,7 @@ class DIConfigWrapper
     /**
      * @param string $section
      */
-    private function addSectionIfMissing($section)
+    private function addSectionIfMissing($section): void
     {
         if (!array_key_exists($section, $this->configArray)) {
             if (array_key_exists($section, $this->sectionDefaults)) {

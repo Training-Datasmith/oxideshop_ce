@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,7 +23,7 @@ class PasswordHasher
     /**
      * @var \oxHasher
      */
-    private $_ohasher = null;
+    private $_ohasher;
 
     /**
      * Gets hasher.
@@ -51,7 +53,7 @@ class PasswordHasher
      *
      * @return string
      */
-    public function hash($sPassword, $sSalt)
+    public function hash(string $sPassword, string $sSalt)
     {
         return $this->getHasher()->hash($sPassword . $sSalt);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,7 +30,7 @@ class BackwardsCompatibilityAutoload
          * Classes from unified namespace canot be loaded by this auto loader.
          * Do not try to load them in order to avoid strange errors in edge cases.
          */
-        if (false !== strpos($class, 'OxidEsales\Eshop\\')) {
+        if (str_contains($class, 'OxidEsales\Eshop\\')) {
             return false;
         }
 
@@ -49,9 +51,8 @@ class BackwardsCompatibilityAutoload
     {
         $classMap = static::getBackwardsCompatibilityClassMap();
         $bcAlias = strtolower($bcAlias);
-        $result = isset($classMap[$bcAlias]) ? $classMap[$bcAlias] : "";
 
-        return $result;
+        return $classMap[$bcAlias] ?? '';
     }
 
     /**
@@ -60,7 +61,7 @@ class BackwardsCompatibilityAutoload
      *
      * @param string $class Name of the class to load
      */
-    private static function forceBackwardsCompatiblityClassLoading($class)
+    private static function forceBackwardsCompatiblityClassLoading($class): void
     {
         class_exists($class);
     }
@@ -70,7 +71,7 @@ class BackwardsCompatibilityAutoload
      *
      * @return array Mapping of Unified Namespace to backwards compatible classes.
      */
-    private static function getBackwardsCompatibilityClassMap()
+    private static function getBackwardsCompatibilityClassMap(): array
     {
         return (new BackwardsCompatibilityClassMapProvider())->getMap();
     }

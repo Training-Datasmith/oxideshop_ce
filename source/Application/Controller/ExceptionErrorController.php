@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,7 +27,7 @@ class ExceptionErrorController extends \OxidEsales\Eshop\Application\Controller\
     /**
      * Sets exception errros to template
      */
-    public function displayExceptionError()
+    public function displayExceptionError(): void
     {
         $aViewData = $this->getViewData();
 
@@ -52,7 +54,7 @@ class ExceptionErrorController extends \OxidEsales\Eshop\Application\Controller\
         $aErrors = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('Errors');
 
         if (null === $aErrors) {
-            $aErrors = [];
+            return [];
         }
 
         return $aErrors;

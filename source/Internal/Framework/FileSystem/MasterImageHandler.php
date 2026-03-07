@@ -17,8 +17,8 @@ use Symfony\Component\Filesystem\Path;
 class MasterImageHandler implements ImageHandlerInterface
 {
     public function __construct(
-        private Filesystem $filesystem,
-        private ContextInterface $context
+        private readonly Filesystem $filesystem,
+        private readonly ContextInterface $context
     ) {
     }
 
@@ -56,10 +56,6 @@ class MasterImageHandler implements ImageHandlerInterface
         return $this->filesystem->exists($this->getAbsolutePath($path));
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     private function getAbsolutePath(string $path): string
     {
         return Path::join($this->context->getSourcePath(), $path);

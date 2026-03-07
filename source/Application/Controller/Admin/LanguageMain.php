@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Registry;
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main selectlist manager.
@@ -21,28 +23,28 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      *
      * @var array
      */
-    protected $_aLangData = null;
+    protected $_aLangData;
 
     /**
      * Current shop base languages parameters
      *
      * @var array
      */
-    protected $_aLangParams = null;
+    protected $_aLangParams;
 
     /**
      * Current shop base languages base urls
      *
      * @var array
      */
-    protected $_aLanguagesUrls = null;
+    protected $_aLanguagesUrls;
 
     /**
      * Current shop base languages base ssl urls
      *
      * @var array
      */
-    protected $_aLanguagesSslUrls = null;
+    protected $_aLanguagesSslUrls;
 
     /** @var \OxidEsales\Eshop\Core\NoJsValidator */
     private $noJsValidator;
@@ -52,30 +54,28 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     {
         parent::render();
 
-        $sOxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $sOxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         //loading languages info from config
         $this->_aLangData = $this->getLanguages();
 
-        if (isset($sOxId) && $sOxId != "-1") {
+        if (isset($sOxId) && $sOxId != '-1') {
             //checking if translations files exists
             $this->checkLangTranslations($sOxId);
-            $this->_aViewData["edit"] = $this->getLanguageInfo($sOxId);
+            $this->_aViewData['edit'] = $this->getLanguageInfo($sOxId);
         }
 
-        return "language_main";
+        return 'language_main';
     }
 
     /**
      * Saves selection list parameters changes.
-     *
-     * @return mixed
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $sOxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['active'])) {
             $aParams['active'] = 0;
@@ -143,7 +143,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         //sort parameters, urls and languages arrays by language base id
         $this->sortLangArraysByBaseId();
 
-        $this->_aViewData["updatelist"] = "1";
+        $this->_aViewData['updatelist'] = '1';
 
         if ($this->isValidLanguageData($this->_aLangData)) {
             //saving languages info
@@ -185,7 +185,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $aLangData['desc'] = $this->_aLangData['lang'][$sOxId];
         $aLangData['baseurl'] = $this->_aLangData['urls'][$aLangData['baseId']];
         $aLangData['basesslurl'] = $this->_aLangData['sslUrls'][$aLangData['baseId']];
-        $aLangData['default'] = ($this->_aLangData['params'][$sOxId]["baseId"] == $sDefaultLang) ? true : false;
+        $aLangData['default'] = ($this->_aLangData['params'][$sOxId]['baseId'] == $sDefaultLang) ? true : false;
 
         return $aLangData;
     }
@@ -232,10 +232,12 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     {
         foreach (array_keys($this->_aLangData) as $sTypeKey) {
             if (is_array($this->_aLangData[$sTypeKey]) && count($this->_aLangData[$sTypeKey]) > 0) {
-                if ($sTypeKey == 'urls' || $sTypeKey == 'sslUrls') {
+                if ($sTypeKey == 'urls') {
                     continue;
                 }
-
+                if ($sTypeKey == 'sslUrls') {
+                    continue;
+                }
                 $aKeys = array_keys($this->_aLangData[$sTypeKey]);
                 $aValues = array_values($this->_aLangData[$sTypeKey]);
                 //find and replace key
@@ -257,7 +259,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $aSslUrls = [];
         $aLanguages = [];
 
-        uasort($this->_aLangData['params'], [$this, 'sortLangParamsByBaseIdCallback']);
+        uasort($this->_aLangData['params'], $this->sortLangParamsByBaseIdCallback(...));
 
         foreach ($this->_aLangData['params'] as $sAbbr => $aParams) {
             $iId = (int) $aParams['baseId'];
@@ -342,7 +344,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     {
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
 
-        $sDir = dirname($myConfig->getTranslationsDir('lang.php', $sOxId));
+        $sDir = dirname((string) $myConfig->getTranslationsDir('lang.php', $sOxId));
 
         if (empty($sDir)) {
             $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
@@ -372,8 +374,6 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     /**
      * Adding new language to DB - creating new multilangue fields with new
      * language ID (e.g. oxtitle_4)
-     *
-     * @return null
      */
     protected function addNewMultilangFieldsToDb()
     {
@@ -428,7 +428,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $result = true;
 
         $oxid = $this->getEditObjectId();
-        $parameters = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $parameters = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // if creating new language, checking if language already exists with
         // entered language abbreviation
@@ -506,8 +506,8 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             } elseif (!$configValidator->isValid($mLanguageDataParameters)) {
                 $blValid = false;
                 $error = oxNew(\OxidEsales\Eshop\Core\DisplayError::class);
-                $error->setFormatParameters(htmlspecialchars($mLanguageDataParameters));
-                $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
+                $error->setFormatParameters(htmlspecialchars((string) $mLanguageDataParameters));
+                $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
                 \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($error);
             }
         }

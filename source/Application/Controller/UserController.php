@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,42 +36,42 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      *
      * @var array
      */
-    protected $_blShowNoRegOpt = null;
+    protected $_blShowNoRegOpt;
 
     /**
      * Selected Address
      *
      * @var object
      */
-    protected $_sSelectedAddress = null;
+    protected $_sSelectedAddress;
 
     /**
      * Login option
      *
      * @var integer
      */
-    protected $_iOption = null;
+    protected $_iOption;
 
     /**
      * Country list
      *
      * @var object
      */
-    protected $_oCountryList = null;
+    protected $_oCountryList;
 
     /**
      * Order remark
      *
      * @var string
      */
-    protected $_sOrderRemark = null;
+    protected $_sOrderRemark;
 
     /**
      * Wishlist user id
      *
      * @var string
      */
-    protected $_sWishId = null;
+    protected $_sWishId;
 
     /**
      * Loads customer basket object form session (\OxidEsales\Eshop\Core\Session::getBasket()),
@@ -100,7 +102,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
             }
         }
 
-        $this->_aViewData["deladr"] = Registry::getRequest()->getRequestEscapedParameter('deladr');
+        $this->_aViewData['deladr'] = Registry::getRequest()->getRequestEscapedParameter('deladr');
 
         parent::render();
 
@@ -236,10 +238,14 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     {
         $session = Registry::getSession();
         $basket = $session->getBasket();
-        if ($basket && Registry::getConfig()->getConfigParam("blEnableDownloads")) {
-            if ($basket->hasDownloadableProducts()) {
-                return true;
-            }
+        if (!$basket) {
+            return false;
+        }
+        if (!Registry::getConfig()->getConfigParam('blEnableDownloads')) {
+            return false;
+        }
+        if ($basket->hasDownloadableProducts()) {
+            return true;
         }
 
         return false;

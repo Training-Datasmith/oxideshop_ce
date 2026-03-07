@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,14 +9,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use function getLogger;
+
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
 use OxidEsales\Eshop\Application\Model\SeoEncoderVendor;
 use OxidEsales\Eshop\Core\Model\ListModel;
-use OxidEsales\Eshop\Core\Registry;
 
-use function getLogger;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Locator controller for: category, vendor, manufacturers and search lists.
@@ -24,27 +27,27 @@ class Locator extends \OxidEsales\Eshop\Core\Base
     /**
      * Locator type
      */
-    protected $_sType = "list";
+    protected string $_sType = 'list';
 
     /**
      * Next product to currently loaded
      */
-    protected $_oNextProduct = null;
+    protected $_oNextProduct;
 
     /**
      * Previous product to currently loaded
      */
-    protected $_oBackProduct = null;
+    protected $_oBackProduct;
 
     /**
      * search handle
      */
-    protected $_sSearchHandle = null;
+    protected $_sSearchHandle;
 
     /**
      * error message
      */
-    protected $_sErrorMessage = null;
+    protected $_sErrorMessage;
 
     /**
      * Class constructor - sets locator type and parameters posted or loaded
@@ -66,13 +69,13 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      * @param Article            $oCurrArticle   current article
      * @param FrontendController $oLocatorTarget FrontendController object
      */
-    public function setLocatorData($oCurrArticle, $oLocatorTarget)
+    public function setLocatorData($oCurrArticle, $oLocatorTarget): void
     {
         $sLocfnc = "set{$this->_sType}LocatorData";
 
         try {
             call_user_func([$this, $sLocfnc], $oLocatorTarget, $oCurrArticle);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             getLogger()->warning("Locator Type is wrong $this->_sType");
             $this->_sType = '';
         }
@@ -234,16 +237,16 @@ class Locator extends \OxidEsales\Eshop\Core\Base
             // #1834/1184M - specialchar search
             $sSearchParam = Registry::getRequest()->getRequestParameter('searchparam');
             $sSearchFormParam = Registry::getRequest()->getRequestEscapedParameter('searchparam');
-            $sSearchLinkParam = rawurlencode($sSearchParam);
+            $sSearchLinkParam = rawurlencode((string) $sSearchParam);
 
             $sSearchCat = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
-            $sSearchCat = $sSearchCat ? rawurldecode($sSearchCat) : $sSearchCat;
+            $sSearchCat = $sSearchCat ? rawurldecode((string) $sSearchCat) : $sSearchCat;
 
             $sSearchVendor = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
-            $sSearchVendor = $sSearchVendor ? rawurldecode($sSearchVendor) : $sSearchVendor;
+            $sSearchVendor = $sSearchVendor ? rawurldecode((string) $sSearchVendor) : $sSearchVendor;
 
             $sSearchManufacturer = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
-            $sSearchManufacturer = $sSearchManufacturer ? rawurldecode($sSearchManufacturer) : $sSearchManufacturer;
+            $sSearchManufacturer = $sSearchManufacturer ? rawurldecode((string) $sSearchManufacturer) : $sSearchManufacturer;
 
             // loading data for article navigation
             $oIdList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
@@ -342,7 +345,7 @@ class Locator extends \OxidEsales\Eshop\Core\Base
             $oLang = Registry::getLang();
             $sTitle = $oLang->translateString('RECOMMLIST');
             if ($sSearchRecomm !== null) {
-                $sTitle .= " / " . $oLang->translateString('RECOMMLIST_SEARCH') . ' "' . $sSearchFormRecomm . '"';
+                $sTitle .= ' / ' . $oLang->translateString('RECOMMLIST_SEARCH') . ' "' . $sSearchFormRecomm . '"';
             }
             $oLocatorTarget->setSearchTitle($sTitle);
             $oLocatorTarget->setActiveCategory($oRecommList);
@@ -392,7 +395,7 @@ class Locator extends \OxidEsales\Eshop\Core\Base
     protected function makeLink($sLink, $sParams)
     {
         if ($sParams) {
-            $sLink .= ((strpos($sLink, '?') !== false) ? '&amp;' : '?') . $sParams;
+            $sLink .= ((str_contains($sLink, '?')) ? '&amp;' : '?') . $sParams;
         }
 
         return $sLink;
@@ -416,9 +419,9 @@ class Locator extends \OxidEsales\Eshop\Core\Base
         // maybe there is no page number passed, but we still can find the position in id's list
         if (!$iPageNr && $oIdList && $oArticle) {
             $iNrofCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-            $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 1;
+            $iNrofCatArticles = $iNrofCatArticles ?: 1;
             $sParentIdField = 'oxarticles__oxparentid';
-            $sArticleId = $oArticle->$sParentIdField->value ? $oArticle->$sParentIdField->value : $oArticle->getId();
+            $sArticleId = $oArticle->$sParentIdField->value ?: $oArticle->getId();
             $iPos = Registry::getUtils()->arrayStringSearch($sArticleId, $oIdList->arrayKeys());
             $iPageNr = floor($iPos / $iNrofCatArticles);
         }
@@ -453,9 +456,7 @@ class Locator extends \OxidEsales\Eshop\Core\Base
     protected function getProductPos($oArticle, $oIdList, $oLocatorTarget)
     {
         // variant handling
-        $sOxid = $oArticle->oxarticles__oxparentid->value
-            ? $oArticle->oxarticles__oxparentid->value
-            : $oArticle->getId();
+        $sOxid = $oArticle->oxarticles__oxparentid->value ?: $oArticle->getId();
         if ($oIdList->count() && isset($oIdList[$sOxid])) {
             $aIds = $oIdList->arrayKeys();
             $iPos = Registry::getUtils()->arrayStringSearch($sOxid, $aIds);

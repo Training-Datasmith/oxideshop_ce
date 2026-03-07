@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,7 +27,7 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         'oxorder__oxordernr',
         'oxorder__oxbillnr',
         'oxorder__oxtrackcode',
-        'oxorder__oxpaid'
+        'oxorder__oxpaid',
     ];
 
     /** @inheritdoc */
@@ -33,8 +35,8 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
             $oOrder->load($soxId);
@@ -43,16 +45,16 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
             $sOxPaidField = 'oxorder__oxpaid';
             $sDelTypeField = 'oxorder__oxdeltype';
 
-            if ($oOrder->$sOxPaidField->value != "0000-00-00 00:00:00") {
+            if ($oOrder->$sOxPaidField->value != '0000-00-00 00:00:00') {
                 $oOrder->blIsPaid = true;
                 /** @var \OxidEsales\Eshop\Core\UtilsDate $oUtilsDate */
                 $oUtilsDate = \OxidEsales\Eshop\Core\Registry::getUtilsDate();
                 $oOrder->$sOxPaidField = new \OxidEsales\Eshop\Core\Field($oUtilsDate->formatDBDate($oOrder->$sOxPaidField->value));
             }
 
-            $this->_aViewData["edit"] = $oOrder;
-            $this->_aViewData["paymentType"] = $oOrder->getPaymentType();
-            $this->_aViewData["oShipSet"] = $oOrder->getShippingSetList();
+            $this->_aViewData['edit'] = $oOrder;
+            $this->_aViewData['paymentType'] = $oOrder->getPaymentType();
+            $this->_aViewData['oShipSet'] = $oOrder->getShippingSetList();
 
             if ($oOrder->$sDelTypeField->value) {
                 // order user
@@ -64,31 +66,31 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
 
                 /** @var \OxidEsales\Eshop\Application\Model\PaymentList $oPaymentList */
                 $oPaymentList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\PaymentList::class);
-                $this->_aViewData["oPayments"] =
+                $this->_aViewData['oPayments'] =
                                         $oPaymentList->getPaymentList($oOrder->$sDelTypeField->value, $dPrice, $oUser);
             }
 
             // any voucher used ?
-            $this->_aViewData["aVouchers"] = $oOrder->getVoucherNrList();
+            $this->_aViewData['aVouchers'] = $oOrder->getVoucherNrList();
         }
 
-        $this->_aViewData["sNowValue"] = date("Y-m-d H:i:s", \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
+        $this->_aViewData['sNowValue'] = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
 
-        return "order_main";
+        return 'order_main';
     }
 
     /**
      * Saves main orders configuration parameters.
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oOrder->load($soxId);
         } else {
             $aParams['oxorder__oxid'] = null;
@@ -107,7 +109,7 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         }
 
         //change payment
-        $sPayId = Registry::getRequest()->getRequestEscapedParameter("setPayment");
+        $sPayId = Registry::getRequest()->getRequestEscapedParameter('setPayment');
         if (!empty($sPayId) && ($sPayId != $oOrder->oxorder__oxpaymenttype->value)) {
             $aParams['oxorder__oxpaymenttype'] = $sPayId;
             $needOrderRecalculate = true;
@@ -115,7 +117,7 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
 
         $oOrder->assign($aParams);
 
-        $aDynvalues = Registry::getRequest()->getRequestEscapedParameter("dynvalue");
+        $aDynvalues = Registry::getRequest()->getRequestEscapedParameter('dynvalue');
         if (isset($aDynvalues)) {
             $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
             $oPayment->load($oOrder->oxorder__oxpaymentid->value);
@@ -124,9 +126,9 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
             $needOrderRecalculate = true;
         }
         //change delivery set
-        $sDelSetId = Registry::getRequest()->getRequestEscapedParameter("setDelSet");
+        $sDelSetId = Registry::getRequest()->getRequestEscapedParameter('setDelSet');
         if (!empty($sDelSetId) && ($sDelSetId != $oOrder->oxorder__oxdeltype->value)) {
-            $oOrder->oxorder__oxpaymenttype->setValue("oxempty");
+            $oOrder->oxorder__oxpaymenttype->setValue('oxempty');
             $oOrder->setDelivery($sDelSetId);
             $needOrderRecalculate = true;
         } else {
@@ -150,18 +152,18 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     /**
      * Sends order.
      */
-    public function sendOrder()
+    public function sendOrder(): void
     {
         $soxId = $this->getEditObjectId();
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         if ($oOrder->load($soxId)) {
             // #632A
-            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field(date("Y-m-d H:i:s", \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
+            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field(date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
             $oOrder->save();
 
             // #1071C
             $oOrder->getOrderArticles(true);
-            if (Registry::getRequest()->getRequestEscapedParameter("sendmail")) {
+            if (Registry::getRequest()->getRequestEscapedParameter('sendmail')) {
                 // send eMail
                 $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
                 $oEmail->sendSendedNowMail($oOrder);
@@ -173,7 +175,7 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     /**
      * Sends download links.
      */
-    public function sendDownloadLinks()
+    public function sendDownloadLinks(): void
     {
         $soxId = $this->getEditObjectId();
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
@@ -186,11 +188,11 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     /**
      * Resets order shipping date.
      */
-    public function resetOrder()
+    public function resetOrder(): void
     {
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field("0000-00-00 00:00:00");
+            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field('0000-00-00 00:00:00');
             $oOrder->save();
 
             $this->onOrderReset();

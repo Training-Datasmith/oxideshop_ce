@@ -16,6 +16,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServ
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 use OxidEsales\EshopCommunity\Tests\ContainerTrait;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+
 use function Symfony\Component\String\u;
 
 final class ModuleSettingServiceTest extends IntegrationTestCase
@@ -24,7 +25,6 @@ final class ModuleSettingServiceTest extends IntegrationTestCase
 
     private string $testModuleId = 'testSettingModuleId';
     private ModuleSettingServiceInterface $settingFacade;
-
 
     public function setUp(): void
     {
@@ -127,7 +127,6 @@ final class ModuleSettingServiceTest extends IntegrationTestCase
             ->setName('arraySetting')
             ->setValue([]);
 
-
         $testModule = new ModuleConfiguration();
         $testModule
             ->setId($this->testModuleId)
@@ -137,7 +136,6 @@ final class ModuleSettingServiceTest extends IntegrationTestCase
             ->addModuleSetting($booleanSetting)
             ->addModuleSetting($stringSetting)
             ->addModuleSetting($collectionSetting);
-
 
         /** @var ShopConfigurationDaoInterface $dao */
         $dao = $this->get(ShopConfigurationDaoInterface::class);

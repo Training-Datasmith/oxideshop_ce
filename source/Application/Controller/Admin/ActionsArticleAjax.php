@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -33,8 +35,8 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         ['oxmpn', 'oxarticles', 0, 0, 0],
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ]
+        ['oxid', 'oxarticles', 0, 0, 1],
+    ],
     ];
 
     /**
@@ -65,14 +67,14 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
                 $sSqlIfFalse = " {$sArticleTable}.oxid=oxobject2category.oxobjectid ";
                 $sVariantSelection = $blVariantsSelectionParameter ? $sSqlIfTrue : $sSqlIfFalse;
                 $sQAdd = " from {$sViewName} as oxobject2category left join {$sArticleTable} on " . $sVariantSelection .
-                         " where oxobject2category.oxcatnid = " . $oDb->quote($sSelId) . " ";
+                         ' where oxobject2category.oxcatnid = ' . $oDb->quote($sSelId) . ' ';
             }
         }
         // #1513C/#1826C - skip references, to not existing articles
         $sQAdd .= " and $sArticleTable.oxid IS NOT NULL ";
 
         // skipping self from list
-        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . " ";
+        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . ' ';
 
         return $sQAdd;
     }
@@ -100,7 +102,7 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Removing article assignment
      */
-    public function removeActionArticle()
+    public function removeActionArticle(): void
     {
         $sActionId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         //$sActionId = $this->getConfig()->getConfigParam( 'oxid' );
@@ -118,7 +120,7 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Set article assignment
      */
-    public function setActionArticle()
+    public function setActionArticle(): void
     {
         $sArticleId = Registry::getRequest()->getRequestEscapedParameter('oxarticleid');
         $sActionId = Registry::getRequest()->getRequestEscapedParameter('oxid');
@@ -135,7 +137,7 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $oObject2Promotion->init('oxobject2action');
         $oObject2Promotion->oxobject2action__oxactionid = new \OxidEsales\Eshop\Core\Field($sActionId);
         $oObject2Promotion->oxobject2action__oxobjectid = new \OxidEsales\Eshop\Core\Field($sArticleId);
-        $oObject2Promotion->oxobject2action__oxclass = new \OxidEsales\Eshop\Core\Field("oxarticle");
+        $oObject2Promotion->oxobject2action__oxclass = new \OxidEsales\Eshop\Core\Field('oxarticle');
         $oObject2Promotion->save();
     }
 }

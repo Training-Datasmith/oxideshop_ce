@@ -10,14 +10,14 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 
 class ProjectConfigurationGenerator implements ProjectConfigurationGeneratorInterface
 {
     public function __construct(
-        private ShopConfigurationDaoInterface $shopConfigurationDao,
-        private BasicContextInterface $context
+        private readonly ShopConfigurationDaoInterface $shopConfigurationDao,
+        private readonly BasicContextInterface $context
     ) {
     }
 

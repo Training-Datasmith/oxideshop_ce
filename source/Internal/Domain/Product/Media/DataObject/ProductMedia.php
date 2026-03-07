@@ -21,7 +21,7 @@ class ProductMedia
         private readonly Id $id,
         private readonly Id $productId,
         private readonly Media $media,
-        private ProductMediaRoleSet $roleSet,
+        private readonly ProductMediaRoleSet $roleSet,
     ) {
     }
 

@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxDb;
 
 /**
  * Seo encoder base
@@ -19,7 +19,7 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @var string
      */
-    protected $_aRootVendorUri = null;
+    protected $_aRootVendorUri;
 
     /**
      * Returns target "extension" (/)
@@ -106,8 +106,6 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor     Vendor object
      * @param int                                        $languageId Language id
-     *
-     * @return null
      */
     public function getVendorUrl($vendor, $languageId = null)
     {
@@ -123,18 +121,18 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor Vendor object
      */
-    public function onDeleteVendor($vendor)
+    public function onDeleteVendor($vendor): void
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $vendorId = $vendor->getId();
         $database->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxvendor'", [
-            'oxobjectid' => $vendorId
+            'oxobjectid' => $vendorId,
         ]);
-        $database->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $vendorId
+        $database->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $vendorId,
         ]);
-        $database->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            'oxobjectid' => $vendorId
+        $database->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            'oxobjectid' => $vendorId,
         ]);
     }
 
@@ -151,7 +149,7 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
         $seoUrl = null;
         $vendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
         if ($vendor->loadInLang($languageId, $vendorId)) {
-            $seoUrl = $this->getVendorUri($vendor, $languageId, true);
+            return $this->getVendorUri($vendor, $languageId, true);
         }
 
         return $seoUrl;

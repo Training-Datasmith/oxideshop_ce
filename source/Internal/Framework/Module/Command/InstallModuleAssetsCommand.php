@@ -23,15 +23,14 @@ use Symfony\Component\Filesystem\Path;
 class InstallModuleAssetsCommand extends Command
 {
     public function __construct(
-        private ShopConfigurationDaoInterface $shopConfigurationDao,
-        private BasicContextInterface $context,
-        private ModuleFilesInstallerInterface $moduleFilesInstaller
+        private readonly ShopConfigurationDaoInterface $shopConfigurationDao,
+        private readonly BasicContextInterface $context,
+        private readonly ModuleFilesInstallerInterface $moduleFilesInstaller
     ) {
         parent::__construct();
     }
 
-
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription(
             'Install assets for all modules (symlink or copy to the shop out directory depending on the platform).'

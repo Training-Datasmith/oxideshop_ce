@@ -39,18 +39,18 @@ final class TruncateLogicTest extends TestCase
         return [
             [
                 'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
-                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse...'
+                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse...',
             ],
             [
                 'Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. ' .
                 'Suspendisse dapibus pulvinar sem vitae.',
-                'Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse...'
+                'Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse...',
             ],
             [
                 '&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; ' .
                 'elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
                 '&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; ' .
-                'elit lacinia at....'
+                'elit lacinia at....',
             ],
         ];
     }
@@ -71,17 +71,17 @@ final class TruncateLogicTest extends TestCase
             [
                 'Duis iaculis pellentesque felis, et pulvinar elit.',
                 'Duis iaculis...',
-                ['length' => 20]
+                ['length' => 20],
             ],
             [
                 'Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit.',
                 'Duis iaculis...',
-                ['length' => 20]
+                ['length' => 20],
             ],
             [
                 '&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit.',
                 '&#039;Duis&#039; &#039;iaculis&#039;...',
-                ['length' => 20]
+                ['length' => 20],
             ],
         ];
     }
@@ -102,7 +102,7 @@ final class TruncateLogicTest extends TestCase
             [
                 'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
                 'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse (...)',
-                ['suffix' => ' (...)']
+                ['suffix' => ' (...)'],
             ],
         ];
     }
@@ -123,7 +123,7 @@ final class TruncateLogicTest extends TestCase
             [
                 'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
                 'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dap...',
-                ['breakWords' => true]
+                ['breakWords' => true],
             ],
         ];
     }

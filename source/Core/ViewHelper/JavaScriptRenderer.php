@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,10 +20,8 @@ class JavaScriptRenderer
      * @param string $widget      Widget name
      * @param bool   $forceRender Force rendering of scripts.
      * @param bool   $isDynamic   Force rendering of scripts.
-     *
-     * @return string
      */
-    public function render($widget, $forceRender, $isDynamic = false)
+    public function render($widget, $forceRender, $isDynamic = false): string
     {
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
         $output = '';
@@ -61,12 +61,10 @@ class JavaScriptRenderer
 
     /**
      * Returns if it is ajax request.
-     *
-     * @return bool
      */
-    protected function isAjaxRequest()
+    protected function isAjaxRequest(): bool
     {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     /**
@@ -87,10 +85,8 @@ class JavaScriptRenderer
      *
      * @param array  $files
      * @param string $widget
-     *
-     * @return array
      */
-    protected function prepareFilesForRendering($files, $widget)
+    protected function prepareFilesForRendering($files, $widget): array
     {
         return (array) $files;
     }
@@ -100,10 +96,8 @@ class JavaScriptRenderer
      *
      * @param array  $includes String files to include.
      * @param string $widget   Widget name.
-     *
-     * @return string
      */
-    protected function formFilesOutput($includes, $widget)
+    protected function formFilesOutput($includes, $widget): string
     {
         if (!count($includes)) {
             return '';
@@ -124,7 +118,7 @@ class JavaScriptRenderer
         }
         $output = implode(PHP_EOL, $widgets);
         if ($widget && !empty($output)) {
-            $output = <<<JS
+            return <<<JS
 <script>
     window.addEventListener('load', function() {
         $output
@@ -143,10 +137,8 @@ JS;
      * @param array  $scripts     Scripts to execute (from add).
      * @param string $widgetName  Widget name.
      * @param bool   $ajaxRequest Is ajax request.
-     *
-     * @return string
      */
-    protected function formSnippetsOutput($scripts, $widgetName, $ajaxRequest)
+    protected function formSnippetsOutput($scripts, $widgetName, $ajaxRequest): string
     {
         $preparedScripts = [];
         foreach ($scripts as $script) {
@@ -164,10 +156,8 @@ JS;
      * Sanitize javascript, which will be passed to WidgetsHandler.
      *
      * @param string $scripts
-     *
-     * @return string
      */
-    protected function sanitize($scripts)
+    protected function sanitize($scripts): string
     {
         return strtr($scripts, ['\\' => '\\\\', "'" => "\\'", "\r" => '', "\n" => '\n']);
     }

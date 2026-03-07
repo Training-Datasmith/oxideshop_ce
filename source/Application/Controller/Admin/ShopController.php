@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,7 +19,7 @@ use OxidEsales\Eshop\Core\ShopIdCalculator;
  */
 class ShopController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
 {
-    const CURRENT_TEMPLATE = 'shop';
+    public const CURRENT_TEMPLATE = 'shop';
 
     /**
      * Executes parent method parent::render() and returns name of template

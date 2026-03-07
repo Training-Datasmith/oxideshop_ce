@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Registry;
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages deliveryset payment
@@ -24,14 +26,14 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         ['oxdesc', 'oxpayments', 1, 1, 0],
         ['oxaddsum', 'oxpayments', 1, 0, 0],
         ['oxaddsumtype', 'oxpayments', 0, 0, 0],
-        ['oxid', 'oxpayments', 0, 0, 1]
+        ['oxid', 'oxpayments', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxdesc', 'oxpayments', 1, 1, 0],
                                      ['oxaddsum', 'oxpayments', 1, 0, 0],
                                      ['oxaddsumtype', 'oxpayments', 0, 0, 0],
-                                     ['oxid', 'oxobject2payment', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxobject2payment', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -66,14 +68,14 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Remove these payments from this set
      */
-    public function removePayFromSet()
+    public function removePayFromSet(): void
     {
         $aChosenCntr = $this->getActionIds('oxobject2payment.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2payment.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2payment.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2payment where oxobject2payment.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2payment where oxobject2payment.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -83,7 +85,7 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @throws Exception
      */
-    public function addPayToSet()
+    public function addPayToSet(): void
     {
         $aChosenSets = $this->getActionIds('oxpayments.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -93,7 +95,7 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
             $sPayTable = $this->getViewName('oxpayments');
             $aChosenSets = $this->getAll($this->addFilter("select $sPayTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenSets)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
             foreach ($aChosenSets as $sChosenSet) {
@@ -101,14 +103,14 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
                 // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
                 $sID = $database->getOne("select oxid from oxobject2payment where oxpaymentid = :oxpaymentid and oxobjectid = :oxobjectid and oxtype = 'oxdelset'", [
                     'oxpaymentid' => $sChosenSet,
-                    'oxobjectid' => $soxId
+                    'oxobjectid' => $soxId,
                 ]);
                 if (!isset($sID) || !$sID) {
                     $oObject = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
                     $oObject->init('oxobject2payment');
                     $oObject->oxobject2payment__oxpaymentid = new \OxidEsales\Eshop\Core\Field($sChosenSet);
                     $oObject->oxobject2payment__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);
-                    $oObject->oxobject2payment__oxtype = new \OxidEsales\Eshop\Core\Field("oxdelset");
+                    $oObject->oxobject2payment__oxtype = new \OxidEsales\Eshop\Core\Field('oxdelset');
                     $oObject->save();
                 }
             }

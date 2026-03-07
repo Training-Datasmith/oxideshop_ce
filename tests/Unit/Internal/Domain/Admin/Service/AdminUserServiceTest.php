@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Admin\Service;
 
-use OxidEsales\EshopCommunity\Internal\Domain\Admin\DataObject\Admin;
 use OxidEsales\EshopCommunity\Internal\Domain\Admin\Dao\AdminDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Admin\DataObject\Admin;
 use OxidEsales\EshopCommunity\Internal\Domain\Admin\Factory\AdminFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Admin\Service\AdminUserService;
 use OxidEsales\EshopCommunity\Internal\Domain\Admin\Service\AdminUserServiceInterface;
@@ -48,8 +48,7 @@ final class AdminUserServiceTest extends TestCase
     private function getAdminDao(
         ?AdminDaoInterface $adminDao = null,
         ?AdminFactoryInterface $adminFactory = null
-    ): AdminUserServiceInterface
-    {
+    ): AdminUserServiceInterface {
         return new AdminUserService(
             adminDao: $adminDao ?? $this->createStub(AdminDaoInterface::class),
             adminFactory: $adminFactory ?? $this->createStub(AdminFactoryInterface::class)

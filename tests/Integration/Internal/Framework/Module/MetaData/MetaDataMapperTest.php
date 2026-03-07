@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\MetaData;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\ModuleIdNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataKeyException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataValueTypeException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProviderInterface;
 use OxidEsales\EshopCommunity\Tests\TestContainerFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,7 +26,7 @@ final class MetaDataMapperTest extends TestCase
         $expectedModuleData = [
             'id'          => 'TestModuleMetaData20',
             'title'                   => [
-                'en' => 'Module for testModuleMetaData20'
+                'en' => 'Module for testModuleMetaData20',
             ],
             'description' => [
                 'de' => 'de description for testModuleMetaData20',
@@ -54,11 +54,11 @@ final class MetaDataMapperTest extends TestCase
                     'value' => '0',
                     'constraints' => ['0', '1', '2', '3'],
                     'position' => 3],
-                ['group' => 'main', 'name' => 'setting_2', 'type' => 'arr', 'value' => ['value1', 'value2']]
+                ['group' => 'main', 'name' => 'setting_2', 'type' => 'arr', 'value' => ['value1', 'value2']],
             ],
             'events'      => [
                 'onActivate'   => 'TestModuleMetaData20\Events::onActivate',
-                'onDeactivate' => 'TestModuleMetaData20\Events::onDeactivate'
+                'onDeactivate' => 'TestModuleMetaData20\Events::onDeactivate',
             ],
         ];
 
@@ -149,7 +149,7 @@ final class MetaDataMapperTest extends TestCase
         $expectedModuleData = [
             'id'                      => 'TestModuleMetaData21',
             'title'                   => [
-                'en' => 'Module for testModuleMetaData21'
+                'en' => 'Module for testModuleMetaData21',
             ],
             'description'             => [
                 'de' => 'de description for testModuleMetaData21',
@@ -163,7 +163,7 @@ final class MetaDataMapperTest extends TestCase
             'email'                   => 'info@oxid-esales.com',
             'extend'                  => [
                 'OxidEsales\Eshop\Application\Model\Payment' => 'TestModuleMetaData21\Payment',
-                'OxidEsales\Eshop\Application\Model\Article' => 'TestModuleMetaData21\Article'
+                'OxidEsales\Eshop\Application\Model\Article' => 'TestModuleMetaData21\Article',
             ],
             'controllers'             => [
                 'myvendor_mymodule_MyModuleController'      => 'TestModuleMetaData21\Controller',
@@ -176,14 +176,14 @@ final class MetaDataMapperTest extends TestCase
                     'type' => 'select',
                     'value' => '0',
                     'constraints' => ['0', '1', '2', '3'],
-                    'position' => 3
+                    'position' => 3,
                 ],
-                ['group' => 'main', 'name' => 'setting_2', 'type' => 'password', 'value' => 'changeMe']
+                ['group' => 'main', 'name' => 'setting_2', 'type' => 'password', 'value' => 'changeMe'],
             ],
             'events'                  => [
                 'onActivate'   => 'TestModuleMetaData21\Events::onActivate',
-                'onDeactivate' => 'TestModuleMetaData21\Events::onDeactivate'
-            ]
+                'onDeactivate' => 'TestModuleMetaData21\Events::onDeactivate',
+            ],
         ];
 
         $container = $this->getCompiledTestContainer();
@@ -280,7 +280,7 @@ final class MetaDataMapperTest extends TestCase
         $expectedModuleData = [
             'extend' => [
                 'OxidEsales\Eshop\Application\Model\Payment' => 'TestModuleWithPartialMetaData\Payment',
-                'OxidEsales\Eshop\Application\Model\Article' => 'TestModuleWithPartialMetaData\Article'
+                'OxidEsales\Eshop\Application\Model\Article' => 'TestModuleWithPartialMetaData\Article',
             ],
         ];
 
@@ -340,7 +340,6 @@ final class MetaDataMapperTest extends TestCase
 
         $this->assertEquals($expectedModuleData['id'], $moduleConfiguration->getId());
     }
-
 
     private function getMetaDataFilePath(string $testModuleDirectory): string
     {

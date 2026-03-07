@@ -57,8 +57,4 @@ final class Version20250911140000 extends AbstractMigration
 
         $this->addSql("DELETE FROM `oxconfig` WHERE `OXVARNAME` = 'aDetailImageSizes' AND `OXVARTYPE` = 'aarr'");
     }
-
-    public function down(Schema $schema): void
-    {
-    }
 }

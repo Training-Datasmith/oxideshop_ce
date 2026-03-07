@@ -62,22 +62,22 @@ final class NewsletterRecipientsDaoTest extends TestCase
                     NewsletterRecipientsDataMapper::ASSIGNED_USER_GROUPS,
                 ],
                 [
-                    "MR",
+                    'MR',
                     "christine's welt\"",
-                    "Doe",
-                    "test_user@test.com",
-                    "subscribed",
-                    "Deutschland",
-                    "test_group1,test_group2"
+                    'Doe',
+                    'test_user@test.com',
+                    'subscribed',
+                    'Deutschland',
+                    'test_group1,test_group2',
                 ],
                 [
-                    "MS",
+                    'MS',
                     "christine's welt\"",
-                    "Doe",
-                    "test_user2@test.com",
-                    "subscribed",
-                    "Deutschland",
-                    ""
+                    'Doe',
+                    'test_user2@test.com',
+                    'subscribed',
+                    'Deutschland',
+                    '',
                 ],
             ],
             $recipientsList
@@ -109,14 +109,14 @@ final class NewsletterRecipientsDaoTest extends TestCase
                 'OXUSERNAME' => ':username',
                 'OXRIGHTS' => ':userRights',
                 'OXCOUNTRYID' => ':countryId',
-                'OXCREATE' => ':create'
+                'OXCREATE' => ':create',
             ])
             ->setParameters([
                 'id' => $testUserId,
-                'username' => "test_user@test.com",
-                'userRights' => "malladmin",
-                'countryId' => "a7c40f631fc920687.20179984",
-                'create' => (new DateTime())->format('Y-m-d H:i:s')
+                'username' => 'test_user@test.com',
+                'userRights' => 'malladmin',
+                'countryId' => 'a7c40f631fc920687.20179984',
+                'create' => (new DateTime())->format('Y-m-d H:i:s'),
             ]);
 
         $queryBuilder->executeStatement();
@@ -126,11 +126,11 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ->values([
                 'oxid' => ':id',
                 'OXTITLE' => ':title',
-                'OXTITLE_1' => ':title'
+                'OXTITLE_1' => ':title',
             ])
             ->setParameters([
                 'id' => 'test_group1',
-                'title' => "test_group1"
+                'title' => 'test_group1',
             ]);
 
         $queryBuilder->executeStatement();
@@ -140,11 +140,11 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ->values([
                 'oxid' => ':id',
                 'OXTITLE' => ':title',
-                'OXTITLE_1' => ':title'
+                'OXTITLE_1' => ':title',
             ])
             ->setParameters([
                 'id' => 'test_group2',
-                'title' => "test_group2"
+                'title' => 'test_group2',
             ]);
 
         $queryBuilder->executeStatement();
@@ -160,7 +160,7 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ->setParameters([
                 'id' => $shopAdapter->generateUniqueId(),
                 'userId' => $testUserId,
-                'groupId' => 'test_group1'
+                'groupId' => 'test_group1',
             ]);
 
         $queryBuilder->executeStatement();
@@ -176,7 +176,7 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ->setParameters([
                 'id' => $shopAdapter->generateUniqueId(),
                 'userId' => $testUserId,
-                'groupId' => 'test_group2'
+                'groupId' => 'test_group2',
             ]);
 
         $queryBuilder->executeStatement();
@@ -196,12 +196,12 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ->setParameters([
                 'id' => $shopAdapter->generateUniqueId(),
                 'userId' => $testUserId,
-                'sal' => "MR",
-                'fistname' => "christine&#039;s welt&quot;",
-                'lastname' => "Doe",
-                'email' => "test_user@test.com",
-                'otpInState' => "1",
-                'shopId' => "1"
+                'sal' => 'MR',
+                'fistname' => 'christine&#039;s welt&quot;',
+                'lastname' => 'Doe',
+                'email' => 'test_user@test.com',
+                'otpInState' => '1',
+                'shopId' => '1',
             ]);
 
         $queryBuilder->executeStatement();
@@ -221,14 +221,14 @@ final class NewsletterRecipientsDaoTest extends TestCase
                 'OXUSERNAME' => ':username',
                 'OXRIGHTS' => ':userRights',
                 'OXCOUNTRYID' => ':countryId',
-                'OXCREATE' => ':create'
+                'OXCREATE' => ':create',
             ])
             ->setParameters([
                 'id' => $testUserId,
-                'username' => "test_user2@test.com",
-                'userRights' => "malladmin",
-                'countryId' => "a7c40f631fc920687.20179984",
-                'create' => (new DateTime())->add(new DateInterval('P1D'))->format('Y-m-d H:i:s')
+                'username' => 'test_user2@test.com',
+                'userRights' => 'malladmin',
+                'countryId' => 'a7c40f631fc920687.20179984',
+                'create' => (new DateTime())->add(new DateInterval('P1D'))->format('Y-m-d H:i:s'),
             ]);
 
         $queryBuilder->executeStatement();
@@ -248,12 +248,12 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ->setParameters([
                 'id' => $shopAdapter->generateUniqueId(),
                 'userId' => $testUserId,
-                'sal' => "MS ",
-                'fistname' => "christine&#039;s welt&quot;",
-                'lastname' => "Doe",
-                'email' => "test_user2@test.com",
-                'otpInState' => "1",
-                'shopId' => "1"
+                'sal' => 'MS ',
+                'fistname' => 'christine&#039;s welt&quot;',
+                'lastname' => 'Doe',
+                'email' => 'test_user2@test.com',
+                'otpInState' => '1',
+                'shopId' => '1',
             ]);
 
         $queryBuilder->executeStatement();
@@ -276,9 +276,9 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ])
             ->setParameters([
                 'id' => $testUserId,
-                'username' => "test_user3@test.com",
-                'userRights' => "malladmin",
-                'countryId' => "a7c40f631fc920687.20179984",
+                'username' => 'test_user3@test.com',
+                'userRights' => 'malladmin',
+                'countryId' => 'a7c40f631fc920687.20179984',
             ]);
 
         $queryBuilder->executeStatement();
@@ -298,12 +298,12 @@ final class NewsletterRecipientsDaoTest extends TestCase
             ->setParameters([
                 'id' => $shopAdapter->generateUniqueId(),
                 'userId' => $testUserId,
-                'sal' => "MR",
-                'fistname' => "christine&#039;s welt&quot;",
-                'lastname' => "Doe",
-                'email' => "test_user3@test.com",
-                'otpInState' => "1",
-                'shopId' => "99"
+                'sal' => 'MR',
+                'fistname' => 'christine&#039;s welt&quot;',
+                'lastname' => 'Doe',
+                'email' => 'test_user3@test.com',
+                'otpInState' => '1',
+                'shopId' => '99',
             ]);
 
         $queryBuilder->executeStatement();

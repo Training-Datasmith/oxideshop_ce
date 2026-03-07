@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,7 +37,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
         'container2' => [
             ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -44,8 +46,8 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
-        ]
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -106,13 +108,13 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Removes article from Manufacturer config
      */
-    public function removeManufacturer()
+    public function removeManufacturer(): void
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
         $articleIds = $this->getActionIds('oxarticles.oxid');
         $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
-        if (Registry::getRequest()->getRequestEscapedParameter("all")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $articleViewTable = $this->getViewName('oxarticles');
             $articleIds = $this->getAll($this->addFilter("select $articleViewTable.oxid " . $this->getQuery()));
         }
@@ -121,7 +123,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             $query = $this->formManufacturerRemovalQuery($articleIds);
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query);
 
-            $this->resetCounter("manufacturerArticle", $manufacturerId);
+            $this->resetCounter('manufacturerArticle', $manufacturerId);
         }
     }
 
@@ -134,18 +136,18 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function formManufacturerRemovalQuery($articlesToRemove)
     {
-        return "
+        return '
           UPDATE oxarticles
           SET oxmanufacturerid = null
-          WHERE oxid IN ( " . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ") ";
+          WHERE oxid IN ( ' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ') ';
     }
 
     /**
      * Adds article to Manufacturer config
      */
-    public function addManufacturer()
+    public function addManufacturer(): void
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
 
         $articleIds = $this->getActionIds('oxarticles.oxid');
         $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -155,12 +157,12 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             $articleIds = $this->getAll($this->addFilter("select $articleViewName.oxid " . $this->getQuery()));
         }
 
-        if ($manufacturerId && $manufacturerId != "-1" && is_array($articleIds)) {
+        if ($manufacturerId && $manufacturerId != '-1' && is_array($articleIds)) {
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
             $query = $this->formArticleToManufacturerAdditionQuery($manufacturerId, $articleIds);
             $database->execute($query);
-            $this->resetCounter("manufacturerArticle", $manufacturerId);
+            $this->resetCounter('manufacturerArticle', $manufacturerId);
         }
     }
 
@@ -176,9 +178,9 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        return "
+        return '
             UPDATE oxarticles
-            SET oxmanufacturerid = " . $database->quote($manufacturerId) . "
-            WHERE oxid IN ( " . implode(", ", $database->quoteArray($articlesToAdd)) . " )";
+            SET oxmanufacturerid = ' . $database->quote($manufacturerId) . '
+            WHERE oxid IN ( ' . implode(', ', $database->quoteArray($articlesToAdd)) . ' )';
     }
 }

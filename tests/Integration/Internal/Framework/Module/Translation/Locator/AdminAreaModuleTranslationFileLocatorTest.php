@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Translation\Locator;
 
-use Prophecy\Prophecy\ObjectProphecy;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModulesDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator\AdminAreaModuleTranslationFileLocator;
 use OxidEsales\EshopCommunity\Tests\ContainerTrait;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class AdminAreaModuleTranslationFileLocatorTest extends IntegrationTestCase
@@ -70,7 +70,7 @@ final class AdminAreaModuleTranslationFileLocatorTest extends IntegrationTestCas
             [
                 "$modulePath/views/admin/de/de1_lang.php",
                 "$modulePath/views/admin/de/de2_lang.php",
-                "$modulePath/views/admin/de/module_options.php"
+                "$modulePath/views/admin/de/module_options.php",
             ],
             $paths
         );
@@ -92,7 +92,7 @@ final class AdminAreaModuleTranslationFileLocatorTest extends IntegrationTestCas
         self::assertSame(
             [
                 "$modulePath/Application/views/admin/de/de1_lang.php",
-                "$modulePath/Application/views/admin/de/module_options.php"
+                "$modulePath/Application/views/admin/de/module_options.php",
             ],
             $paths
         );

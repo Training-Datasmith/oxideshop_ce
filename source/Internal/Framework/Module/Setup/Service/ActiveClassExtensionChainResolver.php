@@ -17,17 +17,11 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateService
 class ActiveClassExtensionChainResolver implements ActiveClassExtensionChainResolverInterface
 {
     public function __construct(
-        private ShopConfigurationDaoInterface $shopConfigurationDao,
-        private ModuleStateServiceInterface $moduleStateService
+        private readonly ShopConfigurationDaoInterface $shopConfigurationDao,
+        private readonly ModuleStateServiceInterface $moduleStateService
     ) {
     }
 
-
-    /**
-     * @param int $shopId
-     *
-     * @return ClassExtensionsChain
-     */
     public function getActiveExtensionChain(int $shopId): ClassExtensionsChain
     {
         $shopConfiguration = $this->shopConfigurationDao->get($shopId);
@@ -53,12 +47,6 @@ class ActiveClassExtensionChainResolver implements ActiveClassExtensionChainReso
         return $activeExtensionChain;
     }
 
-    /**
-     * @param array             $moduleExtensionClasses
-     * @param int               $shopId
-     * @param ShopConfiguration $shopConfiguration
-     * @return array
-     */
     private function getActiveModuleExtensionClasses(
         array $moduleExtensionClasses,
         int $shopId,
@@ -75,13 +63,6 @@ class ActiveClassExtensionChainResolver implements ActiveClassExtensionChainReso
         return $activeClasses;
     }
 
-    /**
-     * @param string            $classExtension
-     * @param int               $shopId
-     * @param ShopConfiguration $shopConfiguration
-     *
-     * @return bool
-     */
     private function isActiveExtension(
         string $classExtension,
         int $shopId,

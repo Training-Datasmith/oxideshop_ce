@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,15 +26,15 @@ class DeliveryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         ['oxisoalpha2', 'oxcountry', 1, 0, 0],
         ['oxisoalpha3', 'oxcountry', 0, 0, 0],
         ['oxunnum3', 'oxcountry', 0, 0, 0],
-        ['oxid', 'oxcountry', 0, 0, 1]
+        ['oxid', 'oxcountry', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxtitle', 'oxcountry', 1, 1, 0],
                                      ['oxisoalpha2', 'oxcountry', 1, 0, 0],
                                      ['oxisoalpha3', 'oxcountry', 0, 0, 0],
                                      ['oxunnum3', 'oxcountry', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -53,7 +55,7 @@ class DeliveryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         } else {
             $sQAdd = " from oxobject2delivery left join {$sCountryTable} " .
                      "on {$sCountryTable}.oxid=oxobject2delivery.oxobjectid " .
-                     " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) .
+                     ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) .
                      " and oxobject2delivery.oxtype = 'oxcountry' ";
         }
 
@@ -61,7 +63,7 @@ class DeliveryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             $sQAdd .= " and {$sCountryTable}.oxid not in ( select {$sCountryTable}.oxid " .
                       "from oxobject2delivery left join {$sCountryTable} " .
                       "on {$sCountryTable}.oxid=oxobject2delivery.oxobjectid " .
-                      " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) .
+                      ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2delivery.oxtype = 'oxcountry' ) ";
         }
 
@@ -71,14 +73,14 @@ class DeliveryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     /**
      * Removes chosen countries from delivery list
      */
-    public function removeCountryFromDel()
+    public function removeCountryFromDel(): void
     {
         $aChosenCntr = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -86,7 +88,7 @@ class DeliveryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     /**
      * Adds chosen countries to delivery list
      */
-    public function addCountryToDel()
+    public function addCountryToDel(): void
     {
         $aChosenCntr = $this->getActionIds('oxcountry.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -97,7 +99,7 @@ class DeliveryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');

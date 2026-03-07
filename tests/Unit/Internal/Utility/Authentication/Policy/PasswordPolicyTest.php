@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Utility\Authentication\Policy;
 
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
-use PHPUnit\Framework\Attributes\DataProvider;
 use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Exception\PasswordPolicyException;
 use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicy;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,7 +57,7 @@ final class PasswordPolicyTest extends TestCase
                 ['UTF-16LE'],
                 ['ISO-8859-1'],
                 ['ISO-8859-15'],
-                ['Windows-1252']
+                ['Windows-1252'],
             ];
     }
 }

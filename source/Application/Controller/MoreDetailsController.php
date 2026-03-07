@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -28,21 +30,21 @@ class MoreDetailsController extends \OxidEsales\Eshop\Application\Controller\Art
      *
      * @var string
      */
-    protected $_sProductId = null;
+    protected $_sProductId;
 
     /**
      * Active picture id
      *
      * @var string
      */
-    protected $_sActPicId = null;
+    protected $_sActPicId;
 
     /**
      * Article zoom pictures
      *
      * @var array
      */
-    protected $_aArtZoomPics = null;
+    protected $_aArtZoomPics;
 
     /**
      * Current view search engine indexing state
@@ -78,7 +80,7 @@ class MoreDetailsController extends \OxidEsales\Eshop\Application\Controller\Art
 
             if ($aPicGallery['ZoomPic']) {
                 $sActPicId = Registry::getRequest()->getRequestEscapedParameter('actpicid');
-                $this->_sActPicId = $sActPicId ? $sActPicId : 1;
+                $this->_sActPicId = $sActPicId ?: 1;
             }
         }
 

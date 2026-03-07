@@ -9,12 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Utility\Hash\Service;
 
+use function defined;
+
 use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicyInterface;
 use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\Argon2IPasswordHashService;
 use OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\PasswordHashServiceInterface;
-use PHPUnit\Framework\TestCase;
 
-use function defined;
+use PHPUnit\Framework\TestCase;
 
 final class Argon2IPasswordHashServiceTest extends TestCase
 {
@@ -76,7 +77,7 @@ final class Argon2IPasswordHashServiceTest extends TestCase
             [
                 'memory_cost' => PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
                 'time_cost' => PASSWORD_ARGON2_DEFAULT_TIME_COST,
-                'threads' => PASSWORD_ARGON2_DEFAULT_THREADS
+                'threads' => PASSWORD_ARGON2_DEFAULT_THREADS,
             ],
             $info['options']
         );

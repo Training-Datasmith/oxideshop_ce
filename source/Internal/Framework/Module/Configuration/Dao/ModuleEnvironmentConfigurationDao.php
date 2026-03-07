@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Env\EnvUrlFormatter;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -20,10 +20,10 @@ use Symfony\Component\Filesystem\Path;
 class ModuleEnvironmentConfigurationDao implements ModuleEnvironmentConfigurationDaoInterface
 {
     public function __construct(
-        private FileStorageFactoryInterface $fileStorageFactory,
-        private Filesystem $fileSystem,
-        private NodeInterface $node,
-        private BasicContextInterface $context
+        private readonly FileStorageFactoryInterface $fileStorageFactory,
+        private readonly Filesystem $fileSystem,
+        private readonly NodeInterface $node,
+        private readonly BasicContextInterface $context
     ) {
     }
 

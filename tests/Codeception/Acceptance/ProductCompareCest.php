@@ -28,7 +28,7 @@ final class ProductCompareCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -69,21 +69,21 @@ final class ProductCompareCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 € *'
+            'price' => '100,00 € *',
         ];
 
         $productData3 = [
             'id' => '10014',
             'title' => '14 EN product šÄßüл',
             'description' => '13 EN description šÄßüл',
-            'price' => 'from 15,00 €'
+            'price' => 'from 15,00 €',
         ];
 
         $userData = $this->getExistingUserData();
@@ -156,13 +156,13 @@ final class ProductCompareCest
         $I->wantToTest('if product compare functionality is correctly disabled');
 
         //(Use product compare) is disabled
-        $I->updateConfigInDatabase('bl_showCompareList', false, "bool");
+        $I->updateConfigInDatabase('bl_showCompareList', false, 'bool');
 
         $productData = [
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -183,7 +183,7 @@ final class ProductCompareCest
 
         $I->cleanUp();
         //(Use product compare) is enabled
-        $I->updateConfigInDatabase('bl_showCompareList', true, "bool");
+        $I->updateConfigInDatabase('bl_showCompareList', true, 'bool');
     }
 
     public function _failed(AcceptanceTester $I): void

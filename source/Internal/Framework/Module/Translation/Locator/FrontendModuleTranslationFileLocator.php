@@ -10,26 +10,22 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator;
 
 // phpcs:disable
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator\ModuleTranslationFileLocatorAbstract as LocatorAbstract;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator\FrontendModuleTranslationFileLocatorInterface as LocatorInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator\FrontendModuleTranslationFileLocatorInterface as LocatorInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator\ModuleTranslationFileLocatorAbstract as LocatorAbstract;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+
 // phpcs:enable
 
 class FrontendModuleTranslationFileLocator extends LocatorAbstract implements LocatorInterface
 {
     public function __construct(
-        private ActiveModulesDataProviderInterface $activeModulesDataProvider,
-        private Filesystem $filesystem
+        private readonly ActiveModulesDataProviderInterface $activeModulesDataProvider,
+        private readonly Filesystem $filesystem
     ) {
     }
 
-    /**
-     * @param string $lang
-     *
-     * @return array
-     */
     public function locate(string $lang): array
     {
         $langFiles = [];

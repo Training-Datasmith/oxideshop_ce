@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxDb;
 
 /**
  * Shop view validator.
@@ -23,7 +23,7 @@ class ShopViewValidator
 
     protected $_aAllShopLanguages = [];
 
-    protected $_iShopId = null;
+    protected $_iShopId;
 
     protected $_aAllViews = [];
 
@@ -33,10 +33,8 @@ class ShopViewValidator
 
     /**
      * Sets multi language tables.
-     *
-     * @param null $aMultiLangTables
      */
-    public function setMultiLangTables($aMultiLangTables)
+    public function setMultiLangTables($aMultiLangTables): void
     {
         $this->_aMultiLangTables = $aMultiLangTables;
     }
@@ -51,13 +49,12 @@ class ShopViewValidator
         return $this->_aMultiLangTables;
     }
 
-
     /**
      * Sets multi shop tables.
      *
      * @param array $aMultiShopTables
      */
-    public function setMultiShopTables($aMultiShopTables)
+    public function setMultiShopTables($aMultiShopTables): void
     {
         $this->_aMultiShopTables = $aMultiShopTables;
     }
@@ -77,7 +74,7 @@ class ShopViewValidator
      *
      * @param array $aLanguages
      */
-    public function setLanguages($aLanguages)
+    public function setLanguages($aLanguages): void
     {
         $this->_aLanguages = $aLanguages;
     }
@@ -97,7 +94,7 @@ class ShopViewValidator
      *
      * @param array $aAllShopLanguages
      */
-    public function setAllShopLanguages($aAllShopLanguages)
+    public function setAllShopLanguages($aAllShopLanguages): void
     {
         $this->_aAllShopLanguages = $aAllShopLanguages;
     }
@@ -112,13 +109,12 @@ class ShopViewValidator
         return $this->_aAllShopLanguages;
     }
 
-
     /**
      * Sets shop id.
      *
      * @param integer $iShopId
      */
-    public function setShopId($iShopId)
+    public function setShopId($iShopId): void
     {
         $this->_iShopId = $iShopId;
     }
@@ -158,20 +154,19 @@ class ShopViewValidator
     {
         $blResult = false;
 
-        $blEndsWithShopId = preg_match("/[_]([0-9]+)$/", $sViewName, $aMatchEndsWithShopId);
-        $blContainsShopId = preg_match("/[_]([0-9]+)[_]/", $sViewName, $aMatchContainsShopId);
+        $blEndsWithShopId = preg_match('/[_]([0-9]+)$/', $sViewName, $aMatchEndsWithShopId);
+        $blContainsShopId = preg_match('/[_]([0-9]+)[_]/', $sViewName, $aMatchContainsShopId);
 
         if (
             (!$blEndsWithShopId && !$blContainsShopId) ||
             ($blEndsWithShopId && $aMatchEndsWithShopId[1] == $this->getShopId()) ||
             ($blContainsShopId && $aMatchContainsShopId[1] == $this->getShopId())
         ) {
-            $blResult = true;
+            return true;
         }
 
         return $blResult;
     }
-
 
     /**
      * Returns list of shop specific views currently in database
@@ -220,17 +215,13 @@ class ShopViewValidator
      */
     protected function getShopTables()
     {
-        $shopTables = $this->getMultilangTables();
-
-        return $shopTables;
+        return $this->getMultilangTables();
     }
 
     /**
      * Appends possible table views to $this->_aValidShopViews variable.
-     *
-     * @param string $tableName
      */
-    protected function prepareShopTableViewNames($tableName)
+    protected function prepareShopTableViewNames(string $tableName)
     {
         $this->_aValidShopViews[] = 'oxv_' . $tableName;
 
@@ -245,20 +236,16 @@ class ShopViewValidator
      * Checks if view name is valid according to current config
      *
      * @param string $sViewName View name
-     *
-     * @return bool
      */
-    protected function isViewValid($sViewName)
+    protected function isViewValid($sViewName): bool
     {
         return in_array($sViewName, $this->getValidShopViews());
     }
 
     /**
      * Returns list of invalid views
-     *
-     * @return array
      */
-    public function getInvalidViews()
+    public function getInvalidViews(): array
     {
         $aInvalidViews = [];
         $aShopViews = $this->getShopViews();

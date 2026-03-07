@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,15 +14,11 @@ use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\Unavailab
 interface RandomTokenGeneratorBridgeInterface
 {
     /**
-     * @param int $length
-     * @return string
      * @throws UnavailableSourceOfRandomnessException
      */
     public function getAlphanumericToken(int $length): string;
 
     /**
-     * @param int $length
-     * @return string
      * @throws UnavailableSourceOfRandomnessException
      */
     public function getHexToken(int $length): string;

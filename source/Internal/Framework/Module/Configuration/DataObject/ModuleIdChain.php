@@ -14,7 +14,7 @@ use IteratorAggregate;
 
 class ModuleIdChain implements IteratorAggregate
 {
-    public function __construct(private array $moduleIds)
+    public function __construct(private readonly array $moduleIds)
     {
     }
 

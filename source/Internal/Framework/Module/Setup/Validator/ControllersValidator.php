@@ -10,29 +10,28 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator;
 
 // phpcs:disable
+use function array_key_exists;
+use function in_array;
+
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Controller;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ControllersDuplicationModuleConfigurationException;
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
-use Psr\Log\LoggerInterface;
 // phpcs:enable
 
-use function in_array;
-use function array_key_exists;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
+use Psr\Log\LoggerInterface;
 
 class ControllersValidator implements ModuleConfigurationValidatorInterface
 {
     public function __construct(
-        private ShopAdapterInterface $shopAdapter,
-        private ShopConfigurationDaoInterface $shopConfigurationDao,
-        private LoggerInterface $logger
+        private readonly ShopAdapterInterface $shopAdapter,
+        private readonly ShopConfigurationDaoInterface $shopConfigurationDao,
+        private readonly LoggerInterface $logger
     ) {
     }
 
     /**
-     * @param ModuleConfiguration $configuration
-     * @param int                 $shopId
      *
      * @throws ControllersDuplicationModuleConfigurationException
      */
@@ -68,10 +67,6 @@ class ControllersValidator implements ModuleConfigurationValidatorInterface
             && $controllerClassMap[strtolower($controller->getId())] === $controller->getControllerClassNameSpace();
     }
 
-    /**
-     * @param int $shopId
-     * @return array
-     */
     private function getModulesControllerClassMap(int $shopId): array
     {
         $moduleControllersClassMap = [];
@@ -88,8 +83,6 @@ class ControllersValidator implements ModuleConfigurationValidatorInterface
     }
 
     /**
-     * @param Controller $controller
-     * @param array $controllerClassMap
      * @throws ControllersDuplicationModuleConfigurationException
      */
     private function validateKeyDuplication(Controller $controller, array $controllerClassMap): void
@@ -102,8 +95,6 @@ class ControllersValidator implements ModuleConfigurationValidatorInterface
     }
 
     /**
-     * @param Controller $controller
-     * @param array $controllerClassMap
      * @throws ControllersDuplicationModuleConfigurationException
      */
     private function validateNamespaceDuplication(Controller $controller, array $controllerClassMap): void
@@ -115,10 +106,6 @@ class ControllersValidator implements ModuleConfigurationValidatorInterface
         }
     }
 
-    /**
-     * @param int $shopId
-     * @return array
-     */
     private function getControllersClassMap(int $shopId): array
     {
         return array_merge(

@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Utility\Hash\Service;
 
-use OxidEsales\EshopCommunity\Internal\Utility\Hash\Exception\PasswordHashException;
 use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicyInterface;
+use OxidEsales\EshopCommunity\Internal\Utility\Hash\Exception\PasswordHashException;
 
 /**
  * Hashes with the ARGON2I algorithm
@@ -18,21 +18,19 @@ use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPol
 class Argon2IPasswordHashService implements PasswordHashServiceInterface
 {
     public function __construct(
-        private PasswordPolicyInterface $passwordPolicy,
-        private int $memoryCost,
-        private int $timeCost,
-        private int $threads
+        private readonly PasswordPolicyInterface $passwordPolicy,
+        private readonly int $memoryCost,
+        private readonly int $timeCost,
+        private readonly int $threads
     ) {
     }
 
     /**
      * Creates a password hash
      *
-     * @param string $password
      *
      * @throws PasswordHashException
      *
-     * @return string
      */
     public function hash(string $password): string
     {
@@ -53,19 +51,11 @@ class Argon2IPasswordHashService implements PasswordHashServiceInterface
         return $hash;
     }
 
-    /**
-     * @param string $passwordHash
-     *
-     * @return bool
-     */
     public function passwordNeedsRehash(string $passwordHash): bool
     {
         return password_needs_rehash($passwordHash, PASSWORD_ARGON2I, $this->getOptions());
     }
 
-    /**
-     * @return array
-     */
     private function getOptions(): array
     {
         return [

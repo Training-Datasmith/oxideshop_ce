@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -44,7 +46,7 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
                                               ['oxmpn', 'oxarticles', 0, 0, 0],
                                               ['oxprice', 'oxarticles', 0, 0, 0],
                                               ['oxstock', 'oxarticles', 0, 0, 0],
-                                              ['oxid', 'oxarticles', 0, 0, 1]
+                                              ['oxid', 'oxarticles', 0, 0, 1],
     ],
                             'container2' => [
                                 ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -54,8 +56,8 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
                                 ['oxmpn', 'oxarticles', 0, 0, 0],
                                 ['oxprice', 'oxarticles', 0, 0, 0],
                                 ['oxstock', 'oxarticles', 0, 0, 0],
-                                ['oxid', 'oxaccessoire2article', 0, 0, 1]
-                            ]
+                                ['oxid', 'oxaccessoire2article', 0, 0, 1],
+                            ],
     ];
 
     /**
@@ -89,29 +91,27 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
                 $variantSelectionSql = $blVariantsSelectionParameter ? $trueResponse : $failResponse;
 
                 $outputQuery = " from $object2categoryTable left join {$articleTable} on {$variantSelectionSql}" .
-                               " where $object2categoryTable.oxcatnid = " . $db->quote($oxidId) . " ";
+                               " where $object2categoryTable.oxcatnid = " . $db->quote($oxidId) . ' ';
             } else {
                 $outputQuery = " from oxaccessoire2article left join {$articleTable} " .
                                "on oxaccessoire2article.oxobjectid={$articleTable}.oxid " .
-                               " where oxaccessoire2article.oxarticlenid = " . $db->quote($oxidId) . " ";
+                               ' where oxaccessoire2article.oxarticlenid = ' . $db->quote($oxidId) . ' ';
             }
         }
 
         if ($synchId && $synchId != $oxidId) {
             // performance
             $subSelect = ' select oxaccessoire2article.oxobjectid from oxaccessoire2article ';
-            $subSelect .= " where oxaccessoire2article.oxarticlenid = " . $db->quote($synchId) . " ";
+            $subSelect .= ' where oxaccessoire2article.oxarticlenid = ' . $db->quote($synchId) . ' ';
             $outputQuery .= " and {$articleTable}.oxid not in ( $subSelect )";
         }
 
         // skipping self from list
-        $sId = ($synchId) ? $synchId : $oxidId;
-        $outputQuery .= " and {$articleTable}.oxid != " . $db->quote($sId) . " ";
+        $sId = $synchId ?: $oxidId;
 
         // creating AJAX component
-        return $outputQuery;
+        return $outputQuery . (" and {$articleTable}.oxid != " . $db->quote($sId) . ' ');
     }
-
 
     /**
      * overide default sorting and replace it with OXSORT field
@@ -122,23 +122,22 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     {
         if ($this->containerId == 'container2') {
             return ' order by _2,_0';
-        } else {
-            return ' order by _' . $this->getSortCol() . ' ' . $this->getSortDir() . ' ';
         }
+        return ' order by _' . $this->getSortCol() . ' ' . $this->getSortDir() . ' ';
     }
 
     /**
      * Removing article form accessories article list
      */
-    public function removeArticleAcc()
+    public function removeArticleAcc(): void
     {
         $aChosenArt = $this->getActionIds('oxaccessoire2article.oxid');
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxaccessoire2article.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxaccessoire2article.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sChosenArticles = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
             $sQ = "delete from oxaccessoire2article where oxaccessoire2article.oxid in ({$sChosenArticles}) ";
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
@@ -147,7 +146,7 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Adding article to accessories article list
      */
-    public function addArticleAcc()
+    public function addArticleAcc(): void
     {
         $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
         $aChosenArt = $this->getActionIds('oxarticles.oxid');
@@ -159,10 +158,10 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
             $aChosenArt = $this->getAll(parent::addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
-        if ($oArticle->load($soxId) && $soxId && $soxId != "-1" && is_array($aChosenArt)) {
+        if ($oArticle->load($soxId) && $soxId && $soxId != '-1' && is_array($aChosenArt)) {
             foreach ($aChosenArt as $sChosenArt) {
                 $oNewGroup = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oNewGroup->init("oxaccessoire2article");
+                $oNewGroup->init('oxaccessoire2article');
                 $oNewGroup->oxaccessoire2article__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenArt);
                 $oNewGroup->oxaccessoire2article__oxarticlenid = new \OxidEsales\Eshop\Core\Field($oArticle->oxarticles__oxid->value);
                 $oNewGroup->oxaccessoire2article__oxsort = new \OxidEsales\Eshop\Core\Field(0);
@@ -182,23 +181,21 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     {
     }
 
-
     /**
      * Applies sorting for Accessories list
      */
-    public function sortAccessoriesList()
+    public function sortAccessoriesList(): void
     {
         $oxidRelationId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $selectedIdForSort = Registry::getRequest()->getRequestEscapedParameter('sortoxid');
         $sortDirection = Registry::getRequest()->getRequestEscapedParameter('direction');
 
         $accessoriesList = oxNew(ListModel::class);
-        $accessoriesList->init("oxbase", "oxaccessoire2article");
-        $sortQuery = "select * from  oxaccessoire2article where OXARTICLENID = :OXARTICLENID order by oxsort,oxid";
+        $accessoriesList->init('oxbase', 'oxaccessoire2article');
+        $sortQuery = 'select * from  oxaccessoire2article where OXARTICLENID = :OXARTICLENID order by oxsort,oxid';
         $accessoriesList->selectString($sortQuery, [
-            'OXARTICLENID' => $oxidRelationId
+            'OXARTICLENID' => $oxidRelationId,
         ]);
-
 
         $rebuildList = $this->rebuildAccessoriesSortIndexes($accessoriesList);
 
@@ -230,13 +227,10 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         $this->outputResponse($this->getData($countQuery, $normalQuery));
     }
 
-
     /**
      * rebuild Accessories sort indexes
      *
-     * @param ListModel $inputList
      *
-     * @return array
      */
     private function rebuildAccessoriesSortIndexes(ListModel $inputList): array
     {

@@ -39,7 +39,7 @@ class ProductRating
      *
      * @return $this
      */
-    public function setProductId($productId)
+    public function setProductId($productId): static
     {
         $this->productId = $productId;
 
@@ -59,7 +59,7 @@ class ProductRating
      *
      * @return $this
      */
-    public function setRatingAverage($ratingAverage)
+    public function setRatingAverage($ratingAverage): static
     {
         $this->ratingAverage = $ratingAverage;
 
@@ -79,7 +79,7 @@ class ProductRating
      *
      * @return $this
      */
-    public function setRatingCount($ratingCount)
+    public function setRatingCount($ratingCount): static
     {
         $this->ratingCount = $ratingCount;
 

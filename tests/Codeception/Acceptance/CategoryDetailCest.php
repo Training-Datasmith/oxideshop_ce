@@ -14,7 +14,6 @@ use OxidEsales\Codeception\Step\CategoryNavigation;
 use OxidEsales\EshopCommunity\Tests\Codeception\Support\AcceptanceTester;
 use PHPUnit\Framework\Attributes\Group;
 
-
 #[Group('category_description')]
 final class CategoryDetailCest
 {

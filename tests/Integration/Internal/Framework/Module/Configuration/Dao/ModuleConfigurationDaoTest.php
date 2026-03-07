@@ -79,8 +79,6 @@ final class ModuleConfigurationDaoTest extends IntegrationTestCase
         );
     }
 
-
-
     public function testDelete(): void
     {
         $moduleConfiguration = new ModuleConfiguration();

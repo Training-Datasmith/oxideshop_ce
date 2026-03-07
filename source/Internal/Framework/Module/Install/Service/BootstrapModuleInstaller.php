@@ -14,33 +14,23 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject\OxidE
 class BootstrapModuleInstaller implements ModuleInstallerInterface
 {
     public function __construct(
-        private ModuleFilesInstallerInterface $moduleFilesInstaller,
-        private ModuleConfigurationInstallerInterface $moduleConfigurationInstaller
+        private readonly ModuleFilesInstallerInterface $moduleFilesInstaller,
+        private readonly ModuleConfigurationInstallerInterface $moduleConfigurationInstaller
     ) {
     }
 
-    /**
-     * @param OxidEshopPackage $package
-     */
     public function install(OxidEshopPackage $package): void
     {
         $this->moduleFilesInstaller->install($package);
         $this->moduleConfigurationInstaller->install($package->getPackagePath());
     }
 
-    /**
-     * @param OxidEshopPackage $package
-     */
     public function uninstall(OxidEshopPackage $package): void
     {
         $this->moduleConfigurationInstaller->uninstall($package->getPackagePath());
         $this->moduleFilesInstaller->uninstall($package);
     }
 
-    /**
-     * @param OxidEshopPackage $package
-     * @return bool
-     */
     public function isInstalled(OxidEshopPackage $package): bool
     {
         return $this->moduleFilesInstaller->isInstalled($package)

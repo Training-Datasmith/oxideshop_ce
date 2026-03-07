@@ -36,7 +36,7 @@ class Database implements DatabaseInterface
 
     protected $connectionParameters = [];
 
-    protected $connection = null;
+    protected $connection;
 
     /**
      * @var array Map strings used in the shop to Doctrine constants
@@ -45,17 +45,17 @@ class Database implements DatabaseInterface
         'READ UNCOMMITTED' => TransactionIsolationLevel::READ_UNCOMMITTED,
         'READ COMMITTED' => TransactionIsolationLevel::READ_COMMITTED,
         'REPEATABLE READ' => TransactionIsolationLevel::REPEATABLE_READ,
-        'SERIALIZABLE' => TransactionIsolationLevel::SERIALIZABLE
+        'SERIALIZABLE' => TransactionIsolationLevel::SERIALIZABLE,
     ];
 
-    public function setConnectionParameters(array $connectionParameters)
+    public function setConnectionParameters(array $connectionParameters): void
     {
         if (array_key_exists('default', $connectionParameters)) {
             $this->connectionParameters = $connectionParameters['default'];
         }
     }
 
-    public function connect()
+    public function connect(): void
     {
         try {
             $connection = ContainerFacade::get(ConnectionFactoryInterface::class)->create();
@@ -67,21 +67,21 @@ class Database implements DatabaseInterface
         }
     }
 
-    public function forceMasterConnection()
+    public function forceMasterConnection(): void
     {
         if (is_null($this->connection)) {
             $this->connect();
         }
     }
 
-    public function forceSlaveConnection()
+    public function forceSlaveConnection(): void
     {
         if (is_null($this->connection)) {
             $this->connect();
         }
     }
 
-    public function closeConnection()
+    public function closeConnection(): void
     {
         $this->connection->close();
         gc_collect_cycles();
@@ -126,7 +126,7 @@ class Database implements DatabaseInterface
         }
 
         if ($result === false) {
-            $result = [];
+            return [];
         }
 
         return $result;
@@ -159,14 +159,12 @@ class Database implements DatabaseInterface
         }
     }
 
-    public function quoteArray($array)
+    public function quoteArray($array): array
     {
-        return array_map(function ($item) {
-            return $this->quote($item);
-        }, $array);
+        return array_map(fn ($item) => $this->quote($item), $array);
     }
 
-    public function startTransaction()
+    public function startTransaction(): void
     {
         try {
             $this->getConnection()->beginTransaction();
@@ -176,7 +174,7 @@ class Database implements DatabaseInterface
         }
     }
 
-    public function commitTransaction()
+    public function commitTransaction(): void
     {
         try {
             $this->getConnection()->commit();
@@ -186,7 +184,7 @@ class Database implements DatabaseInterface
         }
     }
 
-    public function rollbackTransaction()
+    public function rollbackTransaction(): void
     {
         try {
             $this->getConnection()->rollBack();
@@ -198,7 +196,7 @@ class Database implements DatabaseInterface
 
     public function setTransactionIsolationLevel($level)
     {
-        $level = strtoupper($level);
+        $level = strtoupper((string) $level);
 
         if (!array_key_exists($level, $this->transactionIsolationLevelMap)) {
             throw new InvalidArgumentException('Transaction isolation level is invalid');
@@ -235,20 +233,20 @@ class Database implements DatabaseInterface
      */
     private function checkIfSqlIsReadOnly($query): void
     {
-        $check = ltrim($query, " \t\n\r\0\x0B(");
+        $check = ltrim((string) $query, " \t\n\r\0\x0B(");
         if (!(stripos($check, 'select') === 0 || stripos($check, 'show') === 0)) {
-            throw new InvalidArgumentException("Function is only for read operations select or show");
+            throw new InvalidArgumentException('Function is only for read operations select or show');
         }
     }
 
-    private function checkForMultipleQueries($query, $parameters): string
+    private function checkForMultipleQueries($query, array $parameters): string
     {
-        if ($parameters !== [] || strrpos($query, ';', -1) === false) {
+        if ($parameters !== [] || strrpos((string) $query, ';', -1) === false) {
             return $query;
         }
         $queries = preg_split(
             '~(\"[^\\\\"]*\"|' . "\'[^\\\\']*\'|\'.+\'|`[^\\`]*`)(*SKIP)(*F)|(?<=;)(?![ ]*$)~",
-            $query
+            (string) $query
         );
         if (count($queries) > 1) {
             Registry::getLogger()->error('More than one query within one statement', [$query]);
@@ -257,7 +255,7 @@ class Database implements DatabaseInterface
         return $queries[0];
     }
 
-    public function selectLimit($query, $rowCount = -1, $offset = 0, $parameters = [])
+    public function selectLimit(string $query, $rowCount = -1, $offset = 0, $parameters = [])
     {
         /**
          * Parameter validation.
@@ -329,7 +327,7 @@ class Database implements DatabaseInterface
         return $this->connection;
     }
 
-    private function doesStatementProduceOutput($query)
+    private function doesStatementProduceOutput($query): bool
     {
         return in_array(
             $this->getFirstCommandInStatement($query),
@@ -409,7 +407,7 @@ class Database implements DatabaseInterface
         return $convertedException;
     }
 
-    protected function handleException(StandardException $exception)
+    protected function handleException(StandardException $exception): never
     {
         throw $exception;
     }
@@ -455,7 +453,10 @@ class Database implements DatabaseInterface
         return $lastInsertId;
     }
 
-    public function metaColumns($table)
+    /**
+     * @return \stdClass[]
+     */
+    public function metaColumns($table): array
     {
         $databaseName = $this->getConnection()->getDatabase();
         $query = "SELECT
@@ -500,17 +501,17 @@ class Database implements DatabaseInterface
                 $default = trim($default, "'");
             }
 
-            $typeInformation = explode('(', $type);
+            $typeInformation = explode('(', (string) $type);
             $typeName = trim($typeInformation[0]);
 
             $item = new stdClass();
             $item->name = $field;
             $item->type = $typeName;
-            $item->not_null = ('no' === strtolower($null));
-            $item->primary_key = (strtolower($key) == 'pri');
-            $item->auto_increment = strtolower($extra) == 'auto_increment';
-            $item->binary = (false !== strpos(strtolower($type), 'blob'));
-            $item->unsigned = (false !== strpos(strtolower($type), 'unsigned'));
+            $item->not_null = ('no' === strtolower((string) $null));
+            $item->primary_key = (strtolower((string) $key) == 'pri');
+            $item->auto_increment = strtolower((string) $extra) == 'auto_increment';
+            $item->binary = (str_contains(strtolower((string) $type), 'blob'));
+            $item->unsigned = (str_contains(strtolower((string) $type), 'unsigned'));
             $item->has_default = ((is_null($default)) || ($default === '')) ? false : true;
             if ($item->has_default) {
                 $item->default_value = $default;
@@ -520,7 +521,7 @@ class Database implements DatabaseInterface
              * These variables were set only when there was a value in the previous implementation with ADOdb Lite.
              * We do it the same way here for compatibility.
              */
-            list($max_length, $scale) = $this->getColumnMaxLengthAndScale($column, $item->type);
+            [$max_length, $scale] = $this->getColumnMaxLengthAndScale($column, $item->type);
             if (-1 !== $max_length) {
                 $item->max_length = (string)$max_length;
             } else {
@@ -614,7 +615,7 @@ class Database implements DatabaseInterface
         return $column[$keyMap[$key]];
     }
 
-    protected function getColumnMaxLengthAndScale(array $column, $assignedType)
+    protected function getColumnMaxLengthAndScale(array $column, $assignedType): array
     {
         /** @var int $maxLength The max length of a field. For floating point type or fixed point type fields the precision of the field */
         $maxLength = -1;
@@ -644,9 +645,9 @@ class Database implements DatabaseInterface
              */
         } elseif (preg_match("/^(enum|set)\((.*)\)$/i", strtolower($mySqlType), $matches)) {
             if ($matches[2]) {
-                $pieces = explode(",", $matches[2]);
+                $pieces = explode(',', $matches[2]);
                 /** The array values contain 2 quotes, so we have to subtract 2 from the strlen */
-                $maxLength = max(array_map("strlen", $pieces)) - 2;
+                $maxLength = max(array_map(strlen(...), $pieces)) - 2;
                 if ($maxLength <= 0) {
                     $maxLength = 1;
                 }
@@ -664,7 +665,7 @@ class Database implements DatabaseInterface
         /** Date types, which may have a maximum length */
         $dateTypes = ['YEAR'];
 
-        $assignedType = strtoupper($assignedType);
+        $assignedType = strtoupper((string) $assignedType);
         if (
             (in_array($assignedType, $integerTypes) ||
                 in_array($assignedType, $fixedPointTypes) ||
@@ -681,7 +682,7 @@ class Database implements DatabaseInterface
         return [(int)$maxLength, (int)$scale];
     }
 
-    protected function getFirstCommandInStatement($query)
+    protected function getFirstCommandInStatement($query): string
     {
         $singleLineQuery = str_replace(["\r", "\n"], ' ', $query);
         $sqlComments = '@(([\'"]).*?[^\\\]\2)|((?:\#|--).*?$|/\*(?:[^/*]|/(?!\*)|\*(?!/)|(?R))*\*\/)\s*|(?<=;)\s+@ms';
@@ -703,7 +704,7 @@ class Database implements DatabaseInterface
         }
     }
 
-    protected function isConnectionEstablished($connection)
+    protected function isConnectionEstablished($connection): bool
     {
         try {
             $connection->getServerVersion();
@@ -714,11 +715,11 @@ class Database implements DatabaseInterface
         return true;
     }
 
-    protected function createConnectionErrorMessage($connection)
+    protected function createConnectionErrorMessage($connection): string
     {
         $params = $connection->getParams();
         return sprintf(
-            "Could not connect to the database. Please check your database status and configuration. " .
+            'Could not connect to the database. Please check your database status and configuration. ' .
             "driver: '%s', host: '%s'",
             $params['driver'] ?? '',
             $params['host'] ?? ''

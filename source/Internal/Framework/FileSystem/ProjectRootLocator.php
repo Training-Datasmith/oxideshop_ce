@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\FileSystem;
 
-use RuntimeException;
-use Symfony\Component\Filesystem\Path;
 use function dirname;
 use function is_dir;
+
+use RuntimeException;
+use Symfony\Component\Filesystem\Path;
 
 class ProjectRootLocator
 {

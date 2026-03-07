@@ -54,7 +54,7 @@ readonly class MediaDao implements MediaDaoInterface
             ->values([
                 'id' => ':id',
                 'path' => ':path',
-                'type' => ':type'
+                'type' => ':type',
             ])
             ->setParameters(
                 $this->dataMapper->toData($media)

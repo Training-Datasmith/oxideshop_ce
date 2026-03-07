@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,17 +21,15 @@ use oxException;
 class OnlineLicenseCheckCaller extends \OxidEsales\Eshop\Core\OnlineCaller
 {
     /** Online License Key Check web service url. */
-    const WEB_SERVICE_URL = 'https://olc.oxid-esales.com/check.php';
+    public const WEB_SERVICE_URL = 'https://olc.oxid-esales.com/check.php';
 
     /** XML document tag name. */
-    const XML_DOCUMENT_NAME = 'olcRequest';
+    public const XML_DOCUMENT_NAME = 'olcRequest';
 
     /**
      * Expected response element in the XML response message fom web service.
-     *
-     * @var string
      */
-    private $_sResponseElement = 'olc';
+    private string $_sResponseElement = 'olc';
 
     /**
      * Performs Web service request

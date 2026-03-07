@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,7 +26,7 @@ class ModuleAutoload
     /**
      * @var null|ModuleAutoload A singleton instance of this class or a sub class of this class
      */
-    private static $instance = null;
+    private static ?self $instance = null;
 
     /**
      * ModuleAutoload constructor.
@@ -57,7 +59,7 @@ class ModuleAutoload
          * Classes from unified namespace cannot be loaded by this auto loader.
          * Do not try to load them in order to avoid strange errors in edge cases.
          */
-        if (false !== strpos($class, 'OxidEsales\Eshop\\')) {
+        if (str_contains($class, 'OxidEsales\Eshop\\')) {
             return false;
         }
 
@@ -100,7 +102,7 @@ class ModuleAutoload
 
             foreach ($extensions as $parentClass => $extensionPaths) {
                 foreach ($extensionPaths as $extensionPath) {
-                    if (preg_match('/\b' . $class . '($|\&)/i', $extensionPath)) {
+                    if (preg_match('/\b' . $class . '($|\&)/i', (string) $extensionPath)) {
                         Registry::getUtilsObject()->getClassName($parentClass);
                         break;
                     }

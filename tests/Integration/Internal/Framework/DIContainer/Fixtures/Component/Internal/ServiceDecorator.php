@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Component\Internal;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Component\Internal;
 
-use  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Ce\Internal\ServiceInterface;
+use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Ce\Internal\ServiceInterface;
 
 class ServiceDecorator implements ServiceInterface
 {

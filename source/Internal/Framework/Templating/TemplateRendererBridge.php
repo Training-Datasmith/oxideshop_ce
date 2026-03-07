@@ -11,7 +11,7 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Templating;
 
 class TemplateRendererBridge implements TemplateRendererBridgeInterface
 {
-    public function __construct(private TemplateRendererInterface $renderer)
+    public function __construct(private readonly TemplateRendererInterface $renderer)
     {
     }
 

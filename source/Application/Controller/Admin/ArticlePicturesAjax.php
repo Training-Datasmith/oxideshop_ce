@@ -11,10 +11,10 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MediaValidationException;
 use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\FileExtensionMismatchException;
 use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\FileSizeTooLargeException;
 use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\FileSizeTooSmallException;
+use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MediaValidationException;
 use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MimeBaseTypeMismatchException;
 use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MimeGuessMismatchException;
 use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MimeTypeGuessFailedException;
@@ -37,7 +37,6 @@ class ArticlePicturesAjax extends ListComponentAjax
 
     public function __construct()
     {
-        parent::__construct();
         $this->productMediaUploadProcessor = ContainerFacade::get(ProductMediaUploadProcessorInterface::class);
         $this->productMediaService = ContainerFacade::get(ProductMediaServiceInterface::class);
         $this->requestData = ContainerFacade::get(Request::class)->request;

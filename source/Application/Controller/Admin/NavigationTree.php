@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,20 +16,20 @@ use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use stdClass;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class NavigationTree extends Base
 {
     /**
      * stores DOM object for all navigation tree
      */
-    protected $_oDom = null;
+    protected $_oDom;
 
     /**
      * keeps unmodified dom
      */
-    protected $_oInitialDom = null;
+    protected $_oInitialDom;
 
     /**
      * Default EXPATH supported encodings
@@ -68,7 +70,7 @@ class NavigationTree extends Base
         $xPath = new DomXPath($dom);
 
         // building
-        $nodeList = $xPath->query("//SUBMENU[@cl]");
+        $nodeList = $xPath->query('//SUBMENU[@cl]');
         foreach ($nodeList as $node) {
             // fetching class
             $cl = $node->getAttribute('cl');
@@ -100,10 +102,10 @@ class NavigationTree extends Base
             // looking for non supported character encoding
             if (Str::getStr()->preg_match("/encoding\=(.*)\?\>/", $xml, $matches) !== 0) {
                 if (isset($matches[1])) {
-                    $currEncoding = trim($matches[1], "\"");
+                    $currEncoding = trim((string) $matches[1], '"');
                     if (!in_array(strtolower($currEncoding), $this->_aSupportedExpathXmlEncodings)) {
-                        $xml = str_replace($matches[1], "\"UTF-8\"", $xml);
-                        $xml = iconv($currEncoding, "UTF-8", $xml);
+                        $xml = str_replace($matches[1], '"UTF-8"', $xml);
+                        $xml = iconv($currEncoding, 'UTF-8', $xml);
                     }
                 }
             }
@@ -132,7 +134,7 @@ class NavigationTree extends Base
         foreach (['url', 'link'] as $attrType) {
             foreach ($xPath->query("//OXMENU//*[@$attrType]") as $node) {
                 $localUrl = $node->getAttribute($attrType);
-                if (strpos($localUrl, 'index.php?') === 0) {
+                if (str_starts_with((string) $localUrl, 'index.php?')) {
                     $localUrl = $str->preg_replace('#^index.php\?#', $url, $localUrl);
                     $node->setAttribute($attrType, $localUrl);
                 }
@@ -153,7 +155,7 @@ class NavigationTree extends Base
         foreach ($nodeList as $node) {
             // only allowed modules/user rights or so
             if (($req = $node->getAttribute('rights'))) {
-                $perms = explode(',', $req);
+                $perms = explode(',', (string) $req);
                 foreach ($perms as $perm) {
                     if ($perm && !$this->hasRights($perm)) {
                         $node->parentNode->removeChild($node);
@@ -161,7 +163,7 @@ class NavigationTree extends Base
                 }
                 // not allowed modules/user rights or so
             } elseif (($noReq = $node->getAttribute('norights'))) {
-                $perms = explode(',', $noReq);
+                $perms = explode(',', (string) $noReq);
                 foreach ($perms as $perm) {
                     if ($perm && $this->hasRights($perm)) {
                         $node->parentNode->removeChild($node);
@@ -179,12 +181,12 @@ class NavigationTree extends Base
     protected function checkGroups($dom)
     {
         $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query("//*[@nogroup or @group]");
+        $nodeList = $xPath->query('//*[@nogroup or @group]');
 
         foreach ($nodeList as $node) {
             // allowed only for groups
             if (($req = $node->getAttribute('group'))) {
-                $perms = explode(',', $req);
+                $perms = explode(',', (string) $req);
                 foreach ($perms as $perm) {
                     if ($perm && !$this->hasGroup($perm)) {
                         $node->parentNode->removeChild($node);
@@ -192,7 +194,7 @@ class NavigationTree extends Base
                 }
                 // not allowed for groups
             } elseif (($noReq = $node->getAttribute('nogroup'))) {
-                $perms = explode(',', $noReq);
+                $perms = explode(',', (string) $noReq);
                 foreach ($perms as $perm) {
                     if ($perm && $this->hasGroup($perm)) {
                         $node->parentNode->removeChild($node);
@@ -206,8 +208,6 @@ class NavigationTree extends Base
      * Removes form tree elements if this is demo shop and elements have disableForDemoShop="1"
      *
      * @param DOMDocument $dom document to check group
-     *
-     * @return null
      */
     protected function checkDemoShopDenials($dom)
     {
@@ -217,7 +217,7 @@ class NavigationTree extends Base
         }
 
         $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query("//*[@disableForDemoShop]");
+        $nodeList = $xPath->query('//*[@disableForDemoShop]');
         foreach ($nodeList as $node) {
             if ($node->getAttribute('disableForDemoShop')) {
                 $node->parentNode->removeChild($node);
@@ -233,7 +233,7 @@ class NavigationTree extends Base
     protected function removeInvisibleMenuNodes($dom)
     {
         $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query("//*[@visible]");
+        $nodeList = $xPath->query('//*[@visible]');
         foreach ($nodeList as $node) {
             if (!$node->getAttribute('visible')) {
                 $node->parentNode->removeChild($node);
@@ -418,7 +418,7 @@ class NavigationTree extends Base
             $item->tag('oxid_esales.cache.menu');
             return [
                 'creation_time' => time(),
-                'menu_dom' => $this->generateInitialMenuDomXml($filesToLoad)
+                'menu_dom' => $this->generateInitialMenuDomXml($filesToLoad),
             ];
         });
 
@@ -480,7 +480,7 @@ class NavigationTree extends Base
      *
      * @param string $nodeId node id
      */
-    public function markNodeActive($nodeId)
+    public function markNodeActive($nodeId): void
     {
         $xPath = new DOMXPath($this->getDomXml());
         $nodeList = $xPath->query("//*[@cl='{$nodeId}' or @list='{$nodeId}']");
@@ -552,12 +552,12 @@ class NavigationTree extends Base
      */
     protected function getAdminUrl()
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
 
         if (($adminUrl = ContainerFacade::getParameter('oxid_esales.shop_admin_url'))) {
-            $url = trim($adminUrl, '/');
+            $url = trim((string) $adminUrl, '/');
         } else {
-            $url = trim(ContainerFacade::getParameter('oxid_esales.shop_url'), '/') . '/admin';
+            $url = trim((string) ContainerFacade::getParameter('oxid_esales.shop_url'), '/') . '/admin';
         }
 
         return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl("{$url}/index.php", false);
@@ -603,7 +603,6 @@ class NavigationTree extends Base
         }
     }
 
-
     /**
      * Get template language code
      *
@@ -612,9 +611,8 @@ class NavigationTree extends Base
     protected function getTemplateLanguageCode()
     {
         $language = \OxidEsales\Eshop\Core\Registry::getLang();
-        $templateLanguageCode = $language->getLanguageArray()[$language->getTplLanguage()]->abbr;
 
-        return $templateLanguageCode;
+        return $language->getLanguageArray()[$language->getTplLanguage()]->abbr;
     }
 
     /**
@@ -624,7 +622,7 @@ class NavigationTree extends Base
     {
     }
 
-    private function isMenuCacheOutdated($cache, string $cacheName, array $filesToLoad): bool
+    private function isMenuCacheOutdated(object $cache, string $cacheName, array $filesToLoad): bool
     {
         $cacheItem = $cache->getItem($cacheName);
 

@@ -22,8 +22,8 @@ final class DownloadableProductCest
     public function _before(AcceptanceTester $I): void
     {
         $I->updateConfigInDatabase('blEnableDownloads', true, 'bool');
-        $I->updateConfigInDatabase('iMaxDownloadsCount', "2", 'str');
-        $I->updateConfigInDatabase('iLinkExpirationTime', "240", 'str');
+        $I->updateConfigInDatabase('iMaxDownloadsCount', '2', 'str');
+        $I->updateConfigInDatabase('iLinkExpirationTime', '240', 'str');
         $I->updateConfigInDatabase('blEnableIntangibleProdAgreement', true, 'bool');
 
         $I->updateInDatabase('oxarticles', ['oxisdownloadable' => 1], ['oxartnum' => '1002-1']);
@@ -43,7 +43,7 @@ final class DownloadableProductCest
         $I->haveInDatabase(
             'oxorderfiles',
             [
-                'OXID' => "testdownloadProductCest",
+                'OXID' => 'testdownloadProductCest',
                 'OXORDERID' => $this->orderId,
                 'OXFILENAME' => 'testFile3',
                 'OXFILEID' => '1000l',
@@ -55,7 +55,7 @@ final class DownloadableProductCest
                 'OXLINKEXPIRATIONTIME' => 240,
                 'OXRESETCOUNT' => 0,
                 'OXVALIDUNTIL' => (new DateTime())->modify('+1 week')->format('Y-m-d H:i:s'),
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s'),
             ]
         );
 
@@ -103,6 +103,6 @@ final class DownloadableProductCest
         $accountPage = $startPage->openAccountPage();
         $accountPage->openMyDownloadsPage();
         $I->dontSee(Translator::translate('DOWNLOADS_PAYMENT_PENDING'));
-        $I->clickAndWait(".downloadList a");
+        $I->clickAndWait('.downloadList a');
     }
 }

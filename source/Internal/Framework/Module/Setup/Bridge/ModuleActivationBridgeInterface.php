@@ -15,22 +15,9 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge;
  */
 interface ModuleActivationBridgeInterface
 {
-    /**
-     * @param string $moduleId
-     * @param int    $shopId
-     */
     public function activate(string $moduleId, int $shopId);
 
-    /**
-     * @param string $moduleId
-     * @param int    $shopId
-     */
     public function deactivate(string $moduleId, int $shopId);
 
-    /**
-     * @param string $moduleId
-     * @param int    $shopId
-     * @return bool
-     */
     public function isActive(string $moduleId, int $shopId): bool;
 }

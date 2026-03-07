@@ -14,22 +14,16 @@ use Symfony\Contracts\EventDispatcher\Event;
 abstract class ModuleSetupEvent extends Event
 {
     public function __construct(
-        private int $shopId,
-        private string $moduleId
+        private readonly int $shopId,
+        private readonly string $moduleId
     ) {
     }
 
-    /**
-     * @return string
-     */
     public function getModuleId(): string
     {
         return $this->moduleId;
     }
 
-    /**
-     * @return int
-     */
     public function getShopId(): int
     {
         return $this->shopId;

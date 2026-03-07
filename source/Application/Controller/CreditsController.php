@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,7 +19,7 @@ class CreditsController extends \OxidEsales\Eshop\Application\Controller\Content
      *
      * @var string
      */
-    protected $_sContentId = "oxcredits";
+    protected $_sContentId = 'oxcredits';
 
     /**
      * Returns active content id to load its seo meta info

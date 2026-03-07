@@ -16,9 +16,9 @@ use Symfony\Component\Filesystem\Path;
 
 class MediaUrlGenerator implements MediaUrlGeneratorInterface
 {
-    private string $generatedBaseUrl;
-    private string $picturesRoot;
-    private int $imageQuality;
+    private readonly string $generatedBaseUrl;
+    private readonly string $picturesRoot;
+    private readonly int $imageQuality;
 
     public function __construct(
         ContextInterface $context,

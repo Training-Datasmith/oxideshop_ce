@@ -54,27 +54,27 @@ final class ShopSettingEncoderTest extends TestCase
             [
                 true,
                 '1',
-                'bool'
+                'bool',
             ],
             [
                 'some string',
                 'some string',
-                'string'
+                'string',
             ],
             [
                 2,
                 2,
-                'int'
+                'int',
             ],
             [
                 ['value'],
                 serialize(['value']),
-                'arr'
+                'arr',
             ],
             [
                 ['value'],
                 serialize(['value']),
-                'aarr'
+                'aarr',
             ],
         ];
     }

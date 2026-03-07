@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -38,21 +40,21 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @var string
      */
-    protected $_sClassLocation = null;
+    protected $_sClassLocation;
 
     /**
      * Name of running class method.
      *
      * @var string
      */
-    protected $_sThisAction = null;
+    protected $_sThisAction;
 
     /**
      * If this is a component we will have our parent view here.
      *
      * @var \OxidEsales\Eshop\Core\Controller\BaseController|null
      */
-    protected $_oParent = null;
+    protected $_oParent;
 
     /**
      * Flag if this object is a component or not
@@ -66,35 +68,35 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @var string
      */
-    protected $_sThisTemplate = null;
+    protected $_sThisTemplate;
 
     /**
      * ID of current view - generated php file.
      *
      * @var string
      */
-    protected $_sViewId = null;
+    protected $_sViewId;
 
     /**
      * Current view class name
      *
      * @var string
      */
-    protected $_sClass = null;
+    protected $_sClass;
 
     /**
      * Current view class key
      *
      * @var string
      */
-    protected $classKey = null;
+    protected $classKey;
 
     /**
      * Action function name
      *
      * @var string
      */
-    protected $_sFnc = null;
+    protected $_sFnc;
 
     /**
      * Marker if user defined function was executed
@@ -108,56 +110,56 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @var string
      */
-    protected $_sCharSet = null;
+    protected $_sCharSet;
 
     /**
      * Shop version
      *
      * @var string
      */
-    protected $_sVersion = null;
+    protected $_sVersion;
 
     /**
      * If current shop has demo version
      *
      * @var bool
      */
-    protected $_blDemoVersion = null;
+    protected $_blDemoVersion;
 
     /**
      * If current shop has demo shop
      *
      * @var bool
      */
-    protected $_blDemoShop = null;
+    protected $_blDemoShop;
 
     /**
      * Display if newsletter must be displayed
      *
      * @var bool
      */
-    protected $_iNewsStatus = null;
+    protected $_iNewsStatus;
 
     /**
      * Shop logo
      *
      * @var string
      */
-    protected $_sShopLogo = null;
+    protected $_sShopLogo;
 
     /**
      * Category ID
      *
      * @var string
      */
-    protected $_sCategoryId = null;
+    protected $_sCategoryId;
 
     /**
      * Active category object.
      *
      * @var object
      */
-    protected $_oClickCat = null;
+    protected $_oClickCat;
 
     /**
      * Cache sign to enable/disable use of cache.
@@ -171,15 +173,15 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @var \OxidEsales\Eshop\Core\ViewConfig
      */
-    protected $_oViewConf = null;
+    protected $_oViewConf;
 
     /**
      * Initiates all components stored, executes \OxidEsales\Eshop\Core\Controller\BaseController::addGlobalParams.
      */
-    public function init()
+    public function init(): void
     {
         // setting current view class name
-        $this->_sThisAction = strtolower(get_class($this));
+        $this->_sThisAction = strtolower(static::class);
 
         if (!$this->_blIsComponent) {
             // assume that cached components does not affect this method ...
@@ -192,7 +194,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param array $aParams view parameters array.
      */
-    public function setViewParameters($aParams = null)
+    public function setViewParameters($aParams = null): void
     {
         $this->_aViewParams = $aParams;
     }
@@ -206,7 +208,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      */
     public function getViewParameter($sKey)
     {
-        return (isset($this->_aViewParams[$sKey])) ? $this->_aViewParams[$sKey] : Registry::getRequest()->getRequestEscapedParameter($sKey);
+        return $this->_aViewParams[$sKey] ?? Registry::getRequest()->getRequestEscapedParameter($sKey);
     }
 
     /**
@@ -214,7 +216,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param bool $blIsCallForCache cache sign to enable/disable use of cache
      */
-    public function setIsCallForCache($blIsCallForCache = null)
+    public function setIsCallForCache($blIsCallForCache = null): void
     {
         $this->_blIsCallForCache = $blIsCallForCache;
     }
@@ -281,7 +283,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      * @param string $sPara  name of parameter to pass
      * @param mixed  $sValue value of parameter
      */
-    public function addTplParam($sPara, $sValue)
+    public function addTplParam($sPara, $sValue): void
     {
         $this->_aViewData[$sPara] = $sValue;
     }
@@ -315,7 +317,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param string $sTemplate template name
      */
-    public function setTemplateName($sTemplate)
+    public function setTemplateName($sTemplate): void
     {
         $this->_sThisTemplate = $sTemplate;
     }
@@ -325,7 +327,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param string $classKey current view class key
      */
-    public function setClassKey($classKey)
+    public function setClassKey($classKey): void
     {
         $this->_sClass = $classKey;
         $this->classKey = $classKey;
@@ -346,7 +348,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param string $sFncName action function name
      */
-    public function setFncName($sFncName)
+    public function setFncName($sFncName): void
     {
         $this->_sFnc = $sFncName;
     }
@@ -366,7 +368,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param array $aViewData array of data that is passed to template engine
      */
-    public function setViewData($aViewData = null)
+    public function setViewData($aViewData = null): void
     {
         $this->_aViewData = $aViewData;
     }
@@ -390,12 +392,11 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      */
     public function getViewDataElement($sParamId = null)
     {
-        $return = null;
         if ($sParamId && isset($this->_aViewData[$sParamId])) {
-            $return = $this->_aViewData[$sParamId];
+            return $this->_aViewData[$sParamId];
         }
 
-        return $return;
+        return null;
     }
 
     /**
@@ -403,7 +404,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param string $sClassLocation location of a executed class file
      */
-    public function setClassLocation($sClassLocation = null)
+    public function setClassLocation($sClassLocation = null): void
     {
         $this->_sClassLocation = $sClassLocation;
     }
@@ -423,7 +424,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param string $sThisAction name of running class method
      */
-    public function setThisAction($sThisAction = null)
+    public function setThisAction($sThisAction = null): void
     {
         $this->_sThisAction = $sThisAction;
     }
@@ -442,7 +443,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      * Set parent object. If this is a component we will have our parent view here.
      * @param \OxidEsales\Eshop\Core\Controller\BaseController $oParent parent object
      */
-    public function setParent($oParent = null)
+    public function setParent($oParent = null): void
     {
         $this->_oParent = $oParent;
     }
@@ -462,7 +463,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param bool|null $blIsComponent flag if this object is a component
      */
-    public function setIsComponent($blIsComponent = null)
+    public function setIsComponent($blIsComponent = null): void
     {
         $this->_blIsComponent = $blIsComponent;
     }
@@ -485,7 +486,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @throws \OxidEsales\Eshop\Core\Exception\SystemComponentException system component exception
      */
-    public function executeFunction($sFunction)
+    public function executeFunction($sFunction): void
     {
         // execute
         if ($sFunction && !self::$_blExecuted) {
@@ -499,7 +500,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
                 }
             } elseif (!$this->_blIsComponent) {
                 throw new \OxidEsales\Eshop\Core\Exception\RoutingException(
-                    sprintf("Controller method is not accessible: %s::%s", self::class, $sFunction)
+                    sprintf('Controller method is not accessible: %s::%s', self::class, $sFunction)
                 );
             }
         }
@@ -523,7 +524,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
             $params = explode('?', $sNewAction);
 
             // action parameters is the part before '?'
-            $pageParams = isset($params[1]) ? $params[1] : null;
+            $pageParams = $params[1] ?? null;
 
             // looking for function name
             $params = explode('/', $params[0]);
@@ -636,18 +637,16 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
     public function getShopFullEdition()
     {
         $sEdition = $this->getShopEdition();
-        $sFullEdition = "Community Edition";
-        if ($sEdition == "PE") {
-            $sFullEdition = "Professional Edition";
+        if ($sEdition == 'PE') {
+            return 'Professional Edition';
         }
 
-        if ($sEdition == "EE") {
-            $sFullEdition = "Enterprise Edition";
+        if ($sEdition == 'EE') {
+            return 'Enterprise Edition';
         }
 
-        return $sFullEdition;
+        return 'Community Edition';
     }
-
 
     /**
      * Returns if current shop is demo version
@@ -704,7 +703,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      */
     public function showNewsletter()
     {
-        return $this->_iNewsStatus === null ? 1 : $this->_iNewsStatus;
+        return $this->_iNewsStatus ?? 1;
     }
 
     /**
@@ -712,7 +711,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param bool $blShow if TRUE - newsletter subscription box will be shown
      */
-    public function setShowNewsletter($blShow)
+    public function setShowNewsletter($blShow): void
     {
         $this->_iNewsStatus = $blShow;
     }
@@ -745,7 +744,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param \OxidEsales\Eshop\Application\Model\Category $oCategory active category
      */
-    public function setActCategory($oCategory)
+    public function setActCategory($oCategory): void
     {
         $this->_oClickCat = $oCategory;
     }
@@ -769,7 +768,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
      *
      * @param string $sCategoryId Id of category to cache
      */
-    public function setCategoryId($sCategoryId)
+    public function setCategoryId($sCategoryId): void
     {
         $this->_sCategoryId = $sCategoryId;
     }
@@ -822,12 +821,11 @@ class BaseController extends \OxidEsales\Eshop\Core\Base implements ViewControll
     public function getSidForWidget()
     {
         $session = \OxidEsales\Eshop\Core\Registry::getSession();
-        $sid = null;
         if (!$session->isActualSidInCookie()) {
-            $sid = $session->getId();
+            return $session->getId();
         }
 
-        return $sid;
+        return null;
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,7 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxRegistry;
 
 /**
  * Admin shop list manager.
@@ -18,7 +19,7 @@ use oxRegistry;
 class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
 {
     /** New Shop indicator. */
-    const NEW_SHOP_ID = '-1';
+    public const NEW_SHOP_ID = '-1';
 
     /**
      * Forces main frame update is set TRUE
@@ -46,7 +47,7 @@ class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
      *
      * @var bool
      */
-    protected $_blUpdateNav = null;
+    protected $_blUpdateNav;
 
     /**
      * Executes parent method parent::render() and returns name of template
@@ -60,7 +61,7 @@ class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
 
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != self::NEW_SHOP_ID) {
             // load object
             $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
@@ -79,7 +80,7 @@ class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
 
         if (isset($this->_aViewData['updatenav']) && $this->_aViewData['updatenav']) {
             //skipping requirements checking when reloading nav frame
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("navReload", true);
+            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('navReload', true);
         }
 
         //making sure we really change shops on low level
@@ -103,8 +104,8 @@ class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
         if (!\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('malladmin')) {
             // we only allow to see our shop
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $this->_aWhere[$tableViewNameGenerator->getViewName("oxshops") . ".oxid"]
-                = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("actshop");
+            $this->_aWhere[$tableViewNameGenerator->getViewName('oxshops') . '.oxid']
+                = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('actshop');
         }
 
         return $this->_aWhere;

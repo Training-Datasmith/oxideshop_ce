@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,7 +9,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -28,7 +29,7 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function __construct()
     {
         parent::__construct();
-        $this->init("oxstates");
+        $this->init('oxstates');
     }
 
     /**
@@ -44,12 +45,12 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $params = [
             'oxisoalpha2' => $sCode,
-            'oxcountryid' => $sCountryId
+            'oxcountryid' => $sCountryId,
         ];
 
-        return $oDb->getOne("SELECT oxid FROM oxstates 
+        return $oDb->getOne('SELECT oxid FROM oxstates 
             WHERE oxisoalpha2 = :oxisoalpha2 
-              AND oxcountryid = :oxcountryid", $params);
+              AND oxcountryid = :oxcountryid', $params);
     }
 
     /**
@@ -63,11 +64,11 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sQ = "SELECT oxtitle FROM " . $tableViewNameGenerator->getViewName("oxstates") . " 
-            WHERE oxid = :oxid";
+        $sQ = 'SELECT oxtitle FROM ' . $tableViewNameGenerator->getViewName('oxstates') . ' 
+            WHERE oxid = :oxid';
 
         $sStateTitle = $oDb->getOne($sQ, [
-            'oxid' => $iStateId
+            'oxid' => $iStateId,
         ]);
 
         return (string) $sStateTitle;

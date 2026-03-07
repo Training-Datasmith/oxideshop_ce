@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject;
 
-readonly class MediaPath
+readonly class MediaPath implements \Stringable
 {
     public function __construct(
         private string $path

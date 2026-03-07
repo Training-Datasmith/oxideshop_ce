@@ -27,7 +27,6 @@ final class EnvLoaderTest extends TestCase
     private string $serializedEnvKey = 'SERIALIZED_VALUE_KEY';
     private string $serializedParameterKey = 'serialized_value_key';
 
-
     public function setUp(): void
     {
         parent::setUp();

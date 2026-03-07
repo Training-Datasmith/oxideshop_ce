@@ -61,7 +61,7 @@ final class ServicesYamlValidatorTest extends IntegrationTestCase
     public function testWithCorrectServiceYaml(): void
     {
         $this->moduleConfiguration->setModuleSource('Working');
-        $this->moduleConfiguration->setId("testId");
+        $this->moduleConfiguration->setId('testId');
         $this->modulePathResolver->method('getFullModulePathFromConfiguration')
             ->willReturn(Path::join(__DIR__, 'Fixtures', 'ModuleWithCorrectServiceYaml'));
 

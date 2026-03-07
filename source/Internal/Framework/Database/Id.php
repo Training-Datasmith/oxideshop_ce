@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Database;
 
-readonly class Id
+readonly class Id implements \Stringable
 {
     private string $uid;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,9 +9,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
 
 /**
  * Manages object (users, discounts, deliveries...) assignment to groups.

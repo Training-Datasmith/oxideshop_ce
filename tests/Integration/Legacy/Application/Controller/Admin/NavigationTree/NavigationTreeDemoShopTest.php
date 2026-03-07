@@ -43,7 +43,7 @@ class NavigationTreeDemoShopTest extends IntegrationTestCase
         $domMenuXml = $this->getDomMenuXml();
 
         $xPath = new DomXPath($domMenuXml);
-        foreach ($xPath->query("//*[@disableForDemoShop]") as $node) {
+        foreach ($xPath->query('//*[@disableForDemoShop]') as $node) {
             $node->setAttribute('disableForDemoShop', $disabled);
         }
 
@@ -58,7 +58,7 @@ class NavigationTreeDemoShopTest extends IntegrationTestCase
         $menuDom->preserveWhiteSpace = false;
 
         if (!$menuDom->load($this->getMenuFilePath())) {
-            $this->fail("Admin menu.xml not found.");
+            $this->fail('Admin menu.xml not found.');
         }
 
         $dom = new DOMDocument();
@@ -79,7 +79,7 @@ class NavigationTreeDemoShopTest extends IntegrationTestCase
     private function getDeniedLinksCount(DOMDocument $dom): int
     {
         $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query("//*[@disableForDemoShop]");
+        $nodeList = $xPath->query('//*[@disableForDemoShop]');
         $count = 0;
 
         foreach ($nodeList as $oNode) {

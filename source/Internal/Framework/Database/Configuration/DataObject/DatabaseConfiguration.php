@@ -90,7 +90,7 @@ class DatabaseConfiguration
 
     public function getSocket(): string
     {
-        return trim($this->urlComponents['socket'], '()');
+        return trim((string) $this->urlComponents['socket'], '()');
     }
 
     public function getConnectionParameters(): array

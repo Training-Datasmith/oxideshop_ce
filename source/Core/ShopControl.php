@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -27,21 +29,21 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      *
      * @var bool
      */
-    protected $_blMainTasksExecuted = null;
+    protected $_blMainTasksExecuted;
 
     /**
      * Profiler start time
      *
      * @var double
      */
-    protected $_dTimeStart = null;
+    protected $_dTimeStart;
 
     /**
      * Profiler end time
      *
      * @var double
      */
-    protected $_dTimeEnd = null;
+    protected $_dTimeEnd;
 
     /**
      * errors to be displayed/returned
@@ -50,7 +52,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aErrors = null;
+    protected $_aErrors;
 
     /**
      * same as errors in session
@@ -59,7 +61,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aAllErrors = null;
+    protected $_aAllErrors;
 
     /**
      * same as controller errors in session
@@ -68,8 +70,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aControllerErrors = null;
-
+    protected $_aControllerErrors;
 
     /**
      * output handler object
@@ -78,12 +79,12 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      *
      * @var \OxidEsales\Eshop\Core\Output
      */
-    protected $_oOutput = null;
+    protected $_oOutput;
 
     /**
      * Cache manager instance
      */
-    protected $_oCache = null;
+    protected $_oCache;
 
     /**
      * Main shop manager, that sets shop status, executes configuration methods.
@@ -96,7 +97,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      * @param array  $parameters    Parameters array
      * @param array  $viewsChain    Array of views names that should be initialized also
      */
-    public function start($controllerKey = null, $function = null, $parameters = null, $viewsChain = null)
+    public function start($controllerKey = null, $function = null, $parameters = null, $viewsChain = null): void
     {
         try {
             $this->runOnce();
@@ -146,7 +147,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
         if (!$controllerKey) {
             $session = Registry::getSession();
             if ($this->isAdmin()) {
-                $controllerKey = $session->getVariable("auth") ? 'admin_start' : 'login';
+                $controllerKey = $session->getVariable('auth') ? 'admin_start' : 'login';
             } else {
                 $controllerKey = $this->getFrontendStartControllerKey();
             }
@@ -256,8 +257,6 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
 
     /**
      * Executes regular maintenance functions..
-     *
-     * @return null
      */
     protected function executeMaintenanceTasks()
     {
@@ -281,7 +280,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
     {
         if (!$this->canExecuteFunction($view, $functionName)) {
             throw new \OxidEsales\Eshop\Core\Exception\RoutingException(
-                sprintf("Non public method cannot be accessed: %s::%s", get_class($view), $functionName)
+                sprintf('Non public method cannot be accessed: %s::%s', $view::class, $functionName)
             );
         }
 
@@ -422,7 +421,6 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
             $output = $renderer->renderTemplate('message/exception', $viewData);
         }
 
-
         //Output processing - useful for modules as sometimes you may want to process output manually.
         $output = $outputManager->process($output, $view->getClassKey());
 
@@ -512,8 +510,8 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
                 $tpl = 'message/err_setup';
                 $activeView = oxNew(\OxidEsales\Eshop\Application\Controller\FrontendController::class);
                 $context = [
-                    "oViewConf" => $activeView->getViewConfig(),
-                    "oView"     => $activeView
+                    'oViewConf' => $activeView->getViewConfig(),
+                    'oView'     => $activeView,
                 ];
                 $renderer = $this->getRenderer();
                 $errorOutput = $renderer->renderTemplate($tpl, $context);
@@ -560,7 +558,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
         if ($this->isDebugMode() && !$this->isAdmin()) {
             $debugInfo = oxNew(\OxidEsales\Eshop\Core\DebugInfo::class);
 
-            $logId = md5(time() . rand() . rand());
+            $logId = md5(time() . random_int(0, mt_getrandmax()) . random_int(0, mt_getrandmax()));
             $header = $debugInfo->formatGeneralInfo();
             $display = 'none';
             $monitorMessage = $this->formMonitorMessage($view);
@@ -601,9 +599,8 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
 
         $message = $debugInfo->formatMemoryUsage();
         $message .= $debugInfo->formatTimeStamp();
-        $message .= $debugInfo->formatExecutionTime($this->getTotalTime());
 
-        return $message;
+        return $message . $debugInfo->formatExecutionTime($this->getTotalTime());
     }
 
     /**
@@ -664,8 +661,6 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      * Log an exception.
      *
      * This method forms part of the exception handling process. Any further exceptions must be caught.
-     *
-     * @param \Exception $exception
      */
     protected function logException(\Exception $exception)
     {

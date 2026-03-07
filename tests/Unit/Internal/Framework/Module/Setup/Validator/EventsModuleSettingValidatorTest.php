@@ -64,7 +64,7 @@ final class EventsModuleSettingValidatorTest extends TestCase
     {
         return [
             [new Event('invalidEvent', 'noCallableMethod')],
-            [new Event('', '')]
+            [new Event('', '')],
         ];
     }
 

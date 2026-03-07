@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,7 +27,7 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
      *
      * @var bool
      */
-    protected $_blLoadActions = null;
+    protected $_blLoadActions;
 
     /**
      * Returns article list with action articles

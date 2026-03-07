@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,8 +18,6 @@ class InsertNewBasketItemLogicTwig extends AbstractInsertNewBasketItemLogic
 {
     /**
      * @param Environment $templateEngine
-     *
-     * @return bool
      */
     protected function validateTemplateEngine($templateEngine): bool
     {
@@ -42,10 +42,8 @@ class InsertNewBasketItemLogicTwig extends AbstractInsertNewBasketItemLogic
     }
 
     /**
-     * @param string      $templateName
      * @param Environment $templateEngine
      *
-     * @return string
      */
     protected function renderTemplate(string $templateName, $templateEngine): string
     {

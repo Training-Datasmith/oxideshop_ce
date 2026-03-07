@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -40,7 +42,7 @@ class FileException extends \OxidEsales\Eshop\Core\Exception\StandardException
      *
      * @param string $sFileName file name
      */
-    public function setFileName($sFileName)
+    public function setFileName($sFileName): void
     {
         $this->_sErrFileName = $sFileName;
     }
@@ -60,7 +62,7 @@ class FileException extends \OxidEsales\Eshop\Core\Exception\StandardException
      *
      * @param string $sFileError Error
      */
-    public function setFileError($sFileError)
+    public function setFileError($sFileError): void
     {
         $this->_sFileError = $sFileError;
     }
@@ -83,7 +85,7 @@ class FileException extends \OxidEsales\Eshop\Core\Exception\StandardException
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty File --> " . $this->_sErrFileName . "\n" . "Error Code --> " . $this->_sFileError;
+        return self::class . '-' . parent::getString() . ' Faulty File --> ' . $this->_sErrFileName . "\n" . 'Error Code --> ' . $this->_sFileError;
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,10 +19,8 @@ class Encryptor
      *
      * @param string $string
      * @param string $key
-     *
-     * @return string
      */
-    public function encrypt($string, $key)
+    public function encrypt($string, $key): string
     {
         $string = "ox{$string}id";
 
@@ -28,7 +28,7 @@ class Encryptor
 
         $string = $string ^ $key;
         $string = base64_encode($string);
-        $string = str_replace("=", "!", $string);
+        $string = str_replace('=', '!', $string);
 
         return "ox_$string";
     }
@@ -38,10 +38,8 @@ class Encryptor
      *
      * @param string $key
      * @param string $string
-     *
-     * @return string
      */
-    protected function formKey($key, $string)
+    protected function formKey($key, $string): string
     {
         $key = '_' . $key;
         $keyLength = (int) (strlen($string) / strlen($key)) + 5;

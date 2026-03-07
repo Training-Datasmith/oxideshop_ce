@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,21 +36,21 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
      *
      * @var object
      */
-    protected $_oArticle = null;
+    protected $_oArticle;
 
     /**
      * Bid price.
      *
      * @var string
      */
-    protected $_sBidPrice = null;
+    protected $_sBidPrice;
 
     /**
      * Price alarm status.
      *
      * @var integer
      */
-    protected $_iPriceAlarmStatus = null;
+    protected $_iPriceAlarmStatus;
 
     /**
      * Validates email
@@ -59,7 +61,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
      *
      * @return  bool    false on error
      */
-    public function addme()
+    public function addme(): void
     {
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
         $myUtils = \OxidEsales\Eshop\Core\Registry::getUtils();

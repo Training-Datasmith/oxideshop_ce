@@ -15,9 +15,9 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRat
 class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
 {
     public function __construct(
-        private UserReviewServiceInterface $userReviewService,
-        private UserRatingServiceInterface $userRatingService,
-        private ReviewAndRatingMergingServiceInterface $reviewAndRatingMergingService
+        private readonly UserReviewServiceInterface $userReviewService,
+        private readonly UserRatingServiceInterface $userRatingService,
+        private readonly ReviewAndRatingMergingServiceInterface $reviewAndRatingMergingService
     ) {
     }
 
@@ -69,7 +69,6 @@ class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
     /**
      * Sorts ReviewAndRating list.
      *
-     * @param ArrayCollection $reviewAndRatingList
      *
      * @return ArrayCollection
      */
@@ -77,9 +76,7 @@ class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
     {
         $reviewAndRatingListArray = $reviewAndRatingList->toArray();
 
-        usort($reviewAndRatingListArray, function (ReviewAndRating $first, ReviewAndRating $second) {
-            return $first->getCreatedAt() < $second->getCreatedAt() ? 1 : -1;
-        });
+        usort($reviewAndRatingListArray, fn (ReviewAndRating $first, ReviewAndRating $second) => $first->getCreatedAt() < $second->getCreatedAt() ? 1 : -1);
 
         return new ArrayCollection($reviewAndRatingListArray);
     }

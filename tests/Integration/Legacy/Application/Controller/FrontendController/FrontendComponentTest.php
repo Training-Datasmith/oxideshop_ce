@@ -40,7 +40,7 @@ final class FrontendComponentTest extends IntegrationTestCase
 
     private function getComponentClass(): oxubase
     {
-        return new class extends oxUbase {
+        return new class () extends oxUbase {
         };
     }
 }

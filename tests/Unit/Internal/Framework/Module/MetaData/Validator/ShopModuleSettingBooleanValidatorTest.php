@@ -84,9 +84,9 @@ final class ShopModuleSettingBooleanValidatorTest extends TestCase
                 MetaDataProvider::METADATA_ID => 'test_id',
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                    'type' => 'str', 'value' => 'String value'
+                    'type' => 'str', 'value' => 'String value',
                     ],
-                ]
+                ],
             ];
         $validator = new ModuleSettingBooleanValidator();
 
@@ -101,9 +101,9 @@ final class ShopModuleSettingBooleanValidatorTest extends TestCase
                 MetaDataProvider::METADATA_ID => 'test_id',
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'value' => 'Any value'
+                        'value' => 'Any value',
                     ],
-                ]
+                ],
             ];
         $validator = new ModuleSettingBooleanValidator();
 
@@ -117,9 +117,9 @@ final class ShopModuleSettingBooleanValidatorTest extends TestCase
                 MetaDataProvider::METADATA_ID => 'test_id',
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'type' => 'bool', 'value' => $value
+                        'type' => 'bool', 'value' => $value,
                     ],
-                ]
+                ],
             ];
 
         $validator = new ModuleSettingBooleanValidator();

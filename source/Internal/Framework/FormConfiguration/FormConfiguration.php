@@ -11,16 +11,9 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration;
 
 class FormConfiguration implements FormConfigurationInterface
 {
-    /**
-     * @var array
-     */
-    private $fieldConfigurations = [];
+    private array $fieldConfigurations = [];
 
-    /**
-     * @param FieldConfigurationInterface $fieldConfiguration
-     * @return self
-     */
-    public function addFieldConfiguration(FieldConfigurationInterface $fieldConfiguration)
+    public function addFieldConfiguration(FieldConfigurationInterface $fieldConfiguration): static
     {
         $this->fieldConfigurations[] = $fieldConfiguration;
         return $this;

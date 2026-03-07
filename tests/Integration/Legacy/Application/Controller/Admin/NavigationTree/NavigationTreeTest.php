@@ -22,8 +22,8 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActiv
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 final class NavigationTreeTest extends IntegrationTestCase
 {
@@ -143,7 +143,7 @@ final class NavigationTreeTest extends IntegrationTestCase
         $this->assertNotEmpty(
             $cache->get(
                 $cacheName,
-                fn(ItemInterface $item): array => $item->get()
+                fn (ItemInterface $item): array => $item->get()
             )
         );
 
@@ -152,7 +152,7 @@ final class NavigationTreeTest extends IntegrationTestCase
         $cache->get($cacheName, function () use ($testXml): array {
             return [
                 'creation_time' => time(),
-                'menu_dom' => $testXml
+                'menu_dom' => $testXml,
             ];
         });
 

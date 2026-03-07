@@ -15,17 +15,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigurationChangedEventSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @param ProjectYamlChangedEvent $event
-     */
-    public function resetContainer(ProjectYamlChangedEvent $event)
+    public function resetContainer(ProjectYamlChangedEvent $event): void
     {
         ContainerFactory::resetContainer();
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [ProjectYamlChangedEvent::class => 'resetContainer'];

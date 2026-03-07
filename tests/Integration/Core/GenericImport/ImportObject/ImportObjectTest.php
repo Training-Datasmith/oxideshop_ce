@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core\GenericImport\ImportObject;
 
+use function array_map;
+
 use OxidEsales\Eshop\Application\Model\Article as Product;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
@@ -16,9 +18,9 @@ use OxidEsales\EshopCommunity\Core\GenericImport\ImportObject\Accessories2Articl
 use OxidEsales\EshopCommunity\Core\GenericImport\ImportObject\Article;
 use OxidEsales\EshopCommunity\Core\GenericImport\ImportObject\ArticleExtends;
 use OxidEsales\EshopCommunity\Core\Registry;
+
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 
-use function array_map;
 use function sort;
 
 final class ImportObjectTest extends IntegrationTestCase

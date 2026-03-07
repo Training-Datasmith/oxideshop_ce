@@ -176,7 +176,7 @@ final class ShopConfigurationDaoTest extends IntegrationTestCase
         $storage->save([
             ModuleSettingsDataMapper::MAPPING_KEY => [
                 $this->testedSetting => ['value' => $this->newValue],
-            ]
+            ],
         ]);
     }
 

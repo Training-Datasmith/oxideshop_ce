@@ -30,7 +30,7 @@ final class FlowThemeCest
             'id' => '10014',
             'title' => '14 EN product šÄßüл',
             'description' => '13 EN description šÄßüл',
-            'price' => 'from 15,00 €'
+            'price' => 'from 15,00 €',
         ];
 
         $searchListPage = $I->openShop()

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,20 +37,19 @@ class DiscountArticles extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             }
 
             // generating category tree for artikel choose select list
-            $this->createCategoryTree("artcattree");
+            $this->createCategoryTree('artcattree');
         }
 
-        $iAoc = Registry::getRequest()->getRequestEscapedParameter("aoc");
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDiscountArticlesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountArticlesAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountArticlesAjax->getColumns();
-
-            return "popups/discount_articles";
-        } elseif ($iAoc == 2) {
+            return 'popups/discount_articles';
+        }
+        if ($iAoc == 2) {
             $oDiscountCategoriesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountCategoriesAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountCategoriesAjax->getColumns();
-
-            return "popups/discount_categories";
+            return 'popups/discount_categories';
         }
 
         return 'discount_articles';

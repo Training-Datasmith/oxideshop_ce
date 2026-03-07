@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,9 +24,9 @@ class TemplateController extends \OxidEsales\Eshop\Application\Controller\Fronte
         parent::render();
 
         // security fix so that you cant access files from outside template dir
-        $sTplName = basename((string) Registry::getRequest()->getRequestEscapedParameter("tpl"));
+        $sTplName = basename((string) Registry::getRequest()->getRequestEscapedParameter('tpl'));
         if ($sTplName) {
-            $sTplName = 'custom/' . $sTplName;
+            return 'custom/' . $sTplName;
         }
 
         return $sTplName;

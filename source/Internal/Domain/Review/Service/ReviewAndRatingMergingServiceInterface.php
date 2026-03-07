@@ -16,8 +16,6 @@ interface ReviewAndRatingMergingServiceInterface
     /**
      * Merges Reviews and Ratings to Collection of ReviewAndRating view objects.
      *
-     * @param ArrayCollection $reviews
-     * @param ArrayCollection $ratings
      *
      * @return ArrayCollection
      */

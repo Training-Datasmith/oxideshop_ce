@@ -22,15 +22,12 @@ class ProjectYamlImportService implements ProjectYamlImportServiceInterface
     private const SERVICE_FILE_NAME = 'services.yaml';
 
     public function __construct(
-        private ProjectYamlDaoInterface $projectYamlDao,
-        private BasicContextInterface $context
+        private readonly ProjectYamlDaoInterface $projectYamlDao,
+        private readonly BasicContextInterface $context
     ) {
     }
 
-    /**
-     * @param string $serviceDir
-     */
-    public function addImport(string $serviceDir)
+    public function addImport(string $serviceDir): void
     {
         if (!realpath($serviceDir)) {
             throw new NoServiceYamlException();
@@ -41,10 +38,7 @@ class ProjectYamlImportService implements ProjectYamlImportServiceInterface
         $this->projectYamlDao->saveProjectConfigFile($projectConfig);
     }
 
-    /**
-     * @param string $serviceDir
-     */
-    public function removeImport(string $serviceDir)
+    public function removeImport(string $serviceDir): void
     {
         $projectConfig = $this->projectYamlDao->loadProjectConfigFile();
 
@@ -56,7 +50,7 @@ class ProjectYamlImportService implements ProjectYamlImportServiceInterface
     /**
      * Checks if the import files exist and if not removes them
      */
-    public function removeNonExistingImports()
+    public function removeNonExistingImports(): void
     {
         $projectConfig = $this->projectYamlDao->loadProjectConfigFile();
 
@@ -76,9 +70,8 @@ class ProjectYamlImportService implements ProjectYamlImportServiceInterface
 
     /**
      * @param $fileName
-     * @return string
      */
-    private function getAbsolutePath($fileName): string
+    private function getAbsolutePath(string $fileName): string
     {
         return Path::makeAbsolute(
             $fileName,
@@ -86,10 +79,6 @@ class ProjectYamlImportService implements ProjectYamlImportServiceInterface
         );
     }
 
-    /**
-     * @param string $serviceDir
-     * @return string
-     */
     private function getServiceRelativeFilePath(string $serviceDir): string
     {
         return Path::makeRelative(

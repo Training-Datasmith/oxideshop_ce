@@ -7,8 +7,6 @@
 
 declare(strict_types=1);
 
-use OxidEsales\EshopCommunity\Tests\Integration\Core\Fixtures\Modules\ModuleChainExtension\ExtendedArticle;
-
 $sMetadataVersion = '2.0';
 $aModule = [
     'id' => 'ExampleModule',

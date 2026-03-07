@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,21 +17,21 @@ use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
  */
 class UtilsUrl extends \OxidEsales\Eshop\Core\Base
 {
-    const PARAMETER_SEPARATOR = '&amp;';
+    public const PARAMETER_SEPARATOR = '&amp;';
 
     /**
      * Additional url parameters which should be appended to seo/std urls.
      *
      * @var array
      */
-    protected $_aAddUrlParams = null;
+    protected $_aAddUrlParams;
 
     /**
      * Current shop hosts array.
      *
      * @var array
      */
-    protected $_aHosts = null;
+    protected $_aHosts;
 
     /**
      * Returns core parameters which must be added to each url.
@@ -170,7 +172,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
         }
 
         if ($sUrl && !$blFinalUrl) {
-            $sUrl = $this->appendParamSeparator($sUrl);
+            return $this->appendParamSeparator($sUrl);
         }
 
         return $sUrl;
@@ -190,7 +192,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
         if (is_array($aParams)) {
             foreach ($aParams as $sParam) {
                 $sUrl = $oStr->preg_replace(
-                    '/(\?|&(amp;)?)' . preg_quote($sParam) . '=[a-z0-9\.]+&?(amp;)?/i',
+                    '/(\?|&(amp;)?)' . preg_quote((string) $sParam) . '=[a-z0-9\.]+&?(amp;)?/i',
                     '\1',
                     $sUrl
                 );
@@ -199,13 +201,13 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
             $sUrl = $oStr->preg_replace('/(\?|&(amp;)?).+/i', '\1', $sUrl);
         }
 
-        return trim($sUrl, "?");
+        return trim((string) $sUrl, '?');
     }
 
     public function addShopHost($url)
     {
-        if (!preg_match("#^https?://#i", $url)) {
-            $url = ContainerFacade::getParameter('oxid_esales.shop_url') . $url;
+        if (!preg_match('#^https?://#i', (string) $url)) {
+            return ContainerFacade::getParameter('oxid_esales.shop_url') . $url;
         }
 
         return $url;
@@ -226,7 +228,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
         $sUrl = $this->appendUrl($sUrl, $aParams, $blFinalUrl);
 
         if ($this->isCurrentShopHost($sUrl)) {
-            $sUrl = $this->processShopUrl($sUrl, $blFinalUrl, $iLang);
+            return $this->processShopUrl($sUrl, $blFinalUrl, $iLang);
         }
 
         return $sUrl;
@@ -250,7 +252,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
         $sUrl = \OxidEsales\Eshop\Core\Registry::getSession()->processUrl($sUrl);
 
         if ($blFinalUrl) {
-            $sUrl = $this->rightTrimAmp($sUrl);
+            return $this->rightTrimAmp($sUrl);
         }
 
         return $sUrl;
@@ -336,12 +338,10 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
      * Improved url parsing with parse_url as base and scheme checking improvement in url preprocessing
      *
      * @param string $url
-     * @param string $flag
      * @param string $appendScheme Append this scheme to url if no scheme found
-     *
      * @return string
      */
-    private function parseUrlAndAppendSchema($url, $flag, $appendScheme = 'http')
+    private function parseUrlAndAppendSchema($url, int $flag, string $appendScheme = 'http'): array|int|string|false|null
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             $url = $appendScheme . '://' . $url;
@@ -382,7 +382,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
         $aUrlParts = explode('?', $sUrl);
 
         // check for params part
-        if (!is_array($aUrlParts) || count($aUrlParts) != 2) {
+        if (count($aUrlParts) != 2) {
             return $sUrl;
         }
 
@@ -431,12 +431,12 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
     {
         $oUtilsServer = \OxidEsales\Eshop\Core\Registry::getUtilsServer();
 
-        $aServerParams["HTTPS"] = $oUtilsServer->getServerVar("HTTPS");
-        $aServerParams["HTTP_X_FORWARDED_PROTO"] = $oUtilsServer->getServerVar("HTTP_X_FORWARDED_PROTO");
-        $aServerParams["HTTP_HOST"] = $oUtilsServer->getServerVar("HTTP_HOST");
-        $aServerParams["REQUEST_URI"] = $oUtilsServer->getServerVar("REQUEST_URI");
+        $aServerParams['HTTPS'] = $oUtilsServer->getServerVar('HTTPS');
+        $aServerParams['HTTP_X_FORWARDED_PROTO'] = $oUtilsServer->getServerVar('HTTP_X_FORWARDED_PROTO');
+        $aServerParams['HTTP_HOST'] = $oUtilsServer->getServerVar('HTTP_HOST');
+        $aServerParams['REQUEST_URI'] = $oUtilsServer->getServerVar('REQUEST_URI');
 
-        $sProtocol = "http://";
+        $sProtocol = 'http://';
 
         if (
             isset($aServerParams['HTTPS']) && (($aServerParams['HTTPS'] == 'on' || $aServerParams['HTTPS'] == 1))
@@ -461,12 +461,12 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
     {
         // url building
         // replace possible ampersands, explode, and filter out empty values
-        $sValue = str_replace("&amp;", "&", $sValue);
-        $aNavParams = explode("&", $sValue);
+        $sValue = str_replace('&amp;', '&', $sValue);
+        $aNavParams = explode('&', $sValue);
         $aNavParams = array_filter($aNavParams);
         $aParams = [];
         foreach ($aNavParams as $sValue) {
-            $exp = explode("=", $sValue);
+            $exp = explode('=', $sValue);
             $aParams[$exp[0]] = $exp[1] ?? null;
         }
 
@@ -556,10 +556,8 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
      * Returns url separator (?,&amp;) for adding new parameters.
      *
      * @param string $url
-     *
-     * @return string
      */
-    private function getUrlParametersSeparator($url)
+    private function getUrlParametersSeparator($url): string
     {
         $oStr = Str::getStr();
 
@@ -577,10 +575,8 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
      * Removes parameters which are not set.
      *
      * @param string $parametersToAdd
-     *
-     * @return string
      */
-    private function removeNotSetParameters($parametersToAdd)
+    private function removeNotSetParameters($parametersToAdd): string
     {
         if (is_array($parametersToAdd) && !empty($parametersToAdd)) {
             foreach ($parametersToAdd as $key => $value) {
@@ -597,20 +593,16 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
      * @param array  $aAddParams              parameters to add to URL
      * @param string $query                   URL query part
      * @param bool   $allowParameterOverwrite Decides if same parameters should overwrite query parameters
-     *
-     * @return array
      */
-    private function mergeDuplicatedParameters($aAddParams, $query, $allowParameterOverwrite = true)
+    private function mergeDuplicatedParameters(array $aAddParams, string|array $query, $allowParameterOverwrite = true): array
     {
         parse_str($query, $currentUrlParameters);
         if ($allowParameterOverwrite) {
-            $newParameters = array_merge($currentUrlParameters, $aAddParams);
-        } else {
-            $newFilteredParameters = array_diff_key($aAddParams, $currentUrlParameters);
-            $newParameters = array_merge($currentUrlParameters, $newFilteredParameters);
+            return array_merge($currentUrlParameters, $aAddParams);
         }
+        $newFilteredParameters = array_diff_key($aAddParams, $currentUrlParameters);
 
-        return $newParameters;
+        return array_merge($currentUrlParameters, $newFilteredParameters);
     }
 
     /**

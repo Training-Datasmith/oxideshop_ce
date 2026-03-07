@@ -10,15 +10,15 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Dao;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ReviewDataMapperInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Review;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 
 class ReviewDao implements ReviewDaoInterface
 {
     public function __construct(
-        private QueryBuilderFactoryInterface $queryBuilderFactory,
-        private ReviewDataMapperInterface $reviewDataMapper
+        private readonly QueryBuilderFactoryInterface $queryBuilderFactory,
+        private readonly ReviewDataMapperInterface $reviewDataMapper
     ) {
     }
 
@@ -42,10 +42,7 @@ class ReviewDao implements ReviewDaoInterface
         return $this->mapReviews($queryBuilder->fetchAllAssociative());
     }
 
-    /**
-     * @param Review $review
-     */
-    public function delete(Review $review)
+    public function delete(Review $review): void
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder
@@ -59,10 +56,8 @@ class ReviewDao implements ReviewDaoInterface
      * Maps rating data from database to Reviews Collection.
      *
      * @param array $reviewsData
-     *
-     * @return ArrayCollection
      */
-    private function mapReviews($reviewsData)
+    private function mapReviews($reviewsData): \Doctrine\Common\Collections\ArrayCollection
     {
         $reviews = new ArrayCollection();
 

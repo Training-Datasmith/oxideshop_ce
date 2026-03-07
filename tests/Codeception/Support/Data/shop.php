@@ -81,5 +81,5 @@ return [
             'OXSEOACTIVE_1' => 1,
             'OXSEOACTIVE_2' => 0,
             'OXSEOACTIVE_3' => 0,
-        ]
+        ],
 ];

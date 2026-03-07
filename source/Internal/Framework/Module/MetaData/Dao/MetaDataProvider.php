@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Converter\MetaDataConverterInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\InvalidMetaDataException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataValidatorInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 
 class MetaDataProvider implements MetaDataProviderInterface
 {
@@ -39,17 +39,14 @@ class MetaDataProvider implements MetaDataProviderInterface
     private string $filePath;
 
     public function __construct(
-        private MetaDataNormalizerInterface $metaDataNormalizer,
-        private BasicContextInterface $context,
-        private MetaDataValidatorInterface $metaDataValidatorService,
-        private MetaDataConverterInterface $metaDataConverter
+        private readonly MetaDataNormalizerInterface $metaDataNormalizer,
+        private readonly BasicContextInterface $context,
+        private readonly MetaDataValidatorInterface $metaDataValidatorService,
+        private readonly MetaDataConverterInterface $metaDataConverter
     ) {
     }
 
     /**
-     * @param string $filePath
-     *
-     * @return array
      * @throws InvalidMetaDataException
      */
     public function getData(string $filePath): array
@@ -64,7 +61,6 @@ class MetaDataProvider implements MetaDataProviderInterface
     }
 
     /**
-     * @return array
      * @throws InvalidMetaDataException
      */
     private function getNormalizedMetaDataFileContent(): array
@@ -93,11 +89,6 @@ class MetaDataProvider implements MetaDataProviderInterface
         ];
     }
 
-    /**
-     * @param array $normalizedMetaData
-     *
-     * @return array
-     */
     private function addFilePathToData(array $normalizedMetaData): array
     {
         $normalizedMetaData[static::METADATA_FILEPATH] = $this->filePath;
@@ -127,11 +118,6 @@ class MetaDataProvider implements MetaDataProviderInterface
         }
     }
 
-    /**
-     * @param array $normalizedMetaData
-     *
-     * @return array
-     */
     private function sanitizeExtendedClasses(array $normalizedMetaData): array
     {
         $sanitizedExtendedClasses = [];
@@ -148,19 +134,11 @@ class MetaDataProvider implements MetaDataProviderInterface
         return $sanitizedExtendedClasses;
     }
 
-    /**
-     * @param string $className
-     *
-     * @return bool
-     */
     private function isBackwardsCompatibleClass(string $className): bool
     {
         return \array_key_exists(strtolower($className), $this->getBackwardsCompatibilityClassMap());
     }
 
-    /**
-     * @return array
-     */
     private function getBackwardsCompatibilityClassMap(): array
     {
         return $this->context->getBackwardsCompatibilityClassMap();

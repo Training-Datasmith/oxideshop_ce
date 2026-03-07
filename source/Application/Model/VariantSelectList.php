@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,17 +18,8 @@ class VariantSelectList implements \OxidEsales\Eshop\Core\Contract\ISelectList
 {
     /**
      * Variant selection list label
-     *
-     * @var string
      */
-    protected $_sLabel = null;
-
-    /**
-     * Selection list index
-     *
-     * @var int
-     */
-    protected $_iIndex = 0;
+    protected string $_sLabel;
 
     /**
      * List with selections
@@ -40,18 +33,20 @@ class VariantSelectList implements \OxidEsales\Eshop\Core\Contract\ISelectList
      *
      * @var \OxidEsales\Eshop\Application\Model\Selection
      */
-    protected $_oActiveSelection = null;
+    protected $_oActiveSelection;
 
     /**
      * Builds current selection list
      *
      * @param string $sLabel list label
-     * @param int    $iIndex list index
+     * @param int $_iIndex list index
      */
-    public function __construct($sLabel, $iIndex)
+    public function __construct($sLabel, /**
+     * Selection list index
+     */
+        protected $_iIndex)
     {
         $this->_sLabel = trim($sLabel);
-        $this->_iIndex = $iIndex;
     }
 
     /**
@@ -72,7 +67,7 @@ class VariantSelectList implements \OxidEsales\Eshop\Core\Contract\ISelectList
      * @param string $blDisabled selection state - disabled/enabled
      * @param string $blActive   selection state - active/inactive
      */
-    public function addVariant($sName, $sValue, $blDisabled, $blActive)
+    public function addVariant($sName, $sValue, $blDisabled, $blActive): void
     {
         $sName = trim($sName);
         //#6053 Allow "0" as a valid value.

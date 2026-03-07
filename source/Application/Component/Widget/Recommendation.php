@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -38,7 +40,7 @@ class Recommendation extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      */
     public function getSimilarRecommLists()
     {
-        $aArticleIds = $this->getViewParameter("aArticleIds");
+        $aArticleIds = $this->getViewParameter('aArticleIds');
 
         $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
 

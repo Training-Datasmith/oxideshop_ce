@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -36,7 +38,7 @@ class AdminNewsletter extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $this->generateCSV($newsletterRecipientsList);
 
         $oUtils = Registry::getUtils();
-        $oUtils->showMessageAndExit("");
+        $oUtils->showMessageAndExit('');
     }
 
     private function getNewsLetterRecipientsList(): array
@@ -56,9 +58,6 @@ class AdminNewsletter extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             );
     }
 
-    /**
-     * @param array $data
-     */
     private function generateCSV(array $data): void
     {
         ContainerFacade::get(FileGeneratorBridgeInterface::class)

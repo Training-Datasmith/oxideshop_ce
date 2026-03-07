@@ -15,8 +15,6 @@ interface NewsletterRecipientsDataMapperInterface
 {
     /**
      * @param NewsletterRecipient[] $newsletterRecipient
-     *
-     * @return array
      */
     public function mapRecipientListDataToArray(array $newsletterRecipient): array;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -11,7 +13,7 @@ namespace OxidEsales\EshopCommunity\Core\Exception;
  * simplified Exception classes for simply displaying errors
  * saves resources when exception functionality is not needed
  */
-class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayError
+class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayError, \Stringable
 {
     /**
      * Language const of a Message
@@ -53,7 +55,7 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
      *
      * @param string $sStackTrace stack trace
      */
-    public function setStackTrace($sStackTrace)
+    public function setStackTrace($sStackTrace): void
     {
         $this->_sStackTrace = $sStackTrace;
     }
@@ -73,7 +75,7 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
      *
      * @param array $aValues exception values to store
      */
-    public function setValues($aValues)
+    public function setValues($aValues): void
     {
         $this->_aValues = $aValues;
     }
@@ -84,7 +86,7 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
      * @param string $sName  storage name
      * @param mixed  $sValue value to store
      */
-    public function addValue($sName, $sValue)
+    public function addValue($sName, $sValue): void
     {
         $this->_aValues[$sName] = $sValue;
     }
@@ -94,7 +96,7 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
      *
      * @param string $sType exception type
      */
-    public function setExceptionType($sType)
+    public function setExceptionType($sType): void
     {
         $this->_sType = $sType;
     }
@@ -136,7 +138,7 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
      *
      * @param bool $bl if TRUE debug mode on
      */
-    public function setDebug($bl)
+    public function setDebug($bl): void
     {
         $this->_blDebug = $bl;
     }
@@ -146,7 +148,7 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
      *
      * @param string $sMessage exception message
      */
-    public function setMessage($sMessage)
+    public function setMessage($sMessage): void
     {
         $this->_sMessage = $sMessage;
     }
@@ -155,7 +157,7 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
      * Sets the exception message arguments used when
      * outputing message using sprintf().
      */
-    public function setMessageArgs()
+    public function setMessageArgs(): void
     {
         $this->_aMessageArgs = func_get_args();
     }
@@ -169,27 +171,22 @@ class ExceptionToDisplay implements \OxidEsales\Eshop\Core\Contract\IDisplayErro
     {
         if ($this->_blDebug) {
             return $this;
-        } else {
-            $sString = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->_sMessage);
-
-            if (!empty($this->_aMessageArgs)) {
-                $sString = vsprintf($sString, $this->_aMessageArgs);
-            }
-
-            return $sString;
         }
+        $sString = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->_sMessage);
+        if (!empty($this->_aMessageArgs)) {
+            return vsprintf($sString, $this->_aMessageArgs);
+        }
+        return $sString;
     }
 
     /**
      * When exception is converted as string, this magic method return exception message
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        $sRes = $this->getErrorClassType() . " (time: " . date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()) . "): " . $this->getOxMessage() . " \n Stack Trace: " . $this->getStackTrace() . "\n";
+        $sRes = $this->getErrorClassType() . ' (time: ' . date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()) . '): ' . $this->getOxMessage() . " \n Stack Trace: " . $this->getStackTrace() . "\n";
         foreach ($this->_aValues as $key => $value) {
-            $sRes .= $key . " => " . $value . "\n";
+            $sRes .= $key . ' => ' . $value . "\n";
         }
 
         return $sRes;

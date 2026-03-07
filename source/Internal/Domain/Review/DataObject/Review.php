@@ -51,7 +51,7 @@ class Review
      *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -70,7 +70,7 @@ class Review
      * @param int $rating
      * @return $this
      */
-    public function setRating($rating)
+    public function setRating($rating): static
     {
         $this->rating = $rating;
 
@@ -89,7 +89,7 @@ class Review
      * @param string $text
      * @return $this
      */
-    public function setText($text)
+    public function setText($text): static
     {
         $this->text = $text;
 
@@ -108,7 +108,7 @@ class Review
      * @param string $objectId
      * @return $this
      */
-    public function setObjectId($objectId)
+    public function setObjectId($objectId): static
     {
         $this->objectId = $objectId;
 
@@ -127,7 +127,7 @@ class Review
      * @param string $userId
      * @return $this
      */
-    public function setUserId($userId)
+    public function setUserId($userId): static
     {
         $this->userId = $userId;
 
@@ -147,7 +147,7 @@ class Review
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->type = $type;
 
@@ -167,7 +167,7 @@ class Review
      *
      * @return $this
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt($createdAt): static
     {
         $this->createdAt = $createdAt;
 

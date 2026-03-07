@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,11 +23,17 @@ use Traversable;
  */
 class ResultSet implements \IteratorAggregate, ResultSetInterface
 {
+    /**
+     * @var array{}
+     */
     public $fields;
 
+    /**
+     * @var false
+     */
     public $EOF;
 
-    private Result $result;
+    private readonly Result $result;
 
     public function __construct(private Statement $statement)
     {
@@ -40,7 +48,7 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
         $this->fetchRow();
     }
 
-    public function close()
+    public function close(): void
     {
         $this->result->free();
         $this->fields = [];
@@ -82,7 +90,7 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
         return $this->fields;
     }
 
-    protected function getStatement()
+    protected function getStatement(): \Doctrine\DBAL\Statement
     {
         return $this->statement;
     }

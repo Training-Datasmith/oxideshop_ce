@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,15 +26,15 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         ['oxisoalpha2', 'oxcountry', 1, 0, 0],
         ['oxisoalpha3', 'oxcountry', 0, 0, 0],
         ['oxunnum3', 'oxcountry', 0, 0, 0],
-        ['oxid', 'oxcountry', 0, 0, 1]
+        ['oxid', 'oxcountry', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxtitle', 'oxcountry', 1, 1, 0],
                                      ['oxisoalpha2', 'oxcountry', 1, 0, 0],
                                      ['oxisoalpha3', 'oxcountry', 0, 0, 0],
                                      ['oxunnum3', 'oxcountry', 0, 0, 0],
-                                     ['oxid', 'oxobject2payment', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxobject2payment', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -60,7 +62,7 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         if ($sSynchCountryId && $sSynchCountryId != $sCountryId) {
             $sQAdd .= "and $sCountryTable.oxid not in ( ";
             $sQAdd .= "select $sCountryTable.oxid from oxobject2payment left join $sCountryTable on $sCountryTable.oxid=oxobject2payment.oxobjectid ";
-            $sQAdd .= "where oxobject2payment.oxpaymentid = " . $oDb->quote($sSynchCountryId) . " and oxobject2payment.oxtype = 'oxcountry' ) ";
+            $sQAdd .= 'where oxobject2payment.oxpaymentid = ' . $oDb->quote($sSynchCountryId) . " and oxobject2payment.oxtype = 'oxcountry' ) ";
         }
 
         return $sQAdd;
@@ -69,7 +71,7 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Adds chosen user group (groups) to delivery list
      */
-    public function addPayCountry()
+    public function addPayCountry(): void
     {
         $aChosenCntr = $this->getActionIds('oxcountry.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -78,13 +80,13 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             $sCountryTable = $this->getViewName('oxcountry');
             $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Payment = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
                 $oObject2Payment->init('oxobject2payment');
                 $oObject2Payment->oxobject2payment__oxpaymentid = new \OxidEsales\Eshop\Core\Field($soxId);
                 $oObject2Payment->oxobject2payment__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCntr);
-                $oObject2Payment->oxobject2payment__oxtype = new \OxidEsales\Eshop\Core\Field("oxcountry");
+                $oObject2Payment->oxobject2payment__oxtype = new \OxidEsales\Eshop\Core\Field('oxcountry');
                 $oObject2Payment->save();
             }
         }
@@ -93,14 +95,14 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Removes chosen user group (groups) from delivery list
      */
-    public function removePayCountry()
+    public function removePayCountry(): void
     {
         $aChosenCntr = $this->getActionIds('oxobject2payment.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2payment.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2payment.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2payment where oxobject2payment.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2payment where oxobject2payment.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }

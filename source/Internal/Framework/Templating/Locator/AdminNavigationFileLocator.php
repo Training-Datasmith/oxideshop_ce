@@ -14,7 +14,7 @@ class AdminNavigationFileLocator implements NavigationFileLocatorInterface
     /**
      * @param NavigationFileLocatorInterface[] $menuFileLocators
      */
-    public function __construct(private iterable $menuFileLocators = [])
+    public function __construct(private readonly iterable $menuFileLocators = [])
     {
     }
 

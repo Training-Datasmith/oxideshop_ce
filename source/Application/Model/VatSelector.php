@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,11 +9,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxObjectException;
-
 use function array_key_exists;
+
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
+
+use oxObjectException;
 
 /**
  * Class, responsible for retrieving correct vat for users and articles
@@ -23,7 +25,7 @@ class VatSelector extends \OxidEsales\Eshop\Core\Base
      *
      * @var bool
      */
-    protected $_blCatVatSet = null;
+    protected $_blCatVatSet;
 
     /**
      * keeps loaded user Vats for later reusage
@@ -130,7 +132,7 @@ class VatSelector extends \OxidEsales\Eshop\Core\Base
                  ORDER BY o2c.oxtime ";
 
         $fVat = $oDb->getOne($sSql, [
-            'oxobjectid' => $oArticle->getId()
+            'oxobjectid' => $oArticle->getId(),
         ]);
         if ($fVat !== false && $fVat !== null) {
             return $fVat;
@@ -148,21 +150,21 @@ class VatSelector extends \OxidEsales\Eshop\Core\Base
      */
     public function getArticleVat(\OxidEsales\Eshop\Application\Model\Article $oArticle)
     {
-        startProfile("_assignPriceInternal");
+        startProfile('_assignPriceInternal');
         // article has its own VAT ?
 
         if (($dArticleVat = $oArticle->getCustomVAT()) !== null) {
-            stopProfile("_assignPriceInternal");
+            stopProfile('_assignPriceInternal');
 
             return $dArticleVat;
         }
         if (($dArticleVat = $this->getVatForArticleCategory($oArticle)) !== false) {
-            stopProfile("_assignPriceInternal");
+            stopProfile('_assignPriceInternal');
 
             return $dArticleVat;
         }
 
-        stopProfile("_assignPriceInternal");
+        stopProfile('_assignPriceInternal');
 
         return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('dDefaultVAT');
     }
@@ -198,7 +200,6 @@ class VatSelector extends \OxidEsales\Eshop\Core\Base
         return false;
     }
 
-
     /**
      * Returns country id which VAT should be applied to.
      * Depending on configuration option either user billing country or shipping country (if available) is returned.
@@ -209,7 +210,7 @@ class VatSelector extends \OxidEsales\Eshop\Core\Base
      */
     protected function getVatCountry(\OxidEsales\Eshop\Application\Model\User $oUser)
     {
-        $blUseShippingCountry = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam("blShippingCountryVat");
+        $blUseShippingCountry = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShippingCountryVat');
 
         if ($blUseShippingCountry) {
             $aAddresses = $oUser->getUserAddresses($oUser->getId());

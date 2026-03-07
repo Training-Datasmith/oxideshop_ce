@@ -11,9 +11,9 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Cache\ModuleConfigurationCacheInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfigurationDataMapperInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Event\ModuleConfigurationChangedEvent;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Storage\ArrayStorageInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
@@ -26,22 +26,19 @@ use Symfony\Component\Filesystem\Path;
 class ModuleConfigurationDao implements ModuleConfigurationDaoInterface
 {
     public function __construct(
-        private BasicContextInterface $context,
-        private ModuleConfigurationDataMapperInterface $moduleConfigurationDataMapper,
-        private FileStorageFactoryInterface $fileStorageFactory,
-        private ModuleConfigurationCacheInterface $cache,
-        private ModuleConfigurationExtenderInterface $moduleConfigurationExtender,
-        private NodeInterface $node,
-        private Filesystem $filesystem,
-        private EventDispatcherInterface $eventDispatcher
+        private readonly BasicContextInterface $context,
+        private readonly ModuleConfigurationDataMapperInterface $moduleConfigurationDataMapper,
+        private readonly FileStorageFactoryInterface $fileStorageFactory,
+        private readonly ModuleConfigurationCacheInterface $cache,
+        private readonly ModuleConfigurationExtenderInterface $moduleConfigurationExtender,
+        private readonly NodeInterface $node,
+        private readonly Filesystem $filesystem,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 
     /**
-     * @param string $moduleId
-     * @param int    $shopId
      *
-     * @return ModuleConfiguration
      * @throws ModuleConfigurationNotFoundException
      */
     public function get(string $moduleId, int $shopId): ModuleConfiguration
@@ -61,10 +58,6 @@ class ModuleConfigurationDao implements ModuleConfigurationDaoInterface
         return $this->cache->get($moduleId, $shopId);
     }
 
-    /**
-     * @param ModuleConfiguration $moduleConfiguration
-     * @param int                 $shopId
-     */
     public function save(ModuleConfiguration $moduleConfiguration, int $shopId): void
     {
         $this->cache->evict($moduleConfiguration->getId(), $shopId);

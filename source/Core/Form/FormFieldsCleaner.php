@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -12,15 +14,8 @@ namespace OxidEsales\EshopCommunity\Core\Form;
  */
 class FormFieldsCleaner
 {
-    /** @var FormFields */
-    private $updatableFields;
-
-    /**
-     * @param \OxidEsales\Eshop\Core\Form\FormFields $updatableFields
-     */
-    public function __construct(\OxidEsales\Eshop\Core\Form\FormFields $updatableFields)
+    public function __construct(private readonly \OxidEsales\Eshop\Core\Form\FormFields $updatableFields)
     {
-        $this->updatableFields = $updatableFields;
     }
 
     /**
@@ -33,31 +28,23 @@ class FormFieldsCleaner
     public function filterByUpdatableFields(array $listToClean)
     {
         $allowedFields = $this->updatableFields->getUpdatableFields();
-
-        $cleanedList = $listToClean;
         if ($allowedFields->count() > 0) {
-            $cleanedList = $this->filterFieldsByWhiteList($allowedFields, $listToClean);
+            return $this->filterFieldsByWhiteList($allowedFields, $listToClean);
         }
 
-        return $cleanedList;
+        return $listToClean;
     }
 
     /**
      * Return fields by performing a case-insensitive compare.
      * Does not change original case-sensitivity of fields.
      *
-     * @param \ArrayIterator $allowedFields
-     * @param array          $listToClean
      *
-     * @return array
      */
-    private function filterFieldsByWhiteList(\ArrayIterator $allowedFields, array $listToClean)
+    private function filterFieldsByWhiteList(\ArrayIterator $allowedFields, array $listToClean): array
     {
-        $allowedFieldsLowerCase = array_map('strtolower', (array)$allowedFields);
-        $cleanedList = array_filter($listToClean, function ($field) use ($allowedFieldsLowerCase) {
-            return in_array(strtolower($field), $allowedFieldsLowerCase);
-        }, ARRAY_FILTER_USE_KEY);
+        $allowedFieldsLowerCase = array_map(strtolower(...), (array)$allowedFields);
 
-        return $cleanedList;
+        return array_filter($listToClean, fn ($field) => in_array(strtolower((string) $field), $allowedFieldsLowerCase), ARRAY_FILTER_USE_KEY);
     }
 }

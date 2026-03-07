@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -134,7 +136,7 @@ class ControllerClassNameResolver implements ClassNameResolverInterface
      *
      * @return \OxidEsales\Eshop\Core\Routing\ShopControllerMapProvider
      */
-    protected function getShopControllerMapProvider()
+    protected function getShopControllerMapProvider(): ?\OxidEsales\Eshop\Core\Contract\ControllerMapProviderInterface
     {
         if ($this->shopControllerMapProvider === null) {
             $this->shopControllerMapProvider = oxNew(\OxidEsales\Eshop\Core\Routing\ShopControllerMapProvider::class);

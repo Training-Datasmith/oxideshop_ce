@@ -14,17 +14,13 @@ class MetaDataConverterAggregate implements MetaDataConverterInterface
     /**
      * @var MetaDataConverterInterface[]
      */
-    private $converters;
+    private readonly array $converters;
 
     public function __construct(MetaDataConverterInterface ...$converters)
     {
         $this->converters = $converters;
     }
 
-    /**
-     * @param array $metaData
-     * @return array
-     */
     public function convert(array $metaData): array
     {
         foreach ($this->converters as $converter) {

@@ -13,10 +13,10 @@ use OxidEsales\Eshop\Core\ConfigFile;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use ReflectionClass;
 use Symfony\Component\Filesystem\Filesystem;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 
 /**
  * @deprecated trait will be removed, use in-built PHPUnit test processes isolation instead

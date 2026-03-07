@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,14 +23,14 @@ class Base
      *
      * @var \OxidEsales\Eshop\Application\Model\User
      */
-    protected static $_oActUser = null;
+    protected static $_oActUser;
 
     /**
      * Admin mode marker
      *
      * @var bool
      */
-    protected static $_blIsAdmin = null;
+    protected static $_blIsAdmin;
 
     /**
      * Only used for convenience in UNIT tests by doing so we avoid
@@ -39,20 +41,18 @@ class Base
      * @throws SystemComponentException
      * @return false|mixed
      */
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments)
     {
         if (method_exists($this, $method)) {
             return call_user_func_array([& $this, $method], $arguments);
         }
         throw new SystemComponentException(
-            "Function '$method' does not exist or is not accessible! (" . get_class($this) . ")" . PHP_EOL
+            "Function '$method' does not exist or is not accessible! (" . static::class . ')' . PHP_EOL
         );
     }
 
     /**
      * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     *
-     * @return null
      */
     public function __construct()
     {
@@ -81,7 +81,7 @@ class Base
      *
      * @param \OxidEsales\Eshop\Application\Model\User $user user object
      */
-    public function setUser($user)
+    public function setUser($user): void
     {
         self::$_oActUser = $user;
     }
@@ -105,7 +105,7 @@ class Base
      *
      * @param bool $isAdmin admin mode
      */
-    public function setAdminMode($isAdmin)
+    public function setAdminMode($isAdmin): void
     {
         self::$_blIsAdmin = $isAdmin;
     }

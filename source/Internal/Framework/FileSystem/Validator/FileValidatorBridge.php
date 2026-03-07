@@ -11,7 +11,7 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Validator;
 
 class FileValidatorBridge implements FileValidatorBridgeInterface
 {
-    public function __construct(private FileValidatorInterface $fileValidator)
+    public function __construct(private readonly FileValidatorInterface $fileValidator)
     {
     }
 

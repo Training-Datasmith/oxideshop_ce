@@ -13,8 +13,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataMapper\DataMapperInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMedia;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaSorting;
 use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRole;
+use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaSorting;
 use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
@@ -52,7 +52,7 @@ readonly class ProductMediaDao implements ProductMediaDaoInterface
                 'product_id' => ':product_id',
                 'media_id' => ':media_id',
                 'position' => ':position',
-                'active' => ':active'
+                'active' => ':active',
             ])
             ->setParameters(
                 $data
@@ -121,7 +121,7 @@ readonly class ProductMediaDao implements ProductMediaDaoInterface
             $positionParamName = 'position_' . $position;
 
             $caseClauses .= sprintf(
-                " WHEN :%s THEN :%s ",
+                ' WHEN :%s THEN :%s ',
                 $idParamName,
                 $positionParamName
             );
@@ -389,14 +389,14 @@ readonly class ProductMediaDao implements ProductMediaDaoInterface
             ->insert(self::PRODUCT_MEDIA_ROLES_TABLE)
             ->values([
                 'product_media_id' => ':product_media_id',
-                'role' => ':role'
+                'role' => ':role',
             ]);
 
         foreach ($roles as $role) {
             $insertQuery
                 ->setParameters([
                     'product_media_id' => $productMediaId,
-                    'role' => $role
+                    'role' => $role,
                 ])
                 ->executeStatement();
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,7 +24,7 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      *
      * @var object
      */
-    protected $_oMoreCat = null;
+    protected $_oMoreCat;
 
     /**
      * Marking object as component
@@ -36,14 +38,14 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      *
      * @var bool
      */
-    protected $_oCategoryTree = null;
+    protected $_oCategoryTree;
 
     /**
      * Marking object as component
      *
      * @var \OxidEsales\Eshop\Application\Model\ManufacturerList
      */
-    protected $_oManufacturerTree = null;
+    protected $_oManufacturerTree;
 
     /**
      * Executes parent::init(), searches for active category in URL,
@@ -51,10 +53,8 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      * ("anid", usually article details), then loads article and
      * category if any of them available. Generates category/navigation
      * list.
-     *
-     * @return null
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -90,14 +90,13 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
             $oParentView = $this->getParent();
             if (($oProduct = $oParentView->getViewProduct())) {
                 return $oProduct;
-            } else {
-                $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-                if ($oProduct->load($sActProduct)) {
-                    // storing for reuse
-                    $oParentView->setViewProduct($oProduct);
+            }
+            $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            if ($oProduct->load($sActProduct)) {
+                // storing for reuse
+                $oParentView->setViewProduct($oProduct);
 
-                    return $oProduct;
-                }
+                return $oProduct;
             }
         }
     }
@@ -244,7 +243,7 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
             } elseif ($sActCat && $oProduct->isAssignedToCategory($sActCat)) {
                 // category ?
             } else {
-                list($sListType, $sActCat) = $this->getDefaultParams($oProduct);
+                [$sListType, $sActCat] = $this->getDefaultParams($oProduct);
             }
         }
 
@@ -287,7 +286,7 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      *
      * @param \OxidEsales\Eshop\Application\Model\CategoryList $oCategoryTree category list
      */
-    public function setCategoryTree($oCategoryTree)
+    public function setCategoryTree($oCategoryTree): void
     {
         $this->_oCategoryTree = $oCategoryTree;
     }
@@ -297,7 +296,7 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      *
      * @param \OxidEsales\Eshop\Application\Model\ManufacturerList $oManufacturerTree manufacturer list
      */
-    public function setManufacturerTree($oManufacturerTree)
+    public function setManufacturerTree($oManufacturerTree): void
     {
         $this->_oManufacturerTree = $oManufacturerTree;
     }

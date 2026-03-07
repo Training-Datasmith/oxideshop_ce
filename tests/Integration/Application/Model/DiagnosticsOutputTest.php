@@ -17,8 +17,8 @@ use PHPUnit\Framework\TestCase;
 
 final class DiagnosticsOutputTest extends TestCase
 {
-    private string $key = "diagnostic_tool_result";
-    private static string $sOutputFileName = "diagnostic_tool_result.html";
+    private string $key = 'diagnostic_tool_result';
+    private static string $sOutputFileName = 'diagnostic_tool_result.html';
 
     public function testDownloadResultFileWillSetCorrectContentLengthHeader(): void
     {

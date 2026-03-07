@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -20,56 +22,56 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
      *
      * @var object
      */
-    protected $_oBasket = null;
+    protected $_oBasket;
 
     /**
      * List of customer also bought thies products
      *
      * @var object
      */
-    protected $_aLastProducts = null;
+    protected $_aLastProducts;
 
     /**
      * Currency conversion index value
      *
      * @var double
      */
-    protected $_dConvIndex = null;
+    protected $_dConvIndex;
 
     /**
      * IPayment basket
      *
      * @var double
      */
-    protected $_dIPaymentBasket = null;
+    protected $_dIPaymentBasket;
 
     /**
      * IPayment account
      *
      * @var string
      */
-    protected $_sIPaymentAccount = null;
+    protected $_sIPaymentAccount;
 
     /**
      * IPayment user name
      *
      * @var string
      */
-    protected $_sIPaymentUser = null;
+    protected $_sIPaymentUser;
 
     /**
      * IPayment password
      *
      * @var string
      */
-    protected $_sIPaymentPassword = null;
+    protected $_sIPaymentPassword;
 
     /**
      * Mail error
      *
      * @var string
      */
-    protected $_sMailError = null;
+    protected $_sMailError;
 
     /**
      * Sign if to load and show bargain action
@@ -91,7 +93,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
      * it (\OxidEsales\Eshop\Core\Session::delBasket()), unsets user session ID, if
      * this user didn't entered password while ordering.
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -325,7 +327,6 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     {
         $aPaths = [];
         $aPath = [];
-
 
         $iLang = Registry::getLang()->getBaseLanguage();
         $aPath['title'] = Registry::getLang()->translateString('ORDER_COMPLETED', $iLang, false);

@@ -29,14 +29,14 @@ final class DirectoryValidatorTest extends TestCase
                         'promo' => [],
                         'master' => [],
                         'generated' => [],
-                        'media' => []
+                        'media' => [],
                     ],
                     'media' => [],
                 ],
                 'log' => [],
-                'tmp' => []
+                'tmp' => [],
             ],
-            'var' => []
+            'var' => [],
         ];
 
         $this->dir = vfsStream::setup('root', 0777, $structure);

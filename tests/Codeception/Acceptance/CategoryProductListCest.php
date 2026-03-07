@@ -25,14 +25,14 @@ final class CategoryProductListCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $homePage = $I->openShop();
@@ -67,14 +67,14 @@ final class CategoryProductListCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $homePage = $I->openShop();
@@ -106,14 +106,14 @@ final class CategoryProductListCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $productData2 = [
             'id' => '1002',
             'title' => 'Test product 2 [EN] šÄßüл',
             'description' => 'Test product 2 short desc [EN] šÄßüл',
-            'price' => 'from 55,00 €'
+            'price' => 'from 55,00 €',
         ];
 
         $homePage = $I->openShop();
@@ -132,6 +132,6 @@ final class CategoryProductListCest
     private function setNumberOfProductsInCategoryList(AcceptanceTester $I): void
     {
         $I->updateConfigInDatabase('aNrofCatArticles', serialize([20, 1, 2, 10, 100]), 'arr');
-        $I->updateConfigInDatabase('aNrofCatArticlesInGrid', serialize([20, 1, 2, 10, 100]), "arr");
+        $I->updateConfigInDatabase('aNrofCatArticlesInGrid', serialize([20, 1, 2, 10, 100]), 'arr');
     }
 }

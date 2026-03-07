@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,7 +19,7 @@ namespace OxidEsales\EshopCommunity\Core;
  */
 class OnlineServerEmailBuilder extends \OxidEsales\Eshop\Core\EmailBuilder
 {
-    const OLC_EMAIL = 'olc@oxid-esales.com';
+    public const OLC_EMAIL = 'olc@oxid-esales.com';
 
     /**
      * @inheritdoc

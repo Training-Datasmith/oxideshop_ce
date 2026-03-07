@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,15 +26,15 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         ['oxisoalpha2', 'oxcountry', 1, 0, 0],
         ['oxisoalpha3', 'oxcountry', 0, 0, 0],
         ['oxunnum3', 'oxcountry', 0, 0, 0],
-        ['oxid', 'oxcountry', 0, 0, 1]
+        ['oxid', 'oxcountry', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxtitle', 'oxcountry', 1, 1, 0],
                                      ['oxisoalpha2', 'oxcountry', 1, 0, 0],
                                      ['oxisoalpha3', 'oxcountry', 0, 0, 0],
                                      ['oxunnum3', 'oxcountry', 0, 0, 0],
-                                     ['oxid', 'oxobject2discount', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxobject2discount', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -42,7 +44,7 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     protected function getQuery()
     {
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
         $sCountryTable = $this->getViewName('oxcountry');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
@@ -53,12 +55,12 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             $sQAdd = " from $sCountryTable where $sCountryTable.oxactive = '1' ";
         } else {
             $sQAdd = " from oxobject2discount, $sCountryTable where $sCountryTable.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= "and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) . " and oxobject2discount.oxtype = 'oxcountry' ";
+            $sQAdd .= 'and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) . " and oxobject2discount.oxtype = 'oxcountry' ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= "and $sCountryTable.oxid not in ( select $sCountryTable.oxid from oxobject2discount, $sCountryTable where $sCountryTable.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= "and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) . " and oxobject2discount.oxtype = 'oxcountry' ) ";
+            $sQAdd .= 'and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) . " and oxobject2discount.oxtype = 'oxcountry' ) ";
         }
 
         return $sQAdd;
@@ -67,14 +69,14 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     /**
      * Removes chosen user group (groups) from delivery list
      */
-    public function removeDiscCountry()
+    public function removeDiscCountry(): void
     {
         $aChosenCntr = $this->getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -82,7 +84,7 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     /**
      * Adds chosen user group (groups) to delivery list
      */
-    public function addDiscCountry()
+    public function addDiscCountry(): void
     {
         $aChosenCntr = $this->getActionIds('oxcountry.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -91,13 +93,13 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             $sCountryTable = $this->getViewName('oxcountry');
             $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
                 $oObject2Discount->init('oxobject2discount');
                 $oObject2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($soxId);
                 $oObject2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCntr);
-                $oObject2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxcountry");
+                $oObject2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field('oxcountry');
                 $oObject2Discount->save();
             }
         }

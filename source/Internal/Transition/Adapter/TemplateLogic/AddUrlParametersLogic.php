@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,15 +18,13 @@ class AddUrlParametersLogic
      *
      * @param string $sUrl       Url
      * @param string $sDynParams Dynamic URL parameters
-     *
-     * @return string
      */
     public function addUrlParameters(string $sUrl, string $sDynParams): string
     {
         // removing empty parameters
         $sDynParams = $sDynParams ? Str::getStr()->preg_replace(['/^\?/', '/^\&(amp;)?$/'], '', $sDynParams) : false;
         if ($sDynParams) {
-            $sUrl .= ((str_contains($sUrl, '?')) ? "&amp;" : "?") . $sDynParams;
+            $sUrl .= ((str_contains($sUrl, '?')) ? '&amp;' : '?') . $sDynParams;
         }
 
         return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processSeoUrl($sUrl);

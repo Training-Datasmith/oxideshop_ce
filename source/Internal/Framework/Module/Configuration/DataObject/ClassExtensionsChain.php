@@ -10,44 +10,28 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject;
 
 use ArrayIterator;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
 use Traversable;
 
 class ClassExtensionsChain implements \IteratorAggregate
 {
     public const NAME = 'classExtensions';
 
-    /**
-     * @var array
-     */
-    private $chain = [];
-
-    public function __construct(array $chain = [])
+    public function __construct(private array $chain = [])
     {
-        $this->chain = $chain;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * @return array
-     */
     public function getChain(): array
     {
         return $this->chain;
     }
 
-    /**
-     * @param array $chain
-     * @return ClassExtensionsChain
-     */
     public function setChain(array $chain): ClassExtensionsChain
     {
         $this->chain = $chain;
@@ -56,8 +40,6 @@ class ClassExtensionsChain implements \IteratorAggregate
 
     /**
      * @param ClassExtension[] $extensions
-     *
-     * @return void
      */
     public function addExtensions(array $extensions): void
     {
@@ -67,8 +49,6 @@ class ClassExtensionsChain implements \IteratorAggregate
     }
 
     /**
-     * @param ClassExtension $classExtension
-     *
      * @throws ExtensionNotInChainException
      */
     public function removeExtension(ClassExtension $classExtension): void
@@ -95,9 +75,6 @@ class ClassExtensionsChain implements \IteratorAggregate
         }
     }
 
-    /**
-     * @param ClassExtension $extension
-     */
     public function addExtension(ClassExtension $extension): void
     {
         if (\array_key_exists($extension->getShopClassName(), $this->chain)) {
@@ -112,11 +89,6 @@ class ClassExtensionsChain implements \IteratorAggregate
         }
     }
 
-    /**
-     * @param ClassExtension $extension
-     *
-     * @return bool
-     */
     private function isModuleExtensionClassNameInChain(ClassExtension $extension): bool
     {
         if (\in_array($extension->getModuleExtensionClassName(), $this->chain[$extension->getShopClassName()])) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -29,7 +31,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @var array
      */
-    protected $_aVariantList = null;
+    protected $_aVariantList;
     /**
      * Names of components (classes) that are initiated and executed
      * before any other regular operation.
@@ -50,105 +52,105 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @var Article
      */
-    protected $_oParentProd = null;
+    protected $_oParentProd;
 
     /**
      * Marker if user can rate current product.
      *
      * @var bool
      */
-    protected $_blCanRate = null;
+    protected $_blCanRate;
 
     /**
      * Media files.
      *
      * @var array
      */
-    protected $_aMediaFiles = null;
+    protected $_aMediaFiles;
 
     /**
      * History (last seen) products.
      *
      * @var array
      */
-    protected $_aLastProducts = null;
+    protected $_aLastProducts;
 
     /**
      * Current product's vendor.
      *
      * @var Vendor
      */
-    protected $_oVendor = null;
+    protected $_oVendor;
 
     /**
      * Current product's manufacturer.
      *
      * @var Manufacturer
      */
-    protected $_oManufacturer = null;
+    protected $_oManufacturer;
 
     /**
      * Current product's category.
      *
      * @var object
      */
-    protected $_oCategory = null;
+    protected $_oCategory;
 
     /**
      * Current product's attributes.
      *
      * @var array
      */
-    protected $_aAttributes = null;
+    protected $_aAttributes;
 
     /**
      * Picture gallery.
      *
      * @var array
      */
-    protected $_aPicGallery = null;
+    protected $_aPicGallery;
 
     /**
      * Reviews of current article.
      *
      * @var array
      */
-    protected $_aReviews = null;
+    protected $_aReviews;
 
     /**
      * CrossSelling article list
      *
      * @var object
      */
-    protected $_oCrossSelling = null;
+    protected $_oCrossSelling;
 
     /**
      * Similar products article list.
      *
      * @var object
      */
-    protected $_oSimilarProducts = null;
+    protected $_oSimilarProducts;
 
     /**
      * Accessories of current article.
      *
      * @var object
      */
-    protected $_oAccessoires = null;
+    protected $_oAccessoires;
 
     /**
      * List of customer also bought these products.
      *
      * @var object
      */
-    protected $_aAlsoBoughtArts = null;
+    protected $_aAlsoBoughtArts;
 
     /**
      * Search title.
      *
      * @var string
      */
-    protected $_sSearchTitle = null;
+    protected $_sSearchTitle;
 
     /**
      * Marker if active product was fully initialized before returning it.
@@ -163,35 +165,35 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @var int
      */
-    protected $_iLinkType = null;
+    protected $_iLinkType;
 
     /**
      * Is multi dimension variant view.
      *
      * @var bool
      */
-    protected $_blMdView = null;
+    protected $_blMdView;
 
     /**
      * Rating value.
      *
      * @var double
      */
-    protected $_dRatingValue = null;
+    protected $_dRatingValue;
 
     /**
      * Rating count.
      *
      * @var integer
      */
-    protected $_iRatingCnt = null;
+    protected $_iRatingCnt;
 
     /**
      * Bid price.
      *
      * @var string
      */
-    protected $_sBidPrice = null;
+    protected $_sBidPrice;
 
     /**
      * Marked which defines if current view is sortable or not.
@@ -207,7 +209,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds = null;
+    protected $_aSimilarRecommListIds;
 
     /**
      * Template variable getter. Returns active zoom picture id.
@@ -247,7 +249,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      */
     protected function getAddDynUrlParams()
     {
-        if ($this->getListType() == "search") {
+        if ($this->getListType() == 'search') {
             return $this->getDynUrlParams();
         }
     }
@@ -448,7 +450,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
             //last seen products for #768CA
             $oProduct = $this->getProduct();
             $sParentIdField = 'oxarticles__oxparentid';
-            $sArtId = $oProduct->$sParentIdField->value ? $oProduct->$sParentIdField->value : $oProduct->getId();
+            $sArtId = $oProduct->$sParentIdField->value ?: $oProduct->getId();
 
             $oHistoryArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
             $oHistoryArtList->loadHistoryArticles($sArtId, $iCnt);
@@ -668,7 +670,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @param string $sTitle search title
      */
-    public function setSearchTitle($sTitle)
+    public function setSearchTitle($sTitle): void
     {
         $this->_sSearchTitle = $sTitle;
     }
@@ -678,7 +680,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @param string $sActCatPath category tree path.
      */
-    public function setCatTreePath($sActCatPath)
+    public function setCatTreePath($sActCatPath): void
     {
         $this->_sCatTreePath = $sActCatPath;
     }
@@ -781,12 +783,12 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         $oProduct = $this->getProduct();
         $sParentIdField = 'oxarticles__oxparentid';
         if (($oParent = $this->getParentProduct($oProduct->$sParentIdField->value))) {
-            $sVarSelId = Registry::getRequest()->getRequestEscapedParameter("varselid");
+            $sVarSelId = Registry::getRequest()->getRequestEscapedParameter('varselid');
 
             return $oParent->getVariantSelections($sVarSelId, $oProduct->getId());
         }
 
-        return $oProduct->getVariantSelections(Registry::getRequest()->getRequestEscapedParameter("varselid"));
+        return $oProduct->getVariantSelections(Registry::getRequest()->getRequestEscapedParameter('varselid'));
     }
 
     /**
@@ -832,7 +834,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
                     $myUtils->showMessageAndExit('');
                 }
 
-                $sVarSelId = Registry::getRequest()->getRequestEscapedParameter("varselid");
+                $sVarSelId = Registry::getRequest()->getRequestEscapedParameter('varselid');
                 $aVarSelections = $this->_oProduct->getVariantSelections($sVarSelId);
                 if ($aVarSelections && $aVarSelections['oActiveVariant'] && $aVarSelections['blPerfectFit']) {
                     $this->_oProduct = $aVarSelections['oActiveVariant'];
@@ -853,7 +855,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         $sSortingParameters = $this->getViewParameter('sorting');
         if ($sSortingParameters) {
-            list($sortBy, $sortOrder) = explode('|', $sSortingParameters);
+            [$sortBy, $sortOrder] = explode('|', $sSortingParameters);
             if ((new SortingValidator())->isValid($sortBy, $sortOrder)) {
                 $this->setItemSorting($this->getSortIdent(), $sortBy, $sortOrder);
             }
@@ -875,7 +877,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
 
         // if category parameter is not found, use category from product
-        $sCatId = $this->getViewParameter("cnid");
+        $sCatId = $this->getViewParameter('cnid');
 
         if (!$sCatId && $oProduct->getCategory()) {
             $oCategory = $oProduct->getCategory();
@@ -889,9 +891,9 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         $oLocator = oxNew(\OxidEsales\Eshop\Application\Component\Locator::class, $this->getListType());
         $oLocator->setLocatorData($oProduct, $this);
 
-        $this->_aViewData["config"] = Registry::getConfig();
+        $this->_aViewData['config'] = Registry::getConfig();
 
-        $config = Registry::getConfig();
+        Registry::getConfig();
         $this->_aViewData['preview'] = Registry::getRequest()->getRequestEscapedParameter('preview');
         $this->_aViewData['altImageUrl'] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
         $this->_aViewData['SSLAltImageUrl'] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
@@ -957,7 +959,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
 
         if ($this->getListType() != 'search' && $oCategory && $oCategory instanceof \OxidEsales\Eshop\Application\Model\Category) {
             if ($sSortBy = $oCategory->getDefaultSorting()) {
-                $sSortDir = ($oCategory->getDefaultSortingMode()) ? "desc" : "asc";
+                $sSortDir = ($oCategory->getDefaultSortingMode()) ? 'desc' : 'asc';
                 $aSorting = ['sortby' => $sSortBy, 'sortdir' => $sSortDir];
             }
         }

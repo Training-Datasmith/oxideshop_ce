@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -59,7 +61,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @var string
      */
-    protected $_sCatPathString = null;
+    protected $_sCatPathString;
 
     /**
      * Marked which defines if current view is sortable or not
@@ -73,42 +75,42 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @var array
      */
-    protected $_aAttributes = null;
+    protected $_aAttributes;
 
     /**
      * Category article list
      *
      * @var array
      */
-    protected $_aCatArtList = null;
+    protected $_aCatArtList;
 
     /**
      * If category has subcategories
      *
      * @var bool
      */
-    protected $_blHasVisibleSubCats = null;
+    protected $_blHasVisibleSubCats;
 
     /**
      * List of category's subcategories
      *
      * @var array
      */
-    protected $_aSubCatList = null;
+    protected $_aSubCatList;
 
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /**
      * Active object is category.
      *
      * @var bool
      */
-    protected $_blIsCat = null;
+    protected $_blIsCat;
 
     /**
      * Recomendation list
@@ -117,14 +119,14 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @var object
      */
-    protected $_oRecommList = null;
+    protected $_oRecommList;
 
     /**
      * Category title
      *
      * @var string
      */
-    protected $_sCatTitle = null;
+    protected $_sCatTitle;
 
     /**
      * Sign if to load and show bargain action
@@ -140,7 +142,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds = null;
+    protected $_aSimilarRecommListIds;
 
     /**
      * Generates (if not generated yet) and returns view ID (for
@@ -216,7 +218,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
             $category = oxNew(Category::class);
             $category->oxcategories__oxactive = new Field(1, Field::T_RAW);
             $this->setActiveCategory($category);
-        // END deprecated
+            // END deprecated
         } elseif (($category = $this->getActiveCategory())) {
             $this->_blIsCat = true;
             $this->_blBargainAction = true;
@@ -309,12 +311,11 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     protected function getProductLinkType()
     {
-        $categoryType = OXARTICLE_LINKTYPE_CATEGORY;
         if (($category = $this->getActiveCategory()) && $category->isPriceCategory()) {
-            $categoryType = OXARTICLE_LINKTYPE_PRICECATEGORY;
+            return OXARTICLE_LINKTYPE_PRICECATEGORY;
         }
 
-        return $categoryType;
+        return OXARTICLE_LINKTYPE_CATEGORY;
     }
 
     /**
@@ -323,7 +324,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * Session variables:
      * <b>session_attrfilter</b>
      */
-    public function executefilter()
+    public function executefilter(): void
     {
         $baseLanguageId = Registry::getLang()->getBaseLanguage();
         // store this into session
@@ -343,7 +344,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Reset filter.
      */
-    public function resetFilter()
+    public function resetFilter(): void
     {
         $activeCategory = Registry::getRequest()->getRequestEscapedParameter('cnid');
         $sessionFilter = Registry::getSession()->getVariable('session_attrfilter');
@@ -364,7 +365,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
 
         $numberOfCategoryArticles = (int) $config->getConfigParam('iNrofCatArticles');
-        $numberOfCategoryArticles = $numberOfCategoryArticles ? $numberOfCategoryArticles : 1;
+        $numberOfCategoryArticles = $numberOfCategoryArticles ?: 1;
 
         // load only articles which we show on screen
         $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
@@ -428,7 +429,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         $listDisplayType = Registry::getSession()->getVariable('ldtype');
 
         if (is_null($listDisplayType)) {
-            $listDisplayType = Registry::getConfig()->getConfigParam('sDefaultListDisplayType');
+            return Registry::getConfig()->getConfigParam('sDefaultListDisplayType');
         }
 
         return $listDisplayType;
@@ -508,7 +509,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         $description = $str->cleanStr($description);
         $description = $str->htmlspecialchars($description);
 
-        return trim($description);
+        return trim((string) $description);
     }
 
     /**
@@ -522,7 +523,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
 
         if ($titlePageSuffix = $this->getTitlePageSuffix()) {
             if ($meta) {
-                $meta .= ", ";
+                $meta .= ', ';
             }
             $meta .= $titlePageSuffix;
         }
@@ -563,7 +564,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     {
         if (isset($category->oxcategories__oxlongdesc) && $category->oxcategories__oxlongdesc instanceof Field) {
             $activeLanguageId = Registry::getLang()->getTplLanguage();
-            $oxid = (string) $category->getId() . (string) $category->getLanguage();
+            $oxid = $category->getId() . $category->getLanguage();
             return trim($this->getRenderer()->renderFragment(
                 $category->oxcategories__oxlongdesc->getRawValue(),
                 "ox:{$oxid}{$activeLanguageId}",
@@ -608,7 +609,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
 
             if ($categoryTree = $this->getCategoryTree()) {
                 foreach ($categoryTree->getPath() as $category) {
-                    $keywordsList[] = trim($category->oxcategories__oxtitle->value);
+                    $keywordsList[] = trim((string) $category->oxcategories__oxtitle->value);
                 }
             }
 
@@ -620,7 +621,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
             }
 
             if (count($keywordsList) > 0) {
-                $keywords = implode(", ", $keywordsList);
+                $keywords = implode(', ', $keywordsList);
             }
         }
 
@@ -647,18 +648,18 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
             foreach ($articleList as $article) {
                 /** @var \OxidEsales\Eshop\Application\Model\Article $article */
                 $description = $stringModifier->strip_tags(
-                    trim($stringModifier->strtolower($article->getLongDescription()->value))
+                    trim((string) $stringModifier->strtolower($article->getLongDescription()->value))
                 );
 
                 //removing dots from string (they are not cleaned up during general string cleanup)
-                $description = $stringModifier->preg_replace("/\./", " ", $description);
+                $description = $stringModifier->preg_replace("/\./", ' ', $description);
 
                 if ($stringModifier->strlen($description) > $maxTextLength) {
                     $midText = $stringModifier->substr($description, 0, $maxTextLength);
                     $description = $stringModifier->substr(
                         $midText,
                         0,
-                        ($stringModifier->strlen($midText) - $stringModifier->strpos(strrev($midText), ' '))
+                        ($stringModifier->strlen($midText) - $stringModifier->strpos(strrev((string) $midText), ' '))
                     );
                 }
                 if ($text) {
@@ -689,7 +690,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     public function getTemplateName()
     {
         if ($templateName = Registry::getRequest()->getRequestEscapedParameter('tpl')) {
-            $this->_sThisTemplate = 'custom/' . basename($templateName);
+            $this->_sThisTemplate = 'custom/' . basename((string) $templateName);
         } elseif (($category = $this->getActiveCategory()) && $category->getFieldData('oxtemplate')) {
             $this->_sThisTemplate = $category->oxcategories__oxtemplate->value;
         }
@@ -759,14 +760,13 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
                 $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
                 $articleViewName = $tableViewNameGenerator->getViewName('oxarticles');
                 $sortBy = $articleViewName . '.' . $defaultSorting;
-                $sortDirection = ($category->getDefaultSortingMode()) ? "desc" : "asc";
+                $sortDirection = ($category->getDefaultSortingMode()) ? 'desc' : 'asc';
                 $sorting = ['sortby' => $sortBy, 'sortdir' => $sortDirection];
             }
         }
 
         return $sorting;
     }
-
 
     /**
      * Returns title suffix used in template
@@ -788,7 +788,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     public function getTitlePageSuffix()
     {
         if (($activePage = $this->getActPage())) {
-            return Registry::getLang()->translateString('PAGE') . " " . ($activePage + 1);
+            return Registry::getLang()->translateString('PAGE') . ' ' . ($activePage + 1);
         }
     }
 
@@ -1008,7 +1008,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
                 $baseLanguageId = $language->getBaseLanguage();
 
                 $this->_sCatTitle = $language->translateString('CATEGORY_OVERVIEW', $baseLanguageId, false);
-            // END deprecated
+                // END deprecated
             } elseif (($category = $this->getActiveCategory())) {
                 $this->_sCatTitle = $category->oxcategories__oxtitle->value;
             }
@@ -1066,16 +1066,14 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         if (($category = $this->getActiveCategory())) {
             $utilsUrl = Registry::getUtilsUrl();
             if (Registry::getUtils()->seoIsActive()) {
-                $url = $utilsUrl->prepareCanonicalUrl(
+                return $utilsUrl->prepareCanonicalUrl(
                     $category->getBaseSeoLink($category->getLanguage(), $this->getActPage())
-                );
-            } else {
-                $url = $utilsUrl->prepareCanonicalUrl(
-                    $category->getBaseStdLink($category->getLanguage(), $this->getActPage())
                 );
             }
 
-            return $url;
+            return $utilsUrl->prepareCanonicalUrl(
+                $category->getBaseStdLink($category->getLanguage(), $this->getActPage())
+            );
         }
     }
 

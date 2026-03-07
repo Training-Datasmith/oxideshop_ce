@@ -9,11 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service;
 
+use function in_array;
+
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ModuleConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ModuleDependencyDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\UnresolvedModuleDependencies;
 
-use function in_array;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\UnresolvedModuleDependencies;
 
 class ModuleDependencyResolver implements ModuleDependencyResolverInterface
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -10,8 +12,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use stdClass;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use stdClass;
 
 /**
  * Admin article main manager.
@@ -34,20 +36,20 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $this->_aViewData['edit'] = $oArticle;
 
         $sOxId = $this->getEditObjectId();
-        $sVoxId = Registry::getRequest()->getRequestEscapedParameter("voxid");
-        $sOxParentId = Registry::getRequest()->getRequestEscapedParameter("oxparentid");
+        $sVoxId = Registry::getRequest()->getRequestEscapedParameter('voxid');
+        $sOxParentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
 
         // new variant ?
-        if (isset($sVoxId) && $sVoxId == "-1" && isset($sOxParentId) && $sOxParentId && $sOxParentId != "-1") {
+        if (isset($sVoxId) && $sVoxId == '-1' && isset($sOxParentId) && $sOxParentId && $sOxParentId != '-1') {
             $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
             $oParentArticle->load($sOxParentId);
-            $this->_aViewData["parentarticle"] = $oParentArticle;
-            $this->_aViewData["oxparentid"] = $sOxParentId;
+            $this->_aViewData['parentarticle'] = $oParentArticle;
+            $this->_aViewData['oxparentid'] = $sOxParentId;
 
-            $this->_aViewData["oxid"] = $sOxId = "-1";
+            $this->_aViewData['oxid'] = $sOxId = '-1';
         }
 
-        if ($sOxId && $sOxId != "-1") {
+        if ($sOxId && $sOxId != '-1') {
             // load object
             $oArticle = $this->updateArticle($oArticle, $sOxId);
 
@@ -61,9 +63,9 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             if ($oArticle->oxarticles__oxparentid->value) {
                 $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
                 $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData["parentarticle"] = $oParentArticle;
-                $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
-                $this->_aViewData["issubvariant"] = 1;
+                $this->_aViewData['parentarticle'] = $oParentArticle;
+                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
+                $this->_aViewData['issubvariant'] = 1;
             }
 
             // #381A
@@ -74,27 +76,27 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        $this->_aViewData["editor"] = $this->generateTextEditor(
-            "100%",
+        $this->_aViewData['editor'] = $this->generateTextEditor(
+            '100%',
             300,
             $oArticle,
-            "oxarticles__oxlongdesc",
-            "details.css"
+            'oxarticles__oxlongdesc',
+            'details.css'
         );
-        $this->_aViewData["blUseTimeCheck"] = Registry::getConfig()->getConfigParam('blUseTimeCheck');
+        $this->_aViewData['blUseTimeCheck'] = Registry::getConfig()->getConfigParam('blUseTimeCheck');
 
-        return "article_main";
+        return 'article_main';
     }
 
     /**
@@ -108,14 +110,14 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Saves changes of article parameters.
      */
-    public function save()
+    public function save(): void
     {
         parent::save();
 
         $oDb = DatabaseProvider::getDb();
         $oConfig = Registry::getConfig();
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // default values
         $aParams = $this->addDefaultValues($aParams);
@@ -126,8 +128,8 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         }
 
         // varianthandling
-        $soxparentId = Registry::getRequest()->getRequestEscapedParameter("oxparentid");
-        if (isset($soxparentId) && $soxparentId && $soxparentId != "-1") {
+        $soxparentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
+        if (isset($soxparentId) && $soxparentId && $soxparentId != '-1') {
             $aParams['oxarticles__oxparentid'] = $soxparentId;
         } else {
             unset($aParams['oxarticles__oxparentid']);
@@ -136,7 +138,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oArticle = $this->createArticle();
         $oArticle->setLanguage($this->_iEditLang);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oArticle->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxarticles__oxid'] = null;
@@ -158,13 +160,13 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $oArticle->oxarticles__oxartnum->value != $aParams['oxarticles__oxartnum']
         ) {
             $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sSelect = "select oxid from " . $tableViewNameGenerator->getViewName('oxarticles');
-            $sSelect .= " where oxartnum = " . $oDb->quote($aParams['oxarticles__oxartnum']);
-            $sSelect .= " and oxid != " . $oDb->quote($aParams['oxarticles__oxid']);
+            $sSelect = 'select oxid from ' . $tableViewNameGenerator->getViewName('oxarticles');
+            $sSelect .= ' where oxartnum = ' . $oDb->quote($aParams['oxarticles__oxartnum']);
+            $sSelect .= ' and oxid != ' . $oDb->quote($aParams['oxarticles__oxid']);
             $record = DatabaseProvider::getDb()->select($sSelect);
             if ($record && $record->count() > 0) {
                 $oArticle->assign($record->fields);
-                $this->_aViewData["errorsavingatricle"] = 1;
+                $this->_aViewData['errorsavingatricle'] = 1;
             }
         }
 
@@ -181,9 +183,9 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oArticle->save();
 
         // set oxid if inserted
-        if ($soxId == "-1") {
-            $sFastCat = Registry::getRequest()->getRequestEscapedParameter("art_category");
-            if ($sFastCat != "-1") {
+        if ($soxId == '-1') {
+            $sFastCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
+            if ($sFastCat != '-1') {
                 $this->addToCategory($sFastCat, $oArticle->getId());
             }
         }
@@ -209,9 +211,8 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $sValue = str_replace('&quot;', '"', $sValue);
         $sValue = str_replace('&lang=', '&amp;lang=', $sValue);
         $sValue = str_replace('<p>&nbsp;</p>', '', $sValue);
-        $sValue = str_replace('<p>&nbsp; </p>', '', $sValue);
 
-        return $sValue;
+        return str_replace('<p>&nbsp; </p>', '', $sValue);
     }
 
     /**
@@ -224,11 +225,11 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $categories = DatabaseProvider::getDb()->getCol(
             'select oxcatnid from oxobject2category where oxobjectid = :oxobjectid',
             [
-            'oxobjectid' => $sArticleId
+            'oxobjectid' => $sArticleId,
             ]
         );
         foreach ($categories as $category) {
-            $this->resetCounter("catArticle", $category);
+            $this->resetCounter('catArticle', $category);
         }
     }
 
@@ -238,10 +239,10 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * @param string $sCatID Category id
      * @param string $sOXID  Article id
      */
-    public function addToCategory($sCatID, $sOXID)
+    public function addToCategory($sCatID, $sOXID): void
     {
         $base = oxNew(BaseModel::class);
-        $base->init("oxobject2category");
+        $base->init('oxobject2category');
         $base->oxobject2category__oxtime = new \OxidEsales\Eshop\Core\Field(0);
         $base->oxobject2category__oxobjectid = new \OxidEsales\Eshop\Core\Field($sOXID);
         $base->oxobject2category__oxcatnid = new \OxidEsales\Eshop\Core\Field($sCatID);
@@ -258,12 +259,12 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * @param string $sNewId    new product id (default null)
      * @param string $sParentId product parent id
      */
-    public function copyArticle($sOldId = null, $sNewId = null, $sParentId = null)
+    public function copyArticle($sOldId = null, $sNewId = null, $sParentId = null): void
     {
         $myConfig = Registry::getConfig();
 
-        $sOldId = $sOldId ? $sOldId : $this->getEditObjectId();
-        $sNewId = $sNewId ? $sNewId : Registry::getUtilsObject()->generateUID();
+        $sOldId = $sOldId ?: $this->getEditObjectId();
+        $sNewId = $sNewId ?: Registry::getUtilsObject()->generateUID();
 
         $oArticle = oxNew(BaseModel::class);
         $oArticle->init('oxarticles');
@@ -323,7 +324,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $productsIds = DatabaseProvider::getDb()->getCol(
                 'select oxid from oxarticles where oxparentid = :oxparentid',
                 [
-                    'oxparentid' => $sOldId
+                    'oxparentid' => $sOldId,
                 ]
             );
             foreach ($productsIds as $productId) {
@@ -341,14 +342,14 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                     $myConfig->getConfigParam('blWarnOnSameArtNums') &&
                     $oArticle->$sArtNumField->value && $sFncParameter == 'copyArticle'
                 ) {
-                    $sSelect = "select oxid from " . $oArticle->getCoreTableName() .
-                               " where oxartnum = " . $database->quote($oArticle->$sArtNumField->value) .
-                               " and oxid != " . $database->quote($sNewId);
+                    $sSelect = 'select oxid from ' . $oArticle->getCoreTableName() .
+                               ' where oxartnum = ' . $database->quote($oArticle->$sArtNumField->value) .
+                               ' and oxid != ' . $database->quote($sNewId);
 
                     $record = $database->select($sSelect);
                     if ($record && $record->count() > 0) {
                         $oArticle->assign($record->fields);
-                        $this->_aViewData["errorsavingatricle"] = 1;
+                        $this->_aViewData['errorsavingatricle'] = 1;
                     }
                 }
             }
@@ -371,7 +372,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $categories = $database->getAll(
             sprintf('select oxcatnid, oxtime from %s where oxobjectid = :oxobjectid', $sO2CView),
             [
-            'oxobjectid' => $sOldId
+            'oxobjectid' => $sOldId,
             ]
         );
         foreach ($categories as $category) {
@@ -396,13 +397,13 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $ArticleAttributesIds = DatabaseProvider::getDb()->getCol(
             'select oxid from oxobject2attribute where oxobjectid = :oxobjectid',
             [
-            'oxobjectid' => $sOldId
+            'oxobjectid' => $sOldId,
             ]
         );
 
         foreach ($ArticleAttributesIds as $articleAttributesId) {
             $articleAttribute = oxNew(BaseModel::class);
-            $articleAttribute->init("oxobject2attribute");
+            $articleAttribute->init('oxobject2attribute');
             $articleAttribute->load($articleAttributesId);
             $articleAttribute->setId($utilsObject->generateUID());
             $articleAttribute->oxobject2attribute__oxobjectid->setValue($sNewId);
@@ -421,9 +422,9 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid";
+        $sQ = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
         $oRs = $oDb->select($sQ, [
-            'oxartid' => $sOldId
+            'oxartid' => $sOldId,
         ]);
         if ($oRs !== false && $oRs->count() > 0) {
             while (!$oRs->EOF) {
@@ -452,7 +453,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $database = DatabaseProvider::getDb();
 
         $selectListIds = $database->getCol('select oxselnid from oxobject2selectlist where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $sOldId
+            'oxobjectid' => $sOldId,
         ]);
         foreach ($selectListIds as $selectListId) {
             $database->execute(
@@ -480,7 +481,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $objects = $database->getCol(
             'select oxobjectid from oxobject2article where oxarticlenid = :oxarticlenid',
             [
-            'oxarticlenid' => $sOldId
+            'oxarticlenid' => $sOldId,
             ]
         );
         foreach ($objects as $object) {
@@ -489,7 +490,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $database->execute($query, [
                 'oxid' => $myUtilsObject->generateUID(),
                 'oxobjectid' => $object,
-                'oxarticlenid' => $sNewId
+                'oxarticlenid' => $sNewId,
             ]);
         }
     }
@@ -508,7 +509,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $accessories = $database->getCol(
             'select oxobjectid from oxaccessoire2article where oxarticlenid = :oxarticlenid',
             [
-                'oxarticlenid' => $sOldId
+                'oxarticlenid' => $sOldId,
             ]
         );
         foreach ($accessories as $accessoryId) {
@@ -517,7 +518,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $database->execute($sSql, [
                 'oxid' => $myUtilsObject->generateUid(),
                 'oxobjectid' => $accessoryId,
-                'oxarticlenid' => $sNewId
+                'oxarticlenid' => $sNewId,
             ]);
         }
     }
@@ -532,12 +533,12 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         $sShopId = Registry::getConfig()->getShopId();
         $oPriceList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $oPriceList->init("oxbase", "oxprice2article");
-        $sQ = "select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid " .
-              "and (oxamount > 0 or oxamountto > 0) order by oxamount ";
+        $oPriceList->init('oxbase', 'oxprice2article');
+        $sQ = 'select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid ' .
+              'and (oxamount > 0 or oxamountto > 0) order by oxamount ';
         $oPriceList->selectString($sQ, [
             'oxartid' => $sOldId,
-            'oxshopid' => $sShopId
+            'oxshopid' => $sShopId,
         ]);
         if ($oPriceList->count()) {
             foreach ($oPriceList as $oItem) {
@@ -557,7 +558,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     protected function copyArtExtends($sOldId, $sNewId)
     {
         $oExt = oxNew(BaseModel::class);
-        $oExt->init("oxartextends");
+        $oExt->init('oxartextends');
         $oExt->load($sOldId);
         $oExt->setId($sNewId);
         $oExt->save();
@@ -566,7 +567,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Saves article parameters in different language.
      */
-    public function saveinnlang()
+    public function saveinnlang(): void
     {
         $this->save();
     }
@@ -597,16 +598,16 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $sOxIdField = 'oxarticles__oxid';
         if (isset($oParentArticle)) {
             $aJumpList[] = [$oParentArticle->$sOxIdField->value, $this->getTitle($oParentArticle)];
-            $sEditLanguageParameter = Registry::getRequest()->getRequestEscapedParameter("editlanguage");
+            $sEditLanguageParameter = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
             $oParentVariants = $oParentArticle->getAdminVariants($sEditLanguageParameter);
             if ($oParentVariants->count()) {
                 foreach ($oParentVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
                     if ($oVar->$sOxIdField->value == $oArticle->$sOxIdField->value) {
                         $oVariants = $oArticle->getAdminVariants($sEditLanguageParameter);
                         if ($oVariants->count()) {
                             foreach ($oVariants as $oVVar) {
-                                $aJumpList[] = [$oVVar->$sOxIdField->value, " -- " . $this->getTitle($oVVar)];
+                                $aJumpList[] = [$oVVar->$sOxIdField->value, ' -- ' . $this->getTitle($oVVar)];
                             }
                         }
                     }
@@ -616,16 +617,16 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $aJumpList[] = [$oArticle->$sOxIdField->value, $this->getTitle($oArticle)];
             //fetching this article variants data
             $oVariants = $oArticle->getAdminVariants(
-                Registry::getRequest()->getRequestEscapedParameter("editlanguage")
+                Registry::getRequest()->getRequestEscapedParameter('editlanguage')
             );
             if ($oVariants && $oVariants->count()) {
                 foreach ($oVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
                 }
             }
         }
         if (count($aJumpList) > 1) {
-            $this->_aViewData["thisvariantlist"] = $aJumpList;
+            $this->_aViewData['thisvariantlist'] = $aJumpList;
         }
     }
 
@@ -639,8 +640,8 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     protected function getTitle($oObj)
     {
         $sTitle = $oObj->oxarticles__oxtitle->value;
-        if (!strlen($sTitle)) {
-            $sTitle = $oObj->oxarticles__oxvarselect->value;
+        if (!strlen((string) $sTitle)) {
+            return $oObj->oxarticles__oxvarselect->value;
         }
 
         return $sTitle;
@@ -713,9 +714,9 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     protected function formQueryForCopyingToCategory($newArticleId, $sUid, $sCatId, $sTime)
     {
         $oDb = DatabaseProvider::getDb();
-        return "insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) " .
-            "VALUES (" . $oDb->quote($sUid) . ", " . $oDb->quote($newArticleId) . ", " .
-            $oDb->quote($sCatId) . ", " . $oDb->quote($sTime) . ") ";
+        return 'insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) ' .
+            'VALUES (' . $oDb->quote($sUid) . ', ' . $oDb->quote($newArticleId) . ', ' .
+            $oDb->quote($sCatId) . ', ' . $oDb->quote($sTime) . ') ';
     }
 
     /**
@@ -760,8 +761,6 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     protected function createArticle()
     {
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-
-        return $oArticle;
+        return oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
     }
 }

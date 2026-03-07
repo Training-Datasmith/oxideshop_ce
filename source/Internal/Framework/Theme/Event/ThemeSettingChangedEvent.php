@@ -21,16 +21,14 @@ class ThemeSettingChangedEvent extends Event
      * @param string $theme Theme information as in oxconfig.oxmodule
      */
     public function __construct(
-        private string $configurationVariable,
-        private int $shopId,
-        private string $theme
+        private readonly string $configurationVariable,
+        private readonly int $shopId,
+        private readonly string $theme
     ) {
     }
 
     /**
      * Getter for configuration variable name.
-     *
-     * @return string
      */
     public function getConfigurationVariable(): string
     {
@@ -39,8 +37,6 @@ class ThemeSettingChangedEvent extends Event
 
     /**
      * Getter for shop id.
-     *
-     * @return integer
      */
     public function getShopId(): int
     {
@@ -49,8 +45,6 @@ class ThemeSettingChangedEvent extends Event
 
     /**
      * Getter for theme information.
-     *
-     * @return string
      */
     public function getTheme(): string
     {

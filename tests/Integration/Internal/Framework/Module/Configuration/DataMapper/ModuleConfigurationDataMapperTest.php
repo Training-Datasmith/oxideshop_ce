@@ -41,7 +41,7 @@ final class ModuleConfigurationDataMapperTest extends TestCase
             'url'         => 'http://example.com',
             'email'       => 'test@example.com',
             'keyWithoutDataMapperAssigned' => [
-                'subkey' => 'subvalue'
+                'subkey' => 'subvalue',
             ],
             ClassExtensionsDataMapper::MAPPING_KEY => [
                 'shopClass' => 'moduleClass',
@@ -50,7 +50,7 @@ final class ModuleConfigurationDataMapperTest extends TestCase
                 'controller1' => Controller1::class,
             ],
             EventsDataMapper::MAPPING_KEY => [
-                'onActivate'   => 'MyEvents::onActivate'
+                'onActivate'   => 'MyEvents::onActivate',
             ],
             ModuleSettingsDataMapper::MAPPING_KEY => [
                 'name' => [
@@ -59,8 +59,8 @@ final class ModuleConfigurationDataMapperTest extends TestCase
                     'value'         => true,
                     'position'      => 4,
                     'constraints'   => [1, 2],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $moduleConfigurationDataMapper = $this->get(ModuleConfigurationDataMapperInterface::class);

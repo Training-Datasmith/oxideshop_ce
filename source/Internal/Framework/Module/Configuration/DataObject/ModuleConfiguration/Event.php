@@ -12,22 +12,16 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Data
 class Event
 {
     public function __construct(
-        private string $action,
-        private string $method
+        private readonly string $action,
+        private readonly string $method
     ) {
     }
 
-    /**
-     * @return string
-     */
     public function getAction(): string
     {
         return $this->action;
     }
 
-    /**
-     * @return string
-     */
     public function getMethod(): string
     {
         return $this->method;

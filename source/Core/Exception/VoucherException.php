@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,17 +23,15 @@ class VoucherException extends \OxidEsales\Eshop\Core\Exception\StandardExceptio
 
     /**
      * Voucher nr. involved in this exception
-     *
-     * @var string
      */
-    private $_sVoucherNr;
+    private ?string $_sVoucherNr = null;
 
     /**
      * Sets the voucher number as a string
      *
      * @param string $sVoucherNr voucher number
      */
-    public function setVoucherNr($sVoucherNr)
+    public function setVoucherNr($sVoucherNr): void
     {
         $this->_sVoucherNr = (string) $sVoucherNr;
     }
@@ -54,7 +54,7 @@ class VoucherException extends \OxidEsales\Eshop\Core\Exception\StandardExceptio
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty Voucher Nr --> " . $this->_sVoucherNr;
+        return self::class . '-' . parent::getString() . ' Faulty Voucher Nr --> ' . $this->_sVoucherNr;
     }
 
     /**

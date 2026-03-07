@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,7 +16,7 @@ use OxidEsales\Eshop\Core\Str;
  */
 class SepaIBANValidator
 {
-    const IBAN_ALGORITHM_MOD_VALUE = 97;
+    public const IBAN_ALGORITHM_MOD_VALUE = 97;
 
     protected $_aCodeLengths = [];
 
@@ -34,7 +36,7 @@ class SepaIBANValidator
         $sIBAN = strtoupper(trim($sIBAN));
 
         if ($this->isLengthValid($sIBAN)) {
-            $blValid = $this->isAlgorithmValid($sIBAN);
+            return $this->isAlgorithmValid($sIBAN);
         }
 
         return $blValid;
@@ -49,30 +51,26 @@ class SepaIBANValidator
      */
     public function isValidCodeLengths($aCodeLengths)
     {
-        $blValid = false;
         if ($this->isNotEmptyArray($aCodeLengths)) {
-            $blValid = $this->isEachCodeLengthValid($aCodeLengths);
+            return $this->isEachCodeLengthValid($aCodeLengths);
         }
 
-        return $blValid;
+        return false;
     }
 
     /**
      * Set IBAN Registry
      *
      * @param array $aCodeLengths
-     *
-     * @return bool
      */
-    public function setCodeLengths($aCodeLengths)
+    public function setCodeLengths($aCodeLengths): bool
     {
         if ($this->isValidCodeLengths($aCodeLengths)) {
             $this->_aCodeLengths = $aCodeLengths;
 
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -85,15 +83,12 @@ class SepaIBANValidator
         return $this->_aCodeLengths;
     }
 
-
     /**
      * Check if the total IBAN length is correct as per country. If not, the IBAN is invalid.
      *
      * @param string $sIBAN IBAN
-     *
-     * @return bool
      */
-    protected function isLengthValid($sIBAN)
+    protected function isLengthValid($sIBAN): bool
     {
         $iActualLength = Str::getStr()->strlen($sIBAN);
 
@@ -102,13 +97,10 @@ class SepaIBANValidator
         return !is_null($iCorrectLength) && $iActualLength === $iCorrectLength;
     }
 
-
     /**
      * Gets length for country.
      *
      * @param string $sIBAN IBAN
-     *
-     * @return null
      */
     protected function getLengthForCountry($sIBAN)
     {
@@ -116,9 +108,7 @@ class SepaIBANValidator
 
         $sCountryCode = Str::getStr()->substr($sIBAN, 0, 2);
 
-        $iCorrectLength = (isset($aIBANRegistry[$sCountryCode])) ? $aIBANRegistry[$sCountryCode] : null;
-
-        return $iCorrectLength;
+        return $aIBANRegistry[$sCountryCode] ?? null;
     }
 
     /**
@@ -141,10 +131,8 @@ class SepaIBANValidator
      * Move the four initial characters to the end of the string.
      *
      * @param string $sIBAN IBAN
-     *
-     * @return string
      */
-    protected function moveInitialCharactersToEnd($sIBAN)
+    protected function moveInitialCharactersToEnd($sIBAN): string
     {
         $oStr = Str::getStr();
 
@@ -158,10 +146,8 @@ class SepaIBANValidator
      * Replace each letter in the string with two digits, thereby expanding the string, where A = 10, B = 11, ..., Z = 35.
      *
      * @param string $sIBAN IBAN
-     *
-     * @return string
      */
-    protected function replaceLettersToNumbers($sIBAN)
+    protected function replaceLettersToNumbers($sIBAN): string
     {
         $aReplaceArray = [
             'A' => 10,
@@ -189,7 +175,7 @@ class SepaIBANValidator
             'W' => 32,
             'X' => 33,
             'Y' => 34,
-            'Z' => 35
+            'Z' => 35,
         ];
 
         return str_replace(
@@ -203,10 +189,8 @@ class SepaIBANValidator
      * Interpret the string as a decimal integer and compute the remainder of that number on division by 97.
      *
      * @param string $sIBAN IBAN
-     *
-     * @return bool
      */
-    protected function isIBANChecksumValid($sIBAN)
+    protected function isIBANChecksumValid($sIBAN): bool
     {
         return (int) bcmod($sIBAN, self::IBAN_ALGORITHM_MOD_VALUE) === 1;
     }
@@ -215,10 +199,8 @@ class SepaIBANValidator
      * Checks if Code length is non empty array
      *
      * @param array $aCodeLengths Code lengths
-     *
-     * @return bool
      */
-    protected function isNotEmptyArray($aCodeLengths)
+    protected function isNotEmptyArray($aCodeLengths): bool
     {
         return is_array($aCodeLengths) && !empty($aCodeLengths);
     }
@@ -251,22 +233,18 @@ class SepaIBANValidator
      * Checks if country code is valid
      *
      * @param string $sCountryAbbr Country abbreviation
-     *
-     * @return bool
      */
-    protected function isCodeLengthKeyValid($sCountryAbbr)
+    protected function isCodeLengthKeyValid($sCountryAbbr): bool
     {
-        return (int) preg_match("/^[A-Z]{2}$/", $sCountryAbbr) !== 0;
+        return (int) preg_match('/^[A-Z]{2}$/', $sCountryAbbr) !== 0;
     }
 
     /**
      * Checks if value is numeric and does not contain whitespaces
      *
      * @param integer $iLength Length
-     *
-     * @return bool
      */
-    protected function isCodeLengthValueValid($iLength)
+    protected function isCodeLengthValueValid($iLength): bool
     {
         return is_numeric($iLength) && (int) preg_match("/\./", $iLength) !== 1;
     }

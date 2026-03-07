@@ -17,7 +17,7 @@ use OxidEsales\Eshop\Core\Config;
  */
 class TemplateFileLocator implements FileLocatorInterface
 {
-    public function __construct(private Config $context)
+    public function __construct(private readonly Config $context)
     {
     }
 

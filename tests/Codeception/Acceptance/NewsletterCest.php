@@ -88,7 +88,6 @@ final class NewsletterCest
         $I->seeInDatabase('oxnewssubscribed', ['OXEMAIL' => $email, 'OXUNSUBSCRIBED !=' => '0000-00-00 00:00:00']);
     }
 
-
     public function subscribeForNewsletterDoubleOptInOff(AcceptanceTester $I): void
     {
         $I->wantToTest('subscribe for newsletter with double-opt-in off');

@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use oxDb;
 
 /**
  * Article amount price list
@@ -26,7 +26,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oArticle = null;
+    protected $_oArticle;
 
     /**
      * Class constructor
@@ -52,7 +52,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article
      */
-    public function setArticle($oArticle)
+    public function setArticle($oArticle): void
     {
         $this->_oArticle = $oArticle;
     }
@@ -62,7 +62,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $article Article
      */
-    public function load($article)
+    public function load($article): void
     {
         $this->setArticle($article);
 
@@ -86,13 +86,13 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
         }
 
         $params = [
-            'oxartid' => $sArticleId
+            'oxartid' => $sArticleId,
         ];
 
         if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blMallInterchangeArticles')) {
             $sShopSelect = '1';
         } else {
-            $sShopSelect = " `oxshopid` = :oxshopid ";
+            $sShopSelect = ' `oxshopid` = :oxshopid ';
             $params['oxshopid'] = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
         }
 

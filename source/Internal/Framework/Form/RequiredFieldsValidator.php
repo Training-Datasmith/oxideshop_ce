@@ -11,13 +11,9 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Form;
 
 class RequiredFieldsValidator implements FormValidatorInterface
 {
-    /**
-     * @var array
-     */
-    private $errors = [];
+    private array $errors = [];
 
     /**
-     * @param FormInterface $form
      * @return bool
      */
     public function isValid(FormInterface $form)
@@ -47,7 +43,7 @@ class RequiredFieldsValidator implements FormValidatorInterface
     /**
      * Add error.
      */
-    private function addError()
+    private function addError(): void
     {
         $this->errors[] = 'ERROR_MESSAGE_INPUT_NOTALLFIELDS';
     }

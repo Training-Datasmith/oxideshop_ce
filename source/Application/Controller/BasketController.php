@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,9 +9,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use Psr\Log\LoggerInterface;
 
@@ -40,14 +42,14 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      *
      * @var object
      */
-    protected $_oBasketArticles = null;
+    protected $_oBasketArticles;
 
     /**
      * Similar List
      *
      * @var object
      */
-    protected $_oSimilarList = null;
+    protected $_oSimilarList;
 
     /**
      * Recomm List
@@ -56,7 +58,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      *
      * @var object
      */
-    protected $_oRecommList = null;
+    protected $_oRecommList;
 
     /**
      * First basket product object. It is used to load
@@ -64,7 +66,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      *
      * @var \OxidEsales\EshopCommunity\Application\Model\Article
      */
-    protected $_oFirstBasketProduct = null;
+    protected $_oFirstBasketProduct;
 
     /**
      * Current view search engine indexing state
@@ -78,14 +80,14 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      *
      * @var \OxidEsales\Eshop\Core\Model\ListModel
      */
-    protected $_oWrappings = null;
+    protected $_oWrappings;
 
     /**
      * Card objects list
      *
      * @var \OxidEsales\Eshop\Core\Model\ListModel
      */
-    protected $_oCards = null;
+    protected $_oCards;
 
     /**
      * Array of id to form recommendation list.
@@ -94,7 +96,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds = null;
+    protected $_aSimilarRecommListIds;
 
     /**
      * Executes parent::render(), creates list with basket articles
@@ -112,7 +114,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
             $session->getBasketReservations()->renewExpiration();
         }
 
-        $this->_aViewData["allowUnevenAmounts"] = $config->getConfigParam('blAllowUnevenAmounts');
+        $this->_aViewData['allowUnevenAmounts'] = $config->getConfigParam('blAllowUnevenAmounts');
 
         parent::render();
 
@@ -212,10 +214,8 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
 
     /**
      * Assigns voucher to current basket
-     *
-     * @return null
      */
-    public function addVoucher()
+    public function addVoucher(): void
     {
         $session = Registry::getSession();
         if (!$session->checkSessionChallenge()) {
@@ -240,10 +240,8 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
 
     /**
      * Removes voucher from basket (calls \OxidEsales\Eshop\Application\Model\Basket::removeVoucher())
-     *
-     * @return null
      */
-    public function removeVoucher()
+    public function removeVoucher(): void
     {
         $session = Registry::getSession();
         if (!$session->checkSessionChallenge()) {
@@ -282,8 +280,6 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
 
     /**
      * Returns a name of the view variable containing the error/exception messages
-     *
-     * @return null
      */
     public function getErrorDestination()
     {
@@ -354,7 +350,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * oBasket::giftmessage, oBasket::chosencard). Then sets
      * basket back to session (\OxidEsales\Eshop\Core\Session::setBasket()).
      */
-    public function changeWrapping()
+    public function changeWrapping(): void
     {
         $session = Registry::getSession();
         if (!$session->checkSessionChallenge()) {
@@ -402,7 +398,6 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     {
         $session = Registry::getSession();
 
-        /** @var \OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator $oBasketContentMarkGenerator */
         return oxNew(BasketContentMarkGenerator::class, $session->getBasket());
     }
 

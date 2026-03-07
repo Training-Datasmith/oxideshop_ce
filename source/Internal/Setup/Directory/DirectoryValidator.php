@@ -94,7 +94,7 @@ class DirectoryValidator implements DirectoryValidatorInterface
 
             foreach ($recursiveIterator as $path => $dir) {
                 if ($dir->isDir()) {
-                    $directories[] = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+                    $directories[] = rtrim((string) $path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
                 }
             }
         }
@@ -107,9 +107,7 @@ class DirectoryValidator implements DirectoryValidatorInterface
         $shopSourcePath = rtrim($this->basicContext->getSourcePath(), DIRECTORY_SEPARATOR) .  DIRECTORY_SEPARATOR;
 
         $directories = array_map(
-            static function ($value) use ($shopSourcePath) {
-                return $shopSourcePath . $value;
-            },
+            static fn (string $value) => $shopSourcePath . $value,
             self::DIRECTORIES_LIST
         );
 

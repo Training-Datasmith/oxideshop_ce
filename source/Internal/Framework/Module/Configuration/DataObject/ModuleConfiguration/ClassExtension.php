@@ -12,22 +12,16 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Data
 class ClassExtension
 {
     public function __construct(
-        private string $ShopClassName,
-        private string $moduleExtensionClassName
+        private readonly string $ShopClassName,
+        private readonly string $moduleExtensionClassName
     ) {
     }
 
-    /**
-     * @return string
-     */
     public function getShopClassName(): string
     {
         return $this->ShopClassName;
     }
 
-    /**
-     * @return string
-     */
     public function getModuleExtensionClassName(): string
     {
         return $this->moduleExtensionClassName;

@@ -23,9 +23,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class ContainerFactory implements ContainerProviderInterface
 {
-    private static $instance;
+    private static ?\OxidEsales\EshopCommunity\Internal\Container\ContainerFactory $instance = null;
     private ContainerInterface $symfonyContainer;
-    private ContainerCacheInterface $cache;
+    private readonly ContainerCacheInterface $cache;
     private static ?int $shopId;
 
     /**
@@ -45,7 +45,7 @@ class ContainerFactory implements ContainerProviderInterface
     {
         $customContainerProvider = getenv('OXID_CONTAINER_PROVIDER');
         if ($customContainerProvider) {
-           return $customContainerProvider::get();
+            return $customContainerProvider::get();
         }
 
         if (!isset($this->symfonyContainer)) {

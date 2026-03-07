@@ -12,22 +12,16 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Data
 class Controller
 {
     public function __construct(
-        private string $id,
-        private string $controllerClassNameSpace
+        private readonly string $id,
+        private readonly string $controllerClassNameSpace
     ) {
     }
 
-    /**
-     * @return string
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getControllerClassNameSpace(): string
     {
         return $this->controllerClassNameSpace;

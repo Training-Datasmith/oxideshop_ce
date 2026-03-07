@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,7 +27,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         ['oxtitle', 'oxcategories', 1, 1, 0],
         ['oxdesc', 'oxcategories', 1, 1, 0],
         ['oxid', 'oxcategories', 0, 0, 0],
-        ['oxid', 'oxcategories', 0, 0, 1]
+        ['oxid', 'oxcategories', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxtitle', 'oxcategories', 1, 1, 0],
@@ -33,7 +35,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                                      ['oxid', 'oxcategories', 0, 0, 0],
                                      ['oxid', 'oxobject2category', 0, 0, 1],
                                      ['oxtime', 'oxobject2category', 0, 0, 1],
-                                     ['oxid', 'oxcategories', 0, 0, 1]
+                                     ['oxid', 'oxcategories', 0, 0, 1],
                                  ],
     ];
 
@@ -53,19 +55,17 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
 
         if ($oxId) {
             // all categories article is in
-            $query = " from $objectToCategoryView left join $categoriesTable"
+            return " from $objectToCategoryView left join $categoriesTable"
                 . " on $categoriesTable.oxid=$objectToCategoryView.oxcatnid "
                 . " where $objectToCategoryView.oxobjectid = " . $database->quote($oxId)
                 . " and $categoriesTable.oxid is not null ";
-        } else {
-            $query = " from $categoriesTable where $categoriesTable.oxid not in ( "
-                . " select $categoriesTable.oxid from $objectToCategoryView "
-                . "left join $categoriesTable on $categoriesTable.oxid=$objectToCategoryView.oxcatnid "
-                . " where $objectToCategoryView.oxobjectid = " . $database->quote($synchOxid)
-                . " and $categoriesTable.oxid is not null ) and $categoriesTable.oxpriceto = '0'";
         }
 
-        return $query;
+        return " from $categoriesTable where $categoriesTable.oxid not in ( "
+            . " select $categoriesTable.oxid from $objectToCategoryView "
+            . "left join $categoriesTable on $categoriesTable.oxid=$objectToCategoryView.oxcatnid "
+            . " where $objectToCategoryView.oxobjectid = " . $database->quote($synchOxid)
+            . " and $categoriesTable.oxid is not null ) and $categoriesTable.oxpriceto = '0'";
     }
 
     /**
@@ -110,7 +110,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Removes article from chosen category
      */
-    public function removeCat()
+    public function removeCat(): void
     {
         $categoriesToRemove = $this->getActionIds('oxcategories.oxid');
 
@@ -127,13 +127,13 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
 
         // removing all
         if (is_array($categoriesToRemove) && count($categoriesToRemove)) {
-            $query = "delete from oxobject2category where oxobject2category.oxobjectid = :oxobjectid and ";
+            $query = 'delete from oxobject2category where oxobject2category.oxobjectid = :oxobjectid and ';
             $query = $this->updateQueryForRemovingArticleFromCategory($query);
-            $query .= " oxcatnid in ("
+            $query .= ' oxcatnid in ('
                 . implode(', ', DatabaseProvider::getDb()->quoteArray($categoriesToRemove))
                 . ')';
             $dataBase->Execute($query, [
-                'oxobjectid' => $oxId
+                'oxobjectid' => $oxId,
             ]);
 
             // updating oxtime values
@@ -151,7 +151,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      *
      * @throws Exception
      */
-    public function addCat()
+    public function addCat(): void
     {
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
         $categoriesToAdd = $this->getActionIds('oxcategories.oxid');
@@ -174,9 +174,9 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
 
             foreach ($categoriesToAdd as $sAdd) {
                 // check, if it's already in, then don't add it again
-                $sSelect = "select 1 from " . $objectToCategoryView . " as oxobject2category " .
-                    "where oxobject2category.oxcatnid = :oxcatnid " .
-                    "and oxobject2category.oxobjectid = :oxobjectid";
+                $sSelect = 'select 1 from ' . $objectToCategoryView . ' as oxobject2category ' .
+                    'where oxobject2category.oxcatnid = :oxcatnid ' .
+                    'and oxobject2category.oxobjectid = :oxobjectid';
                 if ($database->getOne($sSelect, ['oxcatnid' => $sAdd, 'oxobjectid' => $oxId])) {
                     continue;
                 }
@@ -221,10 +221,10 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Sets selected category as a default
      */
-    public function setAsDefault()
+    public function setAsDefault(): void
     {
-        $defCat = Registry::getRequest()->getRequestEscapedParameter("defcat");
-        $oxId = Registry::getRequest()->getRequestEscapedParameter("oxid");
+        $defCat = Registry::getRequest()->getRequestEscapedParameter('defcat');
+        $oxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         $queryToEmbed = $this->formQueryToEmbedForSettingCategoryAsDefault();
 
@@ -237,7 +237,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                   where oxobjectid = :oxobjectid and oxcatnid = :oxcatnid {$queryToEmbed}";
         DatabaseProvider::getInstance()->getDb()->execute($query, [
             'oxobjectid' => $oxId,
-            'oxcatnid' => $defCat
+            'oxcatnid' => $defCat,
         ]);
 
         // #0003366: invalidate article SEO for all shops

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -14,10 +16,12 @@ use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BasketChangedEvent;
-use Psr\Log\LoggerInterface;
-use stdClass;
 
 use function oxNew;
+
+use Psr\Log\LoggerInterface;
+
+use stdClass;
 
 /**
  * Main shopping basket manager. Arranges shopping basket
@@ -39,7 +43,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @var string
      */
-    protected $_sLastCallFnc = null;
+    protected $_sLastCallFnc;
 
     protected bool $isBasketCalculated = false;
 
@@ -60,11 +64,11 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         'searchmanufacturer', // search manufacturer
         // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
         'searchrecomm', // search recomendation
-        'recommid' // recomm. list id
+        'recommid', // recomm. list id
         // END deprecated
     ];
 
-    public function init()
+    public function init(): void
     {
         if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
             $basketReservations = Registry::getSession()->getBasketReservations();
@@ -233,8 +237,8 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
             }
         }
 
-        $amount = $amount ?? Registry::getRequest()->getRequestEscapedParameter('am');
-        $sel = $sel ?? Registry::getRequest()->getRequestEscapedParameter('sel');
+        $amount ??= Registry::getRequest()->getRequestEscapedParameter('am');
+        $sel ??= Registry::getRequest()->getRequestEscapedParameter('sel');
         $persParam = $persParam ?: Registry::getRequest()->getRequestEscapedParameter('persparam');
 
         if ($products = $this->getItems($productId, $amount, $sel, $persParam, $override)) {
@@ -249,7 +253,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
                 if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
                     Registry::getSession()->getBasketReservations()->reserveBasket($basket);
                 }
-            } catch (NoArticleException $exception) {
+            } catch (NoArticleException) {
                 return $this->getRedirectUrl();
             } catch (\Exception $exception) {
                 $database->rollbackTransaction();
@@ -283,7 +287,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         // special treatment
         // search param
         if ($sParam = Registry::getRequest()->getRequestParameter('searchparam')) {
-            $sPosition .= 'searchparam=' . rawurlencode($sParam) . '&';
+            $sPosition .= 'searchparam=' . rawurlencode((string) $sParam) . '&';
         }
 
         // current page number
@@ -341,13 +345,13 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $aProducts = Registry::getRequest()->getRequestEscapedParameter('aproducts');
 
         // collecting specified item
-        $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
+        $sProductId = $sProductId ?: Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sProductId) {
             // additionally fetching current product info
-            $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
+            $dAmount ??= Registry::getRequest()->getRequestEscapedParameter('am');
 
             // select lists
-            $aSel = isset($aSel) ? $aSel : Registry::getRequest()->getRequestEscapedParameter('sel');
+            $aSel ??= Registry::getRequest()->getRequestEscapedParameter('sel');
 
             // persistent parameters
             if (empty($aPersParam)) {
@@ -361,7 +365,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
                 'sel'          => $aSel,
                 'persparam'    => $aPersParam,
                 'override'     => $blOverride,
-                'basketitemid' => $sBasketItemId
+                'basketitemid' => $sBasketItemId,
             ];
         }
 
@@ -520,14 +524,13 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         ContainerFacade::dispatch(new BasketChangedEvent($this));
 
         // redirect to basket
-        if (Registry::getRequest()->getRequestEscapedParameter("tobasket")) {
-            return "basket";
-        } else {
-            // clear basket
-            $session = Registry::getSession();
-            $session->getBasket()->deleteBasket();
-            $this->getParent()->setRootCatChanged(false);
+        if (Registry::getRequest()->getRequestEscapedParameter('tobasket')) {
+            return 'basket';
         }
+        // clear basket
+        $session = Registry::getSession();
+        $session->getBasket()->deleteBasket();
+        $this->getParent()->setRootCatChanged(false);
     }
 
     /**
@@ -552,14 +555,14 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     {
         $return = [];
 
-        $return['id'] = isset($productInfo['aid']) ? $productInfo['aid'] : $addProductId;
-        $return['amount'] = isset($productInfo['am']) ? $productInfo['am'] : 0;
-        $return['selectList'] = isset($productInfo['sel']) ? $productInfo['sel'] : null;
+        $return['id'] = $productInfo['aid'] ?? $addProductId;
+        $return['amount'] = $productInfo['am'] ?? 0;
+        $return['selectList'] = $productInfo['sel'] ?? null;
 
         $return['persistentParameters'] = $this->getPersistedParameters($productInfo['persparam'] ?? null);
-        $return['override'] = isset($productInfo['override']) ? $productInfo['override'] : null;
+        $return['override'] = $productInfo['override'] ?? null;
         $return['bundle'] = isset($productInfo['bundle']) ? true : false;
-        $return['oldBasketItemId'] = isset($productInfo['basketitemid']) ? $productInfo['basketitemid'] : null;
+        $return['oldBasketItemId'] = $productInfo['basketitemid'] ?? null;
 
         return $return;
     }
@@ -598,7 +601,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
             //add to display at specific position
             $exception->setDestination($errorDestination);
             Registry::getUtilsView()->addErrorToDisplay($exception, false, (bool) $errorDestination, $errorDestination);
-        } catch (NoArticleException $exception) {
+        } catch (NoArticleException) {
             //ignored, best solution F ?
         }
 

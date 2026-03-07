@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -45,11 +47,11 @@ class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleL
     {
         oxAdminList::render();
 
-        $this->_aViewData["menustructure"] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
+        $this->_aViewData['menustructure'] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $this->_aViewData["articleListTable"] = $tableViewNameGenerator->getViewName('oxarticles');
+        $this->_aViewData['articleListTable'] = $tableViewNameGenerator->getViewName('oxarticles');
 
-        return "list_review";
+        return 'list_review';
     }
 
     /**
@@ -70,10 +72,9 @@ class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleL
         $sQ .= "left join $sArtTable as oxparentarticles on oxparentarticles.oxid = {$sArtTable}.oxparentid ";
         $sQ .= "where 1 and oxreviews.oxlang = '{$this->_iEditLang}' ";
 
-
         //removing parent id checking from sql
         $sStr = "/\s+and\s+" . $sArtTable . "\.oxparentid\s*=\s*''/";
-        $sQ = Str::getStr()->preg_replace($sStr, " ", $sQ);
+        $sQ = Str::getStr()->preg_replace($sStr, ' ', $sQ);
 
         return " $sQ and {$sArtTable}.oxid is not null ";
     }

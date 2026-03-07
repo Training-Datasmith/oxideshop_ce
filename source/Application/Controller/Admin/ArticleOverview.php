@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -27,7 +29,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $this->_aViewData['edit'] = $product = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
 
         $productEditId = $this->getEditObjectId();
-        if (isset($productEditId) && $productEditId != "-1") {
+        if (isset($productEditId) && $productEditId != '-1') {
             $database = $this->getDatabase();
 
             $this->updateArticle($product, $productEditId);
@@ -35,21 +37,21 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             $shopId = $config->getShopID();
 
             $query = $this->formOrderAmountQuery($productEditId);
-            $this->_aViewData["totalordercnt"] = $iTotalOrderCnt = (float) $database->getOne($query);
+            $this->_aViewData['totalordercnt'] = $iTotalOrderCnt = (float) $database->getOne($query);
 
             $query = $this->formSoldOutAmountQuery($productEditId);
-            $this->_aViewData["soldcnt"] = $iSoldCnt = (float) $database->getOne($query);
+            $this->_aViewData['soldcnt'] = $iSoldCnt = (float) $database->getOne($query);
 
             $query = $this->formCanceledAmountQuery($productEditId);
-            $this->_aViewData["canceledcnt"] = $iCanceledCnt = (float) $database->getOne($query);
+            $this->_aViewData['canceledcnt'] = $iCanceledCnt = (float) $database->getOne($query);
 
-            $this->_aViewData["leftordercnt"] = $iTotalOrderCnt - $iSoldCnt - $iCanceledCnt;
+            $this->_aViewData['leftordercnt'] = $iTotalOrderCnt - $iSoldCnt - $iCanceledCnt;
 
-            $query = "select oxartid,sum(oxamount) as cnt from oxorderarticles " .
-                       "where oxordershopid = :oxordershopid group by oxartid order by cnt desc";
+            $query = 'select oxartid,sum(oxamount) as cnt from oxorderarticles ' .
+                       'where oxordershopid = :oxordershopid group by oxartid order by cnt desc';
 
             $productIds = $database->getCol($query, [
-                'oxordershopid' => $shopId
+                'oxordershopid' => $shopId,
             ]);
             $topPosition = 0;
             $position = 0;
@@ -61,14 +63,14 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
                 }
             }
 
-            $this->_aViewData["postopten"] = $topPosition;
-            $this->_aViewData["toptentotal"] = $position;
+            $this->_aViewData['postopten'] = $topPosition;
+            $this->_aViewData['toptentotal'] = $position;
         }
 
-        $this->_aViewData["afolder"] = $config->getConfigParam('aProductfolder');
-        $this->_aViewData["aSubclass"] = $config->getConfigParam('aArticleClasses');
+        $this->_aViewData['afolder'] = $config->getConfigParam('aProductfolder');
+        $this->_aViewData['aSubclass'] = $config->getConfigParam('aArticleClasses');
 
-        return "article_overview";
+        return 'article_overview';
     }
 
     /**
@@ -88,10 +90,9 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     protected function formOrderAmountQuery($oxId)
     {
-        $query = "select sum(oxamount) from oxorderarticles ";
-        $query .= "where oxartid=" . $this->getDatabase()->quote($oxId);
+        $query = 'select sum(oxamount) from oxorderarticles ';
 
-        return $query;
+        return $query . ('where oxartid=' . $this->getDatabase()->quote($oxId));
     }
 
     /**
@@ -103,10 +104,10 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     protected function formSoldOutAmountQuery($oxId)
     {
-        return "select sum(oxorderarticles.oxamount) from  oxorderarticles, oxorder " .
+        return 'select sum(oxorderarticles.oxamount) from  oxorderarticles, oxorder ' .
             "where (oxorder.oxpaid>0 or oxorder.oxsenddate > 0) and oxorderarticles.oxstorno != '1' " .
-            "and oxorderarticles.oxartid=" . $this->getDatabase()->quote($oxId) .
-            "and oxorder.oxid =oxorderarticles.oxorderid";
+            'and oxorderarticles.oxartid=' . $this->getDatabase()->quote($oxId) .
+            'and oxorder.oxid =oxorderarticles.oxorderid';
     }
 
     /**
@@ -119,7 +120,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     protected function formCanceledAmountQuery($soxId)
     {
         return "select sum(oxamount) from oxorderarticles where oxstorno = '1' " .
-            "and oxartid=" . $this->getDatabase()->quote($soxId);
+            'and oxartid=' . $this->getDatabase()->quote($soxId);
     }
 
     /**
@@ -132,7 +133,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     protected function updateArticle($article, $oxId)
     {
-        $article->loadInLang(Registry::getRequest()->getRequestEscapedParameter("editlanguage"), $oxId);
+        $article->loadInLang(Registry::getRequest()->getRequestEscapedParameter('editlanguage'), $oxId);
 
         return $article;
     }

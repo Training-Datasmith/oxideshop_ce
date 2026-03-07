@@ -248,7 +248,7 @@ final class SessionTest extends TestCase
         $this->setParameter('oxid_esales.session_init_params', [
             'cl' => [
                 'abc' => true,
-            ]
+            ],
         ]);
 
         $_GET['cl'] = 'abc';
@@ -263,7 +263,7 @@ final class SessionTest extends TestCase
             'cl' => [
                 'abc' => true,
                 'register' => false,
-            ]
+            ],
         ]);
 
         $_GET['cl'] = 'register';

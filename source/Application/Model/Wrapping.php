@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,8 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxRegistry;
-use oxDb;
 
 /**
  * Wrapping manager.
@@ -29,7 +29,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice = null;
+    protected $_oPrice;
 
     /**
      * Wrapping Vat
@@ -63,7 +63,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param double $dVat vat
      */
-    public function setWrappingVat($dVat)
+    public function setWrappingVat($dVat): void
     {
         $this->_dVat = $dVat;
     }
@@ -73,7 +73,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param bool $blOnTop wrapping vat config
      */
-    public function setWrappingVatOnTop($blOnTop)
+    public function setWrappingVatOnTop($blOnTop): void
     {
         $this->_blWrappingVatOnTop = $blOnTop;
     }
@@ -123,7 +123,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
               and $sWrappingViewName.oxtype = :oxtype";
         $oEntries->selectString($sSelect, [
             'oxactive' => '1',
-            'oxtype' => $sWrapType
+            'oxtype' => $sWrapType,
         ]);
 
         return $oEntries;
@@ -147,7 +147,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
 
         return (int) $oDb->getOne($sQ, [
             'oxactive' => '1',
-            'oxtype' => $sWrapType
+            'oxtype' => $sWrapType,
         ]);
     }
 
@@ -161,7 +161,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $blResult = (bool) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowNetPrice');
         $oUser = $this->getUser();
         if ($oUser) {
-            $blResult = $oUser->isPriceViewModeNetto();
+            return $oUser->isPriceViewModeNetto();
         }
 
         return $blResult;
@@ -189,12 +189,10 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function getPrice()
     {
         if ($this->isPriceViewModeNetto()) {
-            $dPrice = $this->getWrappingPrice()->getNettoPrice();
-        } else {
-            $dPrice = $this->getWrappingPrice()->getBruttoPrice();
+            return $this->getWrappingPrice()->getNettoPrice();
         }
 
-        return $dPrice;
+        return $this->getWrappingPrice()->getBruttoPrice();
     }
 
     /**
@@ -215,7 +213,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function getPictureUrl()
     {
         if ($this->oxwrapping__oxpic->value) {
-            return \OxidEsales\Eshop\Core\Registry::getConfig()->getPictureUrl("master/wrapping/" . $this->oxwrapping__oxpic->value, false, \OxidEsales\Eshop\Core\Registry::getConfig()->isSsl(), null, $this->oxwrapping__oxshopid->value);
+            return \OxidEsales\Eshop\Core\Registry::getConfig()->getPictureUrl('master/wrapping/' . $this->oxwrapping__oxpic->value, false, \OxidEsales\Eshop\Core\Registry::getConfig()->isSsl(), null, $this->oxwrapping__oxshopid->value);
         }
     }
 }

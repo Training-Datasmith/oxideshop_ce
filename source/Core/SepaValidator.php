@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -79,7 +81,7 @@ class SepaValidator
         'TR' => 26,
         'AE' => 23,
         'GB' => 22,
-        'VG' => 24
+        'VG' => 24,
     ];
 
     /**

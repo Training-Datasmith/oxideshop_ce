@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,13 +9,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsObject;
-use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use Psr\Log\LoggerInterface;
 
@@ -28,70 +30,70 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      *
      * @var object
      */
-    protected $_oPayment = null;
+    protected $_oPayment;
 
     /**
      * Active basket
      *
      * @var \OxidEsales\Eshop\Application\Model\Basket
      */
-    protected $_oBasket = null;
+    protected $_oBasket;
 
     /**
      * Order user remark
      *
      * @var string
      */
-    protected $_sOrderRemark = null;
+    protected $_sOrderRemark;
 
     /**
      * Basket articlelist
      *
      * @var object
      */
-    protected $_oBasketArtList = null;
+    protected $_oBasketArtList;
 
     /**
      * Remote Address
      *
      * @var string
      */
-    protected $_sRemoteAddress = null;
+    protected $_sRemoteAddress;
 
     /**
      * Delivery address
      *
      * @var \OxidEsales\Eshop\Application\Model\Address
      */
-    protected $_oDelAddress = null;
+    protected $_oDelAddress;
 
     /**
      * Shipping set
      *
      * @var object
      */
-    protected $_oShipSet = null;
+    protected $_oShipSet;
 
     /**
      * Config option "blConfirmAGB"
      *
      * @var bool
      */
-    protected $_blConfirmAGB = null;
+    protected $_blConfirmAGB;
 
     /**
      * Config option "blShowOrderButtonOnTop"
      *
      * @var bool
      */
-    protected $_blShowOrderButtonOnTop = null;
+    protected $_blShowOrderButtonOnTop;
 
     /**
      * Boolean of option "blConfirmAGB" error
      *
      * @var bool
      */
-    protected $_blConfirmAGBError = null;
+    protected $_blConfirmAGBError;
 
     /**
      * Current class template name.
@@ -110,14 +112,14 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     /**
      * Count of wrapping + cards options
      */
-    protected $_iWrapCnt = null;
+    protected $_iWrapCnt;
 
     /**
      * Loads basket \OxidEsales\Eshop\Core\Session::getBasket(), sets $this->oBasket->blCalcNeeded = true to
      * recalculate, sets back basket to session \OxidEsales\Eshop\Core\Session::setBasket(), executes
      * parent::init().
      */
-    public function init()
+    public function init(): void
     {
         // disabling performance control variable
         Registry::getConfig()->setConfigParam('bl_perfCalcVatOnlyForBasketOrder', false);
@@ -174,7 +176,7 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
 
         try {
             $this->_aViewData['basketSummaryHash'] = $this->getBasketSummaryHash();
-        } catch (NoArticleException $exception) {
+        } catch (NoArticleException) {
             Registry::getUtils()->redirect(
                 Registry::getConfig()->getShopHomeUrl() . 'cl=basket',
                 false,
@@ -247,7 +249,7 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
         } catch (OutOfStockException $exception) {
             $exception->setDestination('basket');
             Registry::getUtilsView()->addErrorToDisplay($exception, false, true, 'basket');
-        } catch (NoArticleException $exception) {
+        } catch (NoArticleException) {
             return 'basket';
         } catch (ArticleInputException $exception) {
             Registry::getUtilsView()->addErrorToDisplay($exception);
@@ -541,7 +543,8 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
                 Registry::getSession()->setVariable('payerror', 2);
                 $sNextStep = 'payment?payerror=2';
                 break;
-            case ($iSuccess === Order::ORDER_STATE_ORDEREXISTS):
+            case $iSuccess === Order::ORDER_STATE_ORDEREXISTS:
+            default:
                 break; // reload blocker activ
             case (is_numeric($iSuccess) && $iSuccess > 3):
                 Registry::getSession()->setVariable('payerror', $iSuccess);
@@ -552,8 +555,6 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
                 Registry::getSession()->setVariable('payerror', -1);
                 $iSuccess = urlencode($iSuccess);
                 $sNextStep = 'payment?payerror=-1&payerrortext=' . $iSuccess;
-                break;
-            default:
                 break;
         }
 

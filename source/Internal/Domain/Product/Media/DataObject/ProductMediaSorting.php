@@ -12,7 +12,7 @@ namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject;
 use ArrayIterator;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
 
-readonly class ProductMediaSorting
+readonly class ProductMediaSorting implements \Stringable
 {
     private ArrayIterator $sorting;
 

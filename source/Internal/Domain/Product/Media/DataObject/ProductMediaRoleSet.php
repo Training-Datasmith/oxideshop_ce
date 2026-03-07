@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\Collection;
 
 class ProductMediaRoleSet
 {
-    private Collection $roles;
+    private readonly Collection $roles;
 
     public function __construct(ProductMediaRole ...$roles)
     {

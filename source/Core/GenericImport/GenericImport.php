@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,8 +17,8 @@ use OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject;
  */
 class GenericImport
 {
-    const ERROR_USER_NO_RIGHTS = 'Not sufficient rights to perform operation!';
-    const ERROR_NO_INIT = 'Init not executed, Access denied!';
+    public const ERROR_USER_NO_RIGHTS = 'Not sufficient rights to perform operation!';
+    public const ERROR_NO_INIT = 'Init not executed, Access denied!';
 
     /** @var array Import objects types. */
     protected $objects = [
@@ -36,7 +38,7 @@ class GenericImport
     ];
 
     /** @var string Imported data array. */
-    protected $importType = null;
+    protected $importType;
 
     /** @var array Imported id array */
     protected $importedIds = [];
@@ -51,7 +53,7 @@ class GenericImport
     protected $defaultStringEncloser = '"';
 
     /** @var bool CSV file contains header or not. */
-    protected $csvContainsHeader = null;
+    protected $csvContainsHeader;
 
     /** @var string Import file location. */
     protected $importFilePath;
@@ -60,7 +62,7 @@ class GenericImport
     protected $isInitialized = false;
 
     /** @var int */
-    protected $userId = null;
+    protected $userId;
 
     /** @var array */
     protected $statistics = [];
@@ -114,7 +116,7 @@ class GenericImport
         try {
             $importType = $this->getImportType();
             $result = $this->createImportObject($importType);
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
 
         return $result;
@@ -125,7 +127,7 @@ class GenericImport
      *
      * @param string $type Import type prefix.
      */
-    public function setImportType($type)
+    public function setImportType($type): void
     {
         $this->importType = $type;
     }
@@ -135,7 +137,7 @@ class GenericImport
      *
      * @param array $csvFields CSV fields.
      */
-    public function setCsvFileFieldsOrder($csvFields)
+    public function setCsvFileFieldsOrder($csvFields): void
     {
         $this->csvFileFieldsOrder = $csvFields;
     }
@@ -145,7 +147,7 @@ class GenericImport
      *
      * @param bool $csvContainsHeader Whether imported file has a header row.
      */
-    public function setCsvContainsHeader($csvContainsHeader)
+    public function setCsvContainsHeader($csvContainsHeader): void
     {
         $this->csvContainsHeader = $csvContainsHeader;
     }
@@ -153,10 +155,8 @@ class GenericImport
      * Main import method, whole import of all types via a given csv file is done here.
      *
      * @param string $importFilePath Full path of the CSV file.
-     *
-     * @return string
      */
-    public function importFile($importFilePath = null)
+    public function importFile($importFilePath = null): string
     {
         $this->returnMessage = '';
         $this->importFilePath = $importFilePath;
@@ -199,7 +199,7 @@ class GenericImport
      *
      * @param array $data
      */
-    public function importData($data)
+    public function importData($data): void
     {
         foreach ($data as $key => $row) {
             if ($row) {
@@ -233,17 +233,15 @@ class GenericImport
      *
      * @return int $_iImportedRowCount
      */
-    public function getImportedRowCount()
+    public function getImportedRowCount(): int
     {
         return count($this->importedIds);
     }
 
     /**
      * Returns allowed for import objects list.
-     *
-     * @return array
      */
-    public function getImportObjectsList()
+    public function getImportObjectsList(): array
     {
         $importObjects = [];
         foreach ($this->objects as $sKey => $importType) {
@@ -263,10 +261,8 @@ class GenericImport
      * of r=>(bool)result, m=>(string)error message
      *
      * @param array $data
-     *
-     * @return bool
      */
-    protected function importOne($data)
+    protected function importOne($data): bool
     {
         $type = $this->getImportType();
         $importObject = $this->createImportObject($type);
@@ -286,17 +282,15 @@ class GenericImport
      * Performs after import actions.
      * If any error occurred during import tries to run import again and marks retried as true.
      * If after running import second time all of the records failed, stops.
-     *
-     * @param array $data
      */
-    protected function afterImport($data)
+    protected function afterImport(array $data)
     {
         $statistics = $this->getStatistics();
 
         $dataForRetry = [];
         foreach ($statistics as $key => $value) {
             if ($value['r'] == false) {
-                $this->returnMessage .= "File[" . $this->importFilePath . "] - dataset number: $key - Error: " . $value['m'] . " ---<br> " . PHP_EOL;
+                $this->returnMessage .= 'File[' . $this->importFilePath . "] - dataset number: $key - Error: " . $value['m'] . ' ---<br> ' . PHP_EOL;
                 $dataForRetry[$key] = $data[$key];
             }
         }
@@ -321,9 +315,8 @@ class GenericImport
 
         if (strlen($type) != 1 || !array_key_exists($type, $this->objects)) {
             throw new Exception('Error unknown command: ' . $type);
-        } else {
-            return $this->objects[$type];
         }
+        return $this->objects[$type];
     }
 
     /** Adds true to $_aImportedIds where key is given.
@@ -344,14 +337,14 @@ class GenericImport
      *
      * @return array assoc. indices
      */
-    protected function mapFields($data)
+    protected function mapFields(array $data): array
     {
         $result = [];
         $index = 0;
 
         foreach ($this->csvFileFieldsOrder as $value) {
             if (!empty($value)) {
-                if (strtolower($data[$index]) == 'null') {
+                if (strtolower((string) $data[$index]) == 'null') {
                     $result[$value] = null;
                 } else {
                     $result[$value] = $data[$index];
@@ -371,18 +364,16 @@ class GenericImport
      *
      * @return string
      */
-    protected function csvTextConvert($text, $mode)
+    protected function csvTextConvert($text, $mode): string|array
     {
         $search = [chr(13), chr(10), '\'', '"'];
         $replace = ['&#13;', '&#10;', '&#39;', '&#34;'];
 
         if ($mode) {
-            $text = str_replace($search, $replace, $text);
-        } else {
-            $text = str_replace($replace, $search, $text);
+            return str_replace($search, $replace, $text);
         }
 
-        return $text;
+        return str_replace($replace, $search, $text);
     }
 
     /**
@@ -400,7 +391,7 @@ class GenericImport
             $fieldTerminator = $config->getConfigParam('sCSVSign');
         }
         if (!$fieldTerminator) {
-            $fieldTerminator = $this->defaultStringTerminator;
+            return $this->defaultStringTerminator;
         }
 
         return $fieldTerminator;
@@ -444,9 +435,9 @@ class GenericImport
      *
      * @return ImportObject
      */
-    protected function createImportObject($type)
+    protected function createImportObject(string $type)
     {
-        $className = __NAMESPACE__ . "\\ImportObject\\" . $type;
+        $className = __NAMESPACE__ . '\\ImportObject\\' . $type;
 
         return oxNew($className);
     }

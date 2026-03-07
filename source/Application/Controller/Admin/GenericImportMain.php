@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,42 +23,42 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @var string
      */
-    public $sClassDo = "genImport_do";
+    public $sClassDo = 'genImport_do';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "genImport_main";
+    public $sClassMain = 'genImport_main';
 
     /**
      * Csv file path
      *
      * @var string
      */
-    protected $_sCsvFilePath = null;
+    protected $_sCsvFilePath;
 
     /**
      * Csv file field terminator
      *
      * @var string
      */
-    protected $_sStringTerminator = null;
+    protected $_sStringTerminator;
 
     /**
      * Csv file field encloser
      *
      * @var string
      */
-    protected $_sStringEncloser = null;
+    protected $_sStringEncloser;
 
     /**
      * Default Csv file field terminator
      *
      * @var string
      */
-    protected $_sDefaultStringTerminator = ";";
+    protected $_sDefaultStringTerminator = ';';
 
     /**
      * Default Csv file field encloser
@@ -70,7 +72,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @var string
      */
-    protected $_sThisTemplate = "genimport_main";
+    protected $_sThisTemplate = 'genimport_main';
 
     /** @inheritdoc */
     public function render()
@@ -210,7 +212,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $iMaxLineLength = 8192;
 
         //getting first row
-        if (($rFile = @fopen($sPath, "r")) !== false) {
+        if (($rFile = @fopen($sPath, 'r')) !== false) {
             $aRow = fgetcsv($rFile, $iMaxLineLength, $this->getCsvFieldsTerminator(), $this->getCsvFieldsEncolser());
             fclose($rFile);
         }
@@ -286,7 +288,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
         if (isset($upload['name']) && $upload['name']) {
             $this->_sCsvFilePath = Path::join(
                 ContainerFacade::getParameter('oxid_esales.build_directory'),
-                basename($upload['tmp_name'])
+                basename((string) $upload['tmp_name'])
             );
             move_uploaded_file($upload['tmp_name'], $this->_sCsvFilePath);
             Registry::getSession()->setVariable('sCsvFilePath', $this->_sCsvFilePath);
@@ -348,11 +350,11 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
     /**
      * @param string $invalidData
      */
-    private function setErrorToView($invalidData)
+    private function setErrorToView($invalidData): void
     {
         $error = oxNew(\OxidEsales\Eshop\Core\DisplayError::class);
         $error->setFormatParameters(htmlspecialchars($invalidData));
-        $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
+        $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
         Registry::getUtilsView()->addErrorToDisplay($error);
     }
 }

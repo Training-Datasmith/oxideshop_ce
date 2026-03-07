@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,8 +18,6 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
 {
     /**
      * Updating showsuffix field
-     *
-     * @return null
      */
     public function save()
     {

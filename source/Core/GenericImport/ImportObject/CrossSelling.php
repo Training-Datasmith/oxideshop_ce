@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,6 +20,6 @@ class CrossSelling extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\Imp
     /** @var array List of database key fields (i.e. oxid). */
     protected $keyFieldList = [
         'OXARTICLENID' => 'OXARTICLENID',
-        'OXOBJECTID'   => 'OXOBJECTID'
+        'OXOBJECTID'   => 'OXOBJECTID',
     ];
 }

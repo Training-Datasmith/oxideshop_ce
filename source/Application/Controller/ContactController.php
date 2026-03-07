@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -10,8 +12,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Form\FormField;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Form\FormField;
 
 /**
  * Contact window.
@@ -27,28 +29,28 @@ class ContactController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var array
      */
-    protected $_aUserData = null;
+    protected $_aUserData;
 
     /**
      * Entered contact subject.
      *
      * @var string
      */
-    protected $_sContactSubject = null;
+    protected $_sContactSubject;
 
     /**
      * Entered conatct message.
      *
      * @var string
      */
-    protected $_sContactMessage = null;
+    protected $_sContactMessage;
 
     /**
      * Contact email send status.
      *
      * @var null|int
      */
-    protected $_blContactSendStatus = null;
+    protected $_blContactSendStatus;
 
     /**
      * Current class template name.
@@ -181,7 +183,7 @@ class ContactController extends \OxidEsales\Eshop\Application\Controller\Fronten
             [
                 'title' => $title,
                 'link'  => $this->getLink(),
-            ]
+            ],
         ];
     }
 
@@ -195,10 +197,7 @@ class ContactController extends \OxidEsales\Eshop\Application\Controller\Fronten
         return \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveShop()->oxshops__oxcompany->value;
     }
 
-    /**
-     * @return array
-     */
-    private function getMappedContactFormRequest()
+    private function getMappedContactFormRequest(): array
     {
         $request = Registry::getRequest();
         $personData = $request->getRequestEscapedParameter('editval');
@@ -220,7 +219,7 @@ class ContactController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * @param string $subject
      * @param string $message
      */
-    private function sendContactMail($email, $subject, $message)
+    private function sendContactMail($email, $subject, $message): void
     {
         $mailer = oxNew(Email::class);
 

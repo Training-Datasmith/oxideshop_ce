@@ -34,7 +34,7 @@ final class RemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK'  => 5
+                'OXSTOCK'  => 5,
             ]
         );
         $orders = $adminPanel->openOrders();
@@ -47,7 +47,7 @@ final class RemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK' => 6
+                'OXSTOCK' => 6,
             ]
         );
     }
@@ -62,7 +62,7 @@ final class RemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK'  => 5
+                'OXSTOCK'  => 5,
             ]
         );
         $orders = $adminPanel->openOrders();
@@ -75,11 +75,10 @@ final class RemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK'  => 6
+                'OXSTOCK'  => 6,
             ]
         );
     }
-
 
     private function insertAnOrderInDatabase(AcceptanceTester $I): void
     {
@@ -106,7 +105,7 @@ final class RemoveUserOrderCest
                 'OXTRANSSTATUS' => 'OK',
                 'OXFOLDER' => 'ORDERFOLDER_NEW',
                 'OXDELTYPE' => 'oxidstandard',
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s'),
             ]
         );
 
@@ -130,7 +129,7 @@ final class RemoveUserOrderCest
                 'OXTIMESTAMP' => (new DateTime())->format('Y-m-d H:i:s'),
                 'OXSEARCHKEYS' => 'šÄßüл1002',
                 'OXISSEARCH' => 1,
-                'OXORDERSHOPID' => 1
+                'OXORDERSHOPID' => 1,
             ]
         );
     }

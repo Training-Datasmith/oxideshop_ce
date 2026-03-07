@@ -11,34 +11,21 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Form;
 
 class Form implements FormInterface
 {
-    /**
-     * @var array
-     */
-    private $fields = [];
+    private array $fields = [];
 
-    /**
-     * @var array
-     */
-    private $errors = [];
+    private array $errors = [];
 
-    /**
-     * @var array
-     */
-    private $validators = [];
+    private array $validators = [];
 
-    /**
-     * @param FormFieldInterface $field
-     */
-    public function add(FormFieldInterface $field)
+    public function add(FormFieldInterface $field): void
     {
         $this->fields[$field->getName()] = $field;
     }
 
     /**
-     * @param string $name
      * @return FormField
      */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         return $this->fields[$name];
     }
@@ -54,14 +41,14 @@ class Form implements FormInterface
     /**
      * @param array $request
      */
-    public function handleRequest($request)
+    public function handleRequest($request): void
     {
         foreach ($request as $fieldName => $value) {
             $this->$fieldName->setValue($value);
         }
     }
 
-    public function addValidator(FormValidatorInterface $validator)
+    public function addValidator(FormValidatorInterface $validator): void
     {
         $this->validators[] = $validator;
     }

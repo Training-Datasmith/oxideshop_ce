@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Transition\Adapter\TemplateLogic;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatCurrencyLogic;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class FormatCurrencyLogicTest extends IntegrationTestCase
 {
@@ -32,11 +32,11 @@ final class FormatCurrencyLogicTest extends IntegrationTestCase
     public static function numberFormatProvider(): array
     {
         return [
-            ["EUR@ 1.00@ ,@ .@ EUR@ 2", 25000, '25.000,00'],
-            ["EUR@ 1.00@ ,@ .@ EUR@ 2", 25000.1584, '25.000,16'],
-            ["EUR@ 1.00@ ,@ .@ EUR@ 3", 25000.1584, '25.000,158'],
-            ["EUR@ 1.00@ ,@ .@ EUR@ 0", 25000000.5584, '25.000.001'],
-            ["EUR@ 1.00@ .@ ,@ EUR@ 2", 25000000.5584, '25,000,000.56'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 2', 25000, '25.000,00'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 2', 25000.1584, '25.000,16'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 3', 25000.1584, '25.000,158'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 0', 25000000.5584, '25.000.001'],
+            ['EUR@ 1.00@ .@ ,@ EUR@ 2', 25000000.5584, '25,000,000.56'],
         ];
     }
 }

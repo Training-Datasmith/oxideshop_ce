@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -27,7 +29,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var integer
      */
-    protected $_iOrderCnt = null;
+    protected $_iOrderCnt;
 
     /**
      * Number of articles per page.
@@ -41,28 +43,28 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var integer
      */
-    protected $_iCompItemsCnt = null;
+    protected $_iCompItemsCnt;
 
     /**
      * Items which are currently to show in comparison.
      *
      * @var array
      */
-    protected $_aCompItems = null;
+    protected $_aCompItems;
 
     /**
      * Article list in comparison.
      *
      * @var object
      */
-    protected $_oArtList = null;
+    protected $_oArtList;
 
     /**
      * Article attribute list in comparison.
      *
      * @var object
      */
-    protected $_oAttributeList = null;
+    protected $_oAttributeList;
 
     /**
      * Recomendation list
@@ -71,14 +73,14 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var object
      */
-    protected $_oRecommList = null;
+    protected $_oRecommList;
 
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /**
      * Sign if to load and show bargain action
@@ -101,12 +103,12 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds = null;
+    protected $_aSimilarRecommListIds;
 
     /**
      * moves current article to the left in compare items array
      */
-    public function moveLeft() //#777C
+    public function moveLeft(): void //#777C
     {
         $sArticleId = Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sArticleId && ($aItems = $this->getCompareItems())) {
@@ -142,7 +144,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * moves current article to the right in compare items array
      */
-    public function moveRight() //#777C
+    public function moveRight(): void //#777C
     {
         $sArticleId = Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sArticleId && ($aItems = $this->getCompareItems())) {
@@ -178,7 +180,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * changes default template for compare in popup
      */
-    public function inPopup() // #777C
+    public function inPopup(): void // #777C
     {
         $this->_sThisTemplate = 'compare_popup';
         $this->_iArticlesPerPage = -1;
@@ -189,7 +191,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @param integer $iCount compare items count
      */
-    public function setCompareItemsCnt($iCount)
+    public function setCompareItemsCnt($iCount): void
     {
         $this->_iCompItemsCnt = $iCount;
     }
@@ -213,8 +215,6 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
     /**
      * Compare item $_aCompItems getter
-     *
-     * @return null
      */
     public function getCompareItems()
     {
@@ -233,7 +233,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @param array $aItems compare items i new order
      */
-    public function setCompareItems($aItems)
+    public function setCompareItems($aItems): void
     {
         $this->_aCompItems = $aItems;
         Registry::getSession()->setVariable('aFiltcompproducts', $aItems);
@@ -252,11 +252,10 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      *  turn off paging
      */
-    public function setNoPaging()
+    public function setNoPaging(): void
     {
         $this->setArticlesPerPage(0);
     }
-
 
     /**
      * Template variable getter. Returns comparison's article
@@ -413,8 +412,6 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
     /**
      * changes default template for compare in popup
-     *
-     * @return null
      */
     public function getOrderCnt()
     {

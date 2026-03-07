@@ -16,13 +16,11 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration\ModuleSettingsDataMapper;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
+
 // phpcs:enable
 
 class TreeBuilderFactory implements TreeBuilderFactoryInterface
 {
-    /**
-     * @return NodeInterface
-     */
     public function create(): NodeInterface
     {
         $treeBuilder = new TreeBuilder('moduleConfiguration');

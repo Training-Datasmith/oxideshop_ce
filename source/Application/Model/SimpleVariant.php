@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,8 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
-use oxPrice;
 
 /**
  * Lightweight variant handler. Implemnets only absolutely needed oxArticle methods.
@@ -28,14 +28,14 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice = null;
+    protected $_oPrice;
 
     /**
      * Parent article
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oParent = null;
+    protected $_oParent;
 
     /**
      * Stardard/dynamic article urls for languages
@@ -63,7 +63,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @var \OxidEsales\Eshop\Application\Model\User
      */
-    protected $_oUser = null;
+    protected $_oUser;
 
     /**
      * Initializes instance
@@ -71,15 +71,13 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     public function __construct()
     {
         parent::__construct();
-        $this->_sCacheKey = "simplevariants";
+        $this->_sCacheKey = 'simplevariants';
         $this->init('oxarticles');
     }
 
     /**
      * Implementing (fakeing) performance friendly method from oxArticle
      * oxbase
-     *
-     * @return null
      */
     public function getSelectLists()
     {
@@ -120,7 +118,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
 
         // #1437/1436C - added config option, and check for zero A,B,C price values
         if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices') && (float) $dPrice == 0) {
-            $dPrice = $this->oxarticles__oxprice->value;
+            return $this->oxarticles__oxprice->value;
         }
 
         return $dPrice;
@@ -212,7 +210,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @param object $oPrice price object
      */
-    public function setPrice($oPrice)
+    public function setPrice($oPrice): void
     {
         $this->_oPrice = $oPrice;
     }
@@ -224,12 +222,11 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     public function getFPrice()
     {
-        $sPrice = null;
         if (($oPrice = $this->getPrice())) {
-            $sPrice = Registry::getLang()->formatCurrency($oPrice->getBruttoPrice());
+            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice());
         }
 
-        return $sPrice;
+        return null;
     }
 
     /**
@@ -237,7 +234,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oParent Parent article
      */
-    public function setParent($oParent)
+    public function setParent($oParent): void
     {
         $this->_oParent = $oParent;
     }
@@ -259,12 +256,11 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     public function getLinkType()
     {
-        $iLinkType = 0;
         if (($oParent = $this->getParent())) {
-            $iLinkType = $oParent->getLinkType();
+            return $oParent->getLinkType();
         }
 
-        return $iLinkType;
+        return 0;
     }
 
     /**
@@ -276,12 +272,11 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     public function inCategory($sCatNid)
     {
-        $blIn = false;
         if (($oParent = $this->getParent())) {
-            $blIn = $oParent->inCategory($sCatNid);
+            return $oParent->inCategory($sCatNid);
         }
 
-        return $blIn;
+        return false;
     }
 
     /**
@@ -293,12 +288,11 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     public function inPriceCategory($sCatNid)
     {
-        $blIn = false;
         if (($oParent = $this->getParent())) {
-            $blIn = $oParent->inPriceCategory($sCatNid);
+            return $oParent->inPriceCategory($sCatNid);
         }
 
-        return $blIn;
+        return false;
     }
 
     /**

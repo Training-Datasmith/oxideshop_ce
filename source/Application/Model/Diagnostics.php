@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -20,28 +22,28 @@ class Diagnostics
      *
      * @var string
      */
-    protected $_sEdition = "";
+    protected $_sEdition = '';
 
     /**
      * Version of THIS OXID eShop
      *
      * @var string
      */
-    protected $_sVersion = "";
+    protected $_sVersion = '';
 
     /**
      * Revision of THIS OXID eShop
      *
      * @var string
      */
-    protected $_sShopLink = "";
+    protected $_sShopLink = '';
 
     /**
      * Version setter
      *
      * @param string $sVersion Version.
      */
-    public function setVersion($sVersion)
+    public function setVersion($sVersion): void
     {
         if (!empty($sVersion)) {
             $this->_sVersion = $sVersion;
@@ -63,7 +65,7 @@ class Diagnostics
      *
      * @param string $sEdition Edition
      */
-    public function setEdition($sEdition)
+    public function setEdition($sEdition): void
     {
         if (!empty($sEdition)) {
             $this->_sEdition = $sEdition;
@@ -85,7 +87,7 @@ class Diagnostics
      *
      * @param string $sShopLink Shop link.
      */
-    public function setShopLink($sShopLink)
+    public function setShopLink($sShopLink): void
     {
         if (!empty($sShopLink)) {
             $this->_sShopLink = $sShopLink;
@@ -104,12 +106,10 @@ class Diagnostics
 
     /**
      * Collects information on the shop, like amount of categories, articles, users
-     *
-     * @return array
      */
-    public function getShopDetails()
+    public function getShopDetails(): array
     {
-        $aShopDetails = [
+        return [
             'Date'                => date(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('fullDateFormat'), time()),
             'URL'                 => $this->getShopLink(),
             'Edition'             => $this->getEdition(),
@@ -122,8 +122,6 @@ class Diagnostics
             'Articles (Active)'   => $this->countRows('oxarticles', false),
             'Users (Total)'       => $this->countRows('oxuser', true),
         ];
-
-        return $aShopDetails;
     }
 
     /**
@@ -131,12 +129,10 @@ class Diagnostics
      *
      * @param string  $sTable table
      * @param boolean $blMode mode
-     *
-     * @return integer
      */
-    protected function countRows($table, $mode)
+    protected function countRows(string $table, $mode): int
     {
-        $query = sprintf("SELECT COUNT(*) FROM %s", $table);
+        $query = sprintf('SELECT COUNT(*) FROM %s', $table);
 
         if ($mode == false) {
             $query .= ' WHERE oxactive = 1';
@@ -145,13 +141,10 @@ class Diagnostics
         return (int) DatabaseProvider::getDb()->getOne($query);
     }
 
-
     /**
      * Picks some pre-selected PHP configuration settings and returns them.
-     *
-     * @return array
      */
-    public function getPhpSelection()
+    public function getPhpSelection(): array
     {
         $aPhpIniParams = [
             'allow_url_fopen',
@@ -174,13 +167,10 @@ class Diagnostics
         return $aPhpIniConf;
     }
 
-
     /**
      * Returns the installed PHP devoder (like Zend Optimizer, Guard Loader)
-     *
-     * @return string
      */
-    public function getPhpDecoder()
+    public function getPhpDecoder(): string
     {
         $sReturn = 'Zend ';
 
@@ -195,14 +185,11 @@ class Diagnostics
         return $sReturn;
     }
 
-
     /**
      * General server information
      * We will use the exec command here several times. In order tro prevent stop on failure, use $this->isExecAllowed().
-     *
-     * @return array
      */
-    public function getServerInfo()
+    public function getServerInfo(): array
     {
         // init empty variables (can be filled if exec is allowed)
         $iMemTotal = $iMemFree = $sCpuModelName = $sCpuModel = $sCpuFreq = $iCpuCores = null;
@@ -224,7 +211,7 @@ class Diagnostics
             }
         }
 
-        $aServerInfo = [
+        return [
             'Server OS'     => @php_uname('s'),
             'VM'            => $this->getVirtualizationSystem(),
             'PHP'           => $this->getPhpVersion(),
@@ -238,8 +225,6 @@ class Diagnostics
             'CPU frequency' => $sCpuFreq,
             'CPU cores'     => round($iCpuCores, 0),
         ];
-
-        return $aServerInfo;
     }
 
     /**
@@ -250,20 +235,16 @@ class Diagnostics
     protected function getApacheVersion()
     {
         if (function_exists('apache_get_version')) {
-            $sReturn = apache_get_version();
-        } else {
-            $sReturn = $_SERVER['SERVER_SOFTWARE'];
+            return apache_get_version();
         }
 
-        return $sReturn;
+        return $_SERVER['SERVER_SOFTWARE'];
     }
 
     /**
      * Tries to find out which VM is used
-     *
-     * @return string
      */
-    protected function getVirtualizationSystem()
+    protected function getVirtualizationSystem(): string
     {
         $sSystemType = '';
 
@@ -288,10 +269,8 @@ class Diagnostics
 
     /**
      * Determines, whether the exec() command is allowed or not.
-     *
-     * @return boolean
      */
-    public function isExecAllowed()
+    public function isExecAllowed(): bool
     {
         return function_exists('exec');
     }
@@ -303,7 +282,7 @@ class Diagnostics
      *
      * @return string
      */
-    protected function getDeviceList($sSystemType)
+    protected function getDeviceList(string $sSystemType): string|false
     {
         return exec('lspci | grep -i ' . $sSystemType);
     }
@@ -313,7 +292,7 @@ class Diagnostics
      *
      * @return string
      */
-    protected function getCpuAmount()
+    protected function getCpuAmount(): string|false
     {
         // cat /proc/cpuinfo | grep "processor" | sort -u | cut -d: -f2');
         return exec('cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l');
@@ -321,10 +300,8 @@ class Diagnostics
 
     /**
      * Returns CPU speed in Mhz
-     *
-     * @return float
      */
-    protected function getCpuMhz()
+    protected function getCpuMhz(): float
     {
         return round(exec('cat /proc/cpuinfo | grep "MHz" | sort -u | cut -d: -f2'), 0);
     }
@@ -334,7 +311,7 @@ class Diagnostics
      *
      * @return string
      */
-    protected function getBogoMips()
+    protected function getBogoMips(): string|false
     {
         return exec('cat /proc/cpuinfo | grep "bogomips" | sort -u | cut -d: -f2');
     }
@@ -344,7 +321,7 @@ class Diagnostics
      *
      * @return string
      */
-    protected function getMemoryTotal()
+    protected function getMemoryTotal(): string|false
     {
         return exec('cat /proc/meminfo | grep "MemTotal" | sort -u | cut -d: -f2');
     }
@@ -354,7 +331,7 @@ class Diagnostics
      *
      * @return string
      */
-    protected function getMemoryFree()
+    protected function getMemoryFree(): string|false
     {
         return exec('cat /proc/meminfo | grep "MemFree" | sort -u | cut -d: -f2');
     }
@@ -364,37 +341,31 @@ class Diagnostics
      *
      * @return string
      */
-    protected function getCpuModel()
+    protected function getCpuModel(): string|false
     {
         return exec('cat /proc/cpuinfo | grep "model name" | sort -u | cut -d: -f2');
     }
 
     /**
      * Returns total disk space
-     *
-     * @return string
      */
-    protected function getDiskTotalSpace()
+    protected function getDiskTotalSpace(): string
     {
         return round(disk_total_space('/') / 1024 / 1024, 0) . ' GiB';
     }
 
     /**
      * Returns free disk space
-     *
-     * @return string
      */
-    protected function getDiskFreeSpace()
+    protected function getDiskFreeSpace(): string
     {
         return round(disk_free_space('/') / 1024 / 1024, 0) . ' GiB';
     }
 
     /**
      * Returns PHP version
-     *
-     * @return string
      */
-    protected function getPhpVersion()
+    protected function getPhpVersion(): string
     {
         return phpversion();
     }

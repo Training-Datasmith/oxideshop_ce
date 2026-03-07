@@ -9,23 +9,20 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Dao;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\InvalidObjectIdDaoException;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ProductRatingDataMapperInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\ProductRating;
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\InvalidObjectIdDaoException;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 
 class ProductRatingDao implements ProductRatingDaoInterface
 {
     public function __construct(
-        private QueryBuilderFactoryInterface $queryBuilderFactory,
-        private ProductRatingDataMapperInterface $productRatingMapper
+        private readonly QueryBuilderFactoryInterface $queryBuilderFactory,
+        private readonly ProductRatingDataMapperInterface $productRatingMapper
     ) {
     }
 
-    /**
-     * @param ProductRating $productRating
-     */
-    public function update(ProductRating $productRating)
+    public function update(ProductRating $productRating): void
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder
@@ -41,10 +38,9 @@ class ProductRatingDao implements ProductRatingDaoInterface
     /**
      * @param string $productId
      *
-     * @return ProductRating
      * @throws InvalidObjectIdDaoException
      */
-    public function getProductRatingById($productId)
+    public function getProductRatingById($productId): \OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\ProductRating
     {
         $this->validateProductId($productId);
 
@@ -67,7 +63,7 @@ class ProductRatingDao implements ProductRatingDaoInterface
      *
      * @throws InvalidObjectIdDaoException
      */
-    private function validateProductId($productId)
+    private function validateProductId($productId): void
     {
         if (empty($productId) || !is_string($productId)) {
             throw new InvalidObjectIdDaoException();

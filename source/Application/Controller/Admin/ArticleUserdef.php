@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,10 +20,10 @@ class ArticleUserdef extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         parent::render();
 
         $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $this->_aViewData["edit"] = $oArticle;
+        $this->_aViewData['edit'] = $oArticle;
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             if ($oArticle->isDerived()) {
                 $this->_aViewData['readonly'] = true;
             }
@@ -30,6 +32,6 @@ class ArticleUserdef extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
             $oArticle->load($soxId);
         }
 
-        return "article_userdef";
+        return 'article_userdef';
     }
 }

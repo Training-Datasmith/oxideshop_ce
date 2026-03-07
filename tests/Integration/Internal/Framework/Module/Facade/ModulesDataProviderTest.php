@@ -59,7 +59,7 @@ final class ModulesDataProviderTest extends IntegrationTestCase
         self::assertEquals(
             [
                 Path::join($this->context->getShopRootPath(), $this->activeModuleSource),
-                Path::join($this->context->getShopRootPath(), $this->inactiveModuleSource)
+                Path::join($this->context->getShopRootPath(), $this->inactiveModuleSource),
             ],
             $this->get(ModulesDataProviderInterface::class)->getModulePaths()
         );

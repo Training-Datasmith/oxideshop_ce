@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,17 +21,17 @@ class ApplicationServer
     /**
      * Time in seconds, active server information life time.
      */
-    const SERVER_INFORMATION_TIME_LIFE = 86400;
+    public const SERVER_INFORMATION_TIME_LIFE = 86400;
 
     /**
      * Time in seconds, how long inactive server information will be stored.
      */
-    const INACTIVE_SERVER_STORAGE_PERIOD = 259200;
+    public const INACTIVE_SERVER_STORAGE_PERIOD = 259200;
 
     /**
      * Time in seconds, how often server information must be updated.
      */
-    const SERVER_INFO_UPDATE_PERIOD = 86400;
+    public const SERVER_INFO_UPDATE_PERIOD = 86400;
 
     /**
      * @var string
@@ -65,7 +67,7 @@ class ApplicationServer
      *
      * @param string $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -85,7 +87,7 @@ class ApplicationServer
      *
      * @param string $ip
      */
-    public function setIp($ip)
+    public function setIp($ip): void
     {
         $this->ip = $ip;
     }
@@ -105,7 +107,7 @@ class ApplicationServer
      *
      * @param int $timestamp
      */
-    public function setTimestamp($timestamp)
+    public function setTimestamp($timestamp): void
     {
         $this->timestamp = $timestamp;
     }
@@ -125,7 +127,7 @@ class ApplicationServer
      *
      * @param int|null $lastAdminUsage
      */
-    public function setLastAdminUsage($lastAdminUsage)
+    public function setLastAdminUsage($lastAdminUsage): void
     {
         $this->lastAdminUsage = $lastAdminUsage;
     }
@@ -145,7 +147,7 @@ class ApplicationServer
      *
      * @param int|null $lastFrontendUsage Admin server flag which stores timestamp.
      */
-    public function setLastFrontendUsage($lastFrontendUsage)
+    public function setLastFrontendUsage($lastFrontendUsage): void
     {
         $this->lastFrontendUsage = $lastFrontendUsage;
     }
@@ -164,10 +166,8 @@ class ApplicationServer
      * Check if application server was in use during 24h period.
      *
      * @param int $currentTimestamp The current timestamp.
-     *
-     * @return bool
      */
-    public function isInUse($currentTimestamp)
+    public function isInUse($currentTimestamp): bool
     {
         return !$this->hasLifetimeExpired($currentTimestamp, self::SERVER_INFORMATION_TIME_LIFE);
     }
@@ -188,23 +188,21 @@ class ApplicationServer
      * Check if application server information must be updated.
      *
      * @param int $currentTimestamp The current timestamp.
-     *
-     * @return bool
      */
-    public function needToUpdate($currentTimestamp)
+    public function needToUpdate($currentTimestamp): bool
     {
-        return ($this->hasLifetimeExpired($currentTimestamp, self::SERVER_INFO_UPDATE_PERIOD)
-            || !$this->isServerTimeValid($currentTimestamp));
+        if ($this->hasLifetimeExpired($currentTimestamp, self::SERVER_INFO_UPDATE_PERIOD)) {
+            return true;
+        }
+        return !$this->isServerTimeValid($currentTimestamp);
     }
 
     /**
      * Method checks if the hardware time was not rolled back.
      *
      * @param int $currentTimestamp The current timestamp.
-     *
-     * @return bool
      */
-    private function isServerTimeValid($currentTimestamp)
+    private function isServerTimeValid($currentTimestamp): bool
     {
         $timestamp = $this->getTimestamp();
         return ($currentTimestamp - $timestamp) >= 0;
@@ -215,12 +213,10 @@ class ApplicationServer
      *
      * @param int $currentTimestamp The current timestamp.
      * @param int $periodTimestamp  The timestamp of period to check.
-     *
-     * @return bool
      */
-    private function hasLifetimeExpired($currentTimestamp, $periodTimestamp)
+    private function hasLifetimeExpired($currentTimestamp, int $periodTimestamp): bool
     {
         $timestamp = $this->getTimestamp();
-        return (bool) ($currentTimestamp - $timestamp >= $periodTimestamp);
+        return $currentTimestamp - $timestamp >= $periodTimestamp;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,35 +25,35 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @var integer
      */
-    protected $_iOrderCnt = null;
+    protected $_iOrderCnt;
 
     /**
      * Current article id.
      *
      * @var string
      */
-    protected $_sArticleId = null;
+    protected $_sArticleId;
 
     /**
      * Search parameter for Html
      *
      * @var string
      */
-    protected $_sSearchParamForHtml = null;
+    protected $_sSearchParamForHtml;
 
     /**
      * Search parameter
      *
      * @var string
      */
-    protected $_sSearchParam = null;
+    protected $_sSearchParam;
 
     /**
      * List type
      *
      * @var string
      */
-    protected $_sListType = null;
+    protected $_sListType;
 
     /**
      * Current class template name.
@@ -104,10 +106,8 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
     /**
      * Status of the account deletion
-     *
-     * @var bool
      */
-    private $accountDeletionStatus;
+    private ?bool $accountDeletionStatus = null;
 
     /**
      * Loads action articles. If user is logged and returns name of
@@ -154,7 +154,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function confirmTerms()
     {
-        $termsConfirmation = Registry::getRequest()->getRequestEscapedParameter("term");
+        $termsConfirmation = Registry::getRequest()->getRequestEscapedParameter('term');
         if (!$termsConfirmation && $this->isEnabledPrivateSales()) {
             $user = $this->getUser();
             if ($user && !$user->isTermsAccepted()) {
@@ -177,11 +177,11 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         $parameters = parent::getNavigationParams();
 
-        if ($sourceClass = Registry::getRequest()->getRequestEscapedParameter("sourcecl")) {
+        if ($sourceClass = Registry::getRequest()->getRequestEscapedParameter('sourcecl')) {
             $parameters['sourcecl'] = $sourceClass;
         }
 
-        if ($articleId = Registry::getRequest()->getRequestEscapedParameter("anid")) {
+        if ($articleId = Registry::getRequest()->getRequestEscapedParameter('anid')) {
             $parameters['anid'] = $articleId;
         }
 
@@ -196,22 +196,20 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * If this parameter is defined and oxcmp_user::getLoginStatus() ==
      * USER_LOGIN_SUCCESS (means user has just logged in) then user is
      * redirected back to source view.
-     *
-     * @return null
      */
     public function redirectAfterLogin()
     {
         // in case source class is provided - redirecting back to it with all default parameters
         if (
-            ($sourceClass = Registry::getRequest()->getRequestEscapedParameter("sourcecl")) &&
+            ($sourceClass = Registry::getRequest()->getRequestEscapedParameter('sourcecl')) &&
             $this->_oaComponents['oxcmp_user']->getLoginStatus() === USER_LOGIN_SUCCESS
         ) {
             $redirectUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopUrl() . 'index.php?cl=' . rawurlencode($sourceClass);
 
             // building redirect link
             foreach ($this->getNavigationParams() as $key => $value) {
-                if ($value && $key != "sourcecl") {
-                    $redirectUrl .= '&' . rawurlencode($key) . "=" . rawurlencode($value);
+                if ($value && $key != 'sourcecl') {
+                    $redirectUrl .= '&' . rawurlencode((string) $key) . '=' . rawurlencode((string) $value);
                 }
             }
 
@@ -223,8 +221,6 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
     /**
      * changes default template for compare in popup
-     *
-     * @return null
      */
     public function getOrderCnt()
     {
@@ -282,7 +278,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_sSearchParam === null) {
             $this->_sSearchParam = false;
             if ($this->getArticleId()) {
-                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'));
+                $this->_sSearchParam = rawurlencode((string) Registry::getRequest()->getRequestParameter('searchparam'));
             }
         }
 
@@ -320,7 +316,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $baseLanguageId = $language->getBaseLanguage();
         if ($user = $this->getUser()) {
             $username = $user->oxuser__oxusername->value;
-            $pathData['title'] = $language->translateString('MY_ACCOUNT', $baseLanguageId, false) . " - " . $username;
+            $pathData['title'] = $language->translateString('MY_ACCOUNT', $baseLanguageId, false) . ' - ' . $username;
         } else {
             $pathData['title'] = $language->translateString('LOGIN', $baseLanguageId, false);
         }
@@ -366,7 +362,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * Deletes User account.
      */
-    public function deleteAccount()
+    public function deleteAccount(): void
     {
         $this->accountDeletionStatus = false;
         $user = $this->getUser();
@@ -413,10 +409,8 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
     /**
      * Checks if possible to delete user.
-     *
-     * @return bool
      */
-    private function canUserAccountBeDeleted()
+    private function canUserAccountBeDeleted(): bool
     {
         $session = \OxidEsales\Eshop\Core\Registry::getSession();
         return $session->checkSessionChallenge() && $this->isUserAllowedToDeleteOwnAccount();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -31,21 +33,21 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      *
      * @var string
      */
-    protected $_sErrorMessage = null;
+    protected $_sErrorMessage;
 
     /**
      * Diagnostic check object
      *
      * @var mixed
      */
-    protected $_oDiagnostics = null;
+    protected $_oDiagnostics;
 
     /**
      * Result output object
      *
      * @var mixed
      */
-    protected $_oOutput = null;
+    protected $_oOutput;
 
     /**
      * Variable for storing shop root directory
@@ -59,7 +61,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      *
      * @var string
      */
-    protected $_sThisTemplate = "diagnostics_main";
+    protected $_sThisTemplate = 'diagnostics_main';
 
     /**
      * Error status getter
@@ -80,7 +82,6 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     {
         return $this->_sErrorMessage;
     }
-
 
     /**
      * Calls parent constructor and initializes checker object
@@ -104,13 +105,13 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             $this->_aViewData['sErrorMessage'] = $this->getErrorMessage();
         }
 
-        return "diagnostics_form";
+        return 'diagnostics_form';
     }
 
     /**
      * Checks system file versions
      */
-    public function startDiagnostics()
+    public function startDiagnostics(): void
     {
         $this->_oOutput->storeResult(
             $this->getRenderedReport(
@@ -189,7 +190,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     /**
      * Downloads result of system file check
      */
-    public function downloadResultFile()
+    public function downloadResultFile(): void
     {
         $this->_oOutput->downloadResultFile();
         exit(0);
@@ -203,8 +204,8 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     public function getSupportContactForm()
     {
         $aLinks = [
-            "de" => "https://www.oxid-esales.com/ressourcen/anwenderbereich/supportangebot/",
-            "en" => "https://www.oxid-esales.com/en/resources/user-center/support-offer/"
+            'de' => 'https://www.oxid-esales.com/ressourcen/anwenderbereich/supportangebot/',
+            'en' => 'https://www.oxid-esales.com/en/resources/user-center/support-offer/',
         ];
 
         $oLang = Registry::getLang();
@@ -213,7 +214,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $sLangCode = $aLanguages[$iLangId]->abbr;
 
         if (!array_key_exists($sLangCode, $aLinks)) {
-            $sLangCode = "de";
+            $sLangCode = 'de';
         }
 
         return $aLinks[$sLangCode];
@@ -233,9 +234,6 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         return $request->getRequestEscapedParameter($name);
     }
 
-    /**
-     * @return array
-     */
     private function getInstalledModules(): array
     {
         $shopConfiguration = ContainerFacade::get(ShopConfigurationDaoBridgeInterface::class)
@@ -252,11 +250,6 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         return $modules;
     }
 
-    /**
-     * @param array $diagnosticsResult
-     *
-     * @return string
-     */
     private function getRenderedReport(array $diagnosticsResult): string
     {
         return ContainerFacade::get(TemplateRendererBridgeInterface::class)

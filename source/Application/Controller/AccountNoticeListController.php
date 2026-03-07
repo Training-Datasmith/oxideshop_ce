@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use oxRegistry;
 
 /**
  * Current user notice list manager.
@@ -30,21 +30,21 @@ class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controll
      *
      * @var array
      */
-    protected $_aNoticeProductList = null;
+    protected $_aNoticeProductList;
 
     /**
      * return the similar prodcuts from the notice list.
      *
      * @var array
      */
-    protected $_aSimilarProductList = null;
+    protected $_aSimilarProductList;
 
     /**
      * return the recommlist
      *
      * @var array
      */
-    protected $_aRecommList = null;
+    protected $_aRecommList;
 
     /**
      * Current view search engine indexing state
@@ -58,7 +58,7 @@ class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controll
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds = null;
+    protected $_aSimilarRecommListIds;
 
     /**
      * If user is not logged in - returns name of template
@@ -154,7 +154,7 @@ class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controll
 
         $iBaseLanguage = $oLang->getBaseLanguage();
         $aPath['title'] = $oLang->translateString('MY_ACCOUNT', $iBaseLanguage, false);
-        $aPath['link'] = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->getStaticUrl($sSelfLink . "cl=account");
+        $aPath['link'] = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->getStaticUrl($sSelfLink . 'cl=account');
         $aPaths[] = $aPath;
 
         $aPath['title'] = $oLang->translateString('MY_WISH_LIST', $iBaseLanguage, false);

@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Mailing\Factory;
 
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 readonly class TransportFactory implements TransportFactoryInterface
 {

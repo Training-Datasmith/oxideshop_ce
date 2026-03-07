@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,7 +17,7 @@ class BasketContentMarkGenerator
     /**
      * Default value for explanation mark.
      */
-    const DEFAULT_EXPLANATION_MARK = '**';
+    public const DEFAULT_EXPLANATION_MARK = '**';
 
     /**
      * Marks added to array by article type.
@@ -33,8 +35,6 @@ class BasketContentMarkGenerator
 
     /**
      * Sets basket that is used to get article type(downloadable, intangible etc..).
-     *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket
      */
     public function __construct(\OxidEsales\Eshop\Application\Model\Basket $oBasket)
     {
@@ -73,10 +73,8 @@ class BasketContentMarkGenerator
      * Forms marks for articles.
      *
      * @param string $sCurrentMark Current mark.
-     *
-     * @return array
      */
-    private function formMarks($sCurrentMark)
+    private function formMarks(string $sCurrentMark): array
     {
         $oBasket = $this->getBasket();
         $aMarks = [];

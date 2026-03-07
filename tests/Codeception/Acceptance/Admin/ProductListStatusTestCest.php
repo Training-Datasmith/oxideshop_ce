@@ -37,10 +37,10 @@ final class ProductListStatusTestCest
             [
                 'OXACTIVE' => false,
                 'OXACTIVEFROM' => (new DateTime())->modify('-1 day')->format('Y-m-d H:i:s'),
-                'OXACTIVETO' => (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s')
+                'OXACTIVETO' => (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s'),
             ],
             [
-                'OXID' => $this->productID
+                'OXID' => $this->productID,
             ]
         );
 
@@ -60,10 +60,10 @@ final class ProductListStatusTestCest
             [
                 'OXACTIVE' => false,
                 'OXACTIVEFROM' => (new DateTime())->modify('+1 day')->format('Y-m-d H:i:s'),
-                'OXACTIVETO' => (new DateTime())->modify('+2 day')->format('Y-m-d H:i:s')
+                'OXACTIVETO' => (new DateTime())->modify('+2 day')->format('Y-m-d H:i:s'),
             ],
             [
-                'OXID' => $this->productID
+                'OXID' => $this->productID,
             ]
         );
 

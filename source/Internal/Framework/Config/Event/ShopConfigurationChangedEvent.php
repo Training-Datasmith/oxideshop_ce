@@ -18,15 +18,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ShopConfigurationChangedEvent extends Event
 {
     public function __construct(
-        private string $configurationVariable,
-        private int $shopId
+        private readonly string $configurationVariable,
+        private readonly int $shopId
     ) {
     }
 
     /**
      * Getter for configuration variable name.
-     *
-     * @return string
      */
     public function getConfigurationVariable(): string
     {
@@ -35,8 +33,6 @@ class ShopConfigurationChangedEvent extends Event
 
     /**
      * Getter for shop id.
-     *
-     * @return integer
      */
     public function getShopId(): int
     {

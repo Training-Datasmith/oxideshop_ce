@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,12 +9,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Registry;
 use oxAdminDetails;
+use OxidEsales\Eshop\Core\Registry;
 
 class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
 {
-    protected $_sTheme = null;
+    protected $_sTheme;
 
     /** @inheritdoc */
     public function render()
@@ -28,12 +30,12 @@ class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\
 
         $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
         if ($oTheme->load($sTheme)) {
-            $this->_aViewData["oTheme"] = $oTheme;
+            $this->_aViewData['oTheme'] = $oTheme;
 
             try {
                 $aDbVariables = $this->loadConfVars($sShopId, $this->getModuleForConfigVars());
-                $this->_aViewData["var_constraints"] = $aDbVariables['constraints'];
-                $this->_aViewData["var_grouping"] = $aDbVariables['grouping'];
+                $this->_aViewData['var_constraints'] = $aDbVariables['constraints'];
+                $this->_aViewData['var_grouping'] = $aDbVariables['grouping'];
                 foreach ($this->_aConfParams as $sType => $sParam) {
                     $this->_aViewData[$sParam] = $aDbVariables['vars'][$sType] ?? null;
                 }
@@ -65,7 +67,7 @@ class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Saves shop configuration variables
      */
-    public function saveConfVars()
+    public function saveConfVars(): void
     {
         $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
 

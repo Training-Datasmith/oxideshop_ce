@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -49,7 +51,7 @@ class ActionsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         parent::render();
 
         // passing display type back to view
-        $this->_aViewData["displaytype"] = Registry::getRequest()->getRequestEscapedParameter("displaytype");
+        $this->_aViewData['displaytype'] = Registry::getRequest()->getRequestEscapedParameter('displaytype');
 
         return $this->_sThisTemplate;
     }
@@ -67,7 +69,7 @@ class ActionsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $sQ = parent::prepareWhereQuery($aWhere, $sqlFull);
         $sDisplayType = (int) Registry::getRequest()->getRequestEscapedParameter('displaytype');
         $tableViewNameGenerator = new TableViewNameGenerator();
-        $sTable = $tableViewNameGenerator->getViewName("oxactions");
+        $sTable = $tableViewNameGenerator->getViewName('oxactions');
 
         // searching for empty oxfolder fields
         if ($sDisplayType) {

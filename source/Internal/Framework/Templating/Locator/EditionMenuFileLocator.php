@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Path;
 
 class EditionMenuFileLocator implements NavigationFileLocatorInterface
 {
-    private string $themeName;
+    private readonly string $themeName;
     private string $fileName = 'menu.xml';
 
     public function __construct(

@@ -13,13 +13,10 @@ use OxidEsales\EshopCommunity\Internal\Utility\Header\HeaderGeneratorInterface;
 
 class CsvHeaderGeneratorBridge implements HeaderGeneratorBridgeInterface
 {
-    public function __construct(private HeaderGeneratorInterface $headerGenerator)
+    public function __construct(private readonly HeaderGeneratorInterface $headerGenerator)
     {
     }
 
-    /**
-     * @param string $filename
-     */
     public function generate(string $filename): void
     {
         $this->headerGenerator->generate($filename);

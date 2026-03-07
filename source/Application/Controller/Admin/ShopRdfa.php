@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -29,10 +31,10 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      *
      * @var array
      */
-    protected $_aCustomers = ["Enduser"           => 0,
-                                   "Reseller"          => 0,
-                                   "Business"          => 0,
-                                   "PublicInstitution" => 0];
+    protected $_aCustomers = ['Enduser'           => 0,
+                                   'Reseller'          => 0,
+                                   'Business'          => 0,
+                                   'PublicInstitution' => 0];
 
     /**
      * Gets list of content pages which could be used for embedding
@@ -44,7 +46,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
     {
         $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
         $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sTable = $tableViewNameGenerator->getViewName("oxcontents", $this->_iEditLang);
+        $sTable = $tableViewNameGenerator->getViewName('oxcontents', $this->_iEditLang);
         $oContentList->selectString(
             "SELECT * 
              FROM {$sTable} 
@@ -52,7 +54,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
                 AND OXLOADID IN ('oxagb', 'oxdeliveryinfo', 'oximpressum', 'oxrightofwithdrawal')
                 AND OXSHOPID = :OXSHOPID
              ORDER BY OXLOADID ASC",
-            ['OXSHOPID' => Registry::getRequest()->getRequestEscapedParameter("oxid")]
+            ['OXSHOPID' => Registry::getRequest()->getRequestEscapedParameter('oxid')]
         );
 
         return $oContentList;
@@ -65,7 +67,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      */
     public function getCustomers()
     {
-        $aCustomersConf = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopConfVar("aRDFaCustomers");
+        $aCustomersConf = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopConfVar('aRDFaCustomers');
         if (isset($aCustomersConf)) {
             foreach ($this->_aCustomers as $sCustomer => $iValue) {
                 $aCustomers[$sCustomer] = (in_array($sCustomer, $aCustomersConf)) ? 1 : 0;

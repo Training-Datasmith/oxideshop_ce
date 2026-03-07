@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,7 +23,7 @@ use OxidEsales\EshopCommunity\Application\Controller\Admin\ArticlePicturesAjax;
  */
 class ShopControllerMapProvider implements ControllerMapProviderInterface
 {
-    private $controllerMap = [
+    private array $controllerMap = [
         'language' => Controller\Admin\LanguageController::class,
         'module' => Controller\Admin\ModuleController::class,
         'theme' => Controller\Admin\ThemeController::class,

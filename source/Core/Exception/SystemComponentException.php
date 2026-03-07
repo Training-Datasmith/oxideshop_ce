@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -35,7 +37,7 @@ class SystemComponentException extends \OxidEsales\Eshop\Core\Exception\Standard
      *
      * @param string $sComponent name of component
      */
-    public function setComponent($sComponent)
+    public function setComponent($sComponent): void
     {
         $this->_sComponent = $sComponent;
     }
@@ -58,7 +60,7 @@ class SystemComponentException extends \OxidEsales\Eshop\Core\Exception\Standard
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty component --> " . $this->_sComponent;
+        return self::class . '-' . parent::getString() . ' Faulty component --> ' . $this->_sComponent;
     }
 
     /**

@@ -14,9 +14,7 @@ interface MetaDataNormalizerInterface
     /**
      * Normalize the array aModule in metadata.php
      *
-     * @param array $data
      *
-     * @return array
      */
     public function normalizeData(array $data): array;
 }

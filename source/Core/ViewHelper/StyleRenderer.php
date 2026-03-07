@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -16,10 +18,8 @@ class StyleRenderer
      * @param string $widget
      * @param bool   $forceRender
      * @param bool   $isDynamic
-     *
-     * @return string
      */
-    public function render($widget, $forceRender, $isDynamic)
+    public function render($widget, $forceRender, $isDynamic): string
     {
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
         $suffix = $isDynamic ? '_dynamic' : '';
@@ -50,10 +50,8 @@ class StyleRenderer
 
     /**
      * @param array $styles
-     *
-     * @return string
      */
-    protected function formStylesOutput($styles)
+    protected function formStylesOutput($styles): string
     {
         $preparedStyles = [];
         $template = '<link rel="stylesheet" type="text/css" href="%s" />';
@@ -66,10 +64,8 @@ class StyleRenderer
 
     /**
      * @param array $styles
-     *
-     * @return string
      */
-    protected function formConditionalStylesOutput($styles)
+    protected function formConditionalStylesOutput($styles): string
     {
         $preparedStyles = [];
         $template = '<!--[if %s]><link rel="stylesheet" type="text/css" href="%s"><![endif]-->';

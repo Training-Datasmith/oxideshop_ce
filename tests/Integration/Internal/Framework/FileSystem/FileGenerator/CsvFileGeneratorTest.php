@@ -48,8 +48,8 @@ final class CsvFileGeneratorTest extends TestCase
         $this->filesystem->touch($this->filename);
 
         $csvGenerator->generate($this->filename, [
-            ["Salutation", "Name"],
-            ["MR", "John"]
+            ['Salutation', 'Name'],
+            ['MR', 'John'],
         ]);
 
         $this->assertEquals("Salutation,Name\nMR,John\n", file_get_contents($this->filename));
@@ -69,8 +69,8 @@ final class CsvFileGeneratorTest extends TestCase
                 NewsletterRecipientsDataMapper::EMAIL,
                 NewsletterRecipientsDataMapper::OPT_IN_STATE,
                 NewsletterRecipientsDataMapper::COUNTRY,
-                NewsletterRecipientsDataMapper::ASSIGNED_USER_GROUPS
-            ]
+                NewsletterRecipientsDataMapper::ASSIGNED_USER_GROUPS,
+            ],
         ];
 
         $csvGenerator->generate($this->filename, $data);
@@ -86,9 +86,9 @@ final class CsvFileGeneratorTest extends TestCase
         $this->filesystem->touch($this->filename);
 
         $csvGenerator->generate($this->filename, [
-            ["Name", "Description"],
-            ["Test", "Value with \"quotes\" inside"],
-            ["Another", "Backslash \\ test"]
+            ['Name', 'Description'],
+            ['Test', 'Value with "quotes" inside'],
+            ['Another', 'Backslash \\ test'],
         ]);
 
         $expected = "Name,Description\n"

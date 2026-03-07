@@ -11,74 +11,44 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject;
 
 class ShopConfigurationSetting
 {
-    /**
-     * @var int
-     */
-    private $shopId;
+    private ?int $shopId = null;
 
-    /**
-     * @var string
-     */
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private ?string $type = null;
 
     /**
      * @var mixed
      */
     private $value;
 
-    /**
-     * @return int
-     */
     public function getShopId(): int
     {
         return $this->shopId;
     }
 
-    /**
-     * @param int $shopId
-     * @return ShopConfigurationSetting
-     */
     public function setShopId(int $shopId): ShopConfigurationSetting
     {
         $this->shopId = $shopId;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return ShopConfigurationSetting
-     */
     public function setName(string $name): ShopConfigurationSetting
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     * @return ShopConfigurationSetting
-     */
     public function setType(string $type): ShopConfigurationSetting
     {
         $this->type = $type;
@@ -95,7 +65,6 @@ class ShopConfigurationSetting
 
     /**
      * @param mixed $value
-     * @return ShopConfigurationSetting
      */
     public function setValue($value): ShopConfigurationSetting
     {

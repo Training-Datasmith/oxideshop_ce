@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -17,21 +19,21 @@ class GenericExportMain extends \OxidEsales\Eshop\Application\Controller\Admin\D
      *
      * @var string
      */
-    public $sClassDo = "genExport_do";
+    public $sClassDo = 'genExport_do';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "genExport_main";
+    public $sClassMain = 'genExport_main';
 
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = "dyn_exportdefault";
+    protected $_sThisTemplate = 'dyn_exportdefault';
 
     /** @inheritdoc */
     public function render()

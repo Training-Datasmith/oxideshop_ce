@@ -11,9 +11,10 @@ namespace OxidEsales\EshopCommunity\Tests;
 
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\ProjectRootLocator;
 use RuntimeException;
-use Symfony\Component\Process\Process;
 
 use function sprintf;
+
+use Symfony\Component\Process\Process;
 
 trait ConsoleRunnerTrait
 {

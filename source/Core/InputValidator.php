@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -26,12 +28,12 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
     /**
      * Invalid account number error code for template.
      */
-    const INVALID_ACCOUNT_NUMBER = -5;
+    public const INVALID_ACCOUNT_NUMBER = -5;
 
     /**
      * Invalid bank number error code for template.
      */
-    const INVALID_BANK_CODE = -4;
+    public const INVALID_BANK_CODE = -4;
 
     /**
      * Input validation errors.
@@ -40,8 +42,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      */
     protected $_aInputValidationErrors = [];
 
-
-    protected $_oCompanyVatInValidator = null;
+    protected $_oCompanyVatInValidator;
 
     /**
      * Required fields for debit cards.
@@ -51,15 +52,8 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
     protected $_aRequiredDCFields = [
         'lsbankname',
         'lsktonr',
-        'lsktoinhaber'
+        'lsktoinhaber',
     ];
-
-    /**
-     * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     */
-    public function __construct()
-    {
-    }
 
     /**
      * Validates basket amount.
@@ -84,7 +78,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
         }
 
         if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blAllowUnevenAmounts')) {
-            $amount = round((string) $amount);
+            return round($amount);
         }
 
         //negative amounts are not allowed
@@ -109,9 +103,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      */
     public function checkLogin($user, $login, $invAddress)
     {
-        $login = (isset($invAddress['oxuser__oxusername']))
-            ? $invAddress['oxuser__oxusername']
-            : $login;
+        $login = $invAddress['oxuser__oxusername'] ?? $login;
 
         if (
             isset($user->oxuser__oxpassword->value) &&
@@ -126,18 +118,17 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
                 $message = Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_NOTALLFIELDS');
                 $exception = oxNew(InputException::class, $message);
 
-                $this->addValidationError("oxuser__oxpassword", $exception);
+                $this->addValidationError('oxuser__oxpassword', $exception);
 
                 return $login;
-            } else {
-                if (!$user->isSamePassword($newPassword)) {
-                    $message = Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH');
-                    $exception = oxNew(UserException::class, $message);
+            }
+            if (!$user->isSamePassword($newPassword)) {
+                $message = Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH');
+                $exception = oxNew(UserException::class, $message);
 
-                    $this->addValidationError("oxuser__oxpassword", $exception);
+                $this->addValidationError('oxuser__oxpassword', $exception);
 
-                    return $login;
-                }
+                return $login;
             }
         }
 
@@ -145,7 +136,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $message = Registry::getLang()->translateString('ERROR_MESSAGE_USER_USEREXISTS');
             $exception = oxNew(UserException::class, $message);
 
-            $this->addValidationError("oxuser__oxusername", $exception);
+            $this->addValidationError('oxuser__oxusername', $exception);
 
             return $login;
         }
@@ -159,8 +150,6 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      *
      * @param User   $user  Active user.
      * @param string $email User email/login.
-     *
-     * @return null
      */
     public function checkEmail($user, $email)
     {
@@ -169,7 +158,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
             $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_NOTALLFIELDS'));
 
-            return $this->addValidationError("oxuser__oxusername", $exception);
+            return $this->addValidationError('oxuser__oxusername', $exception);
         }
 
         $emailValidator = ContainerFacade::get(EmailValidatorServiceBridgeInterface::class);
@@ -177,7 +166,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
             $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_NOVALIDEMAIL'));
 
-            return $this->addValidationError("oxuser__oxusername", $exception);
+            return $this->addValidationError('oxuser__oxusername', $exception);
         }
     }
 
@@ -199,14 +188,14 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
             $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_EMPTYPASS'));
 
-            return $this->addValidationError("oxuser__oxpassword", $exception);
+            return $this->addValidationError('oxuser__oxpassword', $exception);
         }
 
         if ($shouldCheckPasswordLength && Str::getStr()->strlen($newPassword) < $this->getPasswordLength()) {
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
             $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_TOO_SHORT'));
 
-            return $this->addValidationError("oxuser__oxpassword", $exception);
+            return $this->addValidationError('oxuser__oxpassword', $exception);
         }
 
         //  passwords do not match ?
@@ -214,7 +203,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\UserException::class);
             $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH'));
 
-            return $this->addValidationError("oxuser__oxpassword", $exception);
+            return $this->addValidationError('oxuser__oxpassword', $exception);
         }
     }
 
@@ -225,7 +214,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      */
     public function getPasswordLength()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam("iPasswordLength") ?: 6;
+        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iPasswordLength') ?: 6;
     }
 
     /**
@@ -236,7 +225,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      * @param array $billingAddress  Billing address.
      * @param array $deliveryAddress Delivery address.
      */
-    public function checkRequiredFields($user, $billingAddress, $deliveryAddress)
+    public function checkRequiredFields($user, $billingAddress, $deliveryAddress): void
     {
         /** @var \OxidEsales\Eshop\Application\Model\RequiredAddressFields $requiredAddressFields */
         $requiredAddressFields = oxNew(\OxidEsales\Eshop\Application\Model\RequiredAddressFields::class);
@@ -292,23 +281,23 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      * @param array $invAddress      Billing address info.
      * @param array $deliveryAddress Delivery address info.
      */
-    public function checkCountries($user, $invAddress, $deliveryAddress)
+    public function checkCountries($user, $invAddress, $deliveryAddress): void
     {
-        $billingCountry = isset($invAddress['oxuser__oxcountryid']) ? $invAddress['oxuser__oxcountryid'] : null;
-        $deliveryCountry = isset($deliveryAddress['oxaddress__oxcountryid']) ? $deliveryAddress['oxaddress__oxcountryid'] : null;
+        $billingCountry = $invAddress['oxuser__oxcountryid'] ?? null;
+        $deliveryCountry = $deliveryAddress['oxaddress__oxcountryid'] ?? null;
 
         if ($billingCountry || $deliveryCountry) {
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
             if (($billingCountry == $deliveryCountry) || (!$billingCountry && $deliveryCountry) || ($billingCountry && !$deliveryCountry)) {
-                $billingCountry = $billingCountry ? $billingCountry : $deliveryCountry;
-                $query = "select oxactive from oxcountry where oxid = :oxbillingid";
+                $billingCountry = $billingCountry ?: $deliveryCountry;
+                $query = 'select oxactive from oxcountry where oxid = :oxbillingid';
                 $params = [
-                    'oxbillingid' => $billingCountry
+                    'oxbillingid' => $billingCountry,
                 ];
             } else {
-                $query = "select ( select oxactive from oxcountry where oxid = :oxbillingid ) and
-                              ( select oxactive from oxcountry where oxid = :oxdeliveryid ) ";
+                $query = 'select ( select oxactive from oxcountry where oxid = :oxbillingid ) and
+                              ( select oxactive from oxcountry where oxid = :oxdeliveryid ) ';
                 $params = [
                     'oxbillingid' => $billingCountry,
                     'oxdeliveryid' => $deliveryCountry,
@@ -319,7 +308,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
                 $exception = oxNew(\OxidEsales\Eshop\Core\Exception\UserException::class);
                 $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_NOTALLFIELDS'));
 
-                $this->addValidationError("oxuser__oxcountryid", $exception);
+                $this->addValidationError('oxuser__oxcountryid', $exception);
             }
         }
     }
@@ -330,8 +319,6 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      *
      * @param User  $user       Active user.
      * @param array $invAddress User input array.
-     *
-     * @return null
      */
     public function checkVatId($user, $invAddress)
     {
@@ -349,7 +336,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
                     $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
                     $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('VAT_MESSAGE_' . $vatInValidator->getError()));
 
-                    return $this->addValidationError("oxuser__oxustid", $exception);
+                    return $this->addValidationError('oxuser__oxustid', $exception);
                 }
             }
         } elseif (isset($invAddress['oxuser__oxustid']) && $invAddress['oxuser__oxustid'] && !$invAddress['oxuser__oxcompany']) {
@@ -357,10 +344,9 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
             $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('VAT_MESSAGE_COMPANY_MISSING'));
 
-            return $this->addValidationError("oxuser__oxcompany", $exception);
+            return $this->addValidationError('oxuser__oxcompany', $exception);
         }
     }
-
 
     /**
      * Load and return Country object.
@@ -410,15 +396,13 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      */
     public function validatePaymentInputData($paymentId, &$dynamicValue)
     {
-        if ($paymentId === "oxiddebitnote") {
-            if ($this->isAllBankInformationSet($this->_aRequiredDCFields, $dynamicValue)) {
-                return $this->validateDebitNote($dynamicValue);
-            } else {
-                return false;
-            }
-        } else {
+        if ($paymentId !== 'oxiddebitnote') {
             return true;
         }
+        if ($this->isAllBankInformationSet($this->_aRequiredDCFields, $dynamicValue)) {
+            return $this->validateDebitNote($dynamicValue);
+        }
+        return false;
     }
 
     /**
@@ -485,9 +469,8 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
 
         if (true === $validationResult && !$stringHelper->preg_match("/^\d{10,12}$/", $debitInfo['lsktonr'])) {
             // Account number is invalid
-            $validationResult = self::INVALID_ACCOUNT_NUMBER;
+            return self::INVALID_ACCOUNT_NUMBER;
         }
-
 
         return $validationResult;
     }
@@ -569,7 +552,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      *
      * @param \OxidEsales\Eshop\Core\CompanyVatInValidator $companyVatInValidator validator
      */
-    public function setCompanyVatInValidator($companyVatInValidator)
+    public function setCompanyVatInValidator($companyVatInValidator): void
     {
         $this->_oCompanyVatInValidator = $companyVatInValidator;
     }
@@ -593,7 +576,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $vatInValidator->addChecker($validator);
 
             /** @var \OxidEsales\Eshop\Core\OnlineVatIdCheck $onlineValidator */
-            if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam("blVatIdCheckDisabled")) {
+            if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVatIdCheckDisabled')) {
                 $onlineValidator = oxNew(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class);
                 $vatInValidator->addChecker($onlineValidator);
             }

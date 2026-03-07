@@ -349,7 +349,7 @@ final class ProductMediaDaoTest extends TestCase
                     [
                         $id2,
                         $id1,
-                        $id3
+                        $id3,
                     ]
                 )
             )

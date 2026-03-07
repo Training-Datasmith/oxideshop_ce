@@ -28,7 +28,7 @@ final class WishListCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -79,7 +79,7 @@ final class WishListCest
             'id' => '10014',
             'title' => '14 EN product šÄßüл',
             'description' => '13 EN description šÄßüл',
-            'price' => 'from 15,00 €'
+            'price' => 'from 15,00 €',
         ];
 
         $userData = $this->getExistingUserData();
@@ -104,7 +104,7 @@ final class WishListCest
             'id' => '10014-1-1',
             'title' => '14 EN product šÄßüл S | black | lether',
             'description' => '',
-            'price' => '25,00 €'
+            'price' => '25,00 €',
         ];
         $wishListPage->seeProductData($productData, 2);
 
@@ -127,7 +127,7 @@ final class WishListCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $productNavigation

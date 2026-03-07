@@ -11,8 +11,5 @@ namespace OxidEsales\EshopCommunity\Internal\Utility\Header\Bridge;
 
 interface HeaderGeneratorBridgeInterface
 {
-    /**
-     * @param string $filename
-     */
     public function generate(string $filename): void;
 }

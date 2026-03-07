@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -19,7 +21,7 @@ class VoucherSerieGenerate extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @var string
      */
-    public $sClassDo = "voucherserie_generate";
+    public $sClassDo = 'voucherserie_generate';
 
     /**
      * Number of vouchers to generate per tick
@@ -33,14 +35,14 @@ class VoucherSerieGenerate extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @var string
      */
-    protected $_sThisTemplate = "voucherserie_generate";
+    protected $_sThisTemplate = 'voucherserie_generate';
 
     /**
      * Voucher serie object
      *
      * @var \OxidEsales\Eshop\Application\Model\VoucherSerie
      */
-    protected $_oVoucherSerie = null;
+    protected $_oVoucherSerie;
 
     /**
      * Generated vouchers count
@@ -74,7 +76,7 @@ class VoucherSerieGenerate extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function generateVoucher($iCnt)
     {
-        $iAmount = abs((int) \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("voucherAmount"));
+        $iAmount = abs((int) \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('voucherAmount'));
 
         // creating new vouchers
         if ($iCnt < $iAmount && ($oVoucherSerie = $this->getVoucherSerie())) {
@@ -82,8 +84,8 @@ class VoucherSerieGenerate extends \OxidEsales\Eshop\Application\Controller\Admi
                 $this->_iGenerated = $iCnt;
             }
 
-            $blRandomNr = (bool) \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("randomVoucherNr");
-            $sVoucherNr = $blRandomNr ? \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID() : \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("voucherNr");
+            $blRandomNr = (bool) \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('randomVoucherNr');
+            $sVoucherNr = $blRandomNr ? \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID() : \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('voucherNr');
 
             $oNewVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
             $oNewVoucher->oxvouchers__oxvoucherserieid = new \OxidEsales\Eshop\Core\Field($oVoucherSerie->getId());
@@ -99,13 +101,13 @@ class VoucherSerieGenerate extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Runs voucher generation
      */
-    public function run()
+    public function run(): void
     {
         $blContinue = true;
         $iExportedItems = 0;
 
         // file is open
-        $iStart = Registry::getRequest()->getRequestEscapedParameter("iStart");
+        $iStart = Registry::getRequest()->getRequestEscapedParameter('iStart');
 
         for ($i = $iStart; $i < $iStart + $this->iGeneratePerTick; $i++) {
             if (($iExportedItems = $this->nextTick($i)) === false) {

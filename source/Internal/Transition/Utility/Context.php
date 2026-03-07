@@ -10,10 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Transition\Utility;
 
 use OxidEsales\Eshop\Core\Config;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\Exception\AdminUserNotFoundException;
-use PDO;
 use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Path;
 
@@ -106,7 +104,7 @@ class Context extends BasicContext implements ContextInterface
     /**
      * @return mixed
      */
-    private function getConfigParameter($name, $default = null)
+    private function getConfigParameter(string $name, $default = null)
     {
         return Registry::getConfig()->getConfigParam($name, $default);
     }

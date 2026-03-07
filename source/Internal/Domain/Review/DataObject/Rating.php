@@ -46,7 +46,7 @@ class Rating
      *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -66,7 +66,7 @@ class Rating
      *
      * @return $this
      */
-    public function setRating($rating)
+    public function setRating($rating): static
     {
         $this->rating = $rating;
 
@@ -86,7 +86,7 @@ class Rating
      *
      * @return $this
      */
-    public function setObjectId($objectId)
+    public function setObjectId($objectId): static
     {
         $this->objectId = $objectId;
 
@@ -106,7 +106,7 @@ class Rating
      *
      * @return $this
      */
-    public function setUserId($userId)
+    public function setUserId($userId): static
     {
         $this->userId = $userId;
 
@@ -126,7 +126,7 @@ class Rating
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->type = $type;
 
@@ -146,7 +146,7 @@ class Rating
      *
      * @return $this
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt($createdAt): static
     {
         $this->createdAt = $createdAt;
 

@@ -11,57 +11,32 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setting;
 
 class Setting
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private ?string $type = null;
 
     /**
      * @var mixed
      */
     private $value;
 
-    /**
-     * @var array
-     */
-    private $constraints = [];
+    private array $constraints = [];
 
-    /**
-     * @var string
-     */
-    private $groupName = '';
+    private string $groupName = '';
 
-    /**
-     * @var int
-     */
-    private $positionInGroup = 0;
+    private int $positionInGroup = 0;
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return Setting
-     */
     public function setName(string $name): Setting
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         if ($this->type === null) {
@@ -71,10 +46,6 @@ class Setting
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     * @return Setting
-     */
     public function setType(string $type): Setting
     {
         $this->type = $type;
@@ -91,7 +62,6 @@ class Setting
 
     /**
      * @param mixed $value
-     * @return Setting
      */
     public function setValue($value): Setting
     {
@@ -99,54 +69,33 @@ class Setting
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getConstraints(): array
     {
         return $this->constraints;
     }
 
-    /**
-     * @param array $constraints
-     * @return Setting
-     */
     public function setConstraints(array $constraints): Setting
     {
         $this->constraints = $constraints;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getGroupName(): string
     {
         return $this->groupName;
     }
 
-    /**
-     * @param string $groupName
-     * @return Setting
-     */
     public function setGroupName(string $groupName): Setting
     {
         $this->groupName = $groupName;
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getPositionInGroup(): int
     {
         return $this->positionInGroup;
     }
 
-    /**
-     * @param int $positionInGroup
-     * @return Setting
-     */
     public function setPositionInGroup(int $positionInGroup): Setting
     {
         $this->positionInGroup = $positionInGroup;

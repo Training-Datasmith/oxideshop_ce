@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,9 +9,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Class manages article select lists configuration
@@ -35,7 +37,7 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         ['oxmpn', 'oxarticles', 0, 0, 0],
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
+        ['oxid', 'oxarticles', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -45,15 +47,15 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
                                      ['oxprice', 'oxarticles', 0, 0, 0],
                                      ['oxstock', 'oxarticles', 0, 0, 0],
                                      ['oxid', 'oxobject2selectlist', 0, 0, 1],
-                                     ['oxid', 'oxarticles', 0, 0, 1]
+                                     ['oxid', 'oxarticles', 0, 0, 1],
                                  ],
                                  'container3' => [
                                      ['oxtitle', 'oxselectlist', 1, 1, 0],
                                      ['oxsort', 'oxobject2selectlist', 1, 0, 0],
                                      ['oxident', 'oxselectlist', 0, 0, 0],
                                      ['oxvaldesc', 'oxselectlist', 0, 0, 0],
-                                     ['oxid', 'oxselectlist', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxselectlist', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -85,18 +87,18 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
                         ? " ( $sArtTable.oxid=oxobject2category.oxobjectid or"
                             . " $sArtTable.oxparentid=oxobject2category.oxobjectid ) "
                         : " $sArtTable.oxid=oxobject2category.oxobjectid "
-                    . " where oxobject2category.oxcatnid = " . $oDb->quote($sSelId);
+                    . ' where oxobject2category.oxcatnid = ' . $oDb->quote($sSelId);
             } else {
                 $sQAdd = " from $sArtTable left join oxobject2selectlist on"
                     . " $sArtTable.oxid=oxobject2selectlist.oxobjectid "
-                    . " where oxobject2selectlist.oxselnid = " . $oDb->quote($sSelId);
+                    . ' where oxobject2selectlist.oxselnid = ' . $oDb->quote($sSelId);
             }
         }
 
         if ($sSynchSelId && $sSynchSelId != $sSelId) {
             // performance
             $sQAdd .= " and $sArtTable.oxid not in ( select oxobject2selectlist.oxobjectid from oxobject2selectlist "
-                . " where oxobject2selectlist.oxselnid = " . $oDb->quote($sSynchSelId) . " ) ";
+                . ' where oxobject2selectlist.oxselnid = ' . $oDb->quote($sSynchSelId) . ' ) ';
         }
 
         return $sQAdd;
@@ -105,17 +107,17 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Removes article from Selection list
      */
-    public function removeArtFromSel()
+    public function removeArtFromSel(): void
     {
         $aChosenArt = $this->getActionIds('oxobject2selectlist.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = parent::addFilter("delete oxobject2selectlist.* " . $this->getQuery());
+            $sQ = parent::addFilter('delete oxobject2selectlist.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sQ = "delete from oxobject2selectlist where oxobject2selectlist.oxid in ("
-                . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt))
-                . ") ";
+            $sQ = 'delete from oxobject2selectlist where oxobject2selectlist.oxid in ('
+                . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt))
+                . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -125,7 +127,7 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      *
      * @throws Exception
      */
-    public function addArtToSel()
+    public function addArtToSel(): void
     {
         $aAddArticle = $this->getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -135,20 +137,20 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             $aAddArticle = $this->getAll(parent::addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aAddArticle)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddArticle)) {
             // We force reading from master to prevent issues with slow replications or open transactions
             // (see ESDEV-3804 and ESDEV-3822).
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
             foreach ($aAddArticle as $sAdd) {
                 $oNewGroup = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oNewGroup->init("oxobject2selectlist");
+                $oNewGroup->init('oxobject2selectlist');
                 $oNewGroup->oxobject2selectlist__oxobjectid = new Field($sAdd);
                 $oNewGroup->oxobject2selectlist__oxselnid = new Field($soxId);
                 $oNewGroup->oxobject2selectlist__oxsort = new Field(
                     (int) $database->getOne(
-                        "select max(oxsort) + 1 from oxobject2selectlist where oxobjectid = :oxobjectid",
+                        'select max(oxsort) + 1 from oxobject2selectlist where oxobjectid = :oxobjectid',
                         [
-                            'oxobjectid' => $sAdd
+                            'oxobjectid' => $sAdd,
                         ]
                     )
                 );

@@ -10,12 +10,10 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 
-
 final class UserComponentTest extends IntegrationTestCase
 {
     private string $userName = 'some-users-email@example.com';
     private string $password = 'password123';
-
 
     public function setUp(): void
     {
@@ -203,7 +201,7 @@ final class UserComponentTest extends IntegrationTestCase
         $this->getUserComponent()->createUser();
 
         return [
-            'email' => $email
+            'email' => $email,
         ];
     }
 
@@ -280,10 +278,9 @@ final class UserComponentTest extends IntegrationTestCase
                 'oxaddress__oxzip' => 123,
                 'oxaddress__oxcity' => 'Freiburg',
                 'oxaddress__oxcountryid' => 'a7c40f631fc920687.20179984',
-            ]
+            ],
         ];
     }
-
 
     private function getUserComponent(): UserComponent
     {

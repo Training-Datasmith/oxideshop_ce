@@ -19,8 +19,4 @@ final class Version20230109135625 extends AbstractMigration
         $this->addSql('ALTER TABLE `oxmanufacturers` ADD column `OXSORT` INT NOT NULL DEFAULT 0 AFTER `OXSHOWSUFFIX`');
         $this->addSql('CREATE INDEX OXSORT ON `oxmanufacturers` (OXSORT)');
     }
-
-    public function down(Schema $schema): void
-    {
-    }
 }

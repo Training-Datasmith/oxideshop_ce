@@ -34,9 +34,9 @@ final class ModuleSettingsBooleanConverterTest extends TestCase
             [
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'type' => 'bool', 'value' => $value
+                        'type' => 'bool', 'value' => $value,
                     ],
-                ]
+                ],
             ];
         $converter = new ModuleSettingsBooleanConverter();
 
@@ -62,9 +62,9 @@ final class ModuleSettingsBooleanConverterTest extends TestCase
             [
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'type' => 'bool', 'value' => $value
+                        'type' => 'bool', 'value' => $value,
                     ],
-                ]
+                ],
             ];
         $converter = new ModuleSettingsBooleanConverter();
 
@@ -80,10 +80,10 @@ final class ModuleSettingsBooleanConverterTest extends TestCase
                 [
                     MetaDataProvider::METADATA_SETTINGS => [
                         [
-                            'type' => 'str', 'value' => 'any'
+                            'type' => 'str', 'value' => 'any',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
     }

@@ -91,7 +91,7 @@ final class ContentMainTest extends IntegrationTestCase
 
         $this->mockPostRequest([
             'oxid' => $this->contentId,
-            'editval' => $this->createEditValArray('a-b_c.d!', 'Test content')
+            'editval' => $this->createEditValArray('a-b_c.d!', 'Test content'),
         ]);
 
         $this->contentMain->save();
@@ -107,14 +107,14 @@ final class ContentMainTest extends IntegrationTestCase
         $ident = 'abc';
         $this->mockPostRequest([
             'oxid' => $this->contentId,
-            'editval' => $this->createEditValArray($ident, 'Test content 1')
+            'editval' => $this->createEditValArray($ident, 'Test content 1'),
         ]);
         $this->contentMain->setEditObjectId($this->contentId);
         $this->contentMain->save();
 
         $this->mockPostRequest([
             'oxid' => 'other-content-id',
-            'editval' => $this->createEditValArray($ident, 'Test content 2')
+            'editval' => $this->createEditValArray($ident, 'Test content 2'),
         ]);
         $this->contentMain->setEditObjectId('other-content-id');
         $this->contentMain->save();
@@ -130,7 +130,7 @@ final class ContentMainTest extends IntegrationTestCase
         $this->mockPostRequest([
             'oxid' => $this->contentId,
             'new_lang' => $newLang,
-            'editval' => $this->createEditValArray(uniqid(), $this->unsafeHtml)
+            'editval' => $this->createEditValArray(uniqid(), $this->unsafeHtml),
         ]);
 
         $this->contentMain->saveinnlang();
@@ -148,7 +148,7 @@ final class ContentMainTest extends IntegrationTestCase
         $this->mockPostRequest([
             'oxid' => $this->contentId,
             'new_lang' => $newLang,
-            'editval' => $this->createEditValArray(uniqid(), $this->unsafeHtml)
+            'editval' => $this->createEditValArray(uniqid(), $this->unsafeHtml),
         ]);
 
         $this->contentMain->saveinnlang();
@@ -171,7 +171,7 @@ final class ContentMainTest extends IntegrationTestCase
     {
         $this->mockPostRequest([
             'oxid' => $this->contentId,
-            'editval' => $this->createEditValArray(uniqid(), $content)
+            'editval' => $this->createEditValArray(uniqid(), $content),
         ]);
     }
 

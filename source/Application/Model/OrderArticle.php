@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -9,8 +11,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Application\Model\Contract\ArticleInterface;
 use OxidEsales\Eshop\Core\Str;
+use OxidEsales\EshopCommunity\Application\Model\Contract\ArticleInterface;
 
 /**
  * Order article manager.
@@ -30,35 +32,35 @@ class OrderArticle extends BaseModel implements ArticleInterface
      *
      * @var array
      */
-    protected $_aPersParam = null;
+    protected $_aPersParam;
 
     /**
      * ERP status info
      *
      * @var array
      */
-    protected $_aStatuses = null;
+    protected $_aStatuses;
 
     /**
      * Order article selection list
      *
      * @var array
      */
-    protected $_aOrderArticleSelList = null;
+    protected $_aOrderArticleSelList;
 
     /**
      * Order article instance
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oOrderArticle = null;
+    protected $_oOrderArticle;
 
     /**
      * Article instance
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oArticle = null;
+    protected $_oArticle;
 
     /**
      * New order article marker
@@ -92,19 +94,19 @@ class OrderArticle extends BaseModel implements ArticleInterface
      *
      * @param object $oProduct product to copy
      */
-    public function copyThis($oProduct)
+    public function copyThis($oProduct): void
     {
         $aObjectVars = get_object_vars($oProduct);
 
         foreach ($aObjectVars as $sName => $sValue) {
             if (isset($oProduct->$sName->value)) {
-                $sFieldName = preg_replace('/oxarticles__/', 'oxorderarticles__', $sName);
-                if ($sFieldName != "oxorderarticles__oxtimestamp") {
+                $sFieldName = preg_replace('/oxarticles__/', 'oxorderarticles__', (string) $sName);
+                if ($sFieldName != 'oxorderarticles__oxtimestamp') {
                     $this->$sFieldName = $oProduct->$sName;
                 }
                 // formatting view
                 if (!Registry::getConfig()->getConfigParam('blSkipFormatConversion')) {
-                    if ($sFieldName == "oxorderarticles__oxinsert") {
+                    if ($sFieldName == 'oxorderarticles__oxinsert') {
                         Registry::getUtilsDate()->convertDBDate($this->$sFieldName, true);
                     }
                 }
@@ -115,7 +117,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     /**
      * Assigns DB field values to object fields.
      */
-    public function assign($dbRecord)
+    public function assign($dbRecord): void
     {
         parent::assign($dbRecord);
         $this->setArticleParams();
@@ -129,7 +131,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * @param double $dAddAmount           amount which will be substracled from value in db
      * @param bool   $blAllowNegativeStock amount allow or not negative stock value
      */
-    public function updateArticleStock($dAddAmount, $blAllowNegativeStock = false)
+    public function updateArticleStock($dAddAmount, $blAllowNegativeStock = false): void
     {
         // TODO: use oxarticle reduceStock
         // decrement stock if there is any
@@ -145,7 +147,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
             $oArticle->oxarticles__oxstock = new \OxidEsales\Eshop\Core\Field($iStockCount);
             $oDb->execute('update oxarticles set oxarticles.oxstock = :oxstock where oxarticles.oxid = :oxid', [
                 'oxstock' => $iStockCount,
-                'oxid' => $this->oxorderarticles__oxartid->value
+                'oxid' => $this->oxorderarticles__oxartid->value,
             ]);
             $oArticle->onChange(ACTION_UPDATE_STOCK);
         }
@@ -171,14 +173,14 @@ class OrderArticle extends BaseModel implements ArticleInterface
         $sQ = 'select oxstock from oxarticles 
             where oxid = :oxid';
         $iStockCount = (float) $masterDb->getOne($sQ, [
-            'oxid' => $this->oxorderarticles__oxartid->value
+            'oxid' => $this->oxorderarticles__oxartid->value,
         ]);
 
         $iStockCount += $dAddAmount;
 
         // #1592A. calculating according new stock option
         if (!$blAllowNegativeStock && $iStockCount < 0) {
-            $iStockCount = 0;
+            return 0;
         }
 
         return $iStockCount;
@@ -207,7 +209,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
      *
      * @param array $aParams array of params
      */
-    public function setPersParams($aParams)
+    public function setPersParams($aParams): void
     {
         $this->_aPersParam = $aParams;
 
@@ -221,8 +223,6 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
-     *
-     * @return null
      */
     protected function setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT)
     {
@@ -278,10 +278,10 @@ class OrderArticle extends BaseModel implements ArticleInterface
 
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $sQ = "select oxparentid from " . $oArticle->getViewName() . " 
-            where oxid = :oxid";
+        $sQ = 'select oxparentid from ' . $oArticle->getViewName() . ' 
+            where oxid = :oxid';
         $this->oxarticles__oxparentid = new \OxidEsales\Eshop\Core\Field($oDb->getOne($sQ, [
-            'oxid' => $this->getProductId()
+            'oxid' => $this->getProductId(),
         ]));
 
         return $this->oxarticles__oxparentid->value;
@@ -353,7 +353,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
         if ($this->_oOrderArticle === null) {
             $this->_oOrderArticle = false;
 
-            $sArticleId = $sArticleId ? $sArticleId : $this->getProductId();
+            $sArticleId = $sArticleId ?: $this->getProductId();
             $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
             $oArticle->setLoadParentData(true);
             if ($oArticle->load($sArticleId)) {
@@ -373,12 +373,11 @@ class OrderArticle extends BaseModel implements ArticleInterface
      */
     public function getSelectLists($sKeyPrefix = null)
     {
-        $aSelLists = [];
         if ($oArticle = $this->getOrderArticle()) {
-            $aSelLists = $oArticle->getSelectLists();
+            return $oArticle->getSelectLists();
         }
 
-        return $aSelLists;
+        return [];
     }
 
     /**
@@ -392,14 +391,14 @@ class OrderArticle extends BaseModel implements ArticleInterface
     public function getOrderArticleSelectList($sArtId = null, $sOrderArtSelList = null)
     {
         if ($this->_aOrderArticleSelList === null) {
-            $sOrderArtSelList = $sOrderArtSelList ? $sOrderArtSelList : $this->oxorderarticles__oxselvariant->value;
+            $sOrderArtSelList = $sOrderArtSelList ?: $this->oxorderarticles__oxselvariant->value;
 
-            $sOrderArtSelList = explode(' || ', $sOrderArtSelList)[0];
+            $sOrderArtSelList = explode(' || ', (string) $sOrderArtSelList)[0];
 
             $aRet = [];
 
             if ($oArticle = $this->getOrderArticle($sArtId)) {
-                $aList = explode(", ", $sOrderArtSelList);
+                $aList = explode(', ', $sOrderArtSelList);
                 $oStr = Str::getStr();
 
                 $aArticleSelList = $oArticle->getSelectLists();
@@ -408,7 +407,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
                 if (count($aArticleSelList) > 0) {
                     foreach ($aList as $sList) {
                         if ($sList) {
-                            $aVal = explode(":", $sList);
+                            $aVal = explode(':', $sList);
                             if (isset($aVal[0]) && isset($aVal[1])) {
                                 $sOrderArtListTitle = $oStr->strtolower(trim($aVal[0]));
                                 $sOrderArtSelValue = $oStr->strtolower(trim($aVal[1]));
@@ -461,9 +460,8 @@ class OrderArticle extends BaseModel implements ArticleInterface
 
         if ($oArticle) {
             return $oArticle->getBasketPrice($dAmount, $aSelList, $oBasket);
-        } else {
-            return $this->getPrice();
         }
+        return $this->getPrice();
     }
 
     /**
@@ -486,12 +484,11 @@ class OrderArticle extends BaseModel implements ArticleInterface
      */
     public function getCategoryIds($blActCats = false, $blSkipCache = false)
     {
-        $aCatIds = [];
         if ($oOrderArticle = $this->getOrderArticle()) {
-            $aCatIds = $oOrderArticle->getCategoryIds($blActCats, $blSkipCache);
+            return $oOrderArticle->getCategoryIds($blActCats, $blSkipCache);
         }
 
-        return $aCatIds;
+        return [];
     }
 
     /**
@@ -537,7 +534,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
      *
      * @param bool $blIsNew marker value - TRUE if this item is newy added to order
      */
-    public function setIsNewOrderItem($blIsNew)
+    public function setIsNewOrderItem($blIsNew): void
     {
         $this->_blIsNewOrderItem = $blIsNew;
     }
@@ -559,7 +556,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
      *
      * @param int $iNewAmount new ordered items amount
      */
-    public function setNewAmount($iNewAmount)
+    public function setNewAmount($iNewAmount): void
     {
         if ($iNewAmount >= 0) {
             // to update stock we must first check if it is possible - article exists?
@@ -597,7 +594,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * Sets order article storno value to 1 and if stock control is on -
      * restores previous oxarticle stock state
      */
-    public function cancelOrderArticle()
+    public function cancelOrderArticle(): void
     {
         if ($this->oxorderarticles__oxstorno->value == 0) {
             $myConfig = Registry::getConfig();
@@ -771,13 +768,12 @@ class OrderArticle extends BaseModel implements ArticleInterface
         return parent::insert();
     }
 
-
     /**
      * Set article
      *
      * @param object $oArticle - article object
      */
-    public function setArticle($oArticle)
+    public function setArticle($oArticle): void
     {
         $this->_oArticle = $oArticle;
     }
@@ -798,11 +794,10 @@ class OrderArticle extends BaseModel implements ArticleInterface
         return $this->_oArticle;
     }
 
-
     /**
      * Set order files
      */
-    public function setOrderFiles()
+    public function setOrderFiles(): void
     {
         $oArticle = $this->getArticle();
 

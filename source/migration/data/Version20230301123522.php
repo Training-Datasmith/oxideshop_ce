@@ -21,8 +21,4 @@ final class Version20230301123522 extends AbstractMigration
         $this->addSql('ALTER TABLE `oxmanufacturers` ADD column `OXTHUMBNAIL` VARCHAR(128) NOT NULL default "" COMMENT "Picture thumbnail filename" AFTER `OXPICTURE`');
         $this->addSql('ALTER TABLE `oxmanufacturers` ADD column `OXPROMOTION_ICON` VARCHAR(128) NOT NULL default "" COMMENT "Icon for promotion filename" AFTER `OXTHUMBNAIL`');
     }
-
-    public function down(Schema $schema): void
-    {
-    }
 }

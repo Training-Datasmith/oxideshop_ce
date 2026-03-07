@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,17 +24,17 @@ class ToolsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     public function render()
     {
         if (Registry::getConfig()->isDemoShop()) {
-            Registry::getUtils()->showMessageAndExit("Access denied !");
+            Registry::getUtils()->showMessageAndExit('Access denied !');
         }
 
         parent::render();
 
         $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
-        $this->_aViewData["blIsMallAdmin"] = $oAuthUser->oxuser__oxrights->value == "malladmin";
+        $this->_aViewData['blIsMallAdmin'] = $oAuthUser->oxuser__oxrights->value == 'malladmin';
 
         $this->_aViewData['showViewUpdate'] = ContainerFacade::getParameter('oxid_esales.show_update_views_button');
 
-        return "tools_main";
+        return 'tools_main';
     }
 }

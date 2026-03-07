@@ -43,7 +43,7 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 1,
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $basket->addProductToBasket($basketItem1['id'], 1);
@@ -53,14 +53,14 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 2,
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $basketItem2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
         $basket->addProductToBasket($basketItem1['id'], 1);
         $basket->addProductToBasket($basketItem2['id'], 1);
@@ -92,14 +92,14 @@ final class CheckoutProcessCest
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '100,00 €'
+            'totalPrice' => '100,00 €',
         ];
 
         $basketItem2 = [
             'id' => '1002-2',
             'title' => 'Test product 2 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '67,00 €'
+            'totalPrice' => '67,00 €',
         ];
         $homePage = $I->openShop();
 
@@ -180,14 +180,14 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 5,
-            'totalPrice' => '250,00 €'
+            'totalPrice' => '250,00 €',
         ];
 
         $basketItem2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '100,00 €'
+            'totalPrice' => '100,00 €',
         ];
 
         //add Product to basket
@@ -214,7 +214,7 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 3,
-            'totalPrice' => '150,00 €'
+            'totalPrice' => '150,00 €',
         ];
         $paymentPage = $basketPage->seeBasketContains([$basketItem1, $basketItem2], '250,00 €')
             ->goToNextStep()
@@ -271,7 +271,7 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '50,00 €'
+            'totalPrice' => '50,00 €',
         ];
 
         $userData = Fixtures::get('existingUser');
@@ -340,13 +340,13 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '50,00 €'
+            'totalPrice' => '50,00 €',
         ];
 
         $bundledProductData = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
-            'amount' => '+1'
+            'amount' => '+1',
         ];
 
         $this->prepareTestDataForBundledProduct($I, $productData['id'], $bundledProductData['id']);
@@ -620,14 +620,14 @@ final class CheckoutProcessCest
 
         $homePage = $I->openShop();
 
-        $basket->addProductToBasket("1001", 1);
-        $basket->addProductToBasket("1002-2", 1);
+        $basket->addProductToBasket('1001', 1);
+        $basket->addProductToBasket('1002-2', 1);
 
         $userData = Fixtures::get('existingUser');
         $homePage->loginUser($userData['userLoginName'], $userData['userPassword']);
         $basketPage = $homePage->openMiniBasket()->openBasketDisplay();
 
-        $basketPage->addCouponToBasket("123123");
+        $basketPage->addCouponToBasket('123123');
         $paymentMethodPage = $basketPage->goToNextStep()->goToNextStep();
         $I->seeText(Translator::translate('PAYMENT_METHOD'));
 
@@ -640,14 +640,14 @@ final class CheckoutProcessCest
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '100,00 €'
+            'totalPrice' => '100,00 €',
         ];
 
         $basketItem2 = [
             'id' => '1002-2',
             'title' => 'Test product 2 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '67,00 €'
+            'totalPrice' => '67,00 €',
         ];
 
         $orderCheckoutPage->validateOrderItems([$basketItem1, $basketItem2]);
@@ -680,7 +680,7 @@ final class CheckoutProcessCest
         $homePage->loginUser($userData['userLoginName'], $userData['userPassword']);
 
         $basket = new Basket($I);
-        $basket->addProductToBasket("1000", 3);
+        $basket->addProductToBasket('1000', 3);
 
         $paymentCheckout = $homePage->openMiniBasket()->openCheckout();
         $paymentCheckout->selectShippingIsAvailable();
@@ -721,8 +721,8 @@ final class CheckoutProcessCest
 
         $homePage = $I->openShop();
 
-        $basket->addProductToBasket("1000", 1);
-        $basket->addProductToBasket("1001", 1);
+        $basket->addProductToBasket('1000', 1);
+        $basket->addProductToBasket('1001', 1);
 
         $userData = Fixtures::get('existingUser');
         $homePage->loginUser($userData['userLoginName'], $userData['userPassword']);
@@ -736,7 +736,7 @@ final class CheckoutProcessCest
         $productPage->openAlsoBoughtProduct();
         $productPage->seeProductTitle('Test product 1 [EN]');
 
-        $basket->addProductToBasket("1000", 1);
+        $basket->addProductToBasket('1000', 1);
         $basket->openMiniBasket();
         $thankYouPage = $basket->openCheckout()->goToNextStep()->submitOrderSuccessfully();
         $thankYouPage->openAlsoBoughtProduct();
@@ -749,7 +749,7 @@ final class CheckoutProcessCest
         $productPage = $searchList->openProduct();
         $productPage->dontSeeAlsoBought();
 
-        $basket->addProductToBasket("1000", 1);
+        $basket->addProductToBasket('1000', 1);
         $basket->openMiniBasket();
         $thankYouPage = $basket->openCheckout()->goToNextStep()->submitOrderSuccessfully();
         $thankYouPage->dontSeeAlsoBought();
@@ -764,7 +764,7 @@ final class CheckoutProcessCest
         $homePage->loginUser($userData['userLoginName'], $userData['userPassword']);
 
         $basket = new Basket($I);
-        $basket->addProductToBasket("1001", 2);
+        $basket->addProductToBasket('1001', 2);
         $basket->openMiniBasket();
         $thankYouPage = $basket->openCheckout()->goToNextStep()->submitOrderSuccessfully();
         $orderHistory = $thankYouPage->goToOrderHistory();
@@ -782,7 +782,7 @@ final class CheckoutProcessCest
             'name' => 'UserNamešÄßüл UserSurnamešÄßüл',
             'itemNumber' => '1',
             'amount' => '1',
-            'product' => 'Test product 1 [EN] šÄßüл'
+            'product' => 'Test product 1 [EN] šÄßüл',
         ];
 
         $orderHistory->seeOrder($orderInformation);
@@ -799,7 +799,7 @@ final class CheckoutProcessCest
 
         $homePage = $I->openShop();
 
-        $basket->addProductToBasket("1001", 1);
+        $basket->addProductToBasket('1001', 1);
 
         $userData = Fixtures::get('existingUser');
         $homePage->loginUser($userData['userLoginName'], $userData['userPassword']);
@@ -822,7 +822,7 @@ final class CheckoutProcessCest
             'shippingPersonalPhone' => '0800 11111',
             'shippingCountry' => 'Germany',
             'shippingEmail' => 'example_test@oxid-esales.dev',
-            'shippingTitle' => 'Mr'
+            'shippingTitle' => 'Mr',
         ];
 
         foreach ($userData as $addressPart) {

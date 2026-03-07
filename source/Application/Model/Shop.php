@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -25,7 +27,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     protected $_aQueries = [];
 
     /** @var array Database tables. */
-    protected $_aTables = null;
+    protected $_aTables;
 
     /** @var bool Defines if multishop inherits categories. */
     protected $_blMultiShopInheritCategories = false;
@@ -42,7 +44,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param array $aTables
      */
-    public function setTables($aTables)
+    public function setTables($aTables): void
     {
         $this->_aTables = $aTables;
     }
@@ -67,7 +69,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param array $aQueries
      */
-    public function setQueries($aQueries)
+    public function setQueries($aQueries): void
     {
         $this->_aQueries = $aQueries;
     }
@@ -87,7 +89,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param string $sQuery
      */
-    public function addQuery($sQuery)
+    public function addQuery($sQuery): void
     {
         $this->_aQueries[] = $sQuery;
     }
@@ -117,7 +119,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param string $aMultiShopTables multi shop tables
      */
-    public function setMultiShopTables($aMultiShopTables)
+    public function setMultiShopTables($aMultiShopTables): void
     {
         $this->_aMultiShopTables = $aMultiShopTables;
     }
@@ -171,7 +173,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @param string $sTable     Table name
      * @param array  $aLanguages Language array( id => abbreviation )
      */
-    public function createViewQuery($sTable, $aLanguages = null)
+    public function createViewQuery($sTable, $aLanguages = null): void
     {
         $sStart = 'CREATE OR REPLACE SQL SECURITY INVOKER VIEW';
 
@@ -227,7 +229,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
 
         $oMetaData = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
         $aTables = array_merge([$sTable], $oMetaData->getAllMultiTables($sTable));
-        foreach ($aTables as $sTableKey => $sTableName) {
+        foreach ($aTables as $sTableName) {
             $aTableFields = $oMetaData->getFields($sTableName);
             foreach ($aTableFields as $sCoreField => $sField) {
                 if (!isset($aFields[$sCoreField])) {
@@ -252,7 +254,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $oMetaData = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
         $aTables = $oMetaData->getAllMultiTables($sTable);
         if (count($aTables)) {
-            foreach ($aTables as $sTableKey => $sTableName) {
+            foreach ($aTables as $sTableName) {
                 $sJoin .= "LEFT JOIN {$sTableName} USING (OXID) ";
             }
         }
@@ -349,7 +351,7 @@ class Shop extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             $sJoin = $this->getViewJoinLang($table, $languageId);
         }
 
-        if ("" === $sFields) {
+        if ('' === $sFields) {
             Registry::getLogger()->error("View for $table can not be generated, Please check if table exists");
             return;
         }

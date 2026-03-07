@@ -151,8 +151,8 @@ final class MetaDataProviderTest extends TestCase
         $basicContext = $this->createStub(BasicContextInterface::class);
         $basicContext->method('getBackwardsCompatibilityClassMap')->willReturn(
             [
-                "oxarticle" => "EShopNamespace\\ArticleClass",
-                "oxorder"   => "EShopNamespace\\OrderClass",
+                'oxarticle' => 'EShopNamespace\\ArticleClass',
+                'oxorder'   => 'EShopNamespace\\OrderClass',
             ]
         );
         $metaDataProvider = new MetaDataProvider(
@@ -165,9 +165,9 @@ final class MetaDataProviderTest extends TestCase
 
         $this->assertEquals(
             [
-                "EShopNamespace\\ArticleClass" => "VendorNamespace\\VendorClass1",
-                "EShopNamespace\\OrderClass"   => "VendorNamespace\\VendorClass2",
-                "EShopNamespace\\UserClass"    => "VendorNamespace\\VendorClass3",
+                'EShopNamespace\\ArticleClass' => 'VendorNamespace\\VendorClass1',
+                'EShopNamespace\\OrderClass'   => 'VendorNamespace\\VendorClass2',
+                'EShopNamespace\\UserClass'    => 'VendorNamespace\\VendorClass3',
             ],
             $metaData['moduleData']['extend']
         );

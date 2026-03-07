@@ -16,7 +16,7 @@ abstract class AbstractControllerDecorator implements ViewControllerInterface
     ) {
     }
 
-    public function init()
+    public function init(): void
     {
         $this->controller->init();
     }
@@ -31,7 +31,7 @@ abstract class AbstractControllerDecorator implements ViewControllerInterface
         return $this->controller->getFncName();
     }
 
-    public function executeFunction($function)
+    public function executeFunction($function): void
     {
         $this->controller->executeFunction($function);
     }
@@ -51,7 +51,7 @@ abstract class AbstractControllerDecorator implements ViewControllerInterface
         return $this->controller->getViewData();
     }
 
-    public function setViewData($viewData = null)
+    public function setViewData($viewData = null): void
     {
         $this->controller->setViewData($viewData);
     }
@@ -66,17 +66,17 @@ abstract class AbstractControllerDecorator implements ViewControllerInterface
         return $this->controller->getCharSet();
     }
 
-    public function setClassKey($classKey)
+    public function setClassKey($classKey): void
     {
         $this->controller->setClassKey($classKey);
     }
 
-    public function setFncName($fncName)
+    public function setFncName($fncName): void
     {
         $this->controller->setFncName($fncName);
     }
 
-    public function setViewParameters($params = null)
+    public function setViewParameters($params = null): void
     {
         $this->controller->setViewParameters($params);
     }

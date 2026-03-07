@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,7 +25,7 @@ class SystemRequirementsMain extends \OxidEsales\Eshop\Application\Controller\Ad
         $this->_aViewData['aInfo'] = $oSysReq->getSystemInfo();
         $this->_aViewData['aCollations'] = $oSysReq->checkCollation();
 
-        return "sysreq_main";
+        return 'sysreq_main';
     }
 
     /**
@@ -35,21 +37,12 @@ class SystemRequirementsMain extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function getModuleClass($iModuleState)
     {
-        switch ($iModuleState) {
-            case 2:
-                $sClass = 'pass';
-                break;
-            case 1:
-                $sClass = 'pmin';
-                break;
-            case -1:
-                $sClass = 'null';
-                break;
-            default:
-                $sClass = 'fail';
-                break;
-        }
-        return $sClass;
+        return match ($iModuleState) {
+            2 => 'pass',
+            1 => 'pmin',
+            -1 => 'null',
+            default => 'fail',
+        };
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -46,7 +48,7 @@ class UserShippingAddressUpdatableFields extends AbstractUpdatableFields
             'OXFON',
             'OXFAX',
             'OXSAL',
-            'OXTIMESTAMP'
+            'OXTIMESTAMP',
         ];
     }
 }

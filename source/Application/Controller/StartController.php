@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -20,7 +22,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      *
      * @var string
      */
-    protected $_sListDisplayType = null;
+    protected $_sListDisplayType;
 
     /**
      * Current class template name.
@@ -48,14 +50,14 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      *
      * @var bool
      */
-    protected $_blLoadActions = null;
+    protected $_blLoadActions;
 
     /**
      * Newest article list
      *
      * @var array
      */
-    protected $_aNewArticleList = null;
+    protected $_aNewArticleList;
 
     /**
      * Sign if to load and show top5articles action
@@ -173,12 +175,10 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      */
     public function getManufacturerForSlider()
     {
-        $oList = null;
-
         if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfLoadManufacturerTree')) {
-            $oList = $this->getManufacturerlist();
+            return $this->getManufacturerlist();
         }
 
-        return $oList;
+        return null;
     }
 }

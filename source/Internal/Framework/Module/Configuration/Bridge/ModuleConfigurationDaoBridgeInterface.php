@@ -17,14 +17,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
  */
 interface ModuleConfigurationDaoBridgeInterface
 {
-    /**
-     * @param string $moduleId
-     * @return ModuleConfiguration
-     */
     public function get(string $moduleId): ModuleConfiguration;
 
-    /**
-     * @param ModuleConfiguration $moduleConfiguration
-     */
     public function save(ModuleConfiguration $moduleConfiguration);
 }

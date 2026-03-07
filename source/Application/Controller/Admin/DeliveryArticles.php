@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,13 +26,13 @@ class DeliveryArticles extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
 
         $soxId = $this->getEditObjectId();
 
-        if (isset($soxId) && $soxId != "-1") {
-            $this->createCategoryTree("artcattree");
+        if (isset($soxId) && $soxId != '-1') {
+            $this->createCategoryTree('artcattree');
 
             // load object
             $oDelivery = oxNew(\OxidEsales\Eshop\Application\Model\Delivery::class);
             $oDelivery->load($soxId);
-            $this->_aViewData["edit"] = $oDelivery;
+            $this->_aViewData['edit'] = $oDelivery;
 
             //Disable editing for derived articles
             if ($oDelivery->isDerived()) {
@@ -38,19 +40,18 @@ class DeliveryArticles extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             }
         }
 
-        $iAoc = Registry::getRequest()->getRequestEscapedParameter("aoc");
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDeliveryArticlesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryArticlesAjax::class);
             $this->_aViewData['oxajax'] = $oDeliveryArticlesAjax->getColumns();
-
-            return "popups/delivery_articles";
-        } elseif ($iAoc == 2) {
+            return 'popups/delivery_articles';
+        }
+        if ($iAoc == 2) {
             $oDeliveryCategoriesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryCategoriesAjax::class);
             $this->_aViewData['oxajax'] = $oDeliveryCategoriesAjax->getColumns();
-
-            return "popups/delivery_categories";
+            return 'popups/delivery_categories';
         }
 
-        return "delivery_articles";
+        return 'delivery_articles';
     }
 }

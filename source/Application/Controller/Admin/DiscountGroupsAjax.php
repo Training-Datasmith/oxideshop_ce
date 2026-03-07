@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -15,7 +17,7 @@ use OxidEsales\Eshop\Core\Registry;
 class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
 {
     /** If this discount id comes from request, it means that new discount should be created. */
-    const NEW_DISCOUNT_ID = "-1";
+    public const NEW_DISCOUNT_ID = '-1';
 
     /**
      * Columns array
@@ -33,7 +35,7 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
              ['oxtitle', 'oxgroups', 1, 0, 0],
              ['oxid', 'oxgroups', 0, 0, 0],
              ['oxid', 'oxobject2discount', 0, 0, 1],
-         ]
+         ],
     ];
 
     /**
@@ -54,14 +56,14 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             $sQAdd = " from {$sGroupTable} where 1 ";
         } else {
             $sQAdd = " from oxobject2discount, {$sGroupTable} where {$sGroupTable}.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) .
+            $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) .
                       " and oxobject2discount.oxtype = 'oxgroups' ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and {$sGroupTable}.oxid not in ( select {$sGroupTable}.oxid " .
                       "from oxobject2discount, {$sGroupTable} where {$sGroupTable}.oxid=oxobject2discount.oxobjectid " .
-                      " and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) .
+                      ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2discount.oxtype = 'oxgroups' ) ";
         }
 
@@ -71,17 +73,17 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Removes user group from discount config
      */
-    public function removeDiscGroup()
+    public function removeDiscGroup(): void
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+        \OxidEsales\Eshop\Core\Registry::getConfig();
 
         $groupIds = $this->getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $query = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $query = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
         } elseif ($groupIds && is_array($groupIds)) {
-            $groupIdsQuoted = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($groupIds));
-            $query = "delete from oxobject2discount where oxobject2discount.oxid in (" . $groupIdsQuoted . ") ";
+            $groupIdsQuoted = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($groupIds));
+            $query = 'delete from oxobject2discount where oxobject2discount.oxid in (' . $groupIdsQuoted . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
         }
     }
@@ -89,7 +91,7 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     /**
      * Adds user group to discount config
      */
-    public function addDiscGroup()
+    public function addDiscGroup(): void
     {
         $groupIds = $this->getActionIds('oxgroups.oxid');
         $discountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -104,7 +106,7 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
                 $object2Discount->init('oxobject2discount');
                 $object2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($discountId);
                 $object2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($groupId);
-                $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxgroups");
+                $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field('oxgroups');
                 $object2Discount->save();
             }
         }

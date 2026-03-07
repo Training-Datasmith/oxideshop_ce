@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,7 +36,7 @@ class ModuleChainsGenerator
         }
         $activeChain = $this->getActiveChain($className, $classAlias);
         if (!empty($activeChain)) {
-            $className = $this->createClassExtensions($activeChain, $classAlias);
+            return $this->createClassExtensions($activeChain, $classAlias);
         }
 
         return $className;
@@ -81,7 +83,7 @@ class ModuleChainsGenerator
      *
      * @return string
      */
-    protected function createClassExtensions($classChain, $baseClass)
+    protected function createClassExtensions($classChain, $baseClass): string|array
     {
         //security: just preventing string termination
         $lastClass = str_replace(chr(0), '', $baseClass);
@@ -116,13 +118,11 @@ class ModuleChainsGenerator
      *      class suboutput2_parent extends suboutput1 {}
      *
      * @param string $parentClass
-     * @param string $moduleClass
      *
      * @throws \OxidEsales\Eshop\Core\Exception\SystemComponentException
-     *
      * @return bool Return on error
      */
-    protected function createClassExtension($parentClass, $moduleClass)
+    protected function createClassExtension($parentClass, string $moduleClass): bool
     {
         /**
          * Test if the class file could be loaded
@@ -139,7 +139,7 @@ class ModuleChainsGenerator
             return false;
         }
 
-        $moduleClassParentAlias = $moduleClass . "_parent";
+        $moduleClassParentAlias = $moduleClass . '_parent';
         if (!class_exists($moduleClassParentAlias, false)) {
             class_alias($parentClass, $moduleClassParentAlias);
         }
@@ -162,7 +162,7 @@ class ModuleChainsGenerator
         $currentClass = $requestedClass;
         $safetyCount = 0;
         do {
-            if (($currentClass == "oxconfig") || ($currentClass == \OxidEsales\Eshop\Core\Config::class)) {
+            if (($currentClass == 'oxconfig') || ($currentClass == \OxidEsales\Eshop\Core\Config::class)) {
                 $isConfigClass = true;
                 break;
             }
@@ -183,12 +183,10 @@ class ModuleChainsGenerator
 
     /**
      * Writes/logs an error on module extension creation problem
-     *
-     * @param string $moduleClass
      */
-    protected function onModuleExtensionCreationError($moduleClass)
+    protected function onModuleExtensionCreationError(string $moduleClass)
     {
-        $moduleId = "(module id not availible)";
+        $moduleId = '(module id not availible)';
         if (class_exists("\OxidEsales\Eshop\Core\Module\Module", false)) {
             $module = new \OxidEsales\Eshop\Core\Module\Module();
             $moduleId = $module->getIdByPath($moduleClass);

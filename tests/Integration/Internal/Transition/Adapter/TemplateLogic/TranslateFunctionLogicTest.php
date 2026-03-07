@@ -40,7 +40,7 @@ final class TranslateFunctionLogicTest extends IntegrationTestCase
             [['ident' => 'VAT_PLUS_PERCENT_AMOUNT', 'args' => 0], 'zzgl. 0% MwSt., Betrag'],
             [['ident' => 'VAT_PLUS_PERCENT_AMOUNT', 'args' => ''], 'zzgl. % MwSt., Betrag'],
             [['ident' => 'VAT_PLUS_PERCENT_AMOUNT'], 'zzgl. %s%% MwSt., Betrag'],
-            [['ident' => 'VAT_PLUS_PERCENT_AMOUNT', 'args' => false], 'zzgl. %s%% MwSt., Betrag']
+            [['ident' => 'VAT_PLUS_PERCENT_AMOUNT', 'args' => false], 'zzgl. %s%% MwSt., Betrag'],
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -50,7 +52,7 @@ class Request
         $value = $this->getRequestParameter($name, $defaultValue);
 
         // TODO: remove this after special chars concept implementation
-        $isAdmin = Registry::getConfig()->isAdmin() && Registry::getSession()->getVariable("blIsAdmin");
+        $isAdmin = Registry::getConfig()->isAdmin() && Registry::getSession()->getVariable('blIsAdmin');
         if ($value !== null && !$isAdmin) {
             $this->checkParamSpecialChars($value);
         }
@@ -66,10 +68,10 @@ class Request
      *
      * @return string
      */
-    public function getRequestUrl($sParams = '', $blReturnUrl = false)
+    public function getRequestUrl($sParams = '', $blReturnUrl = false): string|array
     {
         $requestUrl = '';
-        if (!isset($_SERVER["REQUEST_METHOD"]) || $_SERVER["REQUEST_METHOD"] != "POST") {
+        if (!isset($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
             if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']) {
                 $rawRequestUrl = $_SERVER['REQUEST_URI'];
             } else {
@@ -77,7 +79,7 @@ class Request
             }
 
             // trying to resolve controller file name
-            if ($rawRequestUrl && ($iPos = stripos($rawRequestUrl, '?')) !== false) {
+            if ($rawRequestUrl && ($iPos = stripos((string) $rawRequestUrl, '?')) !== false) {
                 $string = Str::getStr();
                 // formatting request url
                 $requestUrl = 'index.php' . $string->substr($rawRequestUrl, $iPos);

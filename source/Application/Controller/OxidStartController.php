@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use OxidEsales\Eshop\Core\SystemEventHandler;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\SystemEventHandler;
 
 /**
  * Encapsulates methods for application initialization.
@@ -17,10 +19,8 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
 {
     /**
      * Initializes globals and environment vars
-     *
-     * @return null
      */
-    public function appInit()
+    public function appInit(): void
     {
         $this->pageStart();
 
@@ -46,15 +46,14 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
 
         if (array_key_exists($errorNumber, $templates)) {
             return $templates[$errorNumber];
-        } else {
-            return 'message/err_unknown';
         }
+        return 'message/err_unknown';
     }
 
     /**
      * Creates and starts session object, sets default currency.
      */
-    public function pageStart()
+    public function pageStart(): void
     {
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
 
@@ -65,7 +64,7 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
     /**
      * Finalizes the script.
      */
-    public function pageClose()
+    public function pageClose(): void
     {
         $systemEventHandler = $this->getSystemEventHandler();
         $systemEventHandler->onShopEnd();

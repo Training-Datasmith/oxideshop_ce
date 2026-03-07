@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Registry;
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages category attributes
@@ -24,20 +26,20 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
         ['oxtitle', 'oxcategories', 1, 1, 0],
         ['oxdesc', 'oxcategories', 1, 1, 0],
         ['oxid', 'oxcategories', 0, 0, 0],
-        ['oxid', 'oxcategories', 0, 0, 1]
+        ['oxid', 'oxcategories', 0, 0, 1],
     ],
                                  'container2' => [
                                      ['oxtitle', 'oxcategories', 1, 1, 0],
                                      ['oxdesc', 'oxcategories', 1, 1, 0],
                                      ['oxid', 'oxcategories', 0, 0, 0],
                                      ['oxid', 'oxcategory2attribute', 0, 0, 1],
-                                     ['oxid', 'oxcategories', 0, 0, 1]
+                                     ['oxid', 'oxcategories', 0, 0, 1],
                                  ],
                                  'container3' => [
                                      ['oxtitle', 'oxattribute', 1, 1, 0],
                                      ['oxsort', 'oxcategory2attribute', 1, 0, 0],
-                                     ['oxid', 'oxcategory2attribute', 0, 0, 1]
-                                 ]
+                                     ['oxid', 'oxcategory2attribute', 0, 0, 1],
+                                 ],
     ];
 
     /**
@@ -61,7 +63,7 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
         } else {
             $sQAdd = " from {$sCatTable} left join oxcategory2attribute " .
                      "on {$sCatTable}.oxid=oxcategory2attribute.oxobjectid " .
-                     " where oxcategory2attribute.oxattrid = " . $oDb->quote($sDiscountId) .
+                     ' where oxcategory2attribute.oxattrid = ' . $oDb->quote($sDiscountId) .
                      " and {$sCatTable}.oxshopid = '" . $myConfig->getShopId() . "' " .
                      " and {$sCatTable}.oxactive = '1' ";
         }
@@ -70,7 +72,7 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
             $sQAdd .= " and {$sCatTable}.oxid not in ( select {$sCatTable}.oxid " .
                       "from {$sCatTable} left join oxcategory2attribute " .
                       "on {$sCatTable}.oxid=oxcategory2attribute.oxobjectid " .
-                      " where oxcategory2attribute.oxattrid = " . $oDb->quote($sSynchDiscountId) .
+                      ' where oxcategory2attribute.oxattrid = ' . $oDb->quote($sSynchDiscountId) .
                       " and {$sCatTable}.oxshopid = '" . $myConfig->getShopId() . "' " .
                       " and {$sCatTable}.oxactive = '1' ) ";
         }
@@ -81,16 +83,16 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     /**
      * Removes category from Attributes list
      */
-    public function removeCatFromAttr()
+    public function removeCatFromAttr(): void
     {
         $aChosenCat = $this->getActionIds('oxcategory2attribute.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxcategory2attribute.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxcategory2attribute.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
-            $sChosenCategories = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCat));
-            $sQ = "delete from oxcategory2attribute where oxcategory2attribute.oxid in (" . $sChosenCategories . ") ";
+            $sChosenCategories = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCat));
+            $sQ = 'delete from oxcategory2attribute where oxcategory2attribute.oxid in (' . $sChosenCategories . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
 
@@ -102,7 +104,7 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
      *
      * @throws Exception
      */
-    public function addCatToAttr()
+    public function addCatToAttr(): void
     {
         $aAddCategory = $this->getActionIds('oxcategories.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -119,7 +121,7 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
             foreach ($aAddCategory as $sAdd) {
                 $oNewGroup = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oNewGroup->init("oxcategory2attribute");
+                $oNewGroup->init('oxcategory2attribute');
                 $sOxSortField = 'oxcategory2attribute__oxsort';
                 $sObjectIdField = 'oxcategory2attribute__oxobjectid';
                 $sAttributeIdField = 'oxcategory2attribute__oxattrid';
@@ -127,10 +129,10 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
                 $oNewGroup->$sObjectIdField = new \OxidEsales\Eshop\Core\Field($sAdd);
                 $oNewGroup->$sAttributeIdField = new \OxidEsales\Eshop\Core\Field($oAttribute->$sOxIdField->value);
 
-                $sSql = "select max(oxsort) + 1 from oxcategory2attribute where oxobjectid = :oxobjectid";
+                $sSql = 'select max(oxsort) + 1 from oxcategory2attribute where oxobjectid = :oxobjectid';
 
                 $oNewGroup->$sOxSortField = new \OxidEsales\Eshop\Core\Field((int) $database->getOne($sSql, [
-                    'oxobjectid' => $sAdd
+                    'oxobjectid' => $sAdd,
                 ]));
                 $oNewGroup->save();
             }

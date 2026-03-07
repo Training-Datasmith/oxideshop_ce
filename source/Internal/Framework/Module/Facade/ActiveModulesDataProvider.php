@@ -89,7 +89,6 @@ class ActiveModulesDataProvider implements ActiveModulesDataProviderInterface
         return $this->moduleCache->get($cacheKey);
     }
 
-    /** @return array */
     private function collectModulePathsForCaching(): array
     {
         $modulePaths = [];
@@ -104,7 +103,6 @@ class ActiveModulesDataProvider implements ActiveModulesDataProviderInterface
         return $modulePaths;
     }
 
-    /** @return array */
     private function collectControllersForCaching(): array
     {
         $controllers = [];

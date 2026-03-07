@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Utility\Hash\Service;
 
-use OxidEsales\EshopCommunity\Internal\Utility\Hash\Exception\PasswordHashException;
 use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicyInterface;
+use OxidEsales\EshopCommunity\Internal\Utility\Hash\Exception\PasswordHashException;
 
 class BcryptPasswordHashService implements PasswordHashServiceInterface
 {
@@ -18,13 +18,13 @@ class BcryptPasswordHashService implements PasswordHashServiceInterface
      * @var int $cost
      * The value of the option cost has to be between 4 and 31.
      */
-    private $cost;
+    private readonly int $cost;
 
     /**
      * @throws PasswordHashException
      */
     public function __construct(
-        private PasswordPolicyInterface $passwordPolicy,
+        private readonly PasswordPolicyInterface $passwordPolicy,
         int $cost
     ) {
         $this->validateCostOption($cost);
@@ -34,9 +34,7 @@ class BcryptPasswordHashService implements PasswordHashServiceInterface
     /**
      * Creates a password hash
      *
-     * @param string $password
      *
-     * @return string
      * @throws PasswordHashException
      */
     public function hash(string $password): string
@@ -58,11 +56,6 @@ class BcryptPasswordHashService implements PasswordHashServiceInterface
         return $hash;
     }
 
-    /**
-     * @param string $passwordHash
-     *
-     * @return bool
-     */
     public function passwordNeedsRehash(string $passwordHash): bool
     {
         return password_needs_rehash(
@@ -72,21 +65,15 @@ class BcryptPasswordHashService implements PasswordHashServiceInterface
         );
     }
 
-    /**
-     * @return array
-     */
     private function getOptions(): array
     {
         return ['cost' => $this->cost];
     }
 
-
     /**
-     * @param int $cost
-     *
      * @throws PasswordHashException
      */
-    private function validateCostOption(int $cost)
+    private function validateCostOption(int $cost): void
     {
         if ($cost < 4) {
             throw new PasswordHashException('The cost option for bcrypt must not be smaller than 4.');

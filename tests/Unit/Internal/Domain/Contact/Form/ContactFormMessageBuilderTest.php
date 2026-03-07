@@ -43,23 +43,23 @@ final class ContactFormMessageBuilderTest extends TestCase
         return [
             [
                 'email',
-                'marina.ginesta@bcn.cat'
+                'marina.ginesta@bcn.cat',
             ],
             [
                 'firstName',
-                'Marina'
+                'Marina',
             ],
             [
                 'lastName',
-                'Ginestà'
+                'Ginestà',
             ],
             [
                 'salutation',
-                'MRS'
+                'MRS',
             ],
             [
                 'message',
-                'I\'m standing on the rooftop'
+                'I\'m standing on the rooftop',
             ],
         ];
     }

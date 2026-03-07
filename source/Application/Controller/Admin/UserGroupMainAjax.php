@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -42,7 +44,7 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                                      ['oxfon', 'oxuser', 0, 0, 0],
                                      ['oxbirthdate', 'oxuser', 0, 0, 0],
                                      ['oxid', 'oxobject2group', 0, 0, 1],
-                                 ]
+                                 ],
     ];
 
     /**
@@ -65,16 +67,16 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
             $sQAdd = " from $sUserTable where 1 ";
         } else {
             $sQAdd = " from $sUserTable, oxobject2group where $sUserTable.oxid=oxobject2group.oxobjectid and ";
-            $sQAdd .= " oxobject2group.oxgroupsid = " . $oDb->quote($sRoleId);
+            $sQAdd .= ' oxobject2group.oxgroupsid = ' . $oDb->quote($sRoleId);
         }
 
         if ($sSynchRoleId && $sSynchRoleId != $sRoleId) {
             $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from $sUserTable, oxobject2group where $sUserTable.oxid=oxobject2group.oxobjectid and ";
-            $sQAdd .= " oxobject2group.oxgroupsid = " . $oDb->quote($sSynchRoleId);
+            $sQAdd .= ' oxobject2group.oxgroupsid = ' . $oDb->quote($sSynchRoleId);
             if (!$myConfig->getConfigParam('blMallUsers')) {
                 $sQAdd .= " and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
             }
-            $sQAdd .= " ) ";
+            $sQAdd .= ' ) ';
         }
 
         if (!$myConfig->getConfigParam('blMallUsers')) {
@@ -87,15 +89,15 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Removes User from group
      */
-    public function removeUserFromUGroup()
+    public function removeUserFromUGroup(): void
     {
         $aRemoveGroups = $this->getActionIds('oxobject2group.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2group.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2group.* ' . $this->getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2group where oxobject2group.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -103,7 +105,7 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Adds User to group
      */
-    public function addUserToUGroup()
+    public function addUserToUGroup(): void
     {
         $aAddUsers = $this->getActionIds('oxuser.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -112,7 +114,7 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
             $sUserTable = $this->getViewName('oxuser');
             $aAddUsers = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aAddUsers)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddUsers)) {
             foreach ($aAddUsers as $sAdduser) {
                 $oNewGroup = oxNew(\OxidEsales\Eshop\Application\Model\Object2Group::class);
                 $oNewGroup->oxobject2group__oxobjectid = new \OxidEsales\Eshop\Core\Field($sAdduser);

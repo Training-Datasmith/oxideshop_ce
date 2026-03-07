@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -36,14 +38,14 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @var string
      */
-    protected $_sParentCatId = null;
+    protected $_sParentCatId;
 
     /**
      * Expanded state of a content category.
      *
      * @var bool
      */
-    protected $_blExpanded = null;
+    protected $_blExpanded;
 
     /**
      * Marks that current object is managed by SEO.
@@ -68,12 +70,10 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      */
     public function __get($sName)
     {
-        switch ($sName) {
-            case 'expanded':
-                return $this->getExpanded();
-                break;
-        }
-        return parent::__get($sName);
+        return match ($sName) {
+            'expanded' => $this->getExpanded(),
+            default => parent::__get($sName),
+        };
     }
 
     /**
@@ -104,7 +104,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @param string $sCategoryId
      */
-    public function setCategoryId($sCategoryId)
+    public function setCategoryId($sCategoryId): void
     {
         $this->oxcontents__oxcatid = new Field($sCategoryId);
     }
@@ -154,9 +154,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             $sSelect = str_replace("`{$sTable}`.`oxcontent`", "( $sContQ ) as oxcontent", $sSelect);
         }
 
-        $aData = DatabaseProvider::getDb()->getRow($sSelect);
-
-        return $aData;
+        return DatabaseProvider::getDb()->getRow($sSelect);
     }
 
     /**
@@ -230,7 +228,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @param array $dbRecord database record
      */
-    public function assign($dbRecord)
+    public function assign($dbRecord): void
     {
         parent::assign($dbRecord);
         // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
@@ -298,14 +296,14 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
         }
 
         if ($this->oxcontents__oxloadid->value === 'oxcredits') {
-            $sUrl .= "index.php?cl=credits";
+            $sUrl .= 'index.php?cl=credits';
         } else {
-            $sUrl .= "index.php?cl=content";
+            $sUrl .= 'index.php?cl=content';
         }
         $sUrl .= '&amp;oxloadid=' . $this->getLoadId();
 
         if ($blAddId) {
-            $sUrl .= "&amp;oxcid=" . $this->getId();
+            $sUrl .= '&amp;oxcid=' . $this->getId();
             // adding parent category if if available
             if (
                 $this->_sParentCatId !== false
@@ -315,8 +313,8 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
                 if ($this->_sParentCatId === null) {
                     $this->_sParentCatId = false;
                     $oDb = DatabaseProvider::getDb();
-                    $sParentId = $oDb->getOne("select oxparentid from oxcategories where oxid = :oxid", [
-                        'oxid' => $this->oxcontents__oxcatid->value
+                    $sParentId = $oDb->getOne('select oxparentid from oxcategories where oxid = :oxid', [
+                        'oxid' => $this->oxcontents__oxcatid->value,
                     ]);
                     if ($sParentId && 'oxrootid' != $sParentId) {
                         $this->_sParentCatId = $sParentId;
@@ -324,7 +322,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
                 }
 
                 if ($this->_sParentCatId) {
-                    $sUrl .= "&amp;cnid=" . $this->_sParentCatId;
+                    $sUrl .= '&amp;cnid=' . $this->_sParentCatId;
                 }
             }
         }
@@ -356,8 +354,6 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
-     *
-     * @return null
      */
     protected function setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT)
     {
@@ -406,10 +402,10 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             $oDb = DatabaseProvider::getDb();
             // dropping expired..
             $oDb->execute(
-                "delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion",
+                'delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion',
                 [
                     'oxshopid' => $sShopId,
-                    'notoxtermversion' => $sVersion
+                    'notoxtermversion' => $sVersion,
                 ]
             );
         }
@@ -434,7 +430,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @param string $sValue type value
      */
-    public function setType($sValue)
+    public function setType($sValue): void
     {
         $this->setFieldData('oxcontents__oxtype', $sValue);
     }
@@ -454,7 +450,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @param string $sValue title value
      */
-    public function setTitle($sValue)
+    public function setTitle($sValue): void
     {
         $this->setFieldData('oxcontents__oxtitle', $sValue);
     }

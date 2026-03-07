@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -29,35 +31,35 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @var string
      */
-    protected $_blVisibleSubCats = null;
+    protected $_blVisibleSubCats;
 
     /**
      * List type
      *
      * @var string
      */
-    protected $_oSubCatList = null;
+    protected $_oSubCatList;
 
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sTplLocation = null;
+    protected $_sTplLocation;
 
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sCatTitle = null;
+    protected $_sCatTitle;
 
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation = null;
+    protected $_oPageNavigation;
 
     /**
      * Marked which defines if current view is sortable or not
@@ -78,7 +80,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @var object
      */
-    protected $_oVendorTree = null;
+    protected $_oVendorTree;
 
     /**
      * Executes parent::render(), loads active vendor, prepares article
@@ -136,7 +138,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
 
         // load only articles which we show on screen
         $iNrOfCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-        $iNrOfCatArticles = $iNrOfCatArticles ? $iNrOfCatArticles : 1;
+        $iNrOfCatArticles = $iNrOfCatArticles ?: 1;
 
         $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
         $oArtList->setSqlLimit($iNrOfCatArticles * $this->getRequestPageNr(), $iNrOfCatArticles);
@@ -196,9 +198,8 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
     {
         if ((\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor()))) {
             return $oVendor->getLink();
-        } else {
-            return parent::generatePageNavigationUrl();
         }
+        return parent::generatePageNavigationUrl();
     }
 
     /**
@@ -250,7 +251,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
         if ($this->_aArticleList === null) {
             $this->_aArticleList = [];
             if (($oVendor = $this->getActVendor()) && ($oVendor->getId() != 'root')) {
-                list($aArticleList, $iAllArtCnt) = $this->loadArticles($oVendor);
+                [$aArticleList, $iAllArtCnt] = $this->loadArticles($oVendor);
                 if ($iAllArtCnt) {
                     $this->_aArticleList = $aArticleList;
                 }
@@ -399,7 +400,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
         $sAddParams = parent::getAddUrlParams();
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
         if ($oVendor = $this->getActVendor()) {
-            $sAddParams .= "&amp;cnid=v_" . $oVendor->getId();
+            $sAddParams .= '&amp;cnid=v_' . $oVendor->getId();
         }
 
         return $sAddParams;
@@ -429,7 +430,6 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
         return $aPaths;
     }
 
-
     /**
      * Returns vendor tree
      *
@@ -456,7 +456,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @param \OxidEsales\Eshop\Application\Model\VendorList $oVendorTree vendor tree
      */
-    public function setVendorTree($oVendorTree)
+    public function setVendorTree($oVendorTree): void
     {
         $this->_oVendorTree = $oVendorTree;
     }

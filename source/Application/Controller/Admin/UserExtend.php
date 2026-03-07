@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -27,7 +29,7 @@ class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
             $oUser->load($soxId);
@@ -37,14 +39,14 @@ class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
             $oCountry->loadInLang(\OxidEsales\Eshop\Core\Registry::getLang()->getObjectTplLanguage(), $oUser->oxuser__oxcountryid->value);
             $oUser->oxuser__oxcountry = new \OxidEsales\Eshop\Core\Field($oCountry->oxcountry__oxtitle->value);
 
-            $this->_aViewData["edit"] = $oUser;
+            $this->_aViewData['edit'] = $oUser;
         }
 
         if (!$this->allowAdminEdit($soxId)) {
             $this->_aViewData['readonly'] = true;
         }
 
-        return "user_extend";
+        return 'user_extend';
     }
 
     /**
@@ -62,10 +64,10 @@ class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
             return false;
         }
 
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oUser->load($soxId);
         } else {
             $aParams['oxuser__oxid'] = null;
@@ -74,11 +76,11 @@ class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
         // checkbox handling
         $aParams['oxuser__oxactive'] = $oUser->oxuser__oxactive->value;
 
-        $blNewsParams = Registry::getRequest()->getRequestEscapedParameter("editnews");
+        $blNewsParams = Registry::getRequest()->getRequestEscapedParameter('editnews');
         if (isset($blNewsParams)) {
             $oNewsSubscription = $oUser->getNewsSubscription();
             $oNewsSubscription->setOptInStatus((int) $blNewsParams);
-            $oNewsSubscription->setOptInEmailStatus((int) Registry::getRequest()->getRequestEscapedParameter("emailfailed"));
+            $oNewsSubscription->setOptInEmailStatus((int) Registry::getRequest()->getRequestEscapedParameter('emailfailed'));
         }
 
         $oUser->assign($aParams);

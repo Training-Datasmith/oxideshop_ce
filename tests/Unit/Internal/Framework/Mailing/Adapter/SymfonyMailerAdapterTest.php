@@ -208,7 +208,7 @@ class SymfonyMailerAdapterTest extends TestCase
                 5 => true,
                 6 => 'inline',
                 7 => $cid,
-            ]
+            ],
         ]);
         $legacyEmail->ContentType = 'text/html';
 
@@ -248,7 +248,7 @@ class SymfonyMailerAdapterTest extends TestCase
                 5 => true,
                 6 => 'inline',
                 7 => $cid,
-            ]
+            ],
         ]);
         $legacyEmail->ContentType = 'text/html';
 
@@ -299,7 +299,7 @@ class SymfonyMailerAdapterTest extends TestCase
                 5 => true,
                 6 => 'inline',
                 7 => $cid2,
-            ]
+            ],
         ]);
         $legacyEmail->ContentType = 'text/html';
 

@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use oxDb;
 
 /**
  * Admin article main pricealarm manager.
@@ -33,7 +33,7 @@ class PriceAlarmMail extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->select(
             $query,
             [
-                'oxshopid' => $shopId
+                'oxshopid' => $shopId,
             ]
         );
         if ($result != false && $result->count() > 0) {
@@ -58,6 +58,6 @@ class PriceAlarmMail extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
             }
         }
 
-        return "pricealarm_mail";
+        return 'pricealarm_mail';
     }
 }

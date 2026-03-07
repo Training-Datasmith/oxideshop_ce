@@ -38,14 +38,14 @@ final class NewsletterRecipientsDataMapperTest extends TestCase
                 NewsletterRecipientsDataMapper::ASSIGNED_USER_GROUPS,
             ],
             [
-                "no",
-                "Soca",
-                "Warrior",
-                "someMail",
-                "subscribed",
-                "Trinidad und Tobago",
-                "someString"
-            ]
+                'no',
+                'Soca',
+                'Warrior',
+                'someMail',
+                'subscribed',
+                'Trinidad und Tobago',
+                'someString',
+            ],
         ];
 
         $this->assertEquals(

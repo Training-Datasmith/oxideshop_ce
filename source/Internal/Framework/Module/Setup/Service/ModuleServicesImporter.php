@@ -12,8 +12,8 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\DataObject\DIConfigWrapper;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception\NoServiceYamlException;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @internal
@@ -21,7 +21,7 @@ use Symfony\Component\Filesystem\Path;
 class ModuleServicesImporter implements ModuleServicesImporterInterface
 {
     public function __construct(
-        private BasicContextInterface $context
+        private readonly BasicContextInterface $context
     ) {
     }
 

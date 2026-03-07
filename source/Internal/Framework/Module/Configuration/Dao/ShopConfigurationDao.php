@@ -10,30 +10,29 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
 
 use DirectoryIterator;
+
+use function dirname;
+use function in_array;
+
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\Chain\ClassExtensionsChainDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\Chain\TemplateExtensionChainDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ShopConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use function dirname;
-use function in_array;
 
 class ShopConfigurationDao implements ShopConfigurationDaoInterface
 {
     public function __construct(
-        private BasicContextInterface $context,
-        private Filesystem $fileSystem,
-        private ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private ClassExtensionsChainDaoInterface $classExtensionsChainDao,
-        private TemplateExtensionChainDaoInterface $templateExtensionChainDao
+        private readonly BasicContextInterface $context,
+        private readonly Filesystem $fileSystem,
+        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
+        private readonly ClassExtensionsChainDaoInterface $classExtensionsChainDao,
+        private readonly TemplateExtensionChainDaoInterface $templateExtensionChainDao
     ) {
     }
 
     /**
-     * @param int $shopId
-     *
-     * @return ShopConfiguration
      * @throws ShopConfigurationNotFoundException
      */
     public function get(int $shopId): ShopConfiguration
@@ -57,9 +56,6 @@ class ShopConfigurationDao implements ShopConfigurationDaoInterface
 
     /**
      * @deprecated use ModuleConfigurationDaoInterface::save() and ClassExtensionsChainDaoInterface::saveChain() instead
-     *
-     * @param ShopConfiguration $shopConfiguration
-     * @param int $shopId
      */
     public function save(ShopConfiguration $shopConfiguration, int $shopId): void
     {
@@ -128,11 +124,6 @@ class ShopConfigurationDao implements ShopConfigurationDaoInterface
         );
     }
 
-    /**
-     * @param int $shopId
-     *
-     * @return bool
-     */
     private function isShopIdExists(int $shopId): bool
     {
         return in_array($shopId, $this->getShopIds(), true);

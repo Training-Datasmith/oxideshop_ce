@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -7,8 +9,8 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use OxidEsales\EshopCommunity\Core\Exception\StandardException;
 use Exception;
+use OxidEsales\EshopCommunity\Core\Exception\StandardException;
 
 /**
  * Class oxOnlineCaller makes call to given URL which is taken from child classes and sends request parameter.
@@ -19,13 +21,13 @@ use Exception;
  */
 abstract class OnlineCaller
 {
-    const ALLOWED_HTTP_FAILED_CALLS_COUNT = 4;
+    public const ALLOWED_HTTP_FAILED_CALLS_COUNT = 4;
 
     /** Amount of seconds for curl execution timeout. */
-    const CURL_EXECUTION_TIMEOUT = 5;
+    public const CURL_EXECUTION_TIMEOUT = 5;
 
     /** Amount of seconds for curl connect timeout. */
-    const CURL_CONNECT_TIMEOUT = 3;
+    public const CURL_CONNECT_TIMEOUT = 3;
 
     /**
      * @var \OxidEsales\Eshop\Core\Curl
@@ -186,7 +188,7 @@ abstract class OnlineCaller
      *
      * @param string $sBody Mail content.
      */
-    private function sendEmail($sBody)
+    private function sendEmail($sBody): void
     {
         $oEmail = $this->getEmailBuilder()->build($sBody);
         $oEmail->send();
@@ -197,7 +199,7 @@ abstract class OnlineCaller
      *
      * @param int $iFailedOnlineCallsCount Amount of calls which previously failed.
      */
-    private function resetFailedCallsCount($iFailedOnlineCallsCount)
+    private function resetFailedCallsCount($iFailedOnlineCallsCount): void
     {
         if ($iFailedOnlineCallsCount > 0) {
             \OxidEsales\Eshop\Core\Registry::getConfig()->saveSystemConfigParameter('int', 'iFailedOnlineCallsCount', 0);
@@ -209,7 +211,7 @@ abstract class OnlineCaller
      *
      * @param int $iFailedOnlineCallsCount Amount of calls which previously failed.
      */
-    private function increaseFailedCallsCount($iFailedOnlineCallsCount)
+    private function increaseFailedCallsCount($iFailedOnlineCallsCount): void
     {
         \OxidEsales\Eshop\Core\Registry::getConfig()->saveSystemConfigParameter('int', 'iFailedOnlineCallsCount', ++$iFailedOnlineCallsCount);
     }

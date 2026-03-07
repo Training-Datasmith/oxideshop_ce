@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Review\DataMapper;
 
-use PHPUnit\Framework\TestCase;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\RatingDataMapper;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Rating;
+use PHPUnit\Framework\TestCase;
 
 final class RatingDataMapperTest extends TestCase
 {

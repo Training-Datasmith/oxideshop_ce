@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -21,20 +23,11 @@ class PriceList
     protected $_aList = [];
 
     /**
-     * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     *
-     * @return null
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Returns Brutto price sum
      *
      * @return double
      */
-    public function getBruttoSum()
+    public function getBruttoSum(): int|float
     {
         $dSum = 0;
         foreach ($this->_aList as $oPrice) {
@@ -49,7 +42,7 @@ class PriceList
      *
      * @return double
      */
-    public function getNettoSum()
+    public function getNettoSum(): int|float
     {
         $dSum = 0;
         foreach ($this->_aList as $oPrice) {
@@ -70,19 +63,16 @@ class PriceList
     {
         if ($isNettoMode) {
             return $this->getNettoSum();
-        } else {
-            return $this->getBruttoSum();
         }
+        return $this->getBruttoSum();
     }
 
     /**
      * Returns VAT values sum separated to different array elements depending on VAT
      *
      * @param bool $isNettoMode mode in which calculate sum, default netto
-     *
-     * @return array
      */
-    public function getVatInfo($isNettoMode = true)
+    public function getVatInfo($isNettoMode = true): array
     {
         $aVatValues = [];
         $aPrices = [];
@@ -107,13 +97,10 @@ class PriceList
         return $aVatValues;
     }
 
-
     /**
      * Return prices separated to different array elements depending on VAT
-     *
-     * @return array
      */
-    public function getPriceInfo()
+    public function getPriceInfo(): array
     {
         $aPrices = [];
         foreach ($this->_aList as $oPrice) {
@@ -148,7 +135,7 @@ class PriceList
      *
      * @return double
      */
-    public function getProportionalVatPercent()
+    public function getProportionalVatPercent(): int|float
     {
         $dTotalSum = 0;
 
@@ -167,21 +154,18 @@ class PriceList
         return $dProportionalVat;
     }
 
-
     /**
      * Add an oxPrice object to prices array
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice oxprice object
      */
-    public function addToPriceList($oPrice)
+    public function addToPriceList($oPrice): void
     {
         $this->_aList[] = $oPrice;
     }
 
     /**
      * Recalculate price list to one price: sum total value of prices, and calculate VAT
-     *
-     * @return null
      */
     public function calculateToPrice()
     {
@@ -212,10 +196,8 @@ class PriceList
 
     /**
      * Return count of added oxPrices
-     *
-     * @return int
      */
-    public function getCount()
+    public function getCount(): int
     {
         return count($this->_aList);
     }

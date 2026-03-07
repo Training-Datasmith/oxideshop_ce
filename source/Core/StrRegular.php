@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -34,20 +36,11 @@ class StrRegular
     protected $_aUmlEntities = ['&auml;', '&ouml;', '&uuml;', '&Auml;', '&Ouml;', '&Uuml;', '&szlig;'];
 
     /**
-     * Class constructor. The constructor is defined in order to be possible to call parent::__construct() in modules.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * PHP strlen() function wrapper
      *
      * @param string $sStr string to measure its length
-     *
-     * @return int
      */
-    public function strlen($sStr)
+    public function strlen($sStr): int
     {
         return strlen($sStr);
     }
@@ -58,10 +51,8 @@ class StrRegular
      * @param string $sStr    value to truncate
      * @param int    $iStart  start position
      * @param int    $iLength length
-     *
-     * @return string
      */
-    public function substr($sStr, $iStart, $iLength = null)
+    public function substr($sStr, $iStart, $iLength = null): string
     {
         if (is_null($iLength)) {
             return substr($sStr, $iStart);
@@ -75,10 +66,8 @@ class StrRegular
      * @param string $sHaystack value to search in
      * @param string $sNeedle   value to search for
      * @param int    $iOffset   initial search position
-     *
-     * @return string
      */
-    public function strpos($sHaystack, $sNeedle, $iOffset = null)
+    public function strpos($sHaystack, $sNeedle, $iOffset = null): int|false
     {
         $iPos = false;
         if ($sHaystack && $sNeedle) {
@@ -97,10 +86,8 @@ class StrRegular
      *
      * @param string $sHaystack string searching in
      * @param string $sNeedle   string to search
-     *
-     * @return mixed
      */
-    public function strstr($sHaystack, $sNeedle)
+    public function strstr($sHaystack, $sNeedle): string|false
     {
         return strstr($sHaystack, $sNeedle);
     }
@@ -109,10 +96,8 @@ class StrRegular
      * PHP multi byte compliant strtolower() function wrapper
      *
      * @param string $sString string being lower cased
-     *
-     * @return string
      */
-    public function strtolower($sString)
+    public function strtolower($sString): string
     {
         return strtolower($sString);
     }
@@ -121,10 +106,8 @@ class StrRegular
      * PHP strtolower() function wrapper
      *
      * @param string $sString string being lower cased
-     *
-     * @return string
      */
-    public function strtoupper($sString)
+    public function strtoupper($sString): string
     {
         return strtoupper($sString);
     }
@@ -134,10 +117,8 @@ class StrRegular
      *
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
-     *
-     * @return string
      */
-    public function htmlspecialchars($sString, $iQuotStyle = ENT_QUOTES)
+    public function htmlspecialchars($sString, $iQuotStyle = ENT_QUOTES): string
     {
         return htmlspecialchars($sString, $iQuotStyle, $this->_sEncoding);
     }
@@ -147,10 +128,8 @@ class StrRegular
      *
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
-     *
-     * @return string
      */
-    public function htmlentities($sString, $iQuotStyle = ENT_QUOTES)
+    public function htmlentities($sString, $iQuotStyle = ENT_QUOTES): string
     {
         return htmlentities($sString, $iQuotStyle, $this->_sEncoding);
     }
@@ -162,10 +141,8 @@ class StrRegular
      * @param int    $iQuotStyle quoting rule
      *
      * @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-     *
-     * @return string
      */
-    public function html_entity_decode($sString, $iQuotStyle = ENT_QUOTES)
+    public function html_entity_decode($sString, $iQuotStyle = ENT_QUOTES): string
     {
         return html_entity_decode($sString, $iQuotStyle, $this->_sEncoding);
     }
@@ -200,9 +177,9 @@ class StrRegular
      *
      * @return string
      */
-    public function preg_replace($sPattern, $sString, $sSubject, $iLimit = -1, $iCount = null)
+    public function preg_replace($sPattern, $sString, $sSubject, $iLimit = -1, $iCount = null): ?string
     {
-        return preg_replace($sPattern, $sString, $sSubject, $iLimit, $iCount);
+        return preg_replace($sPattern, (string) $sString, $sSubject, $iLimit, $iCount);
     }
 
     /**
@@ -218,7 +195,7 @@ class StrRegular
      *
      * @return string
      */
-    public function preg_replace_callback($pattern, $callback, $subject, $limit = -1, &$count = null)
+    public function preg_replace_callback($pattern, $callback, $subject, $limit = -1, &$count = null): ?string
     {
         return preg_replace_callback($pattern, $callback, $subject, $limit, $count);
     }
@@ -233,10 +210,8 @@ class StrRegular
      * @param int    $iOffset  place from which to start the search
      *
      * @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-     *
-     * @return string
      */
-    public function preg_match($sPattern, $sSubject, &$aMatches = null, $iFlags = null, $iOffset = null)
+    public function preg_match($sPattern, $sSubject, &$aMatches = null, $iFlags = null, $iOffset = null): int|false
     {
         return preg_match($sPattern, $sSubject, $aMatches, $iFlags, $iOffset);
     }
@@ -251,10 +226,8 @@ class StrRegular
      * @param int    $iOffset  place from which to start the search
      *
      * @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-     *
-     * @return string
      */
-    public function preg_match_all($sPattern, $sSubject, &$aMatches = null, $iFlags = null, $iOffset = null)
+    public function preg_match_all($sPattern, $sSubject, &$aMatches = null, $iFlags = null, $iOffset = null): int|false
     {
         return preg_match_all($sPattern, $sSubject, $aMatches, $iFlags, $iOffset);
     }
@@ -263,10 +236,8 @@ class StrRegular
      * PHP ucfirst() function wrapper
      *
      * @param string $sSubject input string
-     *
-     * @return string
      */
-    public function ucfirst($sSubject)
+    public function ucfirst($sSubject): string
     {
         $sString = $this->strtoupper($this->substr($sSubject, 0, 1));
 
@@ -280,10 +251,8 @@ class StrRegular
      * @param int    $iLength column width
      * @param string $sBreak  line is broken using the optional break parameter
      * @param bool   $blCut   string is always wrapped at the specified width
-     *
-     * @return string
      */
-    public function wordwrap($sString, $iLength = 75, $sBreak = "\n", $blCut = null)
+    public function wordwrap($sString, $iLength = 75, $sBreak = "\n", $blCut = null): string
     {
         return wordwrap($sString, $iLength, $sBreak, $blCut);
     }
@@ -300,7 +269,7 @@ class StrRegular
      *
      * @return string
      */
-    public function recodeEntities($sInput, $blToHtmlEntities = false, $aUmls = [], $aUmlEntities = [])
+    public function recodeEntities($sInput, $blToHtmlEntities = false, $aUmls = [], $aUmlEntities = []): string|array
     {
         $aUmls = (count($aUmls) > 0) ? array_merge($this->_aUmls, $aUmls) : $this->_aUmls;
         $aUmlEntities = (count($aUmlEntities) > 0)
@@ -321,7 +290,7 @@ class StrRegular
      */
     public function hasSpecialChars($sStr)
     {
-        return $this->preg_match("/(" . implode("|", $this->_aUmls) . "|(&amp;))/", $sStr);
+        return $this->preg_match('/(' . implode('|', $this->_aUmls) . '|(&amp;))/', $sStr);
     }
 
     /**
@@ -342,36 +311,30 @@ class StrRegular
      * wrapper for json encode, which does not work with non utf8 characters
      *
      * @param mixed $data data to encode
-     *
-     * @return string
      */
-    public function jsonEncode($data)
+    public function jsonEncode($data): string
     {
         if (is_array($data)) {
-            $ret = "";
+            $ret = '';
             $blWasOne = false;
             $blNumerical = true;
-            reset($data);
-            while ($blNumerical && $key = key($data)) {
+            while ($blNumerical && $key = array_key_first($data)) {
                 $blNumerical = !is_string($key);
             }
             if ($blNumerical) {
-                return '[' . implode(',', array_map([$this, 'jsonEncode'], $data)) . ']';
-            } else {
-                foreach ($data as $key => $val) {
-                    if ($blWasOne) {
-                        $ret .= ',';
-                    } else {
-                        $blWasOne = true;
-                    }
-                    $ret .= '"' . addslashes($key) . '":' . $this->jsonEncode($val);
-                }
-
-                return "{" . $ret . "}";
+                return '[' . implode(',', array_map($this->jsonEncode(...), $data)) . ']';
             }
-        } else {
-            return '"' . addcslashes((string) $data, "\r\n\t\"\\") . '"';
+            foreach ($data as $key => $val) {
+                if ($blWasOne) {
+                    $ret .= ',';
+                } else {
+                    $blWasOne = true;
+                }
+                $ret .= '"' . addslashes((string) $key) . '":' . $this->jsonEncode($val);
+            }
+            return '{' . $ret . '}';
         }
+        return '"' . addcslashes((string) $data, "\r\n\t\"\\") . '"';
     }
 
     /**
@@ -381,10 +344,8 @@ class StrRegular
      * @param string $sAllowableTags an optional parameter to specify tags which should not be stripped
      *
      * @phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
-     *
-     * @return string
      */
-    public function strip_tags($sString, $sAllowableTags = '')
+    public function strip_tags($sString, $sAllowableTags = ''): string
     {
         if (stripos($sAllowableTags, '<style>') === false) {
             // strip style tags with definitions within
@@ -403,7 +364,7 @@ class StrRegular
      *
      * @return int > 0 if str1 is less than str2; < 0 if str1 is greater than str2, and 0 if they are equal.
      */
-    public function strrcmp($sStr1, $sStr2)
+    public function strrcmp($sStr1, $sStr2): int
     {
         return -strcmp($sStr1, $sStr2);
     }

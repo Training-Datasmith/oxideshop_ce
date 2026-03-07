@@ -12,29 +12,23 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\DataObject\DIConfigWrapper;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Yaml\Yaml;
 
 class ProjectYamlDao implements ProjectYamlDaoInterface
 {
     public function __construct(
-        private BasicContextInterface $context,
-        private Filesystem $filesystem
+        private readonly BasicContextInterface $context,
+        private readonly Filesystem $filesystem
     ) {
     }
 
-    /**
-     * @return DIConfigWrapper
-     */
     public function loadProjectConfigFile(): DIConfigWrapper
     {
         return $this->loadDIConfigFile($this->context->getGeneratedServicesFilePath());
     }
 
-    /**
-     * @param DIConfigWrapper $config
-     */
-    public function saveProjectConfigFile(DIConfigWrapper $config)
+    public function saveProjectConfigFile(DIConfigWrapper $config): void
     {
         $config = $this->convertAbsolutePathsToRelative($config);
 
@@ -48,11 +42,6 @@ class ProjectYamlDao implements ProjectYamlDaoInterface
         );
     }
 
-    /**
-     * @param string $path
-     *
-     * @return DIConfigWrapper
-     */
     public function loadDIConfigFile(string $path): DIConfigWrapper
     {
         $yamlArray = [];
@@ -64,18 +53,11 @@ class ProjectYamlDao implements ProjectYamlDaoInterface
         return new DIConfigWrapper($yamlArray);
     }
 
-    /**
-     * @return string
-     */
     private function getGeneratedServicesFileDirectory(): string
     {
         return \dirname($this->context->getGeneratedServicesFilePath());
     }
 
-    /**
-     * @param DIConfigWrapper $configWrapper
-     * @return DIConfigWrapper
-     */
     private function convertAbsolutePathsToRelative(DIConfigWrapper $configWrapper): DIConfigWrapper
     {
         foreach ($configWrapper->getImportFileNames() as $fileName) {

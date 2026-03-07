@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,7 +26,7 @@ class NamespaceInformationProvider
     protected static $shopEditionNamespaces = [
         'CE' => 'OxidEsales\\EshopCommunity\\',
         'PE' => 'OxidEsales\\EshopProfessional\\',
-        'EE' => 'OxidEsales\\EshopEnterprise\\'
+        'EE' => 'OxidEsales\\EshopEnterprise\\',
     ];
 
     /**
@@ -35,7 +37,7 @@ class NamespaceInformationProvider
     protected static $shopEditionTestNamespaces = [
         'CE' => 'OxidEsales\\EshopCommunity\\Tests\\',
         'PE' => 'OxidEsales\\EshopProfessional\\Tests\\',
-        'EE' => 'OxidEsales\\EshopEnterprise\\Tests\\'
+        'EE' => 'OxidEsales\\EshopEnterprise\\Tests\\',
     ];
 
     /**
@@ -65,15 +67,12 @@ class NamespaceInformationProvider
         return static::$unifiedNamespace;
     }
 
-
     /**
      * @param string $className
-     *
-     * @return bool
      */
-    public static function isNamespacedClass($className)
+    public static function isNamespacedClass($className): bool
     {
-        return strpos($className, '\\') !== false;
+        return str_contains($className, '\\');
     }
 
     /**
@@ -92,16 +91,13 @@ class NamespaceInformationProvider
      * Check if given class belongs to a shop edition namespace.
      *
      * @param string $className
-     *
-     * @return bool
      */
-    public static function classBelongsToShopUnifiedNamespace($className)
+    public static function classBelongsToShopUnifiedNamespace($className): bool
     {
         $lcClassName = strtolower(ltrim($className, '\\'));
         $unifiedNamespace = static::getUnifiedNamespace();
-        $belongsToUnifiedNamespace = (false !== strpos($lcClassName, strtolower($unifiedNamespace)));
 
-        return $belongsToUnifiedNamespace;
+        return str_contains($lcClassName, strtolower($unifiedNamespace));
     }
 
     /**
@@ -119,7 +115,7 @@ class NamespaceInformationProvider
         $lcClassName = strtolower(ltrim($className, '\\'));
 
         foreach ($check as $namespace) {
-            if (false !== strpos($lcClassName, strtolower($namespace))) {
+            if (str_contains($lcClassName, strtolower((string) $namespace))) {
                 $belongsToNamespace = true;
                 continue;
             }

@@ -26,9 +26,9 @@ class ModuleUninstallCommand extends Command
     private const ERROR_MESSAGE = 'Error uninstalling module: ';
 
     public function __construct(
-        private ModuleInstallerInterface $moduleInstaller,
-        private ModulePathResolverInterface $modulePathResolver,
-        private ContextInterface $context
+        private readonly ModuleInstallerInterface $moduleInstaller,
+        private readonly ModulePathResolverInterface $modulePathResolver,
+        private readonly ContextInterface $context
     ) {
         parent::__construct();
     }
@@ -45,9 +45,6 @@ class ModuleUninstallCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      * @throws \Throwable
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -73,10 +70,6 @@ class ModuleUninstallCommand extends Command
             ->getFullModulePathFromConfiguration($moduleId, $this->context->getDefaultShopId());
     }
 
-    /**
-     * @param string $modulePath
-     * @return OxidEshopPackage
-     */
     private function getPackage(string $modulePath): OxidEshopPackage
     {
         return new OxidEshopPackage($modulePath);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -8,7 +10,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Current user order history review.
@@ -32,7 +33,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
      *
      * @var integer
      */
-    protected $_iCntPages = null;
+    protected $_iCntPages;
 
     /**
      * Current class template name.
@@ -46,14 +47,14 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
      *
      * @var array
      */
-    protected $_aOrderList = null;
+    protected $_aOrderList;
 
     /**
      * collecting article which ordered
      *
      * @var array
      */
-    protected $_aArticlesList = null;
+    protected $_aArticlesList;
 
     /**
      * If user is not logged in - returns name of template AccountOrderController::_sThisLoginTemplate, or if user is
@@ -87,7 +88,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
             // Load user Orderlist
             if ($oUser = $this->getUser()) {
                 $iNrofCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-                $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 1;
+                $iNrofCatArticles = $iNrofCatArticles ?: 1;
                 $this->_iAllArtCnt = $oUser->getOrderCount();
                 if ($this->_iAllArtCnt && $this->_iAllArtCnt > 0) {
                     $this->_aOrderList = $oUser->getOrders($iNrofCatArticles, $this->getActPage());

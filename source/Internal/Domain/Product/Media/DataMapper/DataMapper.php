@@ -38,7 +38,7 @@ readonly class DataMapper implements DataMapperInterface
     {
         $roles = [];
         if (!empty($data['roles'])) {
-            foreach (explode(',', $data['roles']) as $role) {
+            foreach (explode(',', (string) $data['roles']) as $role) {
                 $roles[] = ProductMediaRole::from($role);
             }
         }
@@ -67,7 +67,7 @@ readonly class DataMapper implements DataMapperInterface
         return $productMedia
             ->getRoleSet()
             ->getRoles()
-            ->map(static fn(ProductMediaRole $role) => $role->value())
+            ->map(static fn (ProductMediaRole $role): string => $role->value())
             ->getValues();
     }
 }

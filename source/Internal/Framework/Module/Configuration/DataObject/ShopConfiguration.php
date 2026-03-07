@@ -14,17 +14,11 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\
 class ShopConfiguration
 {
     /** @var ModuleConfiguration[] */
-    private $moduleConfigurations = [];
+    private array $moduleConfigurations = [];
 
-    /**
-     * @var ClassExtensionsChain
-     */
-    private $classExtensionsChain;
+    private \OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ClassExtensionsChain $classExtensionsChain;
 
-    /**
-     * @var ModuleTemplateExtensionChain
-     */
-    private $moduleTemplateExtensionsChain;
+    private \OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleTemplateExtensionChain $moduleTemplateExtensionsChain;
 
     public function __construct()
     {
@@ -33,9 +27,6 @@ class ShopConfiguration
     }
 
     /**
-     * @param string $moduleId
-     *
-     * @return ModuleConfiguration
      * @throws ModuleConfigurationNotFoundException
      */
     public function getModuleConfiguration(string $moduleId): ModuleConfiguration
@@ -55,11 +46,9 @@ class ShopConfiguration
     }
 
     /**
-     * @param ModuleConfiguration $moduleConfiguration
-     *
      * @return $this
      */
-    public function addModuleConfiguration(ModuleConfiguration $moduleConfiguration)
+    public function addModuleConfiguration(ModuleConfiguration $moduleConfiguration): static
     {
         $this->moduleConfigurations[$moduleConfiguration->getId()] = $moduleConfiguration;
 
@@ -69,11 +58,10 @@ class ShopConfiguration
     /**
      * @deprecated use ModuleConfigurationDaoInterface::delete() instead
      *
-     * @param string $moduleId
      *
      * @throws ModuleConfigurationNotFoundException
      */
-    public function deleteModuleConfiguration(string $moduleId)
+    public function deleteModuleConfiguration(string $moduleId): void
     {
         if (\array_key_exists($moduleId, $this->moduleConfigurations)) {
             $this->removeModuleExtensionFromClassChain($moduleId);
@@ -83,9 +71,6 @@ class ShopConfiguration
         }
     }
 
-    /**
-     * @return array
-     */
     public function getModuleIdsOfModuleConfigurations(): array
     {
         return array_keys($this->moduleConfigurations);
@@ -98,9 +83,6 @@ class ShopConfiguration
         return $this;
     }
 
-    /**
-     * @return ClassExtensionsChain
-     */
     public function getClassExtensionsChain(): ClassExtensionsChain
     {
         return $this->classExtensionsChain;
@@ -116,19 +98,11 @@ class ShopConfiguration
         return $this->moduleTemplateExtensionsChain;
     }
 
-    /**
-     * @param string $moduleId
-     *
-     * @return bool
-     */
     public function hasModuleConfiguration(string $moduleId): bool
     {
         return isset($this->moduleConfigurations[$moduleId]);
     }
 
-    /**
-     * @param string $moduleId
-     */
     private function removeModuleExtensionFromClassChain(string $moduleId): void
     {
         $moduleConfiguration = $this->moduleConfigurations[$moduleId];

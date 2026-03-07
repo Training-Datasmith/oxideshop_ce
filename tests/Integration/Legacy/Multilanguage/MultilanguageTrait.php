@@ -9,12 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Legacy\Multilanguage;
 
+use function chr;
+
 use OxidEsales\Eshop\Application\Controller\Admin\LanguageMain;
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
-use function chr;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 trait MultilanguageTrait
 {

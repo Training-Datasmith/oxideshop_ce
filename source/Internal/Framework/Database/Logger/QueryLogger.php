@@ -21,7 +21,7 @@ class QueryLogger extends Logger
         parent::__construct($loggerName);
     }
 
-    public function addRecord($level, $message, array $context = array()): bool
+    public function addRecord($level, $message, array $context = []): bool
     {
         return isset($context['sql']) &&
             $this->queryLogFilter->shouldLogQuery($context['sql'])

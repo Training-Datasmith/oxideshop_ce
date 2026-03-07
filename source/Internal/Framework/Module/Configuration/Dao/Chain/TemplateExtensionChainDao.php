@@ -18,8 +18,8 @@ use Symfony\Component\Filesystem\Path;
 class TemplateExtensionChainDao implements TemplateExtensionChainDaoInterface
 {
     public function __construct(
-        private BasicContextInterface $context,
-        private FileStorageFactoryInterface $fileStorageFactory,
+        private readonly BasicContextInterface $context,
+        private readonly FileStorageFactoryInterface $fileStorageFactory,
     ) {
     }
 

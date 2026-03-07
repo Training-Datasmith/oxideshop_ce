@@ -14,14 +14,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class BasketChangedEvent extends Event
 {
-    public function __construct(private BasketComponent $basketComponent)
+    public function __construct(private readonly BasketComponent $basketComponent)
     {
     }
 
     /**
      * Getter for basket component object.
-     *
-     * @return BasketComponent
      */
     public function getBasket(): BasketComponent
     {

@@ -14,7 +14,7 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\ReviewDaoInterface;
 
 class UserReviewService implements UserReviewServiceInterface
 {
-    public function __construct(private ReviewDaoInterface $reviewDao)
+    public function __construct(private readonly ReviewDaoInterface $reviewDao)
     {
     }
 

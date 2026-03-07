@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -24,7 +26,7 @@ abstract class CompanyVatInChecker
      *
      * @param string $error
      */
-    public function setError($error)
+    public function setError($error): void
     {
         $this->_sError = $error;
     }
@@ -42,7 +44,6 @@ abstract class CompanyVatInChecker
     /**
      * Validates company VAT identification number
      *
-     * @param \OxidEsales\Eshop\Application\Model\CompanyVatIn $vatIn
      *
      * @return mixed
      */

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject;
 
-readonly class MediaType
+readonly class MediaType implements \Stringable
 {
     public function __construct(
         private string $type

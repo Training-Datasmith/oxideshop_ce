@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -88,27 +90,13 @@ class Manufacturer extends MultiLanguageModel implements IUrl
      */
     public function __get($sName)
     {
-        switch ($sName) {
-            case 'oxurl':
-            case 'openlink':
-            case 'closelink':
-            case 'link':
-                $sValue = $this->getLink();
-                break;
-            case 'iArtCnt':
-                $sValue = $this->getNrOfArticles();
-                break;
-            case 'isVisible':
-                $sValue = $this->getIsVisible();
-                break;
-            case 'hasVisibleSubCats':
-                $sValue = $this->getHasVisibleSubCats();
-                break;
-            default:
-                $sValue = parent::__get($sName);
-                break;
-        }
-        return $sValue;
+        return match ($sName) {
+            'oxurl', 'openlink', 'closelink', 'link' => $this->getLink(),
+            'iArtCnt' => $this->getNrOfArticles(),
+            'isVisible' => $this->getIsVisible(),
+            'hasVisibleSubCats' => $this->getHasVisibleSubCats(),
+            default => parent::__get($sName),
+        };
     }
 
     /**
@@ -116,7 +104,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
      *
      * @param bool $blShowArticleCount Marker to load manufacturer article count
      */
-    public function setShowArticleCnt($blShowArticleCount = false)
+    public function setShowArticleCnt($blShowArticleCount = false): void
     {
         $this->_blShowArticleCnt = $blShowArticleCount;
     }
@@ -126,7 +114,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
      *
      * @param array $dbRecord parameters/values
      */
-    public function assign($dbRecord)
+    public function assign($dbRecord): void
     {
         parent::assign($dbRecord);
 
@@ -232,7 +220,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
             $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        return $sUrl . "index.php?cl=manufacturerlist" . ($blAddId ? "&amp;mnid=" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=manufacturerlist' . ($blAddId ? '&amp;mnid=' . $this->getId() : '');
     }
 
     /**
@@ -288,7 +276,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
      *
      * @param bool $blVisible manufacturers visibility status setter
      */
-    public function setIsVisible($blVisible)
+    public function setIsVisible($blVisible): void
     {
         $this->_blIsVisible = $blVisible;
     }
@@ -312,7 +300,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
      *
      * @param bool $blHasVisibleSubcats marker if manufacturer has visible subcategories
      */
-    public function setHasVisibleSubCats($blHasVisibleSubcats)
+    public function setHasVisibleSubCats($blHasVisibleSubcats): void
     {
         $this->_blHasVisibleSubCats = $blHasVisibleSubcats;
     }

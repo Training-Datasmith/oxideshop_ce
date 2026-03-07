@@ -12,13 +12,12 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Config\Utility;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject\ShopSettingType;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Exception\InvalidShopSettingValueException;
 
-use function unserialize;
 use function serialize;
+use function unserialize;
 
 class ShopSettingEncoder implements ShopSettingEncoderInterface
 {
     /**
-     * @param string $encodingType
      * @param mixed  $value
      * @return mixed
      */
@@ -34,7 +33,6 @@ class ShopSettingEncoder implements ShopSettingEncoderInterface
     }
 
     /**
-     * @param string $encodingType
      * @param mixed  $value
      * @return mixed
      */
@@ -53,7 +51,7 @@ class ShopSettingEncoder implements ShopSettingEncoderInterface
      * @param mixed $value
      * @throws InvalidShopSettingValueException
      */
-    private function validateSettingValue($value)
+    private function validateSettingValue($value): void
     {
         if (is_object($value)) {
             throw new InvalidShopSettingValueException(

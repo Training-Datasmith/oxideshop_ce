@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -58,7 +60,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     /**
      * Saves selection list parameters changes.
      */
-    public function save()
+    public function save(): void
     {
         // saving/updating seo params
         if (($sOxid = $this->getSaveObjectId())) {
@@ -86,8 +88,8 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
                 $aSeoData['oxseourl'],
                 $this->getSeoEntryType(),
                 $aSeoData['oxfixed'],
-                trim($aSeoData['oxkeywords']),
-                trim($aSeoData['oxdescription']),
+                trim((string) $aSeoData['oxkeywords']),
+                trim((string) $aSeoData['oxdescription']),
                 $this->processParam($aSeoData['oxparams']),
                 true,
                 $this->getAltSeoEntryId()
@@ -156,7 +158,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
             [
                 'oxobjectid' => $this->getEditObjectId(),
                 'oxshopid' => $iShopId,
-                'oxlang' => $iLang
+                'oxlang' => $iLang,
             ]
         );
     }

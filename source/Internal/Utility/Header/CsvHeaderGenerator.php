@@ -11,13 +11,10 @@ namespace OxidEsales\EshopCommunity\Internal\Utility\Header;
 
 class CsvHeaderGenerator implements HeaderGeneratorInterface
 {
-    /**
-     * @param string $filename
-     */
     public function generate(string $filename): void
     {
-        header("Pragma: no-cache");
-        header("Expires: 0");
+        header('Pragma: no-cache');
+        header('Expires: 0');
         header('Content-Type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment;filename={$filename}");
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -22,7 +24,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         $sReturn = parent::render();
 
         // generate help link
-        $myConfig = Registry::getConfig();
+        Registry::getConfig();
         $sDir = Path::join(
             ContainerFacade::getParameter('oxid_esales.shop_source_directory'),
             'documentation',
@@ -51,7 +53,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         $language = Registry::getLang();
         $languageAbbr = $language->getLanguageAbbr($language->getTplLanguage());
 
-        return $languageAbbr === "de" ? 0 : 1;
+        return $languageAbbr === 'de' ? 0 : 1;
     }
 
     /**
@@ -97,7 +99,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Resets number of articles in current shop categories.
      */
-    public function resetNrOfCatArticles()
+    public function resetNrOfCatArticles(): void
     {
         // resetting categories article count cache
         $this->resetContentCache();
@@ -106,7 +108,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Resets number of articles in current shop vendors.
      */
-    public function resetNrOfVendorArticles()
+    public function resetNrOfVendorArticles(): void
     {
         // resetting vendors cache
         $this->resetContentCache();
@@ -115,7 +117,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Resets number of articles in current shop manufacturers.
      */
-    public function resetNrOfManufacturerArticles()
+    public function resetNrOfManufacturerArticles(): void
     {
         // resetting manufacturers cache
         $this->resetContentCache();
@@ -189,7 +191,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         if ($sSelectedCatId) {
             // fixed parent category in select list
             foreach ($oCatTree as $oCategory) {
-                if (strcmp($oCategory->getId(), $sSelectedCatId) == 0) {
+                if (strcmp((string) $oCategory->getId(), $sSelectedCatId) == 0) {
                     $oCategory->selected = 1;
                     break;
                 }
@@ -212,7 +214,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Updates object folder parameters.
      */
-    public function changeFolder()
+    public function changeFolder(): void
     {
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('setfolder');
         $sFolderClass = Registry::getRequest()->getRequestEscapedParameter('folderclass');
@@ -258,10 +260,10 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
             foreach ($aResetInfo as $sResetId => $iPos) {
                 switch ($sType) {
                     case 'vendor':
-                        $this->resetCounter("vendorArticle", $sResetId);
+                        $this->resetCounter('vendorArticle', $sResetId);
                         break;
                     case 'manufacturer':
-                        $this->resetCounter("manufacturerArticle", $sResetId);
+                        $this->resetCounter('manufacturerArticle', $sResetId);
                         break;
                 }
             }
@@ -273,7 +275,6 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * Note: the parameters editedObject and field are not used here but in the enterprise edition.
      *
-     * @param TextEditorHandler $textEditorHandler
      * @param mixed             $editedObject      The object we want to edit, either type of
      *                                             \OxidEsales\Eshop\Core\BaseModel if you want to persist or anything
      *                                             else
@@ -296,8 +297,6 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function createTextEditorHandler()
     {
-        $textEditorHandler = oxNew(TextEditorHandler::class);
-
-        return $textEditorHandler;
+        return oxNew(TextEditorHandler::class);
     }
 }

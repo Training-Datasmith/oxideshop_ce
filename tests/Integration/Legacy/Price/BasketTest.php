@@ -9,11 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Legacy\Price;
 
+use function is_array;
+
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Component\Yaml\Yaml;
 
-use function is_array;
+use Symfony\Component\Yaml\Yaml;
 
 final class BasketTest extends IntegrationTestCase
 {

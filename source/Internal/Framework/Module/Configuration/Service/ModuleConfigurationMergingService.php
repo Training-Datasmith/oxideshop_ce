@@ -17,8 +17,8 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\
 class ModuleConfigurationMergingService implements ModuleConfigurationMergingServiceInterface
 {
     public function __construct(
-        private SettingsMergingServiceInterface $settingsMergingService,
-        private ModuleClassExtensionsMergingServiceInterface $classExtensionsMergingService
+        private readonly SettingsMergingServiceInterface $settingsMergingService,
+        private readonly ModuleClassExtensionsMergingServiceInterface $classExtensionsMergingService
     ) {
     }
 
@@ -51,10 +51,6 @@ class ModuleConfigurationMergingService implements ModuleConfigurationMergingSer
         return $shopConfiguration;
     }
 
-    /**
-     * @param ModuleConfiguration $moduleConfiguration
-     * @return ModuleConfiguration
-     */
     private function cloneModuleConfiguration(ModuleConfiguration $moduleConfiguration): ModuleConfiguration
     {
         $moduleSettingClones = [];
@@ -67,8 +63,6 @@ class ModuleConfigurationMergingService implements ModuleConfigurationMergingSer
     }
 
     /**
-     * @param ShopConfiguration $shopConfiguration
-     * @param ModuleConfiguration $mergedModuleConfiguration
      * @throws ModuleConfigurationNotFoundException
      */
     private function setActivatedOptionToMergedConfiguration(

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -23,14 +25,14 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      *
      * @var string
      */
-    protected $_sActCatId = null;
+    protected $_sActCatId;
 
     /**
      * Product selections (categories, vendors etc assigned)
      *
      * @var array
      */
-    protected $_aSelectionList = null;
+    protected $_aSelectionList;
 
     /**
      * Returns active selection type - oxcategory, oxmanufacturer, oxvendor
@@ -40,14 +42,13 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     public function getActCatType()
     {
         $sType = false;
-        $aData = Registry::getRequest()->getRequestEscapedParameter("aSeoData");
-        if ($aData && isset($aData["oxparams"])) {
+        $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
+        if ($aData && isset($aData['oxparams'])) {
             $oStr = Str::getStr();
-            $iEndPos = $oStr->strpos($aData["oxparams"], "#");
-            $sType = $oStr->substr($aData["oxparams"], 0, $iEndPos);
+            $iEndPos = $oStr->strpos($aData['oxparams'], '#');
+            $sType = $oStr->substr($aData['oxparams'], 0, $iEndPos);
         } elseif ($aList = $this->getSelectionList()) {
-            reset($aList);
-            $sType = key($aList);
+            $sType = array_key_first($aList);
         }
 
         return $sType;
@@ -60,17 +61,17 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     public function getActCatLang()
     {
-        if (Registry::getRequest()->getRequestEscapedParameter("editlanguage") !== null) {
+        if (Registry::getRequest()->getRequestEscapedParameter('editlanguage') !== null) {
             return $this->_iEditLang;
         }
 
         $iLang = false;
-        $aData = Registry::getRequest()->getRequestEscapedParameter("aSeoData");
-        if ($aData && isset($aData["oxparams"])) {
+        $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
+        if ($aData && isset($aData['oxparams'])) {
             $oStr = Str::getStr();
-            $iStartPos = $oStr->strpos($aData["oxparams"], "#");
-            $iEndPos = $oStr->strpos($aData["oxparams"], "#", $iStartPos + 1);
-            $iLang = $oStr->substr($aData["oxparams"], $iEndPos + 1);
+            $iStartPos = $oStr->strpos($aData['oxparams'], '#');
+            $iEndPos = $oStr->strpos($aData['oxparams'], '#', $iStartPos + 1);
+            $iLang = $oStr->substr($aData['oxparams'], $iEndPos + 1);
         } elseif ($aList = $this->getSelectionList()) {
             $aList = reset($aList);
             $iLang = key($aList);
@@ -87,14 +88,14 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     public function getActCatId()
     {
         $sId = false;
-        $aData = Registry::getRequest()->getRequestEscapedParameter("aSeoData");
-        if ($aData && isset($aData["oxparams"])) {
+        $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
+        if ($aData && isset($aData['oxparams'])) {
             $oStr = Str::getStr();
-            $iStartPos = $oStr->strpos($aData["oxparams"], "#");
-            $iEndPos = $oStr->strpos($aData["oxparams"], "#", $iStartPos + 1);
-            $iLen = $oStr->strlen($aData["oxparams"]);
+            $iStartPos = $oStr->strpos($aData['oxparams'], '#');
+            $iEndPos = $oStr->strpos($aData['oxparams'], '#', $iStartPos + 1);
+            $iLen = $oStr->strlen($aData['oxparams']);
 
-            $sId = $oStr->substr($aData["oxparams"], $iStartPos + 1, $iEndPos - $iLen);
+            $sId = $oStr->substr($aData['oxparams'], $iStartPos + 1, $iEndPos - $iLen);
         } elseif ($aList = $this->getSelectionList()) {
             $oItem = reset($aList[$this->getActCatType()][$this->getActCatLang()]);
 
@@ -118,15 +119,15 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
             $oProduct->load($this->getEditObjectId());
 
             if ($oCatList = $this->getCategoryList($oProduct)) {
-                $this->_aSelectionList["oxcategory"][$this->_iEditLang] = $oCatList;
+                $this->_aSelectionList['oxcategory'][$this->_iEditLang] = $oCatList;
             }
 
             if ($oVndList = $this->getVendorList($oProduct)) {
-                $this->_aSelectionList["oxvendor"][$this->_iEditLang] = $oVndList;
+                $this->_aSelectionList['oxvendor'][$this->_iEditLang] = $oVndList;
             }
 
             if ($oManList = $this->getManufacturerList($oProduct)) {
-                $this->_aSelectionList["oxmanufacturer"][$this->_iEditLang] = $oManList;
+                $this->_aSelectionList['oxmanufacturer'][$this->_iEditLang] = $oManList;
             }
         }
 
@@ -154,10 +155,10 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
         $view = $tableViewNameGenerator->getViewName('oxobject2category');
         $queryForPriceCategories = $article->getSqlForPriceCategories('oxid');
         $query = "select oxobject2category.oxcatnid as oxid from {$view} as oxobject2category " .
-              "where oxobject2category.oxobjectid = :oxobjectid union " . $queryForPriceCategories;
+              'where oxobject2category.oxobjectid = :oxobjectid union ' . $queryForPriceCategories;
 
         $categoriesIds = DatabaseProvider::getDb()->getCol($query, [
-            'oxobjectid' => $article->getId()
+            'oxobjectid' => $article->getId(),
         ]);
         foreach ($categoriesIds as $categoryId) {
             $category = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
@@ -273,8 +274,6 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
 
     /**
      * Returns alternative seo entry id
-     *
-     * @return null
      */
     protected function getAltSeoEntryId()
     {
@@ -333,9 +332,8 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
                 default:
                     if ($this->getActCatId()) {
                         return $seoEncoder->getArticleUri($product, $this->getEditLang());
-                    } else {
-                        return $seoEncoder->getArticleMainUri($product, $this->getEditLang());
                     }
+                    return $seoEncoder->getArticleMainUri($product, $this->getEditLang());
             }
         }
     }
@@ -357,16 +355,16 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     public function isEntryFixed()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         $sId = $this->getSaveObjectId();
         $iLang = (int) $this->getEditLang();
         $iShopId = Registry::getConfig()->getShopId();
         $sParam = $this->processParam($this->getActCatId());
 
-        $sQ = "select oxfixed from oxseo where
+        $sQ = 'select oxfixed from oxseo where
                    oxseo.oxobjectid = :oxobjectid and
-                   oxseo.oxshopid = :oxshopid and oxseo.oxlang = :oxlang and oxparams = :oxparams";
+                   oxseo.oxshopid = :oxshopid and oxseo.oxlang = :oxlang and oxparams = :oxparams';
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         return (bool) \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne(
@@ -375,7 +373,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
                 'oxobjectid' => $sId,
                 'oxshopid' => $iShopId,
                 'oxlang' => $iLang,
-                'oxparams' => $sParam
+                'oxparams' => $sParam,
             ]
         );
     }

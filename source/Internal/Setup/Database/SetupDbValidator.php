@@ -16,7 +16,7 @@ use function sprintf;
 
 class SetupDbValidator implements SetupDbValidatorInterface
 {
-    public function __construct(private SetupDbConnectionFactoryInterface $databaseConnectionFactory)
+    public function __construct(private readonly SetupDbConnectionFactoryInterface $databaseConnectionFactory)
     {
     }
 

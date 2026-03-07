@@ -14,7 +14,7 @@ use Symfony\Component\Filesystem\Path;
 
 class ModuleAssetsPathResolver implements ModuleAssetsPathResolverInterface
 {
-    public function __construct(private BasicContextInterface $context)
+    public function __construct(private readonly BasicContextInterface $context)
     {
     }
 

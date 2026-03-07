@@ -14,18 +14,13 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 class ModuleConfigurationDataMapper implements ModuleConfigurationDataMapperInterface
 {
     /** @var ModuleConfigurationDataMapperInterface[] */
-    private $dataMappers = [];
+    private readonly array $dataMappers;
 
     public function __construct(ModuleConfigurationDataMapperInterface ...$dataMappers)
     {
         $this->dataMappers = $dataMappers;
     }
 
-    /**
-     * @param ModuleConfiguration $configuration
-     *
-     * @return array
-     */
     public function toData(ModuleConfiguration $configuration): array
     {
         $data = [
@@ -49,12 +44,6 @@ class ModuleConfigurationDataMapper implements ModuleConfigurationDataMapperInte
         return $data;
     }
 
-    /**
-     * @param ModuleConfiguration $moduleConfiguration
-     * @param array               $data
-     *
-     * @return ModuleConfiguration
-     */
     public function fromData(ModuleConfiguration $moduleConfiguration, array $data): ModuleConfiguration
     {
         $moduleConfiguration

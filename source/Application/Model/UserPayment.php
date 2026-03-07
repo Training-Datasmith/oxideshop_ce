@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
 
 namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
-use oxDb;
 
 /**
  * User payment manager.
@@ -30,14 +28,14 @@ class UserPayment extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @var \OxidEsales\Eshop\Application\Model\Payment
      */
-    protected $_oPayment = null;
+    protected $_oPayment;
 
     /**
      * current dyn values
      *
      * @var array
      */
-    protected $_aDynValues = null;
+    protected $_aDynValues;
 
     /**
      * Special getter for oxpayments__oxdesc field
@@ -95,7 +93,7 @@ class UserPayment extends \OxidEsales\Eshop\Core\Model\BaseModel
                     oxuserid = :oxuserid order by oxorderdate desc';
             $params = [
                 'oxpaymenttype' => $sPaymentType,
-                'oxuserid' => $oUser->getId()
+                'oxuserid' => $oUser->getId(),
             ];
 
             if (($sOxId = $oDb->getOne($sQ, $params))) {
@@ -130,7 +128,7 @@ class UserPayment extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param array $aDynValues the array of dy values
      */
-    public function setDynValues($aDynValues)
+    public function setDynValues($aDynValues): void
     {
         $this->_aDynValues = $aDynValues;
     }

@@ -13,14 +13,14 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\ProductRatingServic
 
 class ProductRatingBridge implements ProductRatingBridgeInterface
 {
-    public function __construct(private ProductRatingServiceInterface $productRatingService)
+    public function __construct(private readonly ProductRatingServiceInterface $productRatingService)
     {
     }
 
     /**
      * @param string $productId
      */
-    public function updateProductRating($productId)
+    public function updateProductRating($productId): void
     {
         $this->productRatingService->updateProductRating($productId);
     }

@@ -92,7 +92,7 @@ final class BasketComponentTest extends IntegrationTestCase
                 'getId' => 'random-string',
                 'isActualSidInCookie' => true,
                 'checkSessionChallenge' => false,
-                'getBasket' => $basket
+                'getBasket' => $basket,
             ]
         );
 

@@ -16,8 +16,8 @@ use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 class ShopConfigurationDaoBridge implements ShopConfigurationDaoBridgeInterface
 {
     public function __construct(
-        private ContextInterface $context,
-        private ShopConfigurationDaoInterface $shopConfigurationDao
+        private readonly ContextInterface $context,
+        private readonly ShopConfigurationDaoInterface $shopConfigurationDao
     ) {
     }
 
@@ -28,7 +28,7 @@ class ShopConfigurationDaoBridge implements ShopConfigurationDaoBridgeInterface
         );
     }
 
-    public function save(ShopConfiguration $shopConfiguration)
+    public function save(ShopConfiguration $shopConfiguration): void
     {
         $this->shopConfigurationDao->save(
             $shopConfiguration,

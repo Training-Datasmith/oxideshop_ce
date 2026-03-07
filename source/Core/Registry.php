@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -26,7 +28,7 @@ class Registry
      *
      * @var null|array
      */
-    protected static $backwardsCompatibilityClassMap = null;
+    protected static $backwardsCompatibilityClassMap;
 
     /**
      * Instance getter. Return an existing or new instance for a given class name.
@@ -59,10 +61,8 @@ class Registry
      * @param null|object  $instance  Object instance
      *
      * @static
-     *
-     * @return null
      */
-    public static function set($className, $instance)
+    public static function set($className, $instance): void
     {
         $key = self::getStorageKey($className);
 
@@ -73,8 +73,6 @@ class Registry
         }
 
         self::$instances[$key] = $instance;
-
-        return;
     }
 
     /**
@@ -333,10 +331,8 @@ class Registry
 
     /**
      * Return all class instances, which are currently set in the registry
-     *
-     * @return array
      */
-    public static function getKeys()
+    public static function getKeys(): array
     {
         return array_keys(self::$instances);
     }
@@ -345,10 +341,8 @@ class Registry
      * Check if an instance of a given class is set in the registry
      *
      * @param string $className
-     *
-     * @return bool
      */
-    public static function instanceExists($className)
+    public static function instanceExists($className): bool
     {
         $key = self::getStorageKey($className);
 
@@ -384,7 +378,7 @@ class Registry
 
         if (!\OxidEsales\Eshop\Core\NamespaceInformationProvider::isNamespacedClass($className)) {
             $bcMap = self::getBackwardsCompatibilityClassMap();
-            $key = isset($bcMap[strtolower($key)]) ? $bcMap[strtolower($key)] : strtolower($key);
+            $key = $bcMap[strtolower($key)] ?? strtolower($key);
         }
 
         return $key;
@@ -404,12 +398,10 @@ class Registry
     protected static function createObject($className)
     {
         if (('oxutilsobject' === strtolower($className)) || \OxidEsales\Eshop\Core\UtilsObject::class === $className) {
-            $object = \OxidEsales\Eshop\Core\UtilsObject::getInstance();
-        } else {
-            $object = \oxNew($className);
+            return \OxidEsales\Eshop\Core\UtilsObject::getInstance();
         }
 
-        return $object;
+        return \oxNew($className);
     }
 
     /**
