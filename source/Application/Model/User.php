@@ -2108,11 +2108,13 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     public function acceptTerms(): void
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sUserId = $oDb->quote($this->getId());
         $sShopId = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
         $sVersion = oxNew(\OxidEsales\Eshop\Application\Model\Content::class)->getTermsVersion();
 
-        $oDb->execute("replace oxacceptedterms set oxuserid={$sUserId}, oxshopid='{$sShopId}', oxtermversion='{$sVersion}'");
+        $oDb->execute(
+            'replace oxacceptedterms set oxuserid=?, oxshopid=?, oxtermversion=?',
+            [$this->getId(), $sShopId, $sVersion]
+        );
     }
 
     /**

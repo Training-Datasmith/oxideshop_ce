@@ -84,7 +84,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         return setcookie(
             $sName,
             $sValue,
-            ['expires' => $iExpire, 'path' => $this->getCookiePath($sPath), 'domain' => $this->getCookieDomain($sDomain), 'secure' => $blSecure, 'httponly' => $blHttpOnly]
+            ['expires' => $iExpire, 'path' => $this->getCookiePath($sPath), 'domain' => $this->getCookieDomain($sDomain), 'secure' => $blSecure, 'httponly' => $blHttpOnly, 'samesite' => 'Lax']
         );
     }
 

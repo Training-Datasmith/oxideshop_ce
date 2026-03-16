@@ -307,7 +307,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
      */
     protected function initNewSessionChallenge()
     {
-        $this->setVariable('sess_stoken', sprintf('%X', crc32((string) Registry::getUtilsObject()->generateUID())));
+        $this->setVariable('sess_stoken', bin2hex(random_bytes(16)));
     }
 
     /**

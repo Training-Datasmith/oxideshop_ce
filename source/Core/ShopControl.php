@@ -385,7 +385,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
         if (is_array($errors) && count($errors)) {
             foreach ($errors as $location => $ex2) {
                 foreach ($ex2 as $key => $er) {
-                    $error = unserialize($er);
+                    $error = unserialize($er, ['allowed_classes' => [\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class]]);
                     $formattedErrors[$location][$key] = $error->getOxMessage();
                 }
             }

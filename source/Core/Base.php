@@ -11,6 +11,7 @@ namespace OxidEsales\EshopCommunity\Core;
 
 use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use ReflectionMethod;
 
 /**
  * Basic class which is used as parent class by other OXID eShop classes.
@@ -43,7 +44,7 @@ class Base
      */
     public function __call(string $method, array $arguments)
     {
-        if (method_exists($this, $method)) {
+        if (method_exists($this, $method) && (new ReflectionMethod($this, $method))->isPublic()) {
             return call_user_func_array([& $this, $method], $arguments);
         }
         throw new SystemComponentException(
