@@ -71,12 +71,12 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "OxidEsales\\EshopCommunity\\": "./source"
+            "Oxid_Esales\\Eshop_Community\\": "./source"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "OxidEsales\\EshopCommunity\\Tests\\": "./tests"
+            "Oxid_Esales\\Eshop_Community\\Tests\\": "./tests"
         }
     },
     "bin": [
