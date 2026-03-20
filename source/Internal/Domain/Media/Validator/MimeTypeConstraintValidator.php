@@ -4,46 +4,29 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MimeBaseTypeMismatchException;
-use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MimeGuessMismatchException;
-use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\MimeTypeGuessFailedException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Mime\MimeTypeGuesserInterface;
-
-readonly class MimeTypeConstraintValidator implements MediaConstraintValidatorInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception\Mime_Base_Type_Mismatch_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception\Mime_Guess_Mismatch_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception\Mime_Type_Guess_Failed_Exception;
+use Symfony\Component\Http_Foundation\File\Uploaded_File;
+use Symfony\Component\Mime\Mime_Type_Guesser_Interface;
+readonly class Mime_Type_Constraint_Validator implements Media_Constraint_Validator_Interface
 {
-    public function __construct(
-        private string $baseTypePrefix,
-        private MimeTypeGuesserInterface $mimeTypeGuesser
-    ) {
-    }
-
-    public function validate(UploadedFile $uploadedFile): void
+    public function __construct(private string $base_type_prefix, private Mime_Type_Guesser_Interface $mime_type_guesser)
     {
-        $path = $uploadedFile->getPathname();
-
-        $guessedMimeType = $this->mimeTypeGuesser->guessMimeType($path)
-            ?? throw new MimeTypeGuessFailedException($path);
-
-        $clientMimeType = $uploadedFile->getClientMimeType();
-
-        if (!str_starts_with($guessedMimeType, $this->baseTypePrefix)) {
-            throw new MimeBaseTypeMismatchException(
-                $guessedMimeType,
-                $this->baseTypePrefix
-            );
+    }
+    public function validate(Uploaded_File $uploaded_file): void
+    {
+        $path = $uploaded_file->get_pathname();
+        $guessed_mime_type = $this->mime_type_guesser->guess_mime_type($path) ?? throw new Mime_Type_Guess_Failed_Exception($path);
+        $client_mime_type = $uploaded_file->get_client_mime_type();
+        if (!str_starts_with($guessed_mime_type, $this->base_type_prefix)) {
+            throw new Mime_Base_Type_Mismatch_Exception($guessed_mime_type, $this->base_type_prefix);
         }
-
-        if ($guessedMimeType !== $clientMimeType) {
-            throw new MimeGuessMismatchException(
-                $guessedMimeType,
-                $clientMimeType
-            );
+        if ($guessed_mime_type !== $client_mime_type) {
+            throw new Mime_Guess_Mismatch_Exception($guessed_mime_type, $client_mime_type);
         }
     }
 }

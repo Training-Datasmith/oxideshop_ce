@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceBridgeInterface;
-
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service_Bridge_Interface;
 /**
  * PriceAlarm window.
  * Arranges "pricealarm" window, by sending eMail and storing into Database (etc.)
@@ -22,36 +19,32 @@ use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceBridge
  * email.
  * OXID eShop -> pricealarm.
  */
-class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Price_Alarm_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'pricealarm';
-
+    protected $_s_this_template = 'pricealarm';
     /**
      * Current article.
      *
      * @var object
      */
-    protected $_oArticle;
-
+    protected $_o_article;
     /**
      * Bid price.
      *
      * @var string
      */
-    protected $_sBidPrice;
-
+    protected $_s_bid_price;
     /**
      * Price alarm status.
      *
      * @var integer
      */
-    protected $_iPriceAlarmStatus;
-
+    protected $_i_price_alarm_status;
     /**
      * Validates email
      * address. If email is wrong - returns false and exits. If email
@@ -63,92 +56,78 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
      */
     public function addme(): void
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $myUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
-        $emailValidator = ContainerFacade::get(EmailValidatorServiceBridgeInterface::class);
-
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('pa');
-        if (!isset($aParams['email']) || !$emailValidator->isEmailValid($aParams['email'])) {
-            $this->_iPriceAlarmStatus = 0;
-
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $my_utils = \Oxid_Esales\Eshop\Core\Registry::get_utils();
+        $email_validator = Container_Facade::get(Email_Validator_Service_Bridge_Interface::class);
+        $a_params = Registry::get_request()->get_request_escaped_parameter('pa');
+        if (!isset($a_params['email']) || !$email_validator->is_email_valid($a_params['email'])) {
+            $this->_i_price_alarm_status = 0;
             return;
         }
-
-        $oCur = $myConfig->getActShopCurrencyObject();
+        $o_cur = $my_config->get_act_shop_currency_object();
         // convert currency to default
-        $dPrice = $myUtils->currency2Float($aParams['price']);
-
-        $oAlarm = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
-        $oAlarm->oxpricealarm__oxuserid = new Field(Registry::getSession()->getVariable('usr'));
-        $oAlarm->oxpricealarm__oxemail = new Field($aParams['email']);
-        $oAlarm->oxpricealarm__oxartid = new Field($aParams['aid']);
-        $oAlarm->oxpricealarm__oxprice = new Field($myUtils->fRound($dPrice, $oCur));
-        $oAlarm->oxpricealarm__oxshopid = new Field($myConfig->getShopId());
-        $oAlarm->oxpricealarm__oxcurrency = new Field($oCur->name);
-
-        $oAlarm->oxpricealarm__oxlang = new Field(Registry::getLang()->getBaseLanguage());
-
-        $oAlarm->save();
-
+        $d_price = $my_utils->currency2Float($a_params['price']);
+        $o_alarm = ox_new(\Oxid_Esales\Eshop\Application\Model\Price_Alarm::class);
+        $o_alarm->oxpricealarm__oxuserid = new Field(Registry::get_session()->get_variable('usr'));
+        $o_alarm->oxpricealarm__oxemail = new Field($a_params['email']);
+        $o_alarm->oxpricealarm__oxartid = new Field($a_params['aid']);
+        $o_alarm->oxpricealarm__oxprice = new Field($my_utils->f_round($d_price, $o_cur));
+        $o_alarm->oxpricealarm__oxshopid = new Field($my_config->get_shop_id());
+        $o_alarm->oxpricealarm__oxcurrency = new Field($o_cur->name);
+        $o_alarm->oxpricealarm__oxlang = new Field(Registry::get_lang()->get_base_language());
+        $o_alarm->save();
         // Send Email
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
-        $this->_iPriceAlarmStatus = (int) $oEmail->sendPricealarmNotification($aParams, $oAlarm);
+        $o_email = ox_new(\Oxid_Esales\Eshop\Core\Email::class);
+        $this->_i_price_alarm_status = (int) $o_email->send_pricealarm_notification($a_params, $o_alarm);
     }
-
     /**
      * Template variable getter. Returns bid price
      *
      * @return string
      */
-    public function getBidPrice()
+    public function get_bid_price()
     {
-        if ($this->_sBidPrice === null) {
-            $this->_sBidPrice = false;
-
-            $aParams = $this->getParams();
-            $oCur = \OxidEsales\Eshop\Core\Registry::getConfig()->getActShopCurrencyObject();
-            $iPrice = \OxidEsales\Eshop\Core\Registry::getUtils()->currency2Float($aParams['price']);
-            $this->_sBidPrice = \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($iPrice, $oCur);
+        if ($this->_s_bid_price === null) {
+            $this->_s_bid_price = false;
+            $a_params = $this->get_params();
+            $o_cur = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_act_shop_currency_object();
+            $i_price = \Oxid_Esales\Eshop\Core\Registry::get_utils()->currency2Float($a_params['price']);
+            $this->_s_bid_price = \Oxid_Esales\Eshop\Core\Registry::get_lang()->format_currency($i_price, $o_cur);
         }
-
-        return $this->_sBidPrice;
+        return $this->_s_bid_price;
     }
-
     /**
      * Template variable getter. Returns active article
      *
      * @return object
      */
-    public function getProduct()
+    public function get_product()
     {
-        if ($this->_oArticle === null) {
-            $this->_oArticle = false;
-            $aParams = $this->getParams();
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oArticle->load($aParams['aid']);
-            $this->_oArticle = $oArticle;
+        if ($this->_o_article === null) {
+            $this->_o_article = false;
+            $a_params = $this->get_params();
+            $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            $o_article->load($a_params['aid']);
+            $this->_o_article = $o_article;
         }
-
-        return $this->_oArticle;
+        return $this->_o_article;
     }
-
     /**
      * Returns params (article id, bid price)
      *
      * @return array
      */
-    private function getParams()
+    private function get_params()
     {
-        return Registry::getRequest()->getRequestEscapedParameter('pa');
+        return Registry::get_request()->get_request_escaped_parameter('pa');
     }
-
     /**
      * Return pricealarm status (if it was send)
      *
      * @return integer
      */
-    public function getPriceAlarmStatus()
+    public function get_price_alarm_status()
     {
-        return $this->_iPriceAlarmStatus;
+        return $this->_i_price_alarm_status;
     }
 }

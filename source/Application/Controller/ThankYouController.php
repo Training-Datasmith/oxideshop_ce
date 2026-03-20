@@ -1,92 +1,79 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Thankyou page.
  * Arranges Thankyou page, sets ordering status, other parameters
  */
-class ThankYouController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Thank_You_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * User basket object
      *
      * @var object
      */
-    protected $_oBasket;
-
+    protected $_o_basket;
     /**
      * List of customer also bought thies products
      *
      * @var object
      */
-    protected $_aLastProducts;
-
+    protected $_a_last_products;
     /**
      * Currency conversion index value
      *
      * @var double
      */
-    protected $_dConvIndex;
-
+    protected $_d_conv_index;
     /**
      * IPayment basket
      *
      * @var double
      */
-    protected $_dIPaymentBasket;
-
+    protected $_d_i_payment_basket;
     /**
      * IPayment account
      *
      * @var string
      */
-    protected $_sIPaymentAccount;
-
+    protected $_s_i_payment_account;
     /**
      * IPayment user name
      *
      * @var string
      */
-    protected $_sIPaymentUser;
-
+    protected $_s_i_payment_user;
     /**
      * IPayment password
      *
      * @var string
      */
-    protected $_sIPaymentPassword;
-
+    protected $_s_i_payment_password;
     /**
      * Mail error
      *
      * @var string
      */
-    protected $_sMailError;
-
+    protected $_s_mail_error;
     /**
      * Sign if to load and show bargain action
      *
      * @var bool
      */
-    protected $_blBargainAction = true;
-
+    protected $_bl_bargain_action = true;
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'page/checkout/thankyou';
-
+    protected $_s_this_template = 'page/checkout/thankyou';
     /**
      * Executes parent::init(), loads basket from session
      * (thankyou::_oBasket = \OxidEsales\Eshop\Core\Session::getBasket()) then destroys
@@ -96,26 +83,21 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     public function init(): void
     {
         parent::init();
-
         // get basket we might need some information from it here
-        $session = \OxidEsales\Eshop\Core\Registry::getSession();
-        $oBasket = $session->getBasket();
-        $oBasket->setOrderId(\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('sess_challenge'));
-
+        $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
+        $o_basket = $session->get_basket();
+        $o_basket->set_order_id(\Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('sess_challenge'));
         // copying basket object
-        $this->_oBasket = clone $oBasket;
-
+        $this->_o_basket = clone $o_basket;
         // delete it from the session
-        $oBasket->deleteBasket();
-        Registry::getSession()->deleteVariable('sess_challenge');
-
+        $o_basket->delete_basket();
+        Registry::get_session()->delete_variable('sess_challenge');
         // if not in order-context, redirect to start
-        $order = $this->getOrder();
-        if (!$order || !$order->getFieldData('oxordernr')) {
-            \OxidEsales\Eshop\Core\Registry::getUtils()->redirect(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopHomeURL() . '&cl=start');
+        $order = $this->get_order();
+        if (!$order || !$order->get_field_data('oxordernr')) {
+            \Oxid_Esales\Eshop\Core\Registry::get_utils()->redirect(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_home_url() . '&cl=start');
         }
     }
-
     /**
      * First checks for basket - if no such object available -
      * redirects to start page. Otherwise - executes parent::render()
@@ -125,214 +107,185 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
      */
     public function render()
     {
-        if (!$this->_oBasket || !$this->_oBasket->getProductsCount()) {
-            \OxidEsales\Eshop\Core\Registry::getUtils()->redirect(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopHomeUrl() . '&cl=start', true, 302);
+        if (!$this->_o_basket || !$this->_o_basket->get_products_count()) {
+            \Oxid_Esales\Eshop\Core\Registry::get_utils()->redirect(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_home_url() . '&cl=start', true, 302);
         }
-
         parent::render();
-
-        $oUser = $this->getUser();
-
+        $o_user = $this->get_user();
         // removing also unregistered user info (#2580)
-        if (!$oUser || !$oUser->oxuser__oxpassword->value) {
-            Registry::getSession()->deleteVariable('usr');
-            Registry::getSession()->deleteVariable('dynvalue');
+        if (!$o_user || !$o_user->oxuser__oxpassword->value) {
+            Registry::get_session()->delete_variable('usr');
+            Registry::get_session()->delete_variable('dynvalue');
         }
-
         // loading order sometimes needed in template
-        if ($this->_oBasket->getOrderId()) {
+        if ($this->_o_basket->get_order_id()) {
             // owners stock reminder
-            $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
-            $oEmail->sendStockReminder($this->_oBasket->getContents());
+            $o_email = ox_new(\Oxid_Esales\Eshop\Core\Email::class);
+            $o_email->send_stock_reminder($this->_o_basket->get_contents());
         }
-
         // we must set active class as start
-        $this->getViewConfig()->setViewConfigParam('cl', 'start');
-
-        return $this->_sThisTemplate;
+        $this->get_view_config()->set_view_config_param('cl', 'start');
+        return $this->_s_this_template;
     }
-
     /**
      * Template variable getter. Returns active basket
      *
      * @return \OxidEsales\Eshop\Application\Model\Basket
      */
-    public function getBasket()
+    public function get_basket()
     {
-        return $this->_oBasket;
+        return $this->_o_basket;
     }
-
     /**
      * Template variable getter. Returns list of customer also bought these products
      *
      * @return object
      */
-    public function getAlsoBoughtTheseProducts()
+    public function get_also_bought_these_products()
     {
-        if ($this->_aLastProducts === null) {
-            $this->_aLastProducts = false;
+        if ($this->_a_last_products === null) {
+            $this->_a_last_products = false;
             // 5th order step
-            $aBasketContents = array_values($this->getBasket()->getContents());
-            if ($oBasketItem = $aBasketContents[0]) {
-                if ($oProduct = $oBasketItem->getArticle(false)) {
-                    $this->_aLastProducts = $oProduct->getCustomerAlsoBoughtThisProducts();
+            $a_basket_contents = array_values($this->get_basket()->get_contents());
+            if ($o_basket_item = $a_basket_contents[0]) {
+                if ($o_product = $o_basket_item->get_article(false)) {
+                    $this->_a_last_products = $o_product->get_customer_also_bought_this_products();
                 }
             }
         }
-
-        return $this->_aLastProducts;
+        return $this->_a_last_products;
     }
-
     /**
      * Template variable getter. Returns currency conversion index value
      *
      * @return object
      */
-    public function getCurrencyCovIndex()
+    public function get_currency_cov_index()
     {
-        if ($this->_dConvIndex === null) {
+        if ($this->_d_conv_index === null) {
             // currency conversion index value
-            $oCur = \OxidEsales\Eshop\Core\Registry::getConfig()->getActShopCurrencyObject();
-            $this->_dConvIndex = 1 / $oCur->rate;
+            $o_cur = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_act_shop_currency_object();
+            $this->_d_conv_index = 1 / $o_cur->rate;
         }
-
-        return $this->_dConvIndex;
+        return $this->_d_conv_index;
     }
-
     /**
      * Template variable getter. Returns ipayment basket price
      *
      * @return double
      */
-    public function getIPaymentBasket()
+    public function get_i_payment_basket()
     {
-        if ($this->_dIPaymentBasket === null) {
-            $this->_dIPaymentBasket = $this->getBasket()->getPrice()->getBruttoPrice() * 100;
+        if ($this->_d_i_payment_basket === null) {
+            $this->_d_i_payment_basket = $this->get_basket()->get_price()->get_brutto_price() * 100;
         }
-
-        return $this->_dIPaymentBasket;
+        return $this->_d_i_payment_basket;
     }
-
     /**
      * Template variable getter. Returns ipayment account
      *
      * @return string
      */
-    public function getIPaymentAccount()
+    public function get_i_payment_account()
     {
-        if ($this->_sIPaymentAccount === null) {
-            $this->_sIPaymentAccount = false;
-            $this->_sIPaymentAccount = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iShopID_iPayment_Account');
+        if ($this->_s_i_payment_account === null) {
+            $this->_s_i_payment_account = false;
+            $this->_s_i_payment_account = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iShopID_iPayment_Account');
         }
-
-        return $this->_sIPaymentAccount;
+        return $this->_s_i_payment_account;
     }
-
     /**
      * Template variable getter. Returns ipayment user name
      *
      * @return string
      */
-    public function getIPaymentUser()
+    public function get_i_payment_user()
     {
-        if ($this->_sIPaymentUser === null) {
-            $this->_sIPaymentUser = false;
-            $this->_sIPaymentUser = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iShopID_iPayment_User');
+        if ($this->_s_i_payment_user === null) {
+            $this->_s_i_payment_user = false;
+            $this->_s_i_payment_user = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iShopID_iPayment_User');
         }
-
-        return $this->_sIPaymentUser;
+        return $this->_s_i_payment_user;
     }
-
     /**
      * Template variable getter. Returns ipayment password
      *
      * @return string
      */
-    public function getIPaymentPassword()
+    public function get_i_payment_password()
     {
-        if ($this->_sIPaymentPassword === null) {
-            $this->_sIPaymentPassword = false;
-            $this->_sIPaymentPassword = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iShopID_iPayment_Passwort');
+        if ($this->_s_i_payment_password === null) {
+            $this->_s_i_payment_password = false;
+            $this->_s_i_payment_password = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iShopID_iPayment_Passwort');
         }
-
-        return $this->_sIPaymentPassword;
+        return $this->_s_i_payment_password;
     }
-
     /**
      * Template variable getter. Returns mail error
      *
      * @return string
      */
-    public function getMailError()
+    public function get_mail_error()
     {
-        if ($this->_sMailError === null) {
-            $this->_sMailError = false;
-            $this->_sMailError = Registry::getRequest()->getRequestEscapedParameter('mailerror');
+        if ($this->_s_mail_error === null) {
+            $this->_s_mail_error = false;
+            $this->_s_mail_error = Registry::get_request()->get_request_escaped_parameter('mailerror');
         }
-
-        return $this->_sMailError;
+        return $this->_s_mail_error;
     }
-
     /**
      * Template variable getter. Returns order
      *
      * @return \OxidEsales\Eshop\Application\Model\Order
      */
-    public function getOrder()
+    public function get_order()
     {
-        if (!isset($this->_oOrder)) {
-            $this->_oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+        if (!isset($this->_o_order)) {
+            $this->_o_order = ox_new(\Oxid_Esales\Eshop\Application\Model\Order::class);
             // loading order sometimes needed in template
-            if ($sOrderId = $this->getBasket()->getOrderId()) {
-                $this->_oOrder->load($sOrderId);
+            if ($s_order_id = $this->get_basket()->get_order_id()) {
+                $this->_o_order->load($s_order_id);
             }
         }
-
-        return $this->_oOrder;
+        return $this->_o_order;
     }
-
     /**
      * Template variable getter. Returns country ISO 3
      *
      * @return string
      */
-    public function getCountryISO3()
+    public function get_country_iso3()
     {
-        $oOrder = $this->getOrder();
-        if ($oOrder) {
-            $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
-            $oCountry->load($oOrder->oxorder__oxbillcountryid->value);
-
-            return $oCountry->oxcountry__oxisoalpha3->value;
+        $o_order = $this->get_order();
+        if ($o_order) {
+            $o_country = ox_new(\Oxid_Esales\Eshop\Application\Model\Country::class);
+            $o_country->load($o_order->oxorder__oxbillcountryid->value);
+            return $o_country->oxcountry__oxisoalpha3->value;
         }
     }
-
     /**
      * Returns name of a view class, which will be active for an action
      * (given a generic fnc, e.g. logout)
      *
      * @return string
      */
-    public function getActionClassName()
+    public function get_action_class_name()
     {
         return 'start';
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        $aPaths = [];
-        $aPath = [];
-
-        $iLang = Registry::getLang()->getBaseLanguage();
-        $aPath['title'] = Registry::getLang()->translateString('ORDER_COMPLETED', $iLang, false);
-        $aPath['link']  = $this->getLink();
-        $aPaths[] = $aPath;
-
-        return $aPaths;
+        $a_paths = [];
+        $a_path = [];
+        $i_lang = Registry::get_lang()->get_base_language();
+        $a_path['title'] = Registry::get_lang()->translate_string('ORDER_COMPLETED', $i_lang, false);
+        $a_path['link'] = $this->get_link();
+        $a_paths[] = $a_path;
+        return $a_paths;
     }
 }

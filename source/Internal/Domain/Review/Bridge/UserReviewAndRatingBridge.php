@@ -4,25 +4,21 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge;
-
-use Doctrine\Common\Collections\ArrayCollection;
-use OxidEsales\Eshop\Application\Model\Article;
-use OxidEsales\Eshop\Application\Model\RecommendationList;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\ReviewAndRatingObjectTypeException;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewAndRatingServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRating;
-
-class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
+use Doctrine\Common\Collections\Array_Collection;
+use Oxid_Esales\Eshop\Application\Model\Article;
+use Oxid_Esales\Eshop\Application\Model\Recommendation_List;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Exception\Review_And_Rating_Object_Type_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\User_Review_And_Rating_Service_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\View_Data_Object\Review_And_Rating;
+class User_Review_And_Rating_Bridge implements User_Review_And_Rating_Bridge_Interface
 {
-    public function __construct(private readonly UserReviewAndRatingServiceInterface $userReviewAndRatingService)
+    public function __construct(private readonly User_Review_And_Rating_Service_Interface $user_review_and_rating_service)
     {
     }
-
     /**
      * Get number of reviews by given user.
      *
@@ -30,13 +26,10 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @return int
      */
-    public function getReviewAndRatingListCount($userId)
+    public function get_review_and_rating_list_count($user_id)
     {
-        return $this
-            ->userReviewAndRatingService
-            ->getReviewAndRatingListCount($userId);
+        return $this->user_review_and_rating_service->get_review_and_rating_list_count($user_id);
     }
-
     /**
      * Returns Collection of User Ratings and Reviews.
      *
@@ -44,64 +37,49 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @return array
      */
-    public function getReviewAndRatingList($userId)
+    public function get_review_and_rating_list($user_id)
     {
-        $reviewAndRatingList = $this
-            ->userReviewAndRatingService
-            ->getReviewAndRatingList($userId);
-
-        $this->prepareRatingAndReviewPropertiesData($reviewAndRatingList);
-
-        return $reviewAndRatingList->toArray();
+        $review_and_rating_list = $this->user_review_and_rating_service->get_review_and_rating_list($user_id);
+        $this->prepare_rating_and_review_properties_data($review_and_rating_list);
+        return $review_and_rating_list->to_array();
     }
-
     /**
      * Prepare RatingAndReview properties data.
      *
      * @param ArrayCollection $reviewAndRatingList
      */
-    private function prepareRatingAndReviewPropertiesData($reviewAndRatingList): void
+    private function prepare_rating_and_review_properties_data($review_and_rating_list): void
     {
-        foreach ($reviewAndRatingList as $reviewAndRating) {
-            $this->setObjectTitleToReviewAndRating($reviewAndRating);
-            $this->formatReviewText($reviewAndRating);
-            $this->formatReviewAndRatingDate($reviewAndRating);
+        foreach ($review_and_rating_list as $review_and_rating) {
+            $this->set_object_title_to_review_and_rating($review_and_rating);
+            $this->format_review_text($review_and_rating);
+            $this->format_review_and_rating_date($review_and_rating);
         }
     }
-
     /**
      * Formats Review text.
      */
-    private function formatReviewText(ReviewAndRating $reviewAndRating): void
+    private function format_review_text(Review_And_Rating $review_and_rating): void
     {
-        $preparedText = htmlspecialchars($reviewAndRating->getReviewText());
-
-        $reviewAndRating->setReviewText($preparedText);
+        $prepared_text = htmlspecialchars($review_and_rating->get_review_text());
+        $review_and_rating->set_review_text($prepared_text);
     }
-
     /**
      * Formats ReviewAndRating date.
      */
-    private function formatReviewAndRatingDate(ReviewAndRating $reviewAndRating): void
+    private function format_review_and_rating_date(Review_And_Rating $review_and_rating): void
     {
-        $formattedDate = Registry::getUtilsDate()->formatDBDate($reviewAndRating->getCreatedAt());
-
-        $reviewAndRating->setCreatedAt($formattedDate);
+        $formatted_date = Registry::get_utils_date()->format_db_date($review_and_rating->get_created_at());
+        $review_and_rating->set_created_at($formatted_date);
     }
-
     /**
      * Sets object title to ReviewAndRating.
      */
-    private function setObjectTitleToReviewAndRating(ReviewAndRating $reviewAndRating): void
+    private function set_object_title_to_review_and_rating(Review_And_Rating $review_and_rating): void
     {
-        $title = $this->getObjectTitle(
-            $reviewAndRating->getObjectType(),
-            $reviewAndRating->getObjectId()
-        );
-
-        $reviewAndRating->setObjectTitle($title);
+        $title = $this->get_object_title($review_and_rating->get_object_type(), $review_and_rating->get_object_id());
+        $review_and_rating->set_object_title($title);
     }
-
     /**
      * Returns object title.
      *
@@ -110,17 +88,14 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @return string
      */
-    private function getObjectTitle($type, $objectId)
+    private function get_object_title($type, $object_id)
     {
-        $objectModel = $this->getObjectModel($type);
-        $objectModel->load($objectId);
-
-        $fieldName = $this->getObjectTitleFieldName($type);
-        $field = $objectModel->$fieldName;
-
+        $object_model = $this->get_object_model($type);
+        $object_model->load($object_id);
+        $field_name = $this->get_object_title_field_name($type);
+        $field = $object_model->{$field_name};
         return $field ? $field->value : '';
     }
-
     /**
      * Returns object model.
      *
@@ -128,23 +103,19 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @throws ReviewAndRatingObjectTypeException
      */
-    private function getObjectModel($type): Article|RecommendationList
+    private function get_object_model($type): Article|Recommendation_List
     {
         if ($type === 'oxarticle') {
-            $model = oxNew(Article::class);
+            $model = ox_new(Article::class);
         }
-
         if ($type === 'oxrecommlist') {
-            $model = oxNew(RecommendationList::class);
+            $model = ox_new(Recommendation_List::class);
         }
-
         if (!isset($model)) {
-            throw new ReviewAndRatingObjectTypeException();
+            throw new Review_And_Rating_Object_Type_Exception();
         }
-
         return $model;
     }
-
     /**
      * Returns field name of the object title.
      *
@@ -152,20 +123,17 @@ class UserReviewAndRatingBridge implements UserReviewAndRatingBridgeInterface
      *
      * @throws ReviewAndRatingObjectTypeException
      */
-    private function getObjectTitleFieldName($type): string
+    private function get_object_title_field_name($type): string
     {
         if ($type === 'oxarticle') {
-            $fieldName = 'oxarticles__oxtitle';
+            $field_name = 'oxarticles__oxtitle';
         }
-
         if ($type === 'oxrecommlist') {
-            $fieldName = 'oxrecommlists__oxtitle';
+            $field_name = 'oxrecommlists__oxtitle';
         }
-
-        if (!isset($fieldName)) {
-            throw new ReviewAndRatingObjectTypeException();
+        if (!isset($field_name)) {
+            throw new Review_And_Rating_Object_Type_Exception();
         }
-
-        return $fieldName;
+        return $field_name;
     }
 }

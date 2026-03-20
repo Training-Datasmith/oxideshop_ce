@@ -4,17 +4,14 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Database;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Setup\Database;
-
-use OxidEsales\DatabaseViewsGenerator\ViewsGenerator;
-
-class ViewsGeneratorFactory implements ViewsGeneratorFactoryInterface
+use Oxid_Esales\Database_Views_Generator\Views_Generator;
+class Views_Generator_Factory implements Views_Generator_Factory_Interface
 {
-    public function create(): ViewsGenerator
+    public function create(): Views_Generator
     {
-        return new ViewsGenerator();
+        return new Views_Generator();
     }
 }

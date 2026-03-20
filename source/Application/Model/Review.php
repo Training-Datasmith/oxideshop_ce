@@ -1,38 +1,32 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Model\BaseModel;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
-
-class Review extends BaseModel
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Model\Base_Model;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Review_And_Rating_Bridge_Interface;
+class Review extends Base_Model
 {
     /**
      * @var string
      */
-    protected $_blDisableShopCheck = true;
-
+    protected $_bl_disable_shop_check = true;
     /**
      * @var string
      */
-    protected $_sClassName = 'oxreview';
-
+    protected $_s_class_name = 'oxreview';
     public function __construct()
     {
         parent::__construct();
         $this->init('oxreviews');
     }
-
     /**
      * Calls parent::assign and assigns review writer data
      *
@@ -40,25 +34,18 @@ class Review extends BaseModel
      *
      * @return bool
      */
-    public function assign($dbRecord)
+    public function assign($db_record)
     {
-        $blRet = parent::assign($dbRecord);
-
+        $bl_ret = parent::assign($db_record);
         if (isset($this->oxreviews__oxuserid) && $this->oxreviews__oxuserid->value) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $params = [
-                'oxid' => $this->oxreviews__oxuserid->value,
-            ];
-
-            $firstName = $oDb->getOne('SELECT oxfname FROM oxuser 
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $params = ['oxid' => $this->oxreviews__oxuserid->value];
+            $first_name = $o_db->get_one('SELECT oxfname FROM oxuser 
                 WHERE oxid = :oxid', $params);
-
-            $this->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($firstName);
+            $this->oxuser__oxfname = new \Oxid_Esales\Eshop\Core\Field($first_name);
         }
-
-        return $blRet;
+        return $bl_ret;
     }
-
     /**
      * Loads object review information. Returns true on success.
      *
@@ -66,16 +53,14 @@ class Review extends BaseModel
      *
      * @return bool
      */
-    public function load($oxId)
+    public function load($ox_id)
     {
-        if ($blRet = parent::load($oxId)) {
+        if ($bl_ret = parent::load($ox_id)) {
             // convert date's to international format
-            $this->oxreviews__oxcreate->setValue(Registry::getUtilsDate()->formatDBDate($this->oxreviews__oxcreate->value));
+            $this->oxreviews__oxcreate->set_value(Registry::get_utils_date()->format_db_date($this->oxreviews__oxcreate->value));
         }
-
-        return $blRet;
+        return $bl_ret;
     }
-
     /**
      * Inserts object data fiels in DB. Returns true on success.
      *
@@ -84,11 +69,9 @@ class Review extends BaseModel
     protected function insert()
     {
         // set oxcreate
-        $this->oxreviews__oxcreate = new \OxidEsales\Eshop\Core\Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
-
+        $this->oxreviews__oxcreate = new \Oxid_Esales\Eshop\Core\Field(date('Y-m-d H:i:s', Registry::get_utils_date()->get_time()));
         return parent::insert();
     }
-
     /**
      * get oxList of reviews for given object ids and type
      *
@@ -99,83 +82,59 @@ class Review extends BaseModel
      *
      * @return \OxidEsales\Eshop\Core\Model\ListModel
      */
-    public function loadList($sType, $aIds, $blLoadEmpty = false, $iLoadInLang = null)
+    public function load_list($s_type, $a_ids, $bl_load_empty = false, $i_load_in_lang = null)
     {
-        $reviews = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $reviews = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
         $reviews->init('oxreview');
-
-        $params = [
-            'oxtype' => $sType,
-            'oxlang' => is_null($iLoadInLang) ? (int) Registry::getLang()->getBaseLanguage() : (int) $iLoadInLang,
-        ];
-
-        if (is_array($aIds) && count($aIds)) {
-            $sObjectIdWhere = 'oxreviews.oxobjectid in ( ' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . ' )';
-        } elseif (is_string($aIds) && $aIds) {
-            $sObjectIdWhere = 'oxreviews.oxobjectid = :oxobjectid';
-            $params['oxobjectid'] = $aIds;
+        $params = ['oxtype' => $s_type, 'oxlang' => is_null($i_load_in_lang) ? (int) Registry::get_lang()->get_base_language() : (int) $i_load_in_lang];
+        if (is_array($a_ids) && count($a_ids)) {
+            $s_object_id_where = 'oxreviews.oxobjectid in ( ' . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_ids)) . ' )';
+        } elseif (is_string($a_ids) && $a_ids) {
+            $s_object_id_where = 'oxreviews.oxobjectid = :oxobjectid';
+            $params['oxobjectid'] = $a_ids;
         } else {
             return $reviews;
         }
-
-        $sSelect = "select oxreviews.* from oxreviews where oxreviews.oxtype = :oxtype and $sObjectIdWhere and oxreviews.oxlang = :oxlang";
-
-        if (!$blLoadEmpty) {
-            $sSelect .= ' and oxreviews.oxtext != "" ';
+        $s_select = "select oxreviews.* from oxreviews where oxreviews.oxtype = :oxtype and {$s_object_id_where} and oxreviews.oxlang = :oxlang";
+        if (!$bl_load_empty) {
+            $s_select .= ' and oxreviews.oxtext != "" ';
         }
-
-        if (Registry::getConfig()->getConfigParam('blGBModerate')) {
-            $sSelect .= ' and ( oxreviews.oxactive = "1" ';
-
-            if ($oUser = $this->getUser()) {
-                $sSelect .= 'or  oxreviews.oxuserid = :oxuserid ';
-                $params['oxuserid'] = $oUser->getId();
+        if (Registry::get_config()->get_config_param('blGBModerate')) {
+            $s_select .= ' and ( oxreviews.oxactive = "1" ';
+            if ($o_user = $this->get_user()) {
+                $s_select .= 'or  oxreviews.oxuserid = :oxuserid ';
+                $params['oxuserid'] = $o_user->get_id();
             }
-
-            $sSelect .= ')';
+            $s_select .= ')';
         }
-
-        $sSelect .= ' order by oxreviews.oxcreate desc ';
-
-        $reviews->selectString($sSelect, $params);
-
+        $s_select .= ' order by oxreviews.oxcreate desc ';
+        $reviews->select_string($s_select, $params);
         foreach ($reviews as $review) {
-            $reviewCreationDate = $review->oxreviews__oxcreate->getRawValue();
-            $review->oxreviews__oxcreate->setValue(
-                Registry::getUtilsDate()->formatDBDate($reviewCreationDate),
-                Field::T_RAW
-            );
-
-            $reviewText = (string)$review->oxreviews__oxtext->value;
-            $review->oxreviews__oxtext->setValue(
-                $reviewText,
-                Field::T_RAW
-            );
+            $review_creation_date = $review->oxreviews__oxcreate->get_raw_value();
+            $review->oxreviews__oxcreate->set_value(Registry::get_utils_date()->format_db_date($review_creation_date), Field::T_RAW);
+            $review_text = (string) $review->oxreviews__oxtext->value;
+            $review->oxreviews__oxtext->set_value($review_text, Field::T_RAW);
         }
-
         return $reviews;
     }
-
     /**
      * Retuns review object type
      *
      * @return string
      */
-    public function getObjectType()
+    public function get_object_type()
     {
         return is_object($this->oxreviews__oxtype) ? $this->oxreviews__oxtype->value : $this->oxreviews__oxtype;
     }
-
     /**
      * Retuns review object id
      *
      * @return string
      */
-    public function getObjectId()
+    public function get_object_id()
     {
         return is_object($this->oxreviews__oxobjectid) ? $this->oxreviews__oxobjectid->value : $this->oxreviews__oxobjectid;
     }
-
     /**
      * Returns ReviewAndRating list by User id.
      *
@@ -183,9 +142,8 @@ class Review extends BaseModel
      *
      * @return array
      */
-    public function getReviewAndRatingListByUserId($userId)
+    public function get_review_and_rating_list_by_user_id($user_id)
     {
-        return ContainerFacade::get(UserReviewAndRatingBridgeInterface::class)
-            ->getReviewAndRatingList($userId);
+        return Container_Facade::get(User_Review_And_Rating_Bridge_Interface::class)->get_review_and_rating_list($user_id);
     }
 }

@@ -4,29 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
-
-interface ShopConfigurationDaoInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Shop_Configuration;
+interface Shop_Configuration_Dao_Interface
 {
-    public function get(int $shopId): ShopConfiguration;
-
+    public function get(int $shop_id): Shop_Configuration;
     /**
      * @deprecated use ModuleConfigurationDaoInterface::save() and ClassExtensionsChainDaoInterface::saveChain() instead
      */
-    public function save(ShopConfiguration $shopConfiguration, int $shopId): void;
-
+    public function save(Shop_Configuration $shop_configuration, int $shop_id): void;
     /**
      * @return ShopConfiguration[]
      */
-    public function getAll(): array;
-
+    public function get_all(): array;
     /**
      * @deprecated will be completely removed
      */
-    public function deleteAll(): void;
+    public function delete_all(): void;
 }

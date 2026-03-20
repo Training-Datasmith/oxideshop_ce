@@ -4,19 +4,15 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\SystemRequirements;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\System_Requirements;
 
 use Exception;
-
 use function random_bytes;
-
-class SystemSecurityChecker implements SystemSecurityCheckerInterface
+class System_Security_Checker implements System_Security_Checker_Interface
 {
     /** @inheritdoc */
-    public function isCryptographicallySecure(): bool
+    public function is_cryptographically_secure(): bool
     {
         try {
             random_bytes(1);

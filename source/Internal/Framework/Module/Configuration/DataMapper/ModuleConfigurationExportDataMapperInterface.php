@@ -4,14 +4,11 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-
-interface ModuleConfigurationExportDataMapperInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration;
+interface Module_Configuration_Export_Data_Mapper_Interface
 {
-    public function toData(ModuleConfiguration $configuration): array;
+    public function to_data(Module_Configuration $configuration): array;
 }

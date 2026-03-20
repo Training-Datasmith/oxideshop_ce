@@ -4,37 +4,22 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Admin\Service;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Admin\Dao\AdminDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Admin\Factory\AdminFactoryInterface;
-
-class AdminUserService implements AdminUserServiceInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Dao\Admin_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Factory\Admin_Factory_Interface;
+class Admin_User_Service implements Admin_User_Service_Interface
 {
-    public function __construct(
-        private readonly AdminDaoInterface $adminDao,
-        private readonly AdminFactoryInterface $adminFactory
-    ) {
+    public function __construct(private readonly Admin_Dao_Interface $admin_dao, private readonly Admin_Factory_Interface $admin_factory)
+    {
     }
-
     /**
      * @inheritDoc
      * @throws \InvalidArgumentException
      */
-    public function createAdmin(
-        string $email,
-        string $password,
-        string $rights,
-        int $shopId
-    ): void {
-        $this->adminDao->create($this->adminFactory->createAdmin(
-            $email,
-            $password,
-            $rights,
-            $shopId
-        ));
+    public function create_admin(string $email, string $password, string $rights, int $shop_id): void
+    {
+        $this->admin_dao->create($this->admin_factory->create_admin($email, $password, $rights, $shop_id));
     }
 }

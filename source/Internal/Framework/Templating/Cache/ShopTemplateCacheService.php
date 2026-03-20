@@ -4,47 +4,32 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Cache;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating\Cache;
-
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-
-class ShopTemplateCacheService implements ShopTemplateCacheServiceInterface
+class Shop_Template_Cache_Service implements Shop_Template_Cache_Service_Interface
 {
-    public function __construct(
-        private readonly ContextInterface $context,
-        private readonly Filesystem $filesystem,
-        private readonly string $compilationDirectory
-    ) {
-    }
-
-    public function getCacheDirectory(int $shopId): string
+    public function __construct(private readonly Context_Interface $context, private readonly Filesystem $filesystem, private readonly string $compilation_directory)
     {
-        return Path::join(
-            $this->compilationDirectory,
-            'template_cache',
-            'shops',
-            (string) $shopId
-        );
     }
-
-    public function invalidateCache(int $shopId): void
+    public function get_cache_directory(int $shop_id): string
     {
-        if ($this->filesystem->exists($this->getCacheDirectory($shopId))) {
-            $this->filesystem->remove($this->getCacheDirectory($shopId));
+        return Path::join($this->compilation_directory, 'template_cache', 'shops', (string) $shop_id);
+    }
+    public function invalidate_cache(int $shop_id): void
+    {
+        if ($this->filesystem->exists($this->get_cache_directory($shop_id))) {
+            $this->filesystem->remove($this->get_cache_directory($shop_id));
         }
     }
-
-    public function invalidateAllShopsCache(): void
+    public function invalidate_all_shops_cache(): void
     {
-        $shops = $this->context->getAllShopIds();
-
+        $shops = $this->context->get_all_shop_ids();
         foreach ($shops as $shop) {
-            $this->invalidateCache($shop);
+            $this->invalidate_cache($shop);
         }
     }
 }

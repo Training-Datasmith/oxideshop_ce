@@ -4,20 +4,17 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception;
-
-class UploadInvalidException extends MediaValidationException
+class Upload_Invalid_Exception extends Media_Validation_Exception
 {
-    public function __construct(private readonly int $errorCode)
+    public function __construct(private readonly int $error_code)
     {
-        parent::__construct('Upload error with PHP code ' . $errorCode);
+        parent::__construct('Upload error with PHP code ' . $error_code);
     }
-
-    public function getErrorCode(): int
+    public function get_error_code(): int
     {
-        return $this->errorCode;
+        return $this->error_code;
     }
 }

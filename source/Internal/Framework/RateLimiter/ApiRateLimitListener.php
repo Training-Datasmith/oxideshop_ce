@@ -4,118 +4,78 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\RateLimiter;
-
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-
-readonly class ApiRateLimitListener implements EventSubscriberInterface
+use Symfony\Component\Event_Dispatcher\Event_Subscriber_Interface;
+use Symfony\Component\Http_Foundation\Json_Response;
+use Symfony\Component\Http_Foundation\Request;
+use Symfony\Component\Http_Foundation\Response;
+use Symfony\Component\Http_Kernel\Event\Request_Event;
+use Symfony\Component\Http_Kernel\Kernel_Events;
+readonly class Api_Rate_Limit_Listener implements Event_Subscriber_Interface
 {
     private const API_PATH_PREFIX = '/api/';
-
-    public function __construct(
-        private bool $enabled,
-        private array $excludedRoutes,
-        private ApiRateLimiterFactoryInterface $rateLimiterFactory,
-        private ClientIdentifierProviderInterface $clientIdentifierProvider
-    ) {
-    }
-
-    public static function getSubscribedEvents(): array
+    public function __construct(private bool $enabled, private array $excluded_routes, private Api_Rate_Limiter_Factory_Interface $rate_limiter_factory, private Client_Identifier_Provider_Interface $client_identifier_provider)
     {
-        return [
-            KernelEvents::REQUEST => ['onKernelRequest', 10],
-        ];
     }
-
-    public function onKernelRequest(RequestEvent $event): void
+    public static function get_subscribed_events(): array
     {
-        if (!$event->isMainRequest()) {
+        return [Kernel_Events::REQUEST => ['onKernelRequest', 10]];
+    }
+    public function on_kernel_request(Request_Event $event): void
+    {
+        if (!$event->is_main_request()) {
             return;
         }
-
-        $request = $event->getRequest();
-
-        if (!$this->isApiRequest($request)) {
+        $request = $event->get_request();
+        if (!$this->is_api_request($request)) {
             return;
         }
-
         if (!$this->enabled) {
             return;
         }
-
-        if ($this->isRouteExcluded($request->getPathInfo())) {
+        if ($this->is_route_excluded($request->get_path_info())) {
             return;
         }
-
-        $limiter = $this->rateLimiterFactory->create($this->clientIdentifierProvider->getClientIdentifier($request));
+        $limiter = $this->rate_limiter_factory->create($this->client_identifier_provider->get_client_identifier($request));
         $limit = $limiter->consume();
-
-        if (!$limit->isAccepted()) {
-            $event->setResponse($this->createRateLimitExceededResponse($limit->getRetryAfter()));
+        if (!$limit->is_accepted()) {
+            $event->set_response($this->create_rate_limit_exceeded_response($limit->get_retry_after()));
             return;
         }
-
-        $request->attributes->set('_rate_limit_info', [
-            'limit' => $limit->getLimit(),
-            'remaining' => $limit->getRemainingTokens(),
-            'reset' => $limit->getRetryAfter()->getTimestamp(),
-        ]);
+        $request->attributes->set('_rate_limit_info', ['limit' => $limit->get_limit(), 'remaining' => $limit->get_remaining_tokens(), 'reset' => $limit->get_retry_after()->get_timestamp()]);
     }
-
-    private function isApiRequest(Request $request): bool
+    private function is_api_request(Request $request): bool
     {
-        return str_starts_with($request->getPathInfo(), self::API_PATH_PREFIX);
+        return str_starts_with($request->get_path_info(), self::API_PATH_PREFIX);
     }
-
-    private function isRouteExcluded(string $route): bool
+    private function is_route_excluded(string $route): bool
     {
-        foreach ($this->excludedRoutes as $pattern) {
-            if ($this->matchRoute($route, $pattern)) {
+        foreach ($this->excluded_routes as $pattern) {
+            if ($this->match_route($route, $pattern)) {
                 return true;
             }
         }
-
         return false;
     }
-
-    private function matchRoute(string $route, string $pattern): bool
+    private function match_route(string $route, string $pattern): bool
     {
         if ($pattern === $route) {
             return true;
         }
-
         if (str_contains($pattern, '*')) {
             $regex = '/^' . str_replace(['/', '*'], ['\/', '.*'], $pattern) . '$/';
             return (bool) preg_match($regex, $route);
         }
-
         return false;
     }
-
-    private function createRateLimitExceededResponse(\DateTimeImmutable $retryAfter): JsonResponse
+    private function create_rate_limit_exceeded_response(\DateTimeImmutable $retry_after): Json_Response
     {
-        $retryAfterSeconds = max(0, $retryAfter->getTimestamp() - time());
-
-        $response = new JsonResponse(
-            [
-                'error' => 'rate_limit_exceeded',
-                'message' => 'Too many requests. Please try again later.',
-                'retry_after' => $retryAfterSeconds,
-            ],
-            Response::HTTP_TOO_MANY_REQUESTS
-        );
-
-        $response->headers->set('Retry-After', (string) $retryAfterSeconds);
-        $response->headers->set('X-RateLimit-Reset', (string) $retryAfter->getTimestamp());
-
+        $retry_after_seconds = max(0, $retry_after->get_timestamp() - time());
+        $response = new Json_Response(['error' => 'rate_limit_exceeded', 'message' => 'Too many requests. Please try again later.', 'retry_after' => $retry_after_seconds], Response::HTTP_TOO_MANY_REQUESTS);
+        $response->headers->set('Retry-After', (string) $retry_after_seconds);
+        $response->headers->set('X-RateLimit-Reset', (string) $retry_after->get_timestamp());
         return $response;
     }
 }

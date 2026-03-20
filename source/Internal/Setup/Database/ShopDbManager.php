@@ -4,66 +4,41 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Database;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Setup\Database;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Configuration\DataObject\DatabaseConfiguration;
-use OxidEsales\EshopCommunity\Internal\Framework\Migration\MigrationExecutorInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Configuration\Data_Object\Database_Configuration;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Migration\Migration_Executor_Interface;
 use Symfony\Component\Filesystem\Path;
-
-class ShopDbManager implements ShopDbManagerInterface
+class Shop_Db_Manager implements Shop_Db_Manager_Interface
 {
-    private DatabaseConfiguration $databaseConfiguration;
-
-    public function __construct(
-        private readonly SetupDbConnectionFactoryInterface $databaseConnectionFactory,
-        private readonly MigrationExecutorInterface $migrationExecutor,
-        private readonly ViewsGeneratorFactoryInterface $databaseViewsGeneratorFactory,
-    ) {
-    }
-
-    public function create(DatabaseConfiguration $databaseConfiguration): void
+    private Database_Configuration $database_configuration;
+    public function __construct(private readonly Setup_Db_Connection_Factory_Interface $database_connection_factory, private readonly Migration_Executor_Interface $migration_executor, private readonly Views_Generator_Factory_Interface $database_views_generator_factory)
     {
-        $this->databaseConfiguration = $databaseConfiguration;
-
-        $this->createDatabase();
-        $this->loadSqlDumps();
-        $this->migrationExecutor->execute();
-        $this->databaseViewsGeneratorFactory
-            ->create()
-            ->generate();
     }
-
-    private function createDatabase(): void
+    public function create(Database_Configuration $database_configuration): void
     {
-        $connection = $this->databaseConnectionFactory->getServerConnection($this->databaseConfiguration);
-        $connection->executeStatement(
-            sprintf(
-                'CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8 COLLATE utf8_general_ci;',
-                $this->databaseConfiguration->getName()
-            )
-        );
+        $this->database_configuration = $database_configuration;
+        $this->create_database();
+        $this->load_sql_dumps();
+        $this->migration_executor->execute();
+        $this->database_views_generator_factory->create()->generate();
+    }
+    private function create_database(): void
+    {
+        $connection = $this->database_connection_factory->get_server_connection($this->database_configuration);
+        $connection->execute_statement(sprintf('CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8 COLLATE utf8_general_ci;', $this->database_configuration->get_name()));
         $connection->close();
     }
-
-    private function loadSqlDumps(): void
+    private function load_sql_dumps(): void
     {
-        $connection = $this->databaseConnectionFactory->getDatabaseConnection($this->databaseConfiguration);
-        $connection->executeStatement($this->readDumpFromFile('database_schema'));
-        $connection->executeStatement($this->readDumpFromFile('initial_data'));
+        $connection = $this->database_connection_factory->get_database_connection($this->database_configuration);
+        $connection->execute_statement($this->read_dump_from_file('database_schema'));
+        $connection->execute_statement($this->read_dump_from_file('initial_data'));
         $connection->close();
     }
-
-    private function readDumpFromFile(string $file): string
+    private function read_dump_from_file(string $file): string
     {
-        return file_get_contents(
-            Path::join(
-                __DIR__,
-                'sql',
-                "$file.sql"
-            )
-        );
+        return file_get_contents(Path::join(__DIR__, 'sql', "{$file}.sql"));
     }
 }

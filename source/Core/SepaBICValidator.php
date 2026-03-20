@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\Eshop\Core\Str;
-
+use Oxid_Esales\Eshop\Core\Str;
 /**
  * SEPA (Single Euro Payments Area) BIC validation class
  */
-class SepaBICValidator
+class Sepa_Bic_Validator
 {
     /**
      * Business identifier code validation
@@ -27,10 +24,9 @@ class SepaBICValidator
      *
      * @param string $sBIC code to check
      */
-    public function isValid($sBIC): bool
+    public function is_valid($s_bic): bool
     {
-        $sBIC = strtoupper(trim($sBIC));
-
-        return (bool) Str::getStr()->preg_match('(^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$)', $sBIC);
+        $s_bic = strtoupper(trim($s_bic));
+        return (bool) Str::get_str()->preg_match('(^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$)', $s_bic);
     }
 }

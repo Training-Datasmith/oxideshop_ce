@@ -1,33 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Article amount price list
  */
-class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
+class Amount_Price_List extends \Oxid_Esales\Eshop\Core\Model\List_Model
 {
     /**
      * List Object class name
      *
      * @var string
      */
-    protected $_sObjectsInListName = 'oxprice2article';
-
+    protected $_s_objects_in_list_name = 'oxprice2article';
     /**
      * oxArticle object
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oArticle;
-
+    protected $_o_article;
     /**
      * Class constructor
      */
@@ -36,27 +32,24 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
         parent::__construct('oxbase');
         $this->init('oxbase', 'oxprice2article');
     }
-
     /**
      *  Article getter
      *
      * @return \OxidEsales\Eshop\Application\Model\Article $_oArticle
      */
-    public function getArticle()
+    public function get_article()
     {
-        return $this->_oArticle;
+        return $this->_o_article;
     }
-
     /**
      * Article setter
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article
      */
-    public function setArticle($oArticle): void
+    public function set_article($o_article): void
     {
-        $this->_oArticle = $oArticle;
+        $this->_o_article = $o_article;
     }
-
     /**
      * Load category list data
      *
@@ -64,41 +57,30 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function load($article): void
     {
-        $this->setArticle($article);
-
-        $aData = $this->loadFromDb();
-
-        $this->assignArray($aData);
+        $this->set_article($article);
+        $a_data = $this->load_from_db();
+        $this->assign_array($a_data);
     }
-
     /**
      * Get data from db
      *
      * @return array
      */
-    protected function loadFromDb()
+    protected function load_from_db()
     {
-        $sArticleId = $this->getArticle()->getId();
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVariantInheritAmountPrice') && $this->getArticle()->getParentId()) {
-            $sArticleId = $this->getArticle()->getParentId();
+        $s_article_id = $this->get_article()->get_id();
+        $db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        if (\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blVariantInheritAmountPrice') && $this->get_article()->get_parent_id()) {
+            $s_article_id = $this->get_article()->get_parent_id();
         }
-
-        $params = [
-            'oxartid' => $sArticleId,
-        ];
-
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blMallInterchangeArticles')) {
-            $sShopSelect = '1';
+        $params = ['oxartid' => $s_article_id];
+        if (\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blMallInterchangeArticles')) {
+            $s_shop_select = '1';
         } else {
-            $sShopSelect = ' `oxshopid` = :oxshopid ';
-            $params['oxshopid'] = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
+            $s_shop_select = ' `oxshopid` = :oxshopid ';
+            $params['oxshopid'] = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_id();
         }
-
-        $sSql = "SELECT * FROM `oxprice2article` 
-            WHERE `oxartid` = :oxartid AND $sShopSelect ORDER BY `oxamount` ";
-
-        return $db->getAll($sSql, $params);
+        $s_sql = "SELECT * FROM `oxprice2article` \n            WHERE `oxartid` = :oxartid AND {$s_shop_select} ORDER BY `oxamount` ";
+        return $db->get_all($s_sql, $params);
     }
 }

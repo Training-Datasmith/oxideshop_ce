@@ -4,25 +4,21 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception;
-
-class MimeGuessMismatchException extends MediaValidationException
+class Mime_Guess_Mismatch_Exception extends Media_Validation_Exception
 {
-    public function __construct(private readonly string $guessedMime, private readonly string $clientMime)
+    public function __construct(private readonly string $guessed_mime, private readonly string $client_mime)
     {
-        parent::__construct('Guessed MIME ' . $guessedMime . ' does not match client MIME ' . $clientMime);
+        parent::__construct('Guessed MIME ' . $guessed_mime . ' does not match client MIME ' . $client_mime);
     }
-
-    public function getGuessedMime(): string
+    public function get_guessed_mime(): string
     {
-        return $this->guessedMime;
+        return $this->guessed_mime;
     }
-
-    public function getClientMime(): string
+    public function get_client_mime(): string
     {
-        return $this->clientMime;
+        return $this->client_mime;
     }
 }

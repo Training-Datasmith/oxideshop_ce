@@ -4,36 +4,29 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Template\Locator;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Template\Locator;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator\NavigationFileLocatorInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Locator\Navigation_File_Locator_Interface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-
-class ModulesMenuFileLocator implements NavigationFileLocatorInterface
+class Modules_Menu_File_Locator implements Navigation_File_Locator_Interface
 {
-    private string $fileName = 'menu.xml';
-
-    public function __construct(
-        private readonly ActiveModulesDataProviderInterface $activeModulesDataProvider,
-        private readonly Filesystem $filesystem
-    ) {
+    private string $file_name = 'menu.xml';
+    public function __construct(private readonly Active_Modules_Data_Provider_Interface $active_modules_data_provider, private readonly Filesystem $filesystem)
+    {
     }
-
     /** @inheritDoc */
     public function locate(): array
     {
-        $menuFiles = [];
-        foreach ($this->activeModulesDataProvider->getModulePaths() as $modulePath) {
-            $menuFilePath = Path::join($modulePath, $this->fileName);
-            if ($this->filesystem->exists($menuFilePath)) {
-                $menuFiles[] = $menuFilePath;
+        $menu_files = [];
+        foreach ($this->active_modules_data_provider->get_module_paths() as $module_path) {
+            $menu_file_path = Path::join($module_path, $this->file_name);
+            if ($this->filesystem->exists($menu_file_path)) {
+                $menu_files[] = $menu_file_path;
             }
         }
-        return $menuFiles;
+        return $menu_files;
     }
 }

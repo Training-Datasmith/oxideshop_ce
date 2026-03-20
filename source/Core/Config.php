@@ -1,50 +1,44 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Application\Controller\OxidStartController;
-use OxidEsales\Eshop\Application\Model\Shop;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Config\Event\ShopConfigurationChangedEvent;
-use OxidEsales\EshopCommunity\Internal\Framework\Edition\Edition;
-use OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Theme\Event\ThemeSettingChangedEvent;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use Oxid_Esales\Eshop\Application\Controller\Frontend_Controller;
+use Oxid_Esales\Eshop\Application\Controller\Oxid_Start_Controller;
+use Oxid_Esales\Eshop\Application\Model\Shop;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Config\Event\Shop_Configuration_Changed_Event;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Edition\Edition;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Bridge\Admin_Theme_Bridge_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Event\Theme_Setting_Changed_Event;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface;
 use stdClass;
 use Symfony\Component\Filesystem\Path;
-
 //max integer
 define('MAX_64BIT_INTEGER', '18446744073709551615');
-
 /**
  * Main shop configuration class.
  */
-#[\AllowDynamicProperties]
-class Config extends \OxidEsales\Eshop\Core\Base
+#[\Allow_Dynamic_Properties]
+class Config extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Application starter instance
      *
      * @var OxidStartController
      */
-    private $_oStart;
-
+    private $_o_start;
     /**
      * Active shop object.
      *
      * @var object
      */
-    protected $_oActShop;
-
+    protected $_o_act_shop;
     /**
      * Active Views object array. Object has setters/getters for these properties:
      *   _sClass - name of current view class
@@ -52,130 +46,111 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aActiveViews = [];
-
+    protected $_a_active_views = [];
     /**
      * Array of global parameters.
      *
      * @var array
      */
-    protected $_aGlobalParams = [];
-
+    protected $_a_global_params = [];
     /**
      * Shop config parameters storage array
      *
      * @var array
      */
-    protected $_aConfigParams = [];
-
+    protected $_a_config_params = [];
     /**
      * Theme config parameters storage array
      *
      * @var array
      */
-    protected $_aThemeConfigParams = [];
-
+    protected $_a_theme_config_params = [];
     /**
      * Current language Id
      *
      * @var int
      */
-    protected $_iLanguageId;
-
+    protected $_i_language_id;
     /**
      * Current shop Id
      *
      * @var int
      */
-    protected $_iShopId;
-
+    protected $_i_shop_id;
     /**
      * Out dir name
      *
      * @var string
      */
-    protected $_sOutDir = 'out';
-
+    protected $_s_out_dir = 'out';
     /**
      * Image dir name
      *
      * @var string
      */
-    protected $_sImageDir = 'img';
-
+    protected $_s_image_dir = 'img';
     /**
      * Dyn Image dir name
      *
      * @var string
      */
-    protected $_sPictureDir = 'pictures';
-
+    protected $_s_picture_dir = 'pictures';
     /**
      * Master pictures dir name
      *
      * @var string
      */
-    protected $_sMasterPictureDir = 'master';
-
+    protected $_s_master_picture_dir = 'master';
     /**
      * Template dir name
      *
      * @var string
      */
-    protected $_sTemplateDir = 'tpl';
-
+    protected $_s_template_dir = 'tpl';
     /**
      * Resource dir name
      *
      * @var string
      */
-    protected $_sResourceDir = 'src';
-
+    protected $_s_resource_dir = 'src';
     /**
      * Modules dir name
      *
      * @var string
      */
-    protected $_sModulesDir = 'modules';
-
+    protected $_s_modules_dir = 'modules';
     /**
      * Whether shop is in SSL mode
      *
      * @var bool
      */
-    protected $_blIsSsl;
-
+    protected $_bl_is_ssl;
     /**
      * Absolute image dirs for each shops
      *
      * @var array
      */
-    protected $_aAbsDynImageDir = [];
-
+    protected $_a_abs_dyn_image_dir = [];
     /**
      * Active currency object
      *
      * @var array
      */
-    protected $_oActCurrencyObject;
-
+    protected $_o_act_currency_object;
     /**
      * Indicates if Config::init() method has been already run.
      * Is checked for loading config variables on demand.
      *
      * @var bool
      */
-    protected $_blInit = false;
-
-    private bool $initVars = false;
-
+    protected $_bl_init = false;
+    private bool $init_vars = false;
     /**
      * prefix for oxModule field for themes in oxConfig and oxConfigDisplay tables
      *
      * @var string
      */
     public const OXMODULE_THEME_PREFIX = 'theme:';
-
     /**
      * Returns config parameter value if such parameter exists
      *
@@ -184,176 +159,147 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return mixed
      */
-    public function getConfigParam($name, $default = null)
+    public function get_config_param($name, $default = null)
     {
-        $this->initVars($this->getShopId());
-
-        if (isset($this->_aConfigParams[$name])) {
-            $value = $this->_aConfigParams[$name];
-        } elseif (isset($this->$name)) {
-            $value = $this->$name;
+        $this->init_vars($this->get_shop_id());
+        if (isset($this->_a_config_params[$name])) {
+            $value = $this->_a_config_params[$name];
+        } elseif (isset($this->{$name})) {
+            $value = $this->{$name};
         } else {
             $value = $default;
         }
-
         return $value;
     }
-
     /**
      * Stores config parameter value in config
      *
      * @param string $name  config parameter name
      * @param mixed  $value config parameter value
      */
-    public function setConfigParam($name, $value): void
+    public function set_config_param($name, $value): void
     {
-        if (isset($this->_aConfigParams[$name])) {
-            $this->_aConfigParams[$name] = $value;
-        } elseif (isset($this->$name)) {
-            $this->$name = $value;
+        if (isset($this->_a_config_params[$name])) {
+            $this->_a_config_params[$name] = $value;
+        } elseif (isset($this->{$name})) {
+            $this->{$name} = $value;
         } else {
-            $this->_aConfigParams[$name] = $value;
+            $this->_a_config_params[$name] = $value;
         }
     }
-
     /**
      * Parse SEO url parameters.
      */
-    protected function processSeoCall()
+    protected function process_seo_call()
     {
         // TODO: refactor shop bootstrap and parse url params as soon as possible
-        if (isSearchEngineUrl()) {
-            oxNew(\OxidEsales\Eshop\Core\SeoDecoder::class)->processSeoCall();
+        if (is_search_engine_url()) {
+            ox_new(\Oxid_Esales\Eshop\Core\Seo_Decoder::class)->process_seo_call();
         }
     }
-
     /**
      * Initialize configuration variables
      *
      * @throws \OxidEsales\Eshop\Core\Exception\DatabaseException
      * @param int $shopId
      */
-    public function initVars($shopId): void
+    public function init_vars($shop_id): void
     {
-        if ($this->initVars === true) {
+        if ($this->init_vars === true) {
             return;
         }
-        $this->initVars = true;
-
-        $this->setDefaults();
-
-        $configLoaded = $this->loadVarsFromDb($shopId);
+        $this->init_vars = true;
+        $this->set_defaults();
+        $config_loaded = $this->load_vars_from_db($shop_id);
         // loading shop config
-        if (empty($shopId) || !$configLoaded) {
+        if (empty($shop_id) || !$config_loaded) {
             // if no config values where loaded (some problems with DB), throwing an exception
-            $exception = new \OxidEsales\Eshop\Core\Exception\DatabaseException(
-                'Unable to load shop config values from database',
-                0,
-                new \Exception()
-            );
+            $exception = new \Oxid_Esales\Eshop\Core\Exception\Database_Exception('Unable to load shop config values from database', 0, new \Exception());
             throw $exception;
         }
-
         // loading theme config options
-        $this->loadVarsFromDb($shopId, null, Config::OXMODULE_THEME_PREFIX . $this->getConfigParam('sTheme'));
-
+        $this->load_vars_from_db($shop_id, null, Config::OXMODULE_THEME_PREFIX . $this->get_config_param('sTheme'));
         // checking if custom theme (which has defined parent theme) config options should be loaded over parent theme (#3362)
-        if ($this->getConfigParam('sCustomTheme')) {
-            $this->loadVarsFromDb($shopId, null, Config::OXMODULE_THEME_PREFIX . $this->getConfigParam('sCustomTheme'));
+        if ($this->get_config_param('sCustomTheme')) {
+            $this->load_vars_from_db($shop_id, null, Config::OXMODULE_THEME_PREFIX . $this->get_config_param('sCustomTheme'));
         }
-
-        $this->loadAdditionalConfiguration();
-
+        $this->load_additional_configuration();
         // Admin handling
-        $this->setConfigParam('blAdmin', isAdmin());
-
+        $this->set_config_param('blAdmin', is_admin());
         if (defined('OX_ADMIN_DIR')) {
-            $this->setConfigParam('sAdminDir', OX_ADMIN_DIR);
+            $this->set_config_param('sAdminDir', OX_ADMIN_DIR);
         }
     }
-
     /**
      * Starts session manager
      */
     public function init(): void
     {
         // Duplicated init protection
-        if ($this->_blInit) {
+        if ($this->_bl_init) {
             return;
         }
-        $this->_blInit = true;
-        $this->initVars = false;
-
+        $this->_bl_init = true;
+        $this->init_vars = false;
         try {
             // config params initialization
-            $this->initVars($this->getShopId());
-
+            $this->init_vars($this->get_shop_id());
             // application initialization
-            $this->initializeShop();
-            $this->_oStart = oxNew(\OxidEsales\Eshop\Application\Controller\OxidStartController::class);
-            $this->_oStart->appInit();
-        } catch (\OxidEsales\Eshop\Core\Exception\DatabaseException $exception) {
-            $this->handleDbConnectionException($exception);
-        } catch (\OxidEsales\Eshop\Core\Exception\CookieException $exception) {
-            $this->handleCookieException($exception);
+            $this->initialize_shop();
+            $this->_o_start = ox_new(\Oxid_Esales\Eshop\Application\Controller\Oxid_Start_Controller::class);
+            $this->_o_start->app_init();
+        } catch (\Oxid_Esales\Eshop\Core\Exception\Database_Exception $exception) {
+            $this->handle_db_connection_exception($exception);
+        } catch (\Oxid_Esales\Eshop\Core\Exception\Cookie_Exception $exception) {
+            $this->handle_cookie_exception($exception);
         }
     }
-
     /**
      * Reloads all configuration.
      */
     public function reinitialize(): void
     {
-        $this->_blInit = false;
-        $this->initVars = false;
+        $this->_bl_init = false;
+        $this->init_vars = false;
         $this->init();
     }
-
     /**
      * Load any additional configuration on Config::init.
      */
-    protected function loadAdditionalConfiguration()
+    protected function load_additional_configuration()
     {
     }
-
     /**
      * Initializes main shop tasks - processing of SEO calls, starting of session.
      */
-    protected function initializeShop()
+    protected function initialize_shop()
     {
-        $this->processSeoCall();
-        $session = \OxidEsales\Eshop\Core\Registry::getSession();
+        $this->process_seo_call();
+        $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
         $session->start();
     }
-
     /**
      * Set important defaults.
      */
-    protected function setDefaults()
+    protected function set_defaults()
     {
-        if (is_null($this->getConfigParam('sDefaultLang'))) {
-            $this->setConfigParam('sDefaultLang', 0);
+        if (is_null($this->get_config_param('sDefaultLang'))) {
+            $this->set_config_param('sDefaultLang', 0);
         }
-
-        if (is_null($this->getConfigParam('blCheckTemplates'))) {
-            $this->setConfigParam('blCheckTemplates', false);
+        if (is_null($this->get_config_param('blCheckTemplates'))) {
+            $this->set_config_param('blCheckTemplates', false);
         }
-
-        if (is_null($this->getConfigParam('blAllowArticlesubclass'))) {
-            $this->setConfigParam('blAllowArticlesubclass', false);
+        if (is_null($this->get_config_param('blAllowArticlesubclass'))) {
+            $this->set_config_param('blAllowArticlesubclass', false);
         }
-
-        if (is_null($this->getConfigParam('iAdminListSize'))) {
-            $this->setConfigParam('iAdminListSize', 9);
+        if (is_null($this->get_config_param('iAdminListSize'))) {
+            $this->set_config_param('iAdminListSize', 9);
         }
-
-        if (is_null($this->getConfigParam('iZoomPicCount'))) {
-            $this->setConfigParam('iZoomPicCount', 4);
+        if (is_null($this->get_config_param('iZoomPicCount'))) {
+            $this->set_config_param('iZoomPicCount', 4);
         }
-
-        $this->setConfigParam('sCoreDir', __DIR__ . DIRECTORY_SEPARATOR);
+        $this->set_config_param('sCoreDir', __DIR__ . DIRECTORY_SEPARATOR);
     }
-
     /**
      * Load config values from DB
      *
@@ -363,40 +309,29 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    protected function loadVarsFromDb($shopId, $onlyVars = null, $module = '')
+    protected function load_vars_from_db($shop_id, $only_vars = null, $module = '')
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        $params = [
-            'oxshopid' => $shopId,
-            'oxmodule' => $module,
-        ];
-
+        $db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $params = ['oxshopid' => $shop_id, 'oxmodule' => $module];
         $select = '
             SELECT oxvarname, oxvartype, oxvarvalue
             FROM oxconfig
             WHERE oxshopid = :oxshopid AND oxmodule LIKE :oxmodule
         ';
-        $select .= $this->getConfigParamsSelectSnippet($onlyVars);
-
-        $result = $db->getAll($select, $params);
-
+        $select .= $this->get_config_params_select_snippet($only_vars);
+        $result = $db->get_all($select, $params);
         foreach ($result as $value) {
-            $varName = $value['oxvarname'];
-            $varType = $value['oxvartype'];
-            $varVal = $value['oxvarvalue'];
-
-            $this->setConfVarFromDb($varName, $varType, $varVal);
-
+            $var_name = $value['oxvarname'];
+            $var_type = $value['oxvartype'];
+            $var_val = $value['oxvarvalue'];
+            $this->set_conf_var_from_db($var_name, $var_type, $var_val);
             //setting theme options array
             if ($module) {
-                $this->_aThemeConfigParams[$varName] = $module;
+                $this->_a_theme_config_params[$var_name] = $module;
             }
         }
-
         return (bool) count($result);
     }
-
     /**
      * Allow loading from some vars only from baseshop
      *
@@ -404,7 +339,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getConfigParamsSelectSnippet($vars)
+    protected function get_config_params_select_snippet($vars)
     {
         $select = '';
         if (is_array($vars) && !empty($vars)) {
@@ -413,10 +348,8 @@ class Config extends \OxidEsales\Eshop\Core\Base
             }
             $select = ' and oxvarname in ( ' . implode(', ', $vars) . ' ) ';
         }
-
         return $select;
     }
-
     /**
      * Sets config variable to config object, first unserializing it by given type.
      *
@@ -424,71 +357,63 @@ class Config extends \OxidEsales\Eshop\Core\Base
      * @param string $varType variable type - arr, aarr, bool or str
      * @param string $varVal  serialized by type value
      */
-    protected function setConfVarFromDb($varName, $varType, $varVal)
+    protected function set_conf_var_from_db($var_name, $var_type, $var_val)
     {
-        match ($varType) {
-            'arr', 'aarr' => $this->setConfigParam($varName, unserialize($varVal, ['allowed_classes' => false])),
-            'bool' => $this->setConfigParam($varName, ($varVal == 'true' || $varVal == '1')),
-            default => $this->setConfigParam($varName, $varVal),
+        match ($var_type) {
+            'arr', 'aarr' => $this->set_config_param($var_name, unserialize($var_val, ['allowed_classes' => false])),
+            'bool' => $this->set_config_param($var_name, $var_val == 'true' || $var_val == '1'),
+            default => $this->set_config_param($var_name, $var_val),
         };
     }
-
     /**
      * Unsets all session data.
      */
-    public function pageClose()
+    public function page_close()
     {
-        if ($this->hasActiveViewsChain()) {
+        if ($this->has_active_views_chain()) {
             // do not commit session until active views chain exists
             return;
         }
-
-        return $this->_oStart->pageClose();
+        return $this->_o_start->page_close();
     }
-
     /**
      * Get request 'cl' parameter which is the controller id.
      *
      * @return string|null
      */
-    public function getRequestControllerId()
+    public function get_request_controller_id()
     {
-        return Registry::getRequest()->getRequestEscapedParameter('cl');
+        return Registry::get_request()->get_request_escaped_parameter('cl');
     }
-
     /**
      * Use this function to get the controller class hidden behind the request's 'cl' parameter.
      *
      * @return mixed
      */
-    public function getRequestControllerClass()
+    public function get_request_controller_class()
     {
-        $controllerId = $this->getRequestControllerId();
-
-        return Registry::getControllerClassNameResolver()->getClassNameById($controllerId);
+        $controller_id = $this->get_request_controller_id();
+        return Registry::get_controller_class_name_resolver()->get_class_name_by_id($controller_id);
     }
-
     /**
      * Returns uploaded file parameter
      *
      * @param string $paramName param name
      */
-    public function getUploadedFile($paramName)
+    public function get_uploaded_file($param_name)
     {
-        return $_FILES[$paramName];
+        return $_FILES[$param_name];
     }
-
     /**
      * Sets global parameter value
      *
      * @param string $name  name of parameter
      * @param mixed  $value value to store
      */
-    public function setGlobalParameter($name, $value): void
+    public function set_global_parameter($name, $value): void
     {
-        $this->_aGlobalParams[$name] = $value;
+        $this->_a_global_params[$name] = $value;
     }
-
     /**
      * Returns global parameter value
      *
@@ -496,11 +421,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return mixed
      */
-    public function getGlobalParameter($name)
+    public function get_global_parameter($name)
     {
-        return $this->_aGlobalParams[$name] ?? null;
+        return $this->_a_global_params[$name] ?? null;
     }
-
     /**
      * Checks if passed parameter has special chars and replaces them.
      * Returns checked value.
@@ -510,23 +434,21 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return mixed
      */
-    public function checkParamSpecialChars(&$value, $raw = null)
+    public function check_param_special_chars(&$value, $raw = null)
     {
-        return Registry::get(\OxidEsales\Eshop\Core\Request::class)->checkParamSpecialChars($value, $raw);
+        return Registry::get(\Oxid_Esales\Eshop\Core\Request::class)->check_param_special_chars($value, $raw);
     }
-
     /**
      * Active Shop id setter
      *
      * @param int    $shopId shop id
      */
-    public function setShopId($shopId): void
+    public function set_shop_id($shop_id): void
     {
-        $session = \OxidEsales\Eshop\Core\Registry::getSession();
-        $session->setVariable('actshop', $shopId);
-        $this->_iShopId = $shopId;
+        $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
+        $session->set_variable('actshop', $shop_id);
+        $this->_i_shop_id = $shop_id;
     }
-
     /**
      * Returns active shop ID.
      *
@@ -535,89 +457,69 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function getShopId()
+    public function get_shop_id()
     {
-        if (is_null($this->_iShopId)) {
-            $shopId = $this->calculateActiveShopId();
-            $this->setShopId($shopId);
-
-            if (!$this->isValidShopId($shopId)) {
-                $shopId = $this->getBaseShopId();
+        if (is_null($this->_i_shop_id)) {
+            $shop_id = $this->calculate_active_shop_id();
+            $this->set_shop_id($shop_id);
+            if (!$this->is_valid_shop_id($shop_id)) {
+                $shop_id = $this->get_base_shop_id();
             }
-            $this->setShopId($shopId);
+            $this->set_shop_id($shop_id);
         }
-
-        return $this->_iShopId;
+        return $this->_i_shop_id;
     }
-
     /**
      * Set is shop url
      *
      * @param bool $isSsl - state bool value
      */
-    public function setIsSsl($isSsl = false): void
+    public function set_is_ssl($is_ssl = false): void
     {
-        $this->_blIsSsl = $isSsl;
+        $this->_bl_is_ssl = $is_ssl;
     }
-
     /**
      * Checks if WEB session is SSL.
      */
-    protected function checkSsl()
+    protected function check_ssl()
     {
-        $myUtilsServer = Registry::getUtilsServer();
-        $serverVars = $myUtilsServer->getServerVar();
-        $httpsServerVar = $myUtilsServer->getServerVar('HTTPS');
-
-        $this->setIsSsl();
-        if ($httpsServerVar === 'on' || $httpsServerVar === 'ON' || $httpsServerVar == '1') {
-            $this->setIsSsl(
-                ContainerFacade::getParameter('oxid_esales.shop_url') || $this->getConfigParam('sMallSSLShopURL')
-            );
-            if (!$this->_blIsSsl && $this->isAdmin()) {
-                $this->setIsSsl(
-                    ContainerFacade::getParameter('oxid_esales.shop_admin_url') !== null
-                );
+        $my_utils_server = Registry::get_utils_server();
+        $server_vars = $my_utils_server->get_server_var();
+        $https_server_var = $my_utils_server->get_server_var('HTTPS');
+        $this->set_is_ssl();
+        if ($https_server_var === 'on' || $https_server_var === 'ON' || $https_server_var == '1') {
+            $this->set_is_ssl(Container_Facade::get_parameter('oxid_esales.shop_url') || $this->get_config_param('sMallSSLShopURL'));
+            if (!$this->_bl_is_ssl && $this->is_admin()) {
+                $this->set_is_ssl(Container_Facade::get_parameter('oxid_esales.shop_admin_url') !== null);
             }
         }
-
         //additional special handling for profihost customers
-        if (
-            isset($serverVars['HTTP_X_FORWARDED_SERVER']) &&
-            (
-                str_contains($serverVars['HTTP_X_FORWARDED_SERVER'], 'ssl') ||
-                str_contains($serverVars['HTTP_X_FORWARDED_SERVER'], 'secure-online-shopping.de')
-            )
-        ) {
-            $this->setIsSsl(true);
+        if (isset($server_vars['HTTP_X_FORWARDED_SERVER']) && (str_contains($server_vars['HTTP_X_FORWARDED_SERVER'], 'ssl') || str_contains($server_vars['HTTP_X_FORWARDED_SERVER'], 'secure-online-shopping.de'))) {
+            $this->set_is_ssl(true);
         }
     }
-
     /**
      * Checks if WEB session is SSL. Returns true if yes.
      *
      * @return bool
      */
-    public function isSsl()
+    public function is_ssl()
     {
-        if (is_null($this->_blIsSsl)) {
-            $this->checkSsl();
+        if (is_null($this->_bl_is_ssl)) {
+            $this->check_ssl();
         }
-
-        return $this->_blIsSsl;
+        return $this->_bl_is_ssl;
     }
-
     /**
      * Checks if shop runs in https only mode
      * https only mode means there is no http url but only a https url
      *
      * @return bool
      */
-    public function isHttpsOnly()
+    public function is_https_only()
     {
-        return $this->isSsl();
+        return $this->is_ssl();
     }
-
     /**
      * Compares current URL to supplied string
      *
@@ -625,13 +527,12 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool true if $url is equal to current page URL
      */
-    public function isCurrentUrl($url)
+    public function is_current_url($url)
     {
         /** @var UtilsServer $utilsServer */
-        $utilsServer = Registry::getUtilsServer();
-        return $utilsServer->isCurrentUrl($url);
+        $utils_server = Registry::get_utils_server();
+        return $utils_server->is_current_url($url);
     }
-
     /**
      * Compares current protocol to supplied url string
      *
@@ -639,16 +540,14 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool true if $url is equal to current page URL
      */
-    public function isCurrentProtocol($url)
+    public function is_current_protocol($url)
     {
         // Missing protocol, cannot proceed, assuming true.
-        if (!$url || (!str_starts_with($url, 'http'))) {
+        if (!$url || !str_starts_with($url, 'http')) {
             return true;
         }
-
-        return (str_starts_with($url, 'https:')) == $this->isSsl();
+        return str_starts_with($url, 'https:') == $this->is_ssl();
     }
-
     /**
      * Returns config sShopURL or sMallShopURL if secondary shop
      *
@@ -657,35 +556,30 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getShopUrl($lang = null, $admin = null)
+    public function get_shop_url($lang = null, $admin = null)
     {
         $url = null;
-        $admin ??= $this->isAdmin();
-
+        $admin ??= $this->is_admin();
         if (!$admin) {
-            $url = $this->getShopUrlByLanguage($lang);
+            $url = $this->get_shop_url_by_language($lang);
             if (!$url) {
-                $url = $this->getMallShopUrl();
+                $url = $this->get_mall_shop_url();
             }
         }
-
         if (!$url) {
-            return ContainerFacade::getParameter('oxid_esales.shop_url');
+            return Container_Facade::get_parameter('oxid_esales.shop_url');
         }
-
         return $url;
     }
-
     /**
      * Returns utils dir URL
      *
      * @return string
      */
-    public function getCoreUtilsUrl()
+    public function get_core_utils_url()
     {
-        return $this->getCurrentShopUrl() . 'Core/utils/';
+        return $this->get_current_shop_url() . 'Core/utils/';
     }
-
     /**
      * Returns SSL or non SSL shop URL without index.php depending on Mall
      * affecting environment is admin mode and current ssl usage status
@@ -694,22 +588,20 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getCurrentShopUrl($admin = null)
+    public function get_current_shop_url($admin = null)
     {
         if ($admin === null) {
-            $admin = $this->isAdmin();
+            $admin = $this->is_admin();
         }
         if ($admin) {
-            $url = ContainerFacade::getParameter('oxid_esales.shop_admin_url');
+            $url = Container_Facade::get_parameter('oxid_esales.shop_admin_url');
             if (!$url) {
-                return $this->getShopUrl() . $this->getConfigParam('sAdminDir') . '/';
+                return $this->get_shop_url() . $this->get_config_param('sAdminDir') . '/';
             }
-
             return $url;
         }
-        return $this->getShopUrl();
+        return $this->get_shop_url();
     }
-
     /**
      * Returns SSL or not SSL shop URL with index.php and sid
      *
@@ -717,11 +609,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getShopCurrentUrl($lang = null)
+    public function get_shop_current_url($lang = null)
     {
-        return Registry::getUtilsUrl()->processUrl($this->getShopURL($lang) . 'index.php', false);
+        return Registry::get_utils_url()->process_url($this->get_shop_url($lang) . 'index.php', false);
     }
-
     /**
      * Returns shop non SSL URL including index.php and sid.
      *
@@ -730,11 +621,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getShopHomeUrl($lang = null, $admin = null)
+    public function get_shop_home_url($lang = null, $admin = null)
     {
-        return Registry::getUtilsUrl()->processUrl($this->getShopUrl($lang, $admin) . 'index.php', false);
+        return Registry::get_utils_url()->process_url($this->get_shop_url($lang, $admin) . 'index.php', false);
     }
-
     /**
      * Returns widget start non SSL URL including widget.php and sid.
      *
@@ -744,85 +634,76 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getWidgetUrl($languageId = null, $inAdmin = null, $urlParameters = [])
+    public function get_widget_url($language_id = null, $in_admin = null, $url_parameters = [])
     {
-        $utilsUrl = Registry::getUtilsUrl();
-        $widgetUrl = $this->getShopUrl($languageId, $inAdmin);
-        $widgetUrl = $utilsUrl->processUrl($widgetUrl . 'widget.php', false);
-
-        if (!isset($languageId)) {
-            $language = Registry::getLang();
-            $languageId = $language->getBaseLanguage();
+        $utils_url = Registry::get_utils_url();
+        $widget_url = $this->get_shop_url($language_id, $in_admin);
+        $widget_url = $utils_url->process_url($widget_url . 'widget.php', false);
+        if (!isset($language_id)) {
+            $language = Registry::get_lang();
+            $language_id = $language->get_base_language();
         }
-        $urlLang = $utilsUrl->getUrlLanguageParameter($languageId);
-
-        $widgetUrl = $utilsUrl->appendUrl($widgetUrl, $urlLang, true);
-
-        return $utilsUrl->appendUrl($widgetUrl, $urlParameters, true, true);
+        $url_lang = $utils_url->get_url_language_parameter($language_id);
+        $widget_url = $utils_url->append_url($widget_url, $url_lang, true);
+        return $utils_url->append_url($widget_url, $url_parameters, true, true);
     }
-
     /**
      * Returns shop SSL URL with index.php and sid.
      *
      * @return string
      */
-    public function getShopSecureHomeUrl()
+    public function get_shop_secure_home_url()
     {
-        return Registry::getUtilsUrl()->processUrl($this->getShopUrl() . 'index.php', false);
+        return Registry::get_utils_url()->process_url($this->get_shop_url() . 'index.php', false);
     }
-
     /**
      * Returns active shop currency.
      *
      * @return string
      */
-    public function getShopCurrency()
+    public function get_shop_currency()
     {
-        if ((null === ($curr = Registry::getRequest()->getRequestEscapedParameter('cur')))) {
-            if (null === ($curr = Registry::getRequest()->getRequestEscapedParameter('currency'))) {
-                $session = \OxidEsales\Eshop\Core\Registry::getSession();
-                $curr = $session->getVariable('currency');
+        if (null === $curr = Registry::get_request()->get_request_escaped_parameter('cur')) {
+            if (null === $curr = Registry::get_request()->get_request_escaped_parameter('currency')) {
+                $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
+                $curr = $session->get_variable('currency');
             }
         }
-
         return (int) $curr;
     }
-
     /**
      * Returns active shop currency object.
      *
      * @return stdClass
      */
-    public function getActShopCurrencyObject()
+    public function get_act_shop_currency_object()
     {
-        if ($this->_oActCurrencyObject === null) {
-            $cur = $this->getShopCurrency();
-            $currencies = $this->getCurrencyArray();
+        if ($this->_o_act_currency_object === null) {
+            $cur = $this->get_shop_currency();
+            $currencies = $this->get_currency_array();
             if (!isset($currencies[$cur])) {
-                $this->_oActCurrencyObject = reset($currencies); // reset() returns the first element
+                $this->_o_act_currency_object = reset($currencies);
+                // reset() returns the first element
             } else {
-                $this->_oActCurrencyObject = $currencies[$cur];
+                $this->_o_act_currency_object = $currencies[$cur];
             }
         }
-
-        return $this->_oActCurrencyObject;
+        return $this->_o_act_currency_object;
     }
-
     /**
      * Sets the actual currency
      *
      * @param int $cur 0 = EUR, 1 = GBP, 2 = CHF
      */
-    public function setActShopCurrency($cur): void
+    public function set_act_shop_currency($cur): void
     {
-        $currencies = $this->getCurrencyArray();
+        $currencies = $this->get_currency_array();
         if (isset($currencies[$cur])) {
-            $session = \OxidEsales\Eshop\Core\Registry::getSession();
-            $session->setVariable('currency', $cur);
-            $this->_oActCurrencyObject = null;
+            $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
+            $session->set_variable('currency', $cur);
+            $this->_o_act_currency_object = null;
         }
     }
-
     /**
      * Returns path to out dir
      *
@@ -830,16 +711,13 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getOutDir($absolute = true)
+    public function get_out_dir($absolute = true)
     {
         if ($absolute) {
-
-            return Path::join(ContainerFacade::getParameter('oxid_esales.shop_source_directory'), $this->_sOutDir)
-                . DIRECTORY_SEPARATOR;
+            return Path::join(Container_Facade::get_parameter('oxid_esales.shop_source_directory'), $this->_s_out_dir) . DIRECTORY_SEPARATOR;
         }
-        return $this->_sOutDir . DIRECTORY_SEPARATOR;
+        return $this->_s_out_dir . DIRECTORY_SEPARATOR;
     }
-
     /**
      * Returns path to out dir
      *
@@ -847,11 +725,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getViewsDir($absolute = true)
+    public function get_views_dir($absolute = true)
     {
-        return Path::join($this->getAppDir($absolute), 'views') . DIRECTORY_SEPARATOR;
+        return Path::join($this->get_app_dir($absolute), 'views') . DIRECTORY_SEPARATOR;
     }
-
     /**
      * Returns path to translations dir
      *
@@ -861,13 +738,11 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getTranslationsDir($file, $dir, $absolute = true)
+    public function get_translations_dir($file, $dir, $absolute = true)
     {
-        $path = Path::join($this->getAppDir($absolute), 'translations', $dir, $file);
-
+        $path = Path::join($this->get_app_dir($absolute), 'translations', $dir, $file);
         return is_readable($path) ? $path : false;
     }
-
     /**
      * Returns path to out dir
      *
@@ -875,16 +750,13 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getAppDir($absolute = true)
+    public function get_app_dir($absolute = true)
     {
         if ($absolute) {
-
-            return Path::join(ContainerFacade::getParameter('oxid_esales.shop_source_directory'), 'Application')
-                . DIRECTORY_SEPARATOR;
+            return Path::join(Container_Facade::get_parameter('oxid_esales.shop_source_directory'), 'Application') . DIRECTORY_SEPARATOR;
         }
         return 'Application' . DIRECTORY_SEPARATOR;
     }
-
     /**
      * Returns url to out dir
      *
@@ -894,22 +766,19 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getOutUrl($ssl = null, $admin = null, $nativeImg = false)
+    public function get_out_url($ssl = null, $admin = null, $native_img = false)
     {
-        $admin = is_null($admin) ? $this->isAdmin() : $admin;
-
-        if ($nativeImg && !$admin) {
-            $url = $this->getShopUrl();
+        $admin = is_null($admin) ? $this->is_admin() : $admin;
+        if ($native_img && !$admin) {
+            $url = $this->get_shop_url();
         } else {
-            $url = ContainerFacade::getParameter('oxid_esales.shop_url');
+            $url = Container_Facade::get_parameter('oxid_esales.shop_url');
             if (!$url && $admin) {
-                $url = ContainerFacade::getParameter('oxid_esales.shop_admin_url') . '../';
+                $url = Container_Facade::get_parameter('oxid_esales.shop_admin_url') . '../';
             }
         }
-
-        return $url . $this->_sOutDir . '/';
+        return $url . $this->_s_out_dir . '/';
     }
-
     /**
      * Finds and returns files or folders path in out dir
      *
@@ -924,98 +793,77 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getDir($file, $dir, $admin, $lang = null, $shop = null, $theme = null, $absolute = true, $ignoreCust = false)
+    public function get_dir($file, $dir, $admin, $lang = null, $shop = null, $theme = null, $absolute = true, $ignore_cust = false)
     {
         if (is_null($theme)) {
-            $theme = $this->getConfigParam('sTheme');
+            $theme = $this->get_config_param('sTheme');
         }
-
         if ($admin) {
-            $theme = ContainerFacade::get(AdminThemeBridgeInterface::class)
-                ->getActiveTheme();
+            $theme = Container_Facade::get(Admin_Theme_Bridge_Interface::class)->get_active_theme();
         }
-
-        if ($dir != $this->_sTemplateDir) {
-            $base = $this->getOutDir($absolute);
-            $absBase = $this->getOutDir();
+        if ($dir != $this->_s_template_dir) {
+            $base = $this->get_out_dir($absolute);
+            $abs_base = $this->get_out_dir();
         } else {
-            $base = $this->getViewsDir($absolute);
-            $absBase = $this->getViewsDir();
+            $base = $this->get_views_dir($absolute);
+            $abs_base = $this->get_views_dir();
         }
-
-        $langAbbr = '-';
+        $lang_abbr = '-';
         // false means skip language folder check
         if ($lang !== false) {
-            $language = Registry::getLang();
-
+            $language = Registry::get_lang();
             if (is_null($lang)) {
-                $lang = $language->getEditLanguage();
+                $lang = $language->get_edit_language();
             }
-
-            $langAbbr = $language->getLanguageAbbr($lang);
+            $lang_abbr = $language->get_language_abbr($lang);
         }
-
         if (is_null($shop)) {
-            $shop = $this->getShopId();
+            $shop = $this->get_shop_id();
         }
-
         //Load from
-        $path = "{$theme}/{$shop}/{$langAbbr}/{$dir}/{$file}";
-        $cacheKey = $path . "_{$ignoreCust}{$absolute}";
-
-        if (($return = Registry::getUtils()->fromStaticCache($cacheKey)) !== null) {
+        $path = "{$theme}/{$shop}/{$lang_abbr}/{$dir}/{$file}";
+        $cache_key = $path . "_{$ignore_cust}{$absolute}";
+        if (($return = Registry::get_utils()->from_static_cache($cache_key)) !== null) {
             return $return;
         }
-
-        $return = $this->getEditionTemplate("{$theme}/{$dir}/{$file}");
-
+        $return = $this->get_edition_template("{$theme}/{$dir}/{$file}");
         // Check for custom template
-        $customTheme = $this->getConfigParam('sCustomTheme');
-        if (!$return && !$admin && !$ignoreCust && $customTheme && $customTheme != $theme) {
-            $return = $this->getDir($file, $dir, $admin, $lang, $shop, $customTheme, $absolute, $ignoreCust);
+        $custom_theme = $this->get_config_param('sCustomTheme');
+        if (!$return && !$admin && !$ignore_cust && $custom_theme && $custom_theme != $theme) {
+            $return = $this->get_dir($file, $dir, $admin, $lang, $shop, $custom_theme, $absolute, $ignore_cust);
         }
-
         //test lang level ..
-        if (!$return && !$admin && is_readable($absBase . $path)) {
+        if (!$return && !$admin && is_readable($abs_base . $path)) {
             $return = $base . $path;
         }
-
         //test shop level ..
         if (!$return && !$admin) {
-            $return = $this->getShopLevelDir($base, $absBase, $file, $dir, $admin, $lang, $shop, $theme, $absolute, $ignoreCust);
+            $return = $this->get_shop_level_dir($base, $abs_base, $file, $dir, $admin, $lang, $shop, $theme, $absolute, $ignore_cust);
         }
-
         //test theme language level ..
-        $path = "$theme/$langAbbr/$dir/$file";
-        if (!$return && $lang !== false && is_readable($absBase . $path)) {
+        $path = "{$theme}/{$lang_abbr}/{$dir}/{$file}";
+        if (!$return && $lang !== false && is_readable($abs_base . $path)) {
             $return = $base . $path;
         }
-
         //test theme level ..
-        $path = "$theme/$dir/$file";
-        if (!$return && is_readable($absBase . $path)) {
+        $path = "{$theme}/{$dir}/{$file}";
+        if (!$return && is_readable($abs_base . $path)) {
             $return = $base . $path;
         }
-
         //test out language level ..
-        $path = "$langAbbr/$dir/$file";
-        if (!$return && $lang !== false && is_readable($absBase . $path)) {
+        $path = "{$lang_abbr}/{$dir}/{$file}";
+        if (!$return && $lang !== false && is_readable($abs_base . $path)) {
             $return = $base . $path;
         }
-
         //test out level ..
-        $path = "$dir/$file";
-        if (!$return && is_readable($absBase . $path)) {
+        $path = "{$dir}/{$file}";
+        if (!$return && is_readable($abs_base . $path)) {
             $return = $base . $path;
         }
-
         // TODO: implement logic to log missing paths
-
-        Registry::getUtils()->toStaticCache($cacheKey, $return);
-
+        Registry::get_utils()->to_static_cache($cache_key, $return);
         return $return;
     }
-
     /**
      * @param string $base
      * @param string $absBase
@@ -1030,18 +878,15 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool|string
      */
-    protected function getShopLevelDir($base, $absBase, $file, $dir, $admin, $lang, $shop, $theme, $absolute, $ignoreCust)
+    protected function get_shop_level_dir($base, $abs_base, $file, $dir, $admin, $lang, $shop, $theme, $absolute, $ignore_cust)
     {
         $return = false;
-
-        $path = "$theme/$shop/$dir/$file";
-        if (is_readable($absBase . $path)) {
+        $path = "{$theme}/{$shop}/{$dir}/{$file}";
+        if (is_readable($abs_base . $path)) {
             return $base . $path;
         }
-
         return $return;
     }
-
     /**
      * Finds and returns file or folder url in out dir
      *
@@ -1056,15 +901,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getUrl($file, $dir, $admin = null, $ssl = null, $nativeImg = false, $lang = null, $shop = null, $theme = null)
+    public function get_url($file, $dir, $admin = null, $ssl = null, $native_img = false, $lang = null, $shop = null, $theme = null)
     {
-        return str_replace(
-            $this->getOutDir(),
-            $this->getOutUrl($ssl, $admin, $nativeImg),
-            $this->getDir($file, $dir, $admin, $lang, $shop, $theme)
-        );
+        return str_replace($this->get_out_dir(), $this->get_out_url($ssl, $admin, $native_img), $this->get_dir($file, $dir, $admin, $lang, $shop, $theme));
     }
-
     /**
      * Finds and returns image files or folders path
      *
@@ -1073,11 +913,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getImagePath($file, $admin = false)
+    public function get_image_path($file, $admin = false)
     {
-        return $this->getDir($file, $this->_sImageDir, $admin);
+        return $this->get_dir($file, $this->_s_image_dir, $admin);
     }
-
     /**
      * Finds and returns image folder url
      *
@@ -1088,13 +927,11 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getImageUrl($admin = false, $ssl = null, $nativeImg = null, $file = null)
+    public function get_image_url($admin = false, $ssl = null, $native_img = null, $file = null)
     {
-        $nativeImg = is_null($nativeImg) ? $this->getConfigParam('blNativeImages') : $nativeImg;
-
-        return $this->getUrl($file, $this->_sImageDir, $admin, $ssl, $nativeImg);
+        $native_img = is_null($native_img) ? $this->get_config_param('blNativeImages') : $native_img;
+        return $this->get_url($file, $this->_s_image_dir, $admin, $ssl, $native_img);
     }
-
     /**
      * Finds and returns image folders path
      *
@@ -1102,11 +939,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getImageDir($admin = false)
+    public function get_image_dir($admin = false)
     {
-        return $this->getDir(null, $this->_sImageDir, $admin);
+        return $this->get_dir(null, $this->_s_image_dir, $admin);
     }
-
     /**
      * Finds and returns product pictures files or folders path
      *
@@ -1118,11 +954,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getPicturePath($file, $admin = false, $lang = null, $shop = null, $theme = null)
+    public function get_picture_path($file, $admin = false, $lang = null, $shop = null, $theme = null)
     {
-        return $this->getDir($file, $this->_sPictureDir, $admin, $lang, $shop, $theme);
+        return $this->get_dir($file, $this->_s_picture_dir, $admin, $lang, $shop, $theme);
     }
-
     /**
      * Finds and returns master pictures folder path
      *
@@ -1130,11 +965,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getMasterPictureDir($admin = false)
+    public function get_master_picture_dir($admin = false)
     {
-        return $this->getDir(null, $this->_sPictureDir . '/' . $this->_sMasterPictureDir, $admin);
+        return $this->get_dir(null, $this->_s_picture_dir . '/' . $this->_s_master_picture_dir, $admin);
     }
-
     /**
      * Finds and returns master picture path
      *
@@ -1143,11 +977,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getMasterPicturePath($file, $admin = false)
+    public function get_master_picture_path($file, $admin = false)
     {
-        return $this->getDir($file, $this->_sPictureDir . '/' . $this->_sMasterPictureDir, $admin);
+        return $this->get_dir($file, $this->_s_picture_dir . '/' . $this->_s_master_picture_dir, $admin);
     }
-
     /**
      * Finds and returns product picture file or folder url
      *
@@ -1160,23 +993,19 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getPictureUrl($file, $admin = false, $ssl = null, $lang = null, $shopId = null, $defPic = 'master/nopic.jpg')
+    public function get_picture_url($file, $admin = false, $ssl = null, $lang = null, $shop_id = null, $def_pic = 'master/nopic.jpg')
     {
-        if ($altUrl = Registry::getPictureHandler()->getAltImageUrl('', $file)) {
-            return $altUrl;
+        if ($alt_url = Registry::get_picture_handler()->get_alt_image_url('', $file)) {
+            return $alt_url;
         }
-
-        $nativeImg = $this->getConfigParam('blNativeImages');
-        $url = $this->getUrl($file, $this->_sPictureDir, $admin, $ssl, $nativeImg, $lang, $shopId);
-
+        $native_img = $this->get_config_param('blNativeImages');
+        $url = $this->get_url($file, $this->_s_picture_dir, $admin, $ssl, $native_img, $lang, $shop_id);
         //anything is better than empty name, because <img src=""> calls shop once more = x2 SLOW.
-        if (!$url && $defPic) {
-            return $this->getUrl($defPic, $this->_sPictureDir, $admin, $ssl, $nativeImg, $lang, $shopId);
+        if (!$url && $def_pic) {
+            return $this->get_url($def_pic, $this->_s_picture_dir, $admin, $ssl, $native_img, $lang, $shop_id);
         }
-
         return $url;
     }
-
     /**
      * Finds and returns product pictures folders path
      *
@@ -1184,11 +1013,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getPictureDir($admin)
+    public function get_picture_dir($admin)
     {
-        return $this->getDir(null, $this->_sPictureDir, $admin);
+        return $this->get_dir(null, $this->_s_picture_dir, $admin);
     }
-
     /**
      * Calculates and returns full path to template.
      *
@@ -1197,11 +1025,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getTemplatePath($templateName, $isAdmin)
+    public function get_template_path($template_name, $is_admin)
     {
-        return $this->getDir($templateName, $this->_sTemplateDir, $isAdmin);
+        return $this->get_dir($template_name, $this->_s_template_dir, $is_admin);
     }
-
     /**
      * Finds and returns templates folders path
      *
@@ -1209,11 +1036,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getTemplateDir($admin = false)
+    public function get_template_dir($admin = false)
     {
-        return $this->getDir(null, $this->_sTemplateDir, $admin);
+        return $this->get_dir(null, $this->_s_template_dir, $admin);
     }
-
     /**
      * Finds and returns template file or folder url
      *
@@ -1224,11 +1050,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getTemplateUrl($file = null, $admin = false, $ssl = null, $lang = null)
+    public function get_template_url($file = null, $admin = false, $ssl = null, $lang = null)
     {
-        return $this->getShopMainUrl() . $this->getDir($file, $this->_sTemplateDir, $admin, $lang, null, null, false);
+        return $this->get_shop_main_url() . $this->get_dir($file, $this->_s_template_dir, $admin, $lang, null, null, false);
     }
-
     /**
      * Finds and returns base template folder url
      *
@@ -1236,12 +1061,11 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getTemplateBase($admin = false)
+    public function get_template_base($admin = false)
     {
         // Base template dir is the parent dir of template dir
-        return str_replace($this->_sTemplateDir . '/', '', $this->getDir(null, $this->_sTemplateDir, $admin, null, null, null, false));
+        return str_replace($this->_s_template_dir . '/', '', $this->get_dir(null, $this->_s_template_dir, $admin, null, null, null, false));
     }
-
     /**
      * Finds and returns resource (css, js, etc..) files or folders path
      *
@@ -1250,11 +1074,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getResourcePath($file = '', $admin = false)
+    public function get_resource_path($file = '', $admin = false)
     {
-        return $this->getDir($file, $this->_sResourceDir, $admin);
+        return $this->get_dir($file, $this->_s_resource_dir, $admin);
     }
-
     /**
      * Finds and returns resource (css, js, etc..) file or folder url
      *
@@ -1265,13 +1088,11 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getResourceUrl($file = '', $admin = false, $ssl = null, $lang = null)
+    public function get_resource_url($file = '', $admin = false, $ssl = null, $lang = null)
     {
-        $nativeImg = $this->getConfigParam('blNativeImages');
-
-        return $this->getUrl($file, $this->_sResourceDir, $admin, $ssl, $nativeImg, $lang);
+        $native_img = $this->get_config_param('blNativeImages');
+        return $this->get_url($file, $this->_s_resource_dir, $admin, $ssl, $native_img, $lang);
     }
-
     /**
      * Finds and returns resource (css, js, etc..) folders path
      *
@@ -1279,11 +1100,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getResourceDir($admin)
+    public function get_resource_dir($admin)
     {
-        return $this->getDir(null, $this->_sResourceDir, $admin);
+        return $this->get_dir(null, $this->_s_resource_dir, $admin);
     }
-
     /**
      * Returns array of available currencies
      *
@@ -1291,33 +1111,30 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return stdClass[]
      */
-    public function getCurrencyArray($currency = null)
+    public function get_currency_array($currency = null)
     {
-        $confCurrencies = $this->getConfigParam('aCurrencies');
-        if (!is_array($confCurrencies)) {
+        $conf_currencies = $this->get_config_param('aCurrencies');
+        if (!is_array($conf_currencies)) {
             return [];
         }
-
         // processing currency configuration data
         $currencies = [];
-        reset($confCurrencies);
-        foreach ($confCurrencies as $key => $val) {
+        reset($conf_currencies);
+        foreach ($conf_currencies as $key => $val) {
             if ($val) {
                 $cur = new stdClass();
                 $cur->id = $key;
-                $curValues = explode('@', (string) $val);
-                $cur->name = trim($curValues[0]);
-                $cur->rate = trim($curValues[1]);
-                $cur->dec = trim($curValues[2]);
-                $cur->thousand = trim($curValues[3]);
-                $cur->sign = trim($curValues[4]);
-                $cur->decimal = trim($curValues[5]);
-
+                $cur_values = explode('@', (string) $val);
+                $cur->name = trim($cur_values[0]);
+                $cur->rate = trim($cur_values[1]);
+                $cur->dec = trim($cur_values[2]);
+                $cur->thousand = trim($cur_values[3]);
+                $cur->sign = trim($cur_values[4]);
+                $cur->decimal = trim($cur_values[5]);
                 // change for US version
-                if (isset($curValues[6])) {
-                    $cur->side = trim($curValues[6]);
+                if (isset($cur_values[6])) {
+                    $cur->side = trim($cur_values[6]);
                 }
-
                 if (isset($currency) && $key == $currency) {
                     $cur->selected = 1;
                 } else {
@@ -1325,16 +1142,13 @@ class Config extends \OxidEsales\Eshop\Core\Base
                 }
                 $currencies[$key] = $cur;
             }
-
             // #861C -  performance, do not load other currencies
-            if (!$this->getConfigParam('bl_perfLoadCurrency')) {
+            if (!$this->get_config_param('bl_perfLoadCurrency')) {
                 break;
             }
         }
-
         return $currencies;
     }
-
     /**
      * Returns currency object.
      *
@@ -1342,77 +1156,68 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return stdClass|null
      */
-    public function getCurrencyObject($name)
+    public function get_currency_object($name)
     {
-        $search = $this->getCurrencyArray();
+        $search = $this->get_currency_array();
         foreach ($search as $cur) {
             if ($cur->name == $name) {
                 return $cur;
             }
         }
     }
-
     /**
      * Checks if the shop is in demo mode.
      *
      * @return bool
      */
-    public function isDemoShop()
+    public function is_demo_shop()
     {
-        return ContainerFacade::getParameter('oxid_esales.demo_shop_mode');
+        return Container_Facade::get_parameter('oxid_esales.demo_shop_mode');
     }
-
-    public function getEdition(): Edition
+    public function get_edition(): Edition
     {
-        return ContainerFacade::get(BasicContextInterface::class)->getEdition();
+        return Container_Facade::get(Basic_Context_Interface::class)->get_edition();
     }
-
     /**
      * Returns full eShop edition name
      */
-    public function getFullEdition(): string
+    public function get_full_edition(): string
     {
-        return $this->getEdition()->getFullEditionName();
+        return $this->get_edition()->get_full_edition_name();
     }
-
     /**
      * Returns build package info file content.
      *
      * @return bool|string
      */
-    public function getPackageInfo()
+    public function get_package_info()
     {
-        $fileName = Path::join(ContainerFacade::getParameter('oxid_esales.shop_source_directory'), 'pkg.info');
-        $rev = @file_get_contents($fileName);
+        $file_name = Path::join(Container_Facade::get_parameter('oxid_esales.shop_source_directory'), 'pkg.info');
+        $rev = @file_get_contents($file_name);
         $rev = str_replace("\n", '<br>', $rev);
-
         if (!$rev) {
             return false;
         }
-
         return $rev;
     }
-
     /**
      * Counts OXID mandates
      *
      * @return int
      */
-    public function getMandateCount()
+    public function get_mandate_count()
     {
         return 1;
     }
-
     /**
      * Checks if shop is MALL. Returns true on success.
      *
      * @return bool
      */
-    public function isMall()
+    public function is_mall()
     {
         return false;
     }
-
     /**
      * Checks version of shop, returns:
      *  0 - version is bellow 2.2
@@ -1420,10 +1225,9 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *  2 - Pro
      *  3 - Enterprise
      */
-    public function detectVersion()
+    public function detect_version()
     {
     }
-
     /**
      * Updates or adds new shop configuration parameters to DB.
      * Arrays must be passed not serialized, serialized values are supported just for backward compatibility.
@@ -1434,62 +1238,44 @@ class Config extends \OxidEsales\Eshop\Core\Base
      * @param int    $shopId  Shop ID, default is current shop
      * @param string $module  Module name (empty for base options)
      */
-    public function saveShopConfVar($varType, $varName, $varVal, $shopId = null, $module = ''): void
+    public function save_shop_conf_var($var_type, $var_name, $var_val, $shop_id = null, $module = ''): void
     {
-        switch ($varType) {
+        switch ($var_type) {
             case 'arr':
             case 'aarr':
-                $value = serialize($varVal);
+                $value = serialize($var_val);
                 break;
             case 'bool':
                 //config param
-                $varVal = (($varVal == 'true' || $varVal) && $varVal && strcasecmp((string) $varVal, 'false'));
+                $var_val = ($var_val == 'true' || $var_val) && $var_val && strcasecmp((string) $var_val, 'false');
                 //db value
-                $value = $varVal ? '1' : '';
+                $value = $var_val ? '1' : '';
                 break;
             case 'num':
                 //config param
-                $varVal = $varVal != '' ? Registry::getUtils()->string2Float($varVal) : '';
-                $value = $varVal;
+                $var_val = $var_val != '' ? Registry::get_utils()->string2Float($var_val) : '';
+                $value = $var_val;
                 break;
             default:
-                $value = $varVal;
+                $value = $var_val;
                 break;
         }
-
-        if (!$shopId) {
-            $shopId = $this->getShopId();
+        if (!$shop_id) {
+            $shop_id = $this->get_shop_id();
         }
-
         // Update value only for current shop
-        if ($shopId == $this->getShopId()) {
-            $this->setConfigParam($varName, $varVal);
+        if ($shop_id == $this->get_shop_id()) {
+            $this->set_config_param($var_name, $var_val);
         }
-
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $newOXID = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID();
-
+        $db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $new_oxid = \Oxid_Esales\Eshop\Core\Registry::get_utils_object()->generate_uid();
         $query = 'delete from oxconfig where oxshopid = :oxshopid and oxvarname = :oxvarname and oxmodule = :oxmodule';
-        $db->execute($query, [
-            'oxshopid' => $shopId,
-            'oxvarname' => $varName,
-            'oxmodule' => $module ?: '',
-        ]);
-
+        $db->execute($query, ['oxshopid' => $shop_id, 'oxvarname' => $var_name, 'oxmodule' => $module ?: '']);
         $query = 'insert into oxconfig (oxid, oxshopid, oxmodule, oxvarname, oxvartype, oxvarvalue)
                   values (:oxid, :oxshopid, :oxmodule, :oxvarname, :oxvartype, :value)';
-        $db->execute($query, [
-            'oxid' => $newOXID,
-            'oxshopid' => $shopId,
-            'oxmodule' => $module ?: '',
-            'oxvarname' => $varName,
-            'oxvartype' => $varType,
-            'value' => $value ?? '',
-        ]);
-
-        $this->informServicesAfterConfigurationChanged($varName, $shopId, $module);
+        $db->execute($query, ['oxid' => $new_oxid, 'oxshopid' => $shop_id, 'oxmodule' => $module ?: '', 'oxvarname' => $var_name, 'oxvartype' => $var_type, 'value' => $value ?? '']);
+        $this->inform_services_after_configuration_changed($var_name, $shop_id, $module);
     }
-
     /**
      * Retrieves shop configuration parameters from DB.
      *
@@ -1499,33 +1285,24 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return object - raw configuration value in DB
      */
-    public function getShopConfVar($varName, $shopId = null, $module = '')
+    public function get_shop_conf_var($var_name, $shop_id = null, $module = '')
     {
-        if (!$shopId) {
-            $shopId = $this->getShopId();
+        if (!$shop_id) {
+            $shop_id = $this->get_shop_id();
         }
-
-        if ($shopId == $this->getShopId() && (!$module || $module == Config::OXMODULE_THEME_PREFIX . $this->getConfigParam('sTheme'))) {
-            $varValue = $this->getConfigParam($varName);
-            if ($varValue !== null) {
-                return $varValue;
+        if ($shop_id == $this->get_shop_id() && (!$module || $module == Config::OXMODULE_THEME_PREFIX . $this->get_config_param('sTheme'))) {
+            $var_value = $this->get_config_param($var_name);
+            if ($var_value !== null) {
+                return $var_value;
             }
         }
-
-        $db = DatabaseProvider::getDb();
-
+        $db = Database_Provider::get_db();
         $query = 'select oxvartype, oxvarvalue from oxconfig where oxshopid = :oxshopid and oxmodule = :oxmodule and oxvarname = :oxvarname';
-        $result = $db->select($query, [
-            'oxshopid' => $shopId,
-            'oxmodule' => $module,
-            'oxvarname' => $varName,
-        ]);
-
+        $result = $db->select($query, ['oxshopid' => $shop_id, 'oxmodule' => $module, 'oxvarname' => $var_name]);
         if ($result != false && $result->count() > 0) {
-            return $this->decodeValue($result->fields['oxvartype'], $result->fields['oxvarvalue']);
+            return $this->decode_value($result->fields['oxvartype'], $result->fields['oxvarvalue']);
         }
     }
-
     /**
      * Decodes and returns database value
      *
@@ -1534,36 +1311,30 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return mixed
      */
-    public function decodeValue($type, $mOrigValue)
+    public function decode_value($type, $m_orig_value)
     {
-        $value = $mOrigValue;
-
+        $value = $m_orig_value;
         return match ($type) {
-            'arr', 'aarr' => unserialize($mOrigValue, ['allowed_classes' => false]),
-            'bool' => $mOrigValue == 'true' || $mOrigValue == '1',
+            'arr', 'aarr' => unserialize($m_orig_value, ['allowed_classes' => false]),
+            'bool' => $m_orig_value == 'true' || $m_orig_value == '1',
             default => $value,
         };
     }
-
     /**
      * Returns true if current active shop is in productive mode or false if not
      *
      * @return bool
      */
-    public function isProductiveMode()
+    public function is_productive_mode()
     {
-        $productive = $this->getConfigParam('blProductive');
+        $productive = $this->get_config_param('blProductive');
         if (!isset($productive)) {
             $query = 'select oxproductive from oxshops where oxid = :oxid';
-            $productive = (bool) \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($query, [
-                'oxid' => $this->getShopId(),
-            ]);
-            $this->setConfigParam('blProductive', $productive);
+            $productive = (bool) \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_one($query, ['oxid' => $this->get_shop_id()]);
+            $this->set_config_param('blProductive', $productive);
         }
-
         return $productive;
     }
-
     /**
      * Function returns default shop ID
      *
@@ -1572,126 +1343,108 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getBaseShopId()
+    public function get_base_shop_id()
     {
-        return \OxidEsales\Eshop\Core\ShopIdCalculator::BASE_SHOP_ID;
+        return \Oxid_Esales\Eshop\Core\Shop_Id_Calculator::BASE_SHOP_ID;
     }
-
     /**
      * Loads and returns active shop object
      *
      * @return Shop
      */
-    public function getActiveShop()
+    public function get_active_shop()
     {
-        if (
-            $this->_oActShop && $this->_iShopId == $this->_oActShop->getId() &&
-            $this->_oActShop->getLanguage() == Registry::getLang()->getBaseLanguage()
-        ) {
-            return $this->_oActShop;
+        if ($this->_o_act_shop && $this->_i_shop_id == $this->_o_act_shop->get_id() && $this->_o_act_shop->get_language() == Registry::get_lang()->get_base_language()) {
+            return $this->_o_act_shop;
         }
-
-        $this->_oActShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
-        $this->_oActShop->load($this->getShopId());
-
-        return $this->_oActShop;
+        $this->_o_act_shop = ox_new(\Oxid_Esales\Eshop\Application\Model\Shop::class);
+        $this->_o_act_shop->load($this->get_shop_id());
+        return $this->_o_act_shop;
     }
-
     /**
      * Returns active view object. If this object was not defined - returns oxubase object
      *
      * @return FrontendController
      */
-    public function getActiveView()
+    public function get_active_view()
     {
-        if (count($this->_aActiveViews)) {
-            $actView = end($this->_aActiveViews);
+        if (count($this->_a_active_views)) {
+            $act_view = end($this->_a_active_views);
         }
-        if (!isset($actView) || $actView == null) {
-            $actView = oxNew(\OxidEsales\Eshop\Application\Controller\FrontendController::class);
-            $this->_aActiveViews[] = $actView;
+        if (!isset($act_view) || $act_view == null) {
+            $act_view = ox_new(\Oxid_Esales\Eshop\Application\Controller\Frontend_Controller::class);
+            $this->_a_active_views[] = $act_view;
         }
-
-        return $actView;
+        return $act_view;
     }
-
     /**
      * Returns top active view object from views chain.
      *
      * @return FrontendController
      */
-    public function getTopActiveView()
+    public function get_top_active_view()
     {
-        if (count($this->_aActiveViews)) {
-            return reset($this->_aActiveViews);
+        if (count($this->_a_active_views)) {
+            return reset($this->_a_active_views);
         }
-        return $this->getActiveView();
+        return $this->get_active_view();
     }
-
     /**
      * Returns all active views objects list.
      *
      * @return array
      */
-    public function getActiveViewsList()
+    public function get_active_views_list()
     {
-        return $this->_aActiveViews;
+        return $this->_a_active_views;
     }
-
     /**
      * View object setter
      *
      * @param object $view view object
      */
-    public function setActiveView($view): void
+    public function set_active_view($view): void
     {
-        $this->_aActiveViews[] = $view;
+        $this->_a_active_views[] = $view;
     }
-
     /**
      * Drop last active view object
      */
-    public function dropLastActiveView(): void
+    public function drop_last_active_view(): void
     {
-        array_pop($this->_aActiveViews);
+        array_pop($this->_a_active_views);
     }
-
     /**
      * Check if there is more than one active view
      */
-    public function hasActiveViewsChain()
+    public function has_active_views_chain()
     {
-        return (count($this->_aActiveViews) > 1);
+        return count($this->_a_active_views) > 1;
     }
-
     /**
      * Get active views class id list
      *
      * @return array
      */
-    public function getActiveViewsIds()
+    public function get_active_views_ids()
     {
         $ids = [];
-
-        if (is_array($this->getActiveViewsList())) {
-            foreach ($this->getActiveViewsList() as $view) {
-                $ids[] = $view->getClassKey();
+        if (is_array($this->get_active_views_list())) {
+            foreach ($this->get_active_views_list() as $view) {
+                $ids[] = $view->get_class_key();
             }
         }
-
         return $ids;
     }
-
     /**
      * Returns log files storage path
      *
      * @return string
      */
-    public function getLogsDir()
+    public function get_logs_dir()
     {
-        return Path::join(ContainerFacade::getParameter('oxid_esales.shop_source_directory'), 'log');
+        return Path::join(Container_Facade::get_parameter('oxid_esales.shop_source_directory'), 'log');
     }
-
     /**
      * Returns true if option is theme option
      *
@@ -1699,21 +1452,19 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function isThemeOption($name)
+    public function is_theme_option($name)
     {
-        return isset($this->_aThemeConfigParams[$name]);
+        return isset($this->_a_theme_config_params[$name]);
     }
-
     /**
      * Returns  SSL or non SSL shop main URL without index.php
      *
      * @return string
      */
-    public function getShopMainUrl()
+    public function get_shop_main_url()
     {
-        return ContainerFacade::getParameter('oxid_esales.shop_url');
+        return Container_Facade::get_parameter('oxid_esales.shop_url');
     }
-
     /**
      * Return active shop ids
      *
@@ -1722,11 +1473,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    public function getShopIds()
+    public function get_shop_ids()
     {
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol('SELECT `oxid` FROM `oxshops`');
+        return \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_col('SELECT `oxid` FROM `oxshops`');
     }
-
     /**
      * Function returns shop url by given language.
      * #680 per language another URL
@@ -1736,58 +1486,52 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return null|string
      */
-    public function getShopUrlByLanguage($lang, $ssl = false)
+    public function get_shop_url_by_language($lang, $ssl = false)
     {
-        $configParameter = $ssl ? 'aLanguageSSLURLs' : 'aLanguageURLs';
-        $lang ??= Registry::getLang()->getBaseLanguage();
-        $languageURLs = $this->getConfigParam($configParameter);
-        if (isset($lang) && isset($languageURLs[$lang]) && !empty($languageURLs[$lang])) {
-            $languageURLs[$lang] = Registry::getUtils()->checkUrlEndingSlash($languageURLs[$lang]);
-            return $languageURLs[$lang];
+        $config_parameter = $ssl ? 'aLanguageSSLURLs' : 'aLanguageURLs';
+        $lang ??= Registry::get_lang()->get_base_language();
+        $language_ur_ls = $this->get_config_param($config_parameter);
+        if (isset($lang) && isset($language_ur_ls[$lang]) && !empty($language_ur_ls[$lang])) {
+            $language_ur_ls[$lang] = Registry::get_utils()->check_url_ending_slash($language_ur_ls[$lang]);
+            return $language_ur_ls[$lang];
         }
     }
-
     /**
      * Function returns mall shop url.
      *
      * @return null|string
      */
-    public function getMallShopUrl()
+    public function get_mall_shop_url()
     {
-        $mallShopUrl = $this->getConfigParam('sMallSSLShopURL');
-        if ($mallShopUrl) {
-            return Registry::getUtils()->checkUrlEndingSlash($mallShopUrl);
+        $mall_shop_url = $this->get_config_param('sMallSSLShopURL');
+        if ($mall_shop_url) {
+            return Registry::get_utils()->check_url_ending_slash($mall_shop_url);
         }
     }
-
     /**
      * Handle database exception.
      * At this point everything has crashed already and not much of shop business logic is left to call.
      * So just go straight and call the ExceptionHandler.
      */
-    protected function handleDbConnectionException(\OxidEsales\Eshop\Core\Exception\DatabaseException $exception)
+    protected function handle_db_connection_exception(\Oxid_Esales\Eshop\Core\Exception\Database_Exception $exception)
     {
-        $this->getExceptionHandler()->handleUncaughtException($exception);
+        $this->get_exception_handler()->handle_uncaught_exception($exception);
     }
-
     /**
      * Redirect to start page and display the error
      *
      * @param \OxidEsales\Eshop\Core\Exception\StandardException $ex message to show on exit
      */
-    protected function handleCookieException($ex)
+    protected function handle_cookie_exception($ex)
     {
-        $this->processSeoCall();
-
+        $this->process_seo_call();
         //starting up the session
-        $session = \OxidEsales\Eshop\Core\Registry::getSession();
+        $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
         $session->start();
-
         // redirect to start page and display the error
-        Registry::getUtilsView()->addErrorToDisplay($ex);
-        Registry::getUtils()->redirect($this->getShopHomeUrl() . 'cl=start', true, 302);
+        Registry::get_utils_view()->add_error_to_display($ex);
+        Registry::get_utils()->redirect($this->get_shop_home_url() . 'cl=start', true, 302);
     }
-
     /**
      * Save system configuration parameters, which is the same for sub-shops.
      *
@@ -1795,11 +1539,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      * @param string $parameterName  Name
      * @param mixed  $parameterValue Value (can be string, integer or array)
      */
-    public function saveSystemConfigParameter($parameterType, $parameterName, $parameterValue): void
+    public function save_system_config_parameter($parameter_type, $parameter_name, $parameter_value): void
     {
-        $this->saveShopConfVar($parameterType, $parameterName, $parameterValue, $this->getBaseShopId());
+        $this->save_shop_conf_var($parameter_type, $parameter_name, $parameter_value, $this->get_base_shop_id());
     }
-
     /**
      * Retrieves system configuration parameters, which is the same for sub-shops.
      *
@@ -1807,11 +1550,10 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return mixed
      */
-    public function getSystemConfigParameter($parameterName)
+    public function get_system_config_parameter($parameter_name)
     {
-        return $this->getShopConfVar($parameterName, $this->getBaseShopId());
+        return $this->get_shop_conf_var($parameter_name, $this->get_base_shop_id());
     }
-
     /**
      * Returns whether given shop id is valid.
      *
@@ -1819,21 +1561,19 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    protected function isValidShopId($shopId)
+    protected function is_valid_shop_id($shop_id)
     {
-        return !empty($shopId);
+        return !empty($shop_id);
     }
-
     /**
      * Returns active shop id.
      *
      * @return string
      */
-    protected function calculateActiveShopId()
+    protected function calculate_active_shop_id()
     {
-        return $this->getBaseShopId();
+        return $this->get_base_shop_id();
     }
-
     /**
      * Check and get template path by Edition if exists
      *
@@ -1841,19 +1581,17 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return false|string
      */
-    protected function getEditionTemplate($templateName)
+    protected function get_edition_template($template_name)
     {
         return false;
     }
-
     /**
      * @return \OxidEsales\Eshop\Core\Exception\ExceptionHandler
      */
-    protected function getExceptionHandler()
+    protected function get_exception_handler()
     {
-        return new \OxidEsales\Eshop\Core\Exception\ExceptionHandler();
+        return new \Oxid_Esales\Eshop\Core\Exception\Exception_Handler();
     }
-
     /**
      * Inform respective services if shop/module/theme related configuration data was changed in database.
      *
@@ -1861,12 +1599,12 @@ class Config extends \OxidEsales\Eshop\Core\Base
      * @param integer $shopId    Shop id
      * @param string  $extension Module or theme name in case of extension config change
      */
-    protected function informServicesAfterConfigurationChanged($varName, $shopId, $extension = '')
+    protected function inform_services_after_configuration_changed($var_name, $shop_id, $extension = '')
     {
         if (empty($extension)) {
-            ContainerFacade::dispatch(new ShopConfigurationChangedEvent($varName, (int) $shopId));
+            Container_Facade::dispatch(new Shop_Configuration_Changed_Event($var_name, (int) $shop_id));
         } elseif (str_contains($extension, self::OXMODULE_THEME_PREFIX)) {
-            ContainerFacade::dispatch(new ThemeSettingChangedEvent($varName, (int) $shopId, $extension));
+            Container_Facade::dispatch(new Theme_Setting_Changed_Event($var_name, (int) $shop_id, $extension));
         }
     }
 }

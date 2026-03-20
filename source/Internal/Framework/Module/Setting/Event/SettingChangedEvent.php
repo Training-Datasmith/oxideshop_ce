@@ -4,38 +4,29 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setting\Event;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Event;
-
-use Symfony\Contracts\EventDispatcher\Event;
-
+use Symfony\Contracts\Event_Dispatcher\Event;
 /**
  * @stable
  * @see OxidEsales/EshopCommunity/Internal/README.md
  */
-class SettingChangedEvent extends Event
+class Setting_Changed_Event extends Event
 {
-    public function __construct(
-        private readonly string $settingName,
-        private readonly int $shopId,
-        private readonly string $moduleId
-    ) {
-    }
-
-    public function getSettingName(): string
+    public function __construct(private readonly string $setting_name, private readonly int $shop_id, private readonly string $module_id)
     {
-        return $this->settingName;
     }
-
-    public function getShopId(): int
+    public function get_setting_name(): string
     {
-        return $this->shopId;
+        return $this->setting_name;
     }
-
-    public function getModuleId(): string
+    public function get_shop_id(): int
     {
-        return $this->moduleId;
+        return $this->shop_id;
+    }
+    public function get_module_id(): string
+    {
+        return $this->module_id;
     }
 }

@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Class for validating address
  */
-class RequiredFieldValidator
+class Required_Field_Validator
 {
     /**
      * Validates field value.
@@ -21,20 +19,16 @@ class RequiredFieldValidator
      *
      * @return bool
      */
-    public function validateFieldValue($sFieldValue)
+    public function validate_field_value($s_field_value)
     {
-        $blValid = true;
-        if (is_array($sFieldValue)) {
-            $blValid = $this->validateFieldValueArray($sFieldValue);
-        } else {
-            if (!trim($sFieldValue ?? '')) {
-                $blValid = false;
-            }
+        $bl_valid = true;
+        if (is_array($s_field_value)) {
+            $bl_valid = $this->validate_field_value_array($s_field_value);
+        } else if (!trim($s_field_value ?? '')) {
+            $bl_valid = false;
         }
-
-        return $blValid;
+        return $bl_valid;
     }
-
     /**
      * Checks if all values are filled up
      *
@@ -42,16 +36,15 @@ class RequiredFieldValidator
      *
      * @return bool
      */
-    private function validateFieldValueArray(array $aFieldValues)
+    private function validate_field_value_array(array $a_field_values)
     {
-        $blValid = true;
-        foreach ($aFieldValues as $sValue) {
-            if (!trim((string) $sValue)) {
-                $blValid = false;
+        $bl_valid = true;
+        foreach ($a_field_values as $s_value) {
+            if (!trim((string) $s_value)) {
+                $bl_valid = false;
                 break;
             }
         }
-
-        return $blValid;
+        return $bl_valid;
     }
 }

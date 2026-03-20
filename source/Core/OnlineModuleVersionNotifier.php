@@ -1,20 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\{
-    ModuleConfigurationDataMapperBridgeInterface, ShopConfigurationDaoBridgeInterface
-};
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\{Module_Configuration_Data_Mapper_Bridge_Interface, Shop_Configuration_Dao_Bridge_Interface};
 use stdClass;
-
 /**
  * Performs Online Module Version Notifier check.
  *
@@ -28,65 +23,54 @@ use stdClass;
  *
  * @ignore   This class will not be included in documentation.
  */
-class OnlineModuleVersionNotifier
+class Online_Module_Version_Notifier
 {
     /** @var \OxidEsales\Eshop\Core\OnlineModuleVersionNotifierCaller */
-    private $_oCaller;
-
-    public function __construct(\OxidEsales\Eshop\Core\OnlineModuleVersionNotifierCaller $oCaller)
+    private $_o_caller;
+    public function __construct(\Oxid_Esales\Eshop\Core\Online_Module_Version_Notifier_Caller $o_caller)
     {
-        $this->_oCaller = $oCaller;
+        $this->_o_caller = $o_caller;
     }
-
     /**
      * Perform Online Module version Notification. Returns result
      */
-    public function versionNotify(): void
+    public function version_notify(): void
     {
-        if (true === \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('preventModuleVersionNotify')) {
+        if (true === \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('preventModuleVersionNotify')) {
             return;
         }
-
-        $oOMNCaller = $this->getOnlineModuleNotifierCaller();
-        $oOMNCaller->doRequest($this->formRequest());
+        $o_omn_caller = $this->get_online_module_notifier_caller();
+        $o_omn_caller->do_request($this->form_request());
     }
-
     /**
      * @return mixed[]
      */
-    protected function prepareModulesInformation(): array
+    protected function prepare_modules_information(): array
     {
-        $shopConfiguration = ContainerFacade::get(ShopConfigurationDaoBridgeInterface::class)->get();
-
-        $preparedModules = [];
-        foreach ($shopConfiguration->getModuleConfigurations() as $moduleConfiguration) {
-            $preparedModules[] = ContainerFacade::get(ModuleConfigurationDataMapperBridgeInterface::class)
-                ->toData($moduleConfiguration);
+        $shop_configuration = Container_Facade::get(Shop_Configuration_Dao_Bridge_Interface::class)->get();
+        $prepared_modules = [];
+        foreach ($shop_configuration->get_module_configurations() as $module_configuration) {
+            $prepared_modules[] = Container_Facade::get(Module_Configuration_Data_Mapper_Bridge_Interface::class)->to_data($module_configuration);
         }
-
-        return $preparedModules;
+        return $prepared_modules;
     }
-
     /**
      * Send request message to Online Module Version Notifier web service.
      */
-    protected function formRequest(): \OxidEsales\Eshop\Core\OnlineModulesNotifierRequest
+    protected function form_request(): \Oxid_Esales\Eshop\Core\Online_Modules_Notifier_Request
     {
-        $oRequestParams = new \OxidEsales\Eshop\Core\OnlineModulesNotifierRequest();
-
-        $oRequestParams->modules = new stdClass();
-        $oRequestParams->modules->module = $this->prepareModulesInformation();
-
-        return $oRequestParams;
+        $o_request_params = new \Oxid_Esales\Eshop\Core\Online_Modules_Notifier_Request();
+        $o_request_params->modules = new stdClass();
+        $o_request_params->modules->module = $this->prepare_modules_information();
+        return $o_request_params;
     }
-
     /**
      * Returns caller.
      *
      * @return \OxidEsales\Eshop\Core\OnlineModuleVersionNotifierCaller
      */
-    protected function getOnlineModuleNotifierCaller()
+    protected function get_online_module_notifier_caller()
     {
-        return $this->_oCaller;
+        return $this->_o_caller;
     }
 }

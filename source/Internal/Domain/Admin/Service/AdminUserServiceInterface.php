@@ -4,17 +4,10 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Admin\Service;
-
-interface AdminUserServiceInterface
+interface Admin_User_Service_Interface
 {
-    public function createAdmin(
-        string $email,
-        string $password,
-        string $rights,
-        int $shopId
-    ): void;
+    public function create_admin(string $email, string $password, string $rights, int $shop_id): void;
 }

@@ -1,49 +1,34 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Dao;
 
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Dao;
-
-use Doctrine\Common\Collections\ArrayCollection;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMedia;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRole;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaSorting;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
-
-interface ProductMediaDaoInterface
+use Doctrine\Common\Collections\Array_Collection;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_Role;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_Sorting;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Id;
+interface Product_Media_Dao_Interface
 {
-    public function add(ProductMedia $productMedia): void;
-
-    public function update(ProductMedia $productMedia): void;
-
+    public function add(Product_Media $product_media): void;
+    public function update(Product_Media $product_media): void;
     public function delete(Id $id): void;
-
-    public function sort(ProductMediaSorting $sorting): void;
-
-    public function get(Id $id): ProductMedia;
-
+    public function sort(Product_Media_Sorting $sorting): void;
+    public function get(Id $id): Product_Media;
     /** @return ArrayCollection<int, ProductMedia> */
-    public function getAll(Id $productId): ArrayCollection;
-
+    public function get_all(Id $product_id): Array_Collection;
     /** @return ArrayCollection<int, ProductMedia> */
-    public function getAllActive(Id $productId): ArrayCollection;
-
+    public function get_all_active(Id $product_id): Array_Collection;
     /** @return ArrayCollection<int, ProductMedia> */
-    public function getAllByRole(Id $productId, ProductMediaRole $role): ArrayCollection;
-
+    public function get_all_by_role(Id $product_id, Product_Media_Role $role): Array_Collection;
     /** @return ArrayCollection<int, ProductMedia> */
-    public function getAllActiveByRole(Id $productId, ProductMediaRole $role): ArrayCollection;
-
-    public function getByRole(Id $productId, ProductMediaRole $role): ?ProductMedia;
-
-    public function getActiveByRole(Id $productId, ProductMediaRole $role): ?ProductMedia;
-
-    public function getActiveByPosition(Id $productId, int $position): ?ProductMedia;
-
-    public function getFirstActive(Id $productId): ?ProductMedia;
+    public function get_all_active_by_role(Id $product_id, Product_Media_Role $role): Array_Collection;
+    public function get_by_role(Id $product_id, Product_Media_Role $role): ?Product_Media;
+    public function get_active_by_role(Id $product_id, Product_Media_Role $role): ?Product_Media;
+    public function get_active_by_position(Id $product_id, int $position): ?Product_Media;
+    public function get_first_active(Id $product_id): ?Product_Media;
 }

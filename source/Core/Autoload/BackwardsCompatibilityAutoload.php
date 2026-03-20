@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Autoload;
+namespace Oxid_Esales\Eshop_Community\Core\Autoload;
 
 /**
  * This class autoloads backwards compatible classes by triggering the composer autoloader via a unified namespace
@@ -15,7 +13,7 @@ namespace OxidEsales\EshopCommunity\Core\Autoload;
  *
  * @internal Do not make a module extension for this class.
  */
-class BackwardsCompatibilityAutoload
+class Backwards_Compatibility_Autoload
 {
     /**
      * Autoload method.
@@ -33,13 +31,11 @@ class BackwardsCompatibilityAutoload
         if (str_contains($class, 'OxidEsales\Eshop\\')) {
             return false;
         }
-
-        $unifiedNamespaceClassName = static::getUnifiedNamespaceClassForBcAlias($class);
-        if (!empty($unifiedNamespaceClassName)) {
-            static::forceBackwardsCompatiblityClassLoading($unifiedNamespaceClassName);
+        $unified_namespace_class_name = static::get_unified_namespace_class_for_bc_alias($class);
+        if (!empty($unified_namespace_class_name)) {
+            static::force_backwards_compatiblity_class_loading($unified_namespace_class_name);
         }
     }
-
     /**
      * Return the name of a Unified Namespace class for a given backwards compatible class
      *
@@ -47,32 +43,29 @@ class BackwardsCompatibilityAutoload
      *
      * @return string Name of the unified namespace class like OxidEsales\Eshop\Application\Model\Article
      */
-    private static function getUnifiedNamespaceClassForBcAlias($bcAlias)
+    private static function get_unified_namespace_class_for_bc_alias($bc_alias)
     {
-        $classMap = static::getBackwardsCompatibilityClassMap();
-        $bcAlias = strtolower($bcAlias);
-
-        return $classMap[$bcAlias] ?? '';
+        $class_map = static::get_backwards_compatibility_class_map();
+        $bc_alias = strtolower($bc_alias);
+        return $class_map[$bc_alias] ?? '';
     }
-
     /**
      * This triggers loading the unified namespace class via composer autoloader and also the
      * aliasing of the backwards compatible class.
      *
      * @param string $class Name of the class to load
      */
-    private static function forceBackwardsCompatiblityClassLoading($class): void
+    private static function force_backwards_compatiblity_class_loading($class): void
     {
         class_exists($class);
     }
-
     /**
      * Return the backwards compatible class map.
      *
      * @return array Mapping of Unified Namespace to backwards compatible classes.
      */
-    private static function getBackwardsCompatibilityClassMap(): array
+    private static function get_backwards_compatibility_class_map(): array
     {
-        return (new BackwardsCompatibilityClassMapProvider())->getMap();
+        return (new Backwards_Compatibility_Class_Map_Provider())->get_map();
     }
 }

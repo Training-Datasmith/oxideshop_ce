@@ -4,14 +4,11 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service;
-
-interface ModuleActivationServiceInterface
+interface Module_Activation_Service_Interface
 {
-    public function activate(string $moduleId, int $shopId);
-
-    public function deactivate(string $moduleId, int $shopId);
+    public function activate(string $module_id, int $shop_id);
+    public function deactivate(string $module_id, int $shop_id);
 }

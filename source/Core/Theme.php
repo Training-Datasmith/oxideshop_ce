@@ -1,35 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Themes handler class.
  *
  * @internal Do not make a module extension for this class.
  */
-class Theme extends \OxidEsales\Eshop\Core\Base
+class Theme extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Theme info array
      *
      * @var array
      */
-    protected $_aTheme = [];
-
+    protected $_a_theme = [];
     /**
      * Theme info list
      *
      * @var array
      */
-    protected $_aThemeList = [];
-
+    protected $_a_theme_list = [];
     /**
      * Load theme info
      *
@@ -37,64 +33,58 @@ class Theme extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function load($sOXID)
+    public function load($s_oxid)
     {
-        $sFilePath = \OxidEsales\Eshop\Core\Registry::getConfig()->getViewsDir() . $sOXID . '/theme.php';
-        if (file_exists($sFilePath) && is_readable($sFilePath)) {
-            $aTheme = [];
-            include $sFilePath;
-            $this->_aTheme = $aTheme;
-            $this->_aTheme['id'] = $sOXID;
-            $this->_aTheme['active'] = ($this->getActiveThemeId() == $sOXID);
-
+        $s_file_path = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_views_dir() . $s_oxid . '/theme.php';
+        if (file_exists($s_file_path) && is_readable($s_file_path)) {
+            $a_theme = [];
+            include $s_file_path;
+            $this->_a_theme = $a_theme;
+            $this->_a_theme['id'] = $s_oxid;
+            $this->_a_theme['active'] = $this->get_active_theme_id() == $s_oxid;
             return true;
         }
-
         return false;
     }
-
     /**
      * Set theme as active
      */
     public function activate(): void
     {
-        $sError = $this->checkForActivationErrors();
-        if ($sError) {
+        $s_error = $this->check_for_activation_errors();
+        if ($s_error) {
             /** @var \OxidEsales\Eshop\Core\Exception\StandardException $oException */
-            $oException = oxNew(\OxidEsales\Eshop\Core\Exception\StandardException::class, $sError);
-            throw $oException;
+            $o_exception = ox_new(\Oxid_Esales\Eshop\Core\Exception\Standard_Exception::class, $s_error);
+            throw $o_exception;
         }
-        $sParent = $this->getInfo('parentTheme');
-        if ($sParent) {
-            \OxidEsales\Eshop\Core\Registry::getConfig()->saveShopConfVar('str', 'sTheme', $sParent);
-            \OxidEsales\Eshop\Core\Registry::getConfig()->saveShopConfVar('str', 'sCustomTheme', $this->getId());
+        $s_parent = $this->get_info('parentTheme');
+        if ($s_parent) {
+            \Oxid_Esales\Eshop\Core\Registry::get_config()->save_shop_conf_var('str', 'sTheme', $s_parent);
+            \Oxid_Esales\Eshop\Core\Registry::get_config()->save_shop_conf_var('str', 'sCustomTheme', $this->get_id());
         } else {
-            \OxidEsales\Eshop\Core\Registry::getConfig()->saveShopConfVar('str', 'sTheme', $this->getId());
-            \OxidEsales\Eshop\Core\Registry::getConfig()->saveShopConfVar('str', 'sCustomTheme', '');
+            \Oxid_Esales\Eshop\Core\Registry::get_config()->save_shop_conf_var('str', 'sTheme', $this->get_id());
+            \Oxid_Esales\Eshop\Core\Registry::get_config()->save_shop_conf_var('str', 'sCustomTheme', '');
         }
-        $settingsHandler = oxNew(\OxidEsales\Eshop\Core\SettingsHandler::class);
-        $settingsHandler->setModuleType('theme')->run($this);
+        $settings_handler = ox_new(\Oxid_Esales\Eshop\Core\Settings_Handler::class);
+        $settings_handler->set_module_type('theme')->run($this);
     }
-
     /**
      * Load theme info list
      *
      * @return array
      */
-    public function getList()
+    public function get_list()
     {
-        $this->_aThemeList = [];
-        $sOutDir = \OxidEsales\Eshop\Core\Registry::getConfig()->getViewsDir();
-        foreach (glob($sOutDir . '*', GLOB_ONLYDIR) as $sDir) {
-            $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
-            if ($oTheme->load(basename($sDir))) {
-                $this->_aThemeList[$sDir] = $oTheme;
+        $this->_a_theme_list = [];
+        $s_out_dir = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_views_dir();
+        foreach (glob($s_out_dir . '*', GLOB_ONLYDIR) as $s_dir) {
+            $o_theme = ox_new(\Oxid_Esales\Eshop\Core\Theme::class);
+            if ($o_theme->load(basename($s_dir))) {
+                $this->_a_theme_list[$s_dir] = $o_theme;
             }
         }
-
-        return $this->_aThemeList;
+        return $this->_a_theme_list;
     }
-
     /**
      * Return theme information
      *
@@ -102,30 +92,26 @@ class Theme extends \OxidEsales\Eshop\Core\Base
      *
      * @return mixed
      */
-    public function getInfo($sName)
+    public function get_info($s_name)
     {
-        if (!isset($this->_aTheme[$sName])) {
+        if (!isset($this->_a_theme[$s_name])) {
             return null;
         }
-
-        return $this->_aTheme[$sName];
+        return $this->_a_theme[$s_name];
     }
-
     /**
      * Return current active theme, or custom theme if specified
      *
      * @return string
      */
-    public function getActiveThemeId()
+    public function get_active_theme_id()
     {
-        $sCustTheme = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sCustomTheme');
-        if ($sCustTheme) {
-            return $sCustTheme;
+        $s_cust_theme = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sCustomTheme');
+        if ($s_cust_theme) {
+            return $s_cust_theme;
         }
-
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sTheme');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sTheme');
     }
-
     /**
      * Get active themes list.
      * Examples:
@@ -134,79 +120,71 @@ class Theme extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    public function getActiveThemesList()
+    public function get_active_themes_list()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $activeThemeList = [];
-        if (!$this->isAdmin()) {
-            $activeThemeList[] = $config->getConfigParam('sTheme');
-
-            if ($customThemeId = $config->getConfigParam('sCustomTheme')) {
-                $activeThemeList[] = $customThemeId;
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $active_theme_list = [];
+        if (!$this->is_admin()) {
+            $active_theme_list[] = $config->get_config_param('sTheme');
+            if ($custom_theme_id = $config->get_config_param('sCustomTheme')) {
+                $active_theme_list[] = $custom_theme_id;
             }
         }
-
-        return $activeThemeList;
+        return $active_theme_list;
     }
-
     /**
      * Return loaded parent
      *
      * @return \OxidEsales\Eshop\Core\Theme
      */
-    public function getParent()
+    public function get_parent()
     {
-        $sParent = $this->getInfo('parentTheme');
-        if (!$sParent) {
+        $s_parent = $this->get_info('parentTheme');
+        if (!$s_parent) {
             return null;
         }
-        $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
-        if ($oTheme->load($sParent)) {
-            return $oTheme;
+        $o_theme = ox_new(\Oxid_Esales\Eshop\Core\Theme::class);
+        if ($o_theme->load($s_parent)) {
+            return $o_theme;
         }
-
         return null;
     }
-
     /**
      * run pre-activation checks and return EXCEPTION_* translation string if error
      * found or false on success
      *
      * @return string
      */
-    public function checkForActivationErrors()
+    public function check_for_activation_errors()
     {
-        if (!$this->getId()) {
+        if (!$this->get_id()) {
             return 'EXCEPTION_THEME_NOT_LOADED';
         }
-        $oParent = $this->getParent();
-        if ($oParent) {
-            $sParentVersion = $oParent->getInfo('version');
-            if (!$sParentVersion) {
+        $o_parent = $this->get_parent();
+        if ($o_parent) {
+            $s_parent_version = $o_parent->get_info('version');
+            if (!$s_parent_version) {
                 return 'EXCEPTION_PARENT_VERSION_UNSPECIFIED';
             }
-            $aMyParentVersions = $this->getInfo('parentVersions');
-            if (!$aMyParentVersions || !is_array($aMyParentVersions)) {
+            $a_my_parent_versions = $this->get_info('parentVersions');
+            if (!$a_my_parent_versions || !is_array($a_my_parent_versions)) {
                 return 'EXCEPTION_UNSPECIFIED_PARENT_VERSIONS';
             }
-            if (!in_array($sParentVersion, $aMyParentVersions)) {
+            if (!in_array($s_parent_version, $a_my_parent_versions)) {
                 return 'EXCEPTION_PARENT_VERSION_MISMATCH';
             }
-        } elseif ($this->getInfo('parentTheme')) {
+        } elseif ($this->get_info('parentTheme')) {
             return 'EXCEPTION_PARENT_THEME_NOT_FOUND';
         }
-
         return false;
     }
-
     /**
      * Get theme ID
      *
      * @return string
      */
-    public function getId()
+    public function get_id()
     {
-        return $this->getInfo('id');
+        return $this->get_info('id');
     }
 }

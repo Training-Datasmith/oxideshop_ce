@@ -4,34 +4,25 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
-
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Id;
 readonly class Media
 {
-    public function __construct(
-        private Id $id,
-        private MediaPath $mediaPath,
-        private MediaType $mediaType,
-    ) {
+    public function __construct(private Id $id, private Media_Path $media_path, private Media_Type $media_type)
+    {
     }
-
-    public function getId(): Id
+    public function get_id(): Id
     {
         return $this->id;
     }
-
-    public function getMediaPath(): MediaPath
+    public function get_media_path(): Media_Path
     {
-        return $this->mediaPath;
+        return $this->media_path;
     }
-
-    public function getMediaType(): MediaType
+    public function get_media_type(): Media_Type
     {
-        return $this->mediaType;
+        return $this->media_type;
     }
 }

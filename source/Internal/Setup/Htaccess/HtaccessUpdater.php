@@ -4,33 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Htaccess;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Setup\Htaccess;
-
-use OxidEsales\EshopCommunity\Internal\Utility\Url\UrlParserInterface;
-
-class HtaccessUpdater implements HtaccessUpdaterInterface
+use Oxid_Esales\Eshop_Community\Internal\Utility\Url\Url_Parser_Interface;
+class Htaccess_Updater implements Htaccess_Updater_Interface
 {
     private const REWRITE_BASE_FOR_EMPTY_PATH = '/';
-
-    public function __construct(
-        private readonly HtaccessDaoFactoryInterface $htaccessDaoFactory,
-        private readonly UrlParserInterface $urlParser
-    ) {
+    public function __construct(private readonly Htaccess_Dao_Factory_Interface $htaccess_dao_factory, private readonly Url_Parser_Interface $url_parser)
+    {
     }
-
     /** @inheritDoc */
-    public function updateRewriteBaseDirective(ShopBaseUrl $shopBaseUrl): void
+    public function update_rewrite_base_directive(Shop_Base_Url $shop_base_url): void
     {
-        $this->htaccessDaoFactory->createRootHtaccessDao()->setRewriteBase(
-            $this->getRewriteBase($shopBaseUrl->getUrl())
-        );
+        $this->htaccess_dao_factory->create_root_htaccess_dao()->set_rewrite_base($this->get_rewrite_base($shop_base_url->get_url()));
     }
-
-    private function getRewriteBase(string $url): string
+    private function get_rewrite_base(string $url): string
     {
-        return $this->urlParser->getPathWithoutTrailingSlash($url) ?: self::REWRITE_BASE_FOR_EMPTY_PATH;
+        return $this->url_parser->get_path_without_trailing_slash($url) ?: self::REWRITE_BASE_FOR_EMPTY_PATH;
     }
 }

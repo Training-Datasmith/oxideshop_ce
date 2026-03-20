@@ -4,21 +4,17 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\State;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\State;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ModuleConfigurationDaoInterface;
-
-class ModuleStateService implements ModuleStateServiceInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao\Module_Configuration_Dao_Interface;
+class Module_State_Service implements Module_State_Service_Interface
 {
-    public function __construct(private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao)
+    public function __construct(private readonly Module_Configuration_Dao_Interface $module_configuration_dao)
     {
     }
-
-    public function isActive(string $moduleId, int $shopId): bool
+    public function is_active(string $module_id, int $shop_id): bool
     {
-        return $this->moduleConfigurationDao->get($moduleId, $shopId)->isActivated();
+        return $this->module_configuration_dao->get($module_id, $shop_id)->is_activated();
     }
 }

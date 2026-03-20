@@ -1,62 +1,51 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller;
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
 /**
  * Displays exception errors
  */
-class ExceptionErrorController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Exception_Error_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'message/exception';
-
+    protected $_s_this_template = 'message/exception';
     /** @var array Remove loading of components on exception handling. */
-    protected $_aComponentNames = [];
-
+    protected $_a_component_names = [];
     /**
      * Sets exception errros to template
      */
-    public function displayExceptionError(): void
+    public function display_exception_error(): void
     {
-        $aViewData = $this->getViewData();
-
+        $a_view_data = $this->get_view_data();
         //add all exceptions to display
-        $aErrors = $this->getErrors();
-
-        if (is_array($aErrors) && count($aErrors)) {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->passAllErrorsToView($aViewData, $aErrors);
+        $a_errors = $this->get_errors();
+        if (is_array($a_errors) && count($a_errors)) {
+            \Oxid_Esales\Eshop\Core\Registry::get_utils_view()->pass_all_errors_to_view($a_view_data, $a_errors);
         }
-
-        $this->addTplParam('Errors', $aViewData['Errors']);
-
+        $this->add_tpl_param('Errors', $a_view_data['Errors']);
         // resetting errors from session
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('Errors', []);
+        \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('Errors', []);
     }
-
     /**
      * return page errors array
      *
      * @return array
      */
-    protected function getErrors()
+    protected function get_errors()
     {
-        $aErrors = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('Errors');
-
-        if (null === $aErrors) {
+        $a_errors = \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('Errors');
+        if (null === $a_errors) {
             return [];
         }
-
-        return $aErrors;
+        return $a_errors;
     }
 }

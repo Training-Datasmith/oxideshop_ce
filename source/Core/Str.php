@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Factory class responsible for redirecting string handling functions to specific
@@ -23,23 +21,20 @@ class Str
      *
      * @var \OxidEsales\Eshop\Core\StrMb|\OxidEsales\Eshop\Core\StrRegular
      */
-    protected static $_oHandler;
-
+    protected static $_o_handler;
     /**
      * Static method initializing new string handler or returning the existing one.
      *
      * @return \OxidEsales\Eshop\Core\StrMb|\OxidEsales\Eshop\Core\StrRegular
      */
-    public static function getStr()
+    public static function get_str()
     {
-        if (!isset(self::$_oHandler)) {
+        if (!isset(self::$_o_handler)) {
             //let's init now non-static instance of oxStr to get the instance of str handler
-            self::$_oHandler = oxNew(\OxidEsales\Eshop\Core\Str::class)->getStrHandler();
+            self::$_o_handler = ox_new(\Oxid_Esales\Eshop\Core\Str::class)->get_str_handler();
         }
-
-        return self::$_oHandler;
+        return self::$_o_handler;
     }
-
     /**
      * Non static getter returning str handler. The sense of getStr() and _getStrHandler() is
      * to be possible to call this method statically ( \OxidEsales\Eshop\Core\Str::getStr() ), yet leaving the
@@ -47,12 +42,11 @@ class Str
      *
      * @return \OxidEsales\Eshop\Core\StrMb|\OxidEsales\Eshop\Core\StrRegular
      */
-    protected function getStrHandler()
+    protected function get_str_handler()
     {
         if (function_exists('mb_strlen')) {
-            return oxNew(\OxidEsales\Eshop\Core\StrMb::class);
+            return ox_new(\Oxid_Esales\Eshop\Core\Str_Mb::class);
         }
-
-        return oxNew(\OxidEsales\Eshop\Core\StrRegular::class);
+        return ox_new(\Oxid_Esales\Eshop\Core\Str_Regular::class);
     }
 }

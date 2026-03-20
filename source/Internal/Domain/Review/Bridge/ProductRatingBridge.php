@@ -4,24 +4,20 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\ProductRatingServiceInterface;
-
-class ProductRatingBridge implements ProductRatingBridgeInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\Product_Rating_Service_Interface;
+class Product_Rating_Bridge implements Product_Rating_Bridge_Interface
 {
-    public function __construct(private readonly ProductRatingServiceInterface $productRatingService)
+    public function __construct(private readonly Product_Rating_Service_Interface $product_rating_service)
     {
     }
-
     /**
      * @param string $productId
      */
-    public function updateProductRating($productId): void
+    public function update_product_rating($product_id): void
     {
-        $this->productRatingService->updateProductRating($productId);
+        $this->product_rating_service->update_product_rating($product_id);
     }
 }

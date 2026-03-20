@@ -4,26 +4,22 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Edition;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Edition;
-
-enum Edition: string
+enum Edition : string
 {
     case Community = 'CE';
     case Professional = 'PE';
     case Enterprise = 'EE';
-
-    public function isCommunityEdition(): bool
+    public function is_community_edition(): bool
     {
         return match ($this) {
             self::Community => true,
             default => false,
         };
     }
-
-    public function getFullEditionName(): string
+    public function get_full_edition_name(): string
     {
         return match ($this) {
             self::Community => 'Community Edition',

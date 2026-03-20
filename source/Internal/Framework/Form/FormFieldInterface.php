@@ -4,53 +4,45 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Form;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Form;
-
-interface FormFieldInterface
+interface Form_Field_Interface
 {
     /**
      * @return string
      */
-    public function getName();
-
+    public function get_name();
     /**
      * @param string $name
      * @return FormFieldInterface
      */
-    public function setName($name);
-
+    public function set_name($name);
     /**
      * @return string
      */
-    public function getValue();
-
+    public function get_value();
     /**
      * @param string $value
      * @return FormFieldInterface
      */
-    public function setValue($value);
-
+    public function set_value($value);
     /**
      * @return string
      */
-    public function getLabel();
-
+    public function get_label();
     /**
      * @param string $label
      * @return FormFieldInterface
      */
-    public function setLabel($label);
+    public function set_label($label);
     /**
      * @return bool
      */
-    public function isRequired();
-
+    public function is_required();
     /**
      * @param bool $isRequired
      * @return FormFieldInterface
      */
-    public function setIsRequired($isRequired);
+    public function set_is_required($is_required);
 }

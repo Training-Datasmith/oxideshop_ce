@@ -4,15 +4,12 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Dao;
-
-use Doctrine\Common\Collections\ArrayCollection;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Rating;
-
-interface RatingDaoInterface
+use Doctrine\Common\Collections\Array_Collection;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Object\Rating;
+interface Rating_Dao_Interface
 {
     /**
      * Returns User Ratings.
@@ -21,8 +18,7 @@ interface RatingDaoInterface
      *
      * @return ArrayCollection
      */
-    public function getRatingsByUserId($userId);
-
+    public function get_ratings_by_user_id($user_id);
     /**
      * Returns Ratings for a product.
      *
@@ -30,7 +26,6 @@ interface RatingDaoInterface
      *
      * @return ArrayCollection
      */
-    public function getRatingsByProductId($productId);
-
+    public function get_ratings_by_product_id($product_id);
     public function delete(Rating $rating);
 }

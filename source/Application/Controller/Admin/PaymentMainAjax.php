@@ -1,113 +1,92 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages payment user groups
  */
-class PaymentMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Payment_Main_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = [
+    protected $_a_columns = [
         // field , table,  visible, multilanguage, id
-        'container1' => [
-            ['oxtitle', 'oxgroups', 1, 0, 0],
-            ['oxid', 'oxgroups', 0, 0, 0],
-            ['oxid', 'oxgroups', 0, 0, 1],
-        ],
-        'container2' => [
-            ['oxtitle', 'oxgroups', 1, 0, 0],
-            ['oxid', 'oxgroups', 0, 0, 0],
-            ['oxid', 'oxobject2group', 0, 0, 1],
-        ],
+        'container1' => [['oxtitle', 'oxgroups', 1, 0, 0], ['oxid', 'oxgroups', 0, 0, 0], ['oxid', 'oxgroups', 0, 0, 1]],
+        'container2' => [['oxtitle', 'oxgroups', 1, 0, 0], ['oxid', 'oxgroups', 0, 0, 0], ['oxid', 'oxobject2group', 0, 0, 1]],
     ];
-
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
         // looking for table/view
-        $sGroupTable = $this->getViewName('oxgroups');
-        $sGroupId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchGroupId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        $s_group_table = $this->get_view_name('oxgroups');
+        $s_group_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_synch_group_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         // category selected or not ?
-        if (!$sGroupId) {
-            $sQAdd = " from {$sGroupTable} ";
+        if (!$s_group_id) {
+            $s_q_add = " from {$s_group_table} ";
         } else {
-            $sQAdd = " from {$sGroupTable}, oxobject2group where ";
-            $sQAdd .= ' oxobject2group.oxobjectid = ' . $oDb->quote($sGroupId) .
-                      " and oxobject2group.oxgroupsid = {$sGroupTable}.oxid ";
+            $s_q_add = " from {$s_group_table}, oxobject2group where ";
+            $s_q_add .= ' oxobject2group.oxobjectid = ' . $o_db->quote($s_group_id) . " and oxobject2group.oxgroupsid = {$s_group_table}.oxid ";
         }
-
-        if (!$sSynchGroupId) {
-            $sSynchGroupId = Registry::getRequest()->getRequestEscapedParameter('oxajax_synchfid');
+        if (!$s_synch_group_id) {
+            $s_synch_group_id = Registry::get_request()->get_request_escaped_parameter('oxajax_synchfid');
         }
-        if ($sSynchGroupId && $sSynchGroupId != $sGroupId) {
-            if (!$sGroupId) {
-                $sQAdd .= 'where ';
+        if ($s_synch_group_id && $s_synch_group_id != $s_group_id) {
+            if (!$s_group_id) {
+                $s_q_add .= 'where ';
             } else {
-                $sQAdd .= 'and ';
+                $s_q_add .= 'and ';
             }
-            $sQAdd .= " {$sGroupTable}.oxid not in ( select {$sGroupTable}.oxid from {$sGroupTable}, oxobject2group " .
-                      'where  oxobject2group.oxobjectid = ' . $oDb->quote($sSynchGroupId) .
-                      " and oxobject2group.oxgroupsid = $sGroupTable.oxid ) ";
+            $s_q_add .= " {$s_group_table}.oxid not in ( select {$s_group_table}.oxid from {$s_group_table}, oxobject2group " . 'where  oxobject2group.oxobjectid = ' . $o_db->quote($s_synch_group_id) . " and oxobject2group.oxgroupsid = {$s_group_table}.oxid ) ";
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Removes group of users that may pay using selected method(s).
      */
-    public function removePayGroup(): void
+    public function remove_pay_group(): void
     {
-        $aRemoveGroups = $this->getActionIds('oxobject2group.oxid');
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2group.* ' . $this->getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
-        } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
-            $sQ = 'delete from oxobject2group where oxobject2group.oxid in (' . $sRemoveGroups . ') ';
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        $a_remove_groups = $this->get_action_ids('oxobject2group.oxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_q = $this->add_filter('delete oxobject2group.* ' . $this->get_query());
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
+        } elseif ($a_remove_groups && is_array($a_remove_groups)) {
+            $s_remove_groups = implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_remove_groups));
+            $s_q = 'delete from oxobject2group where oxobject2group.oxid in (' . $s_remove_groups . ') ';
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
         }
     }
-
     /**
      * Adds group of users that may pay using selected method(s).
      */
-    public function addPayGroup(): void
+    public function add_pay_group(): void
     {
-        $aAddGroups = $this->getActionIds('oxgroups.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sGroupTable = $this->getViewName('oxgroups');
-            $aAddGroups = $this->getAll($this->addFilter("select $sGroupTable.oxid " . $this->getQuery()));
+        $a_add_groups = $this->get_action_ids('oxgroups.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_group_table = $this->get_view_name('oxgroups');
+            $a_add_groups = $this->get_all($this->add_filter("select {$s_group_table}.oxid " . $this->get_query()));
         }
-        if ($soxId && $soxId != '-1' && is_array($aAddGroups)) {
-            foreach ($aAddGroups as $sAddgroup) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Application\Model\Object2Group::class);
-                $oNewGroup->oxobject2group__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oNewGroup->oxobject2group__oxgroupsid = new \OxidEsales\Eshop\Core\Field($sAddgroup);
-                $oNewGroup->save();
+        if ($sox_id && $sox_id != '-1' && is_array($a_add_groups)) {
+            foreach ($a_add_groups as $s_addgroup) {
+                $o_new_group = ox_new(\Oxid_Esales\Eshop\Application\Model\Object2Group::class);
+                $o_new_group->oxobject2group__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($sox_id);
+                $o_new_group->oxobject2group__oxgroupsid = new \Oxid_Esales\Eshop\Core\Field($s_addgroup);
+                $o_new_group->save();
             }
         }
     }

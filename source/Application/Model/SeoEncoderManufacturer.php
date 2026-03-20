@@ -1,36 +1,32 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Seo encoder base
  */
-class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
+class Seo_Encoder_Manufacturer extends \Oxid_Esales\Eshop\Core\Seo_Encoder
 {
     /**
      * Root manufacturer uri cache
      *
      * @var array
      */
-    protected $_aRootManufacturerUri;
-
+    protected $_a_root_manufacturer_uri;
     /**
      * Returns target "extension" (/)
      *
      * @return string
      */
-    protected function getUrlExtension()
+    protected function get_url_extension()
     {
         return '/';
     }
-
     /**
      * Returns part of SEO url excluding path
      *
@@ -40,39 +36,34 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getManufacturerUri($oManufacturer, $iLang = null, $blRegenerate = false)
+    public function get_manufacturer_uri($o_manufacturer, $i_lang = null, $bl_regenerate = false)
     {
-        if (!isset($iLang)) {
-            $iLang = $oManufacturer->getLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = $o_manufacturer->get_language();
         }
         // load from db
-        if ($blRegenerate || !($sSeoUrl = $this->loadFromDb('oxmanufacturer', $oManufacturer->getId(), $iLang))) {
-            if ($iLang != $oManufacturer->getLanguage()) {
-                $sId = $oManufacturer->getId();
-                $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
-                $oManufacturer->loadInLang($iLang, $sId);
+        if ($bl_regenerate || !$s_seo_url = $this->load_from_db('oxmanufacturer', $o_manufacturer->get_id(), $i_lang)) {
+            if ($i_lang != $o_manufacturer->get_language()) {
+                $s_id = $o_manufacturer->get_id();
+                $o_manufacturer = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer::class);
+                $o_manufacturer->load_in_lang($i_lang, $s_id);
             }
-
-            $sSeoUrl = '';
-            if ($oManufacturer->getId() != 'root') {
-                if (!isset($this->_aRootManufacturerUri[$iLang])) {
-                    $oRootManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
-                    $oRootManufacturer->loadInLang($iLang, 'root');
-                    $this->_aRootManufacturerUri[$iLang] = $this->getManufacturerUri($oRootManufacturer, $iLang);
+            $s_seo_url = '';
+            if ($o_manufacturer->get_id() != 'root') {
+                if (!isset($this->_a_root_manufacturer_uri[$i_lang])) {
+                    $o_root_manufacturer = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer::class);
+                    $o_root_manufacturer->load_in_lang($i_lang, 'root');
+                    $this->_a_root_manufacturer_uri[$i_lang] = $this->get_manufacturer_uri($o_root_manufacturer, $i_lang);
                 }
-                $sSeoUrl .= $this->_aRootManufacturerUri[$iLang];
+                $s_seo_url .= $this->_a_root_manufacturer_uri[$i_lang];
             }
-
-            $sSeoUrl .= $this->prepareTitle($oManufacturer->oxmanufacturers__oxtitle->value, false, $oManufacturer->getLanguage()) . '/';
-            $sSeoUrl = $this->processSeoUrl($sSeoUrl, $oManufacturer->getId(), $iLang);
-
+            $s_seo_url .= $this->prepare_title($o_manufacturer->oxmanufacturers__oxtitle->value, false, $o_manufacturer->get_language()) . '/';
+            $s_seo_url = $this->process_seo_url($s_seo_url, $o_manufacturer->get_id(), $i_lang);
             // save to db
-            $this->saveToDb('oxmanufacturer', $oManufacturer->getId(), $oManufacturer->getBaseStdLink($iLang), $sSeoUrl, $iLang);
+            $this->save_to_db('oxmanufacturer', $o_manufacturer->get_id(), $o_manufacturer->get_base_std_link($i_lang), $s_seo_url, $i_lang);
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * Returns Manufacturer SEO url for specified page
      *
@@ -83,24 +74,20 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getManufacturerPageUrl($manufacturer, $pageNumber, $languageId = null, $isFixed = null)
+    public function get_manufacturer_page_url($manufacturer, $page_number, $language_id = null, $is_fixed = null)
     {
-        if (!isset($languageId)) {
-            $languageId = $manufacturer->getLanguage();
+        if (!isset($language_id)) {
+            $language_id = $manufacturer->get_language();
         }
-        $stdUrl = $manufacturer->getBaseStdLink($languageId);
+        $std_url = $manufacturer->get_base_std_link($language_id);
         $parameters = null;
-
-        $stdUrl = $this->trimUrl($stdUrl, $languageId);
-        $seoUrl = $this->getManufacturerUri($manufacturer, $languageId);
-
-        if ($isFixed === null) {
-            $isFixed = $this->isFixed('oxmanufacturer', $manufacturer->getId(), $languageId);
+        $std_url = $this->trim_url($std_url, $language_id);
+        $seo_url = $this->get_manufacturer_uri($manufacturer, $language_id);
+        if ($is_fixed === null) {
+            $is_fixed = $this->is_fixed('oxmanufacturer', $manufacturer->get_id(), $language_id);
         }
-
-        return $this->assembleFullPageUrl($manufacturer, 'oxmanufacturer', $stdUrl, $seoUrl, $pageNumber, $parameters, $languageId, $isFixed);
+        return $this->assemble_full_page_url($manufacturer, 'oxmanufacturer', $std_url, $seo_url, $page_number, $parameters, $language_id, $is_fixed);
     }
-
     /**
      * Encodes manufacturer category URLs into SEO format
      *
@@ -109,34 +96,25 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getManufacturerUrl($oManufacturer, $iLang = null)
+    public function get_manufacturer_url($o_manufacturer, $i_lang = null)
     {
-        if (!isset($iLang)) {
-            $iLang = $oManufacturer->getLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = $o_manufacturer->get_language();
         }
-
-        return $this->getFullUrl($this->getManufacturerUri($oManufacturer, $iLang), $iLang);
+        return $this->get_full_url($this->get_manufacturer_uri($o_manufacturer, $i_lang), $i_lang);
     }
-
     /**
      * Deletes manufacturer seo entry
      *
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer Manufacturer object
      */
-    public function onDeleteManufacturer($oManufacturer): void
+    public function on_delete_manufacturer($o_manufacturer): void
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxmanufacturer'", [
-            'oxobjectid' => $oManufacturer->getId(),
-        ]);
-        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $oManufacturer->getId(),
-        ]);
-        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $oManufacturer->getId(),
-        ]);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $o_db->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxmanufacturer'", ['oxobjectid' => $o_manufacturer->get_id()]);
+        $o_db->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', ['oxobjectid' => $o_manufacturer->get_id()]);
+        $o_db->execute('delete from oxseohistory where oxobjectid = :oxobjectid', ['oxobjectid' => $o_manufacturer->get_id()]);
     }
-
     /**
      * Returns alternative uri used while updating seo
      *
@@ -145,14 +123,13 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    protected function getAltUri($sObjectId, $iLang)
+    protected function get_alt_uri($s_object_id, $i_lang)
     {
-        $sSeoUrl = null;
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
-        if ($oManufacturer->loadInLang($iLang, $sObjectId)) {
-            return $this->getManufacturerUri($oManufacturer, $iLang, true);
+        $s_seo_url = null;
+        $o_manufacturer = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer::class);
+        if ($o_manufacturer->load_in_lang($i_lang, $s_object_id)) {
+            return $this->get_manufacturer_uri($o_manufacturer, $i_lang, true);
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
 }

@@ -1,91 +1,82 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Vendor seo config class
  */
-class VendorSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class Vendor_Seo extends \Oxid_Esales\Eshop\Application\Controller\Admin\Object_Seo
 {
     /**
      * Updating showsuffix field
      */
     public function save()
     {
-        $oVendor = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-        $oVendor->init('oxvendor');
-        if ($oVendor->load($this->getEditObjectId())) {
-            $sShowSuffixField = 'oxvendor__oxshowsuffix';
-            $blShowSuffixParameter = Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
-            $oVendor->$sShowSuffixField = new \OxidEsales\Eshop\Core\Field((int) $blShowSuffixParameter);
-            $oVendor->save();
+        $o_vendor = ox_new(\Oxid_Esales\Eshop\Core\Model\Base_Model::class);
+        $o_vendor->init('oxvendor');
+        if ($o_vendor->load($this->get_edit_object_id())) {
+            $s_show_suffix_field = 'oxvendor__oxshowsuffix';
+            $bl_show_suffix_parameter = Registry::get_request()->get_request_escaped_parameter('blShowSuffix');
+            $o_vendor->{$s_show_suffix_field} = new \Oxid_Esales\Eshop\Core\Field((int) $bl_show_suffix_parameter);
+            $o_vendor->save();
         }
-
         return parent::save();
     }
-
     /**
      * Returns current object type seo encoder object
      *
      * @return \OxidEsales\Eshop\Application\Model\SeoEncoderVendor
      */
-    protected function getEncoder()
+    protected function get_encoder()
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class);
+        return \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Vendor::class);
     }
-
     /**
      * This SEO object supports suffixes so return TRUE
      *
      * @return bool
      */
-    public function isSuffixSupported()
+    public function is_suffix_supported()
     {
         return true;
     }
-
     /**
      * Returns true if SEO object id has suffix enabled
      *
      * @return bool
      */
-    public function isEntrySuffixed()
+    public function is_entry_suffixed()
     {
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-        if ($oVendor->load($this->getEditObjectId())) {
-            return (bool) $oVendor->oxvendor__oxshowsuffix->value;
+        $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+        if ($o_vendor->load($this->get_edit_object_id())) {
+            return (bool) $o_vendor->oxvendor__oxshowsuffix->value;
         }
     }
-
     /**
      * Returns url type
      *
      * @return string
      */
-    protected function getType()
+    protected function get_type()
     {
         return 'oxvendor';
     }
-
     /**
      * Returns seo uri
      *
      * @return string
      */
-    public function getEntryUri()
+    public function get_entry_uri()
     {
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-        if ($oVendor->load($this->getEditObjectId())) {
-            return $this->getEncoder()->getVendorUri($oVendor, $this->getEditLang());
+        $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+        if ($o_vendor->load($this->get_edit_object_id())) {
+            return $this->get_encoder()->get_vendor_uri($o_vendor, $this->get_edit_lang());
         }
     }
 }

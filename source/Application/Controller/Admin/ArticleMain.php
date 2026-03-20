@@ -1,200 +1,156 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Model\BaseModel;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Model\Base_Model;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
 use stdClass;
-
 /**
  * Admin article main manager.
  * Collects and updates (on user submit) article base parameters data ( such as
  * title, article No., short Description and etc.).
  * Admin Menu: Manage Products -> Articles -> Main.
  */
-class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Article_Main extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
         parent::render();
-
-        Registry::getConfig()->setConfigParam('bl_perfLoadPrice', true);
-
-        $oArticle = $this->createArticle();
-        $oArticle->enablePriceLoad();
-
-        $this->_aViewData['edit'] = $oArticle;
-
-        $sOxId = $this->getEditObjectId();
-        $sVoxId = Registry::getRequest()->getRequestEscapedParameter('voxid');
-        $sOxParentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
-
+        Registry::get_config()->set_config_param('bl_perfLoadPrice', true);
+        $o_article = $this->create_article();
+        $o_article->enable_price_load();
+        $this->_a_view_data['edit'] = $o_article;
+        $s_ox_id = $this->get_edit_object_id();
+        $s_vox_id = Registry::get_request()->get_request_escaped_parameter('voxid');
+        $s_ox_parent_id = Registry::get_request()->get_request_escaped_parameter('oxparentid');
         // new variant ?
-        if (isset($sVoxId) && $sVoxId == '-1' && isset($sOxParentId) && $sOxParentId && $sOxParentId != '-1') {
-            $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oParentArticle->load($sOxParentId);
-            $this->_aViewData['parentarticle'] = $oParentArticle;
-            $this->_aViewData['oxparentid'] = $sOxParentId;
-
-            $this->_aViewData['oxid'] = $sOxId = '-1';
+        if (isset($s_vox_id) && $s_vox_id == '-1' && isset($s_ox_parent_id) && $s_ox_parent_id && $s_ox_parent_id != '-1') {
+            $o_parent_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            $o_parent_article->load($s_ox_parent_id);
+            $this->_a_view_data['parentarticle'] = $o_parent_article;
+            $this->_a_view_data['oxparentid'] = $s_ox_parent_id;
+            $this->_a_view_data['oxid'] = $s_ox_id = '-1';
         }
-
-        if ($sOxId && $sOxId != '-1') {
+        if ($s_ox_id && $s_ox_id != '-1') {
             // load object
-            $oArticle = $this->updateArticle($oArticle, $sOxId);
-
+            $o_article = $this->update_article($o_article, $s_ox_id);
             // load object in other languages
-            $oOtherLang = $oArticle->getAvailableInLangs();
-            if (!isset($oOtherLang[$this->_iEditLang])) {
-                $oArticle->loadInLang(key($oOtherLang), $sOxId);
+            $o_other_lang = $o_article->get_available_in_langs();
+            if (!isset($o_other_lang[$this->_i_edit_lang])) {
+                $o_article->load_in_lang(key($o_other_lang), $s_ox_id);
             }
-
             // variant handling
-            if ($oArticle->oxarticles__oxparentid->value) {
-                $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-                $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData['parentarticle'] = $oParentArticle;
-                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
-                $this->_aViewData['issubvariant'] = 1;
+            if ($o_article->oxarticles__oxparentid->value) {
+                $o_parent_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+                $o_parent_article->load($o_article->oxarticles__oxparentid->value);
+                $this->_a_view_data['parentarticle'] = $o_parent_article;
+                $this->_a_view_data['oxparentid'] = $o_article->oxarticles__oxparentid->value;
+                $this->_a_view_data['issubvariant'] = 1;
             }
-
             // #381A
-            $this->formJumpList($oArticle, $oParentArticle ?? null);
-
+            $this->form_jump_list($o_article, $o_parent_article ?? null);
             //hook for modules
-            $oArticle = $this->customizeArticleInformation($oArticle);
-
-            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
-            if (count($aLang)) {
-                $this->_aViewData['posslang'] = $aLang;
+            $o_article = $this->customize_article_information($o_article);
+            $a_lang = array_diff(Registry::get_lang()->get_language_names(), $o_other_lang);
+            if (count($a_lang)) {
+                $this->_a_view_data['posslang'] = $a_lang;
             }
-
-            foreach ($oOtherLang as $id => $language) {
-                $oLang = new stdClass();
-                $oLang->sLangDesc = $language;
-                $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData['otherlang'][$id] = clone $oLang;
+            foreach ($o_other_lang as $id => $language) {
+                $o_lang = new stdClass();
+                $o_lang->s_lang_desc = $language;
+                $o_lang->selected = $id == $this->_i_edit_lang;
+                $this->_a_view_data['otherlang'][$id] = clone $o_lang;
             }
         }
-
-        $this->_aViewData['editor'] = $this->generateTextEditor(
-            '100%',
-            300,
-            $oArticle,
-            'oxarticles__oxlongdesc',
-            'details.css'
-        );
-        $this->_aViewData['blUseTimeCheck'] = Registry::getConfig()->getConfigParam('blUseTimeCheck');
-
+        $this->_a_view_data['editor'] = $this->generate_text_editor('100%', 300, $o_article, 'oxarticles__oxlongdesc', 'details.css');
+        $this->_a_view_data['blUseTimeCheck'] = Registry::get_config()->get_config_param('blUseTimeCheck');
         return 'article_main';
     }
-
     /**
      * @inheritDoc
      */
-    protected function getEditValue($object, $fieldName)
+    protected function get_edit_value($object, $field_name)
     {
-        return $object ? $object->getLongDescription()->getRawValue() : '';
+        return $object ? $object->get_long_description()->get_raw_value() : '';
     }
-
     /**
      * Saves changes of article parameters.
      */
     public function save(): void
     {
         parent::save();
-
-        $oDb = DatabaseProvider::getDb();
-        $oConfig = Registry::getConfig();
-        $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-
+        $o_db = Database_Provider::get_db();
+        $o_config = Registry::get_config();
+        $sox_id = $this->get_edit_object_id();
+        $a_params = Registry::get_request()->get_request_escaped_parameter('editval');
         // default values
-        $aParams = $this->addDefaultValues($aParams);
-
+        $a_params = $this->add_default_values($a_params);
         // null values
-        if (isset($aParams['oxarticles__oxvat']) && $aParams['oxarticles__oxvat'] === '') {
-            $aParams['oxarticles__oxvat'] = null;
+        if (isset($a_params['oxarticles__oxvat']) && $a_params['oxarticles__oxvat'] === '') {
+            $a_params['oxarticles__oxvat'] = null;
         }
-
         // varianthandling
-        $soxparentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
-        if (isset($soxparentId) && $soxparentId && $soxparentId != '-1') {
-            $aParams['oxarticles__oxparentid'] = $soxparentId;
+        $soxparent_id = Registry::get_request()->get_request_escaped_parameter('oxparentid');
+        if (isset($soxparent_id) && $soxparent_id && $soxparent_id != '-1') {
+            $a_params['oxarticles__oxparentid'] = $soxparent_id;
         } else {
-            unset($aParams['oxarticles__oxparentid']);
+            unset($a_params['oxarticles__oxparentid']);
         }
-
-        $oArticle = $this->createArticle();
-        $oArticle->setLanguage($this->_iEditLang);
-
-        if ($soxId != '-1') {
-            $oArticle->loadInLang($this->_iEditLang, $soxId);
+        $o_article = $this->create_article();
+        $o_article->set_language($this->_i_edit_lang);
+        if ($sox_id != '-1') {
+            $o_article->load_in_lang($this->_i_edit_lang, $sox_id);
         } else {
-            $aParams['oxarticles__oxid'] = null;
-            $aParams['oxarticles__oxissearch'] = 1;
-            $aParams['oxarticles__oxstockflag'] = 1;
-            if (empty($aParams['oxarticles__oxstock'])) {
-                $aParams['oxarticles__oxstock'] = 0;
+            $a_params['oxarticles__oxid'] = null;
+            $a_params['oxarticles__oxissearch'] = 1;
+            $a_params['oxarticles__oxstockflag'] = 1;
+            if (empty($a_params['oxarticles__oxstock'])) {
+                $a_params['oxarticles__oxstock'] = 0;
             }
-
-            if (!isset($aParams['oxarticles__oxactive'])) {
-                $aParams['oxarticles__oxactive'] = 0;
+            if (!isset($a_params['oxarticles__oxactive'])) {
+                $a_params['oxarticles__oxactive'] = 0;
             }
         }
-
         //article number handling, warns for artnum duplicates
-        if (
-            isset($aParams['oxarticles__oxartnum']) && strlen($aParams['oxarticles__oxartnum']) > 0 &&
-            $oConfig->getConfigParam('blWarnOnSameArtNums') &&
-            $oArticle->oxarticles__oxartnum->value != $aParams['oxarticles__oxartnum']
-        ) {
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sSelect = 'select oxid from ' . $tableViewNameGenerator->getViewName('oxarticles');
-            $sSelect .= ' where oxartnum = ' . $oDb->quote($aParams['oxarticles__oxartnum']);
-            $sSelect .= ' and oxid != ' . $oDb->quote($aParams['oxarticles__oxid']);
-            $record = DatabaseProvider::getDb()->select($sSelect);
+        if (isset($a_params['oxarticles__oxartnum']) && strlen($a_params['oxarticles__oxartnum']) > 0 && $o_config->get_config_param('blWarnOnSameArtNums') && $o_article->oxarticles__oxartnum->value != $a_params['oxarticles__oxartnum']) {
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+            $s_select = 'select oxid from ' . $table_view_name_generator->get_view_name('oxarticles');
+            $s_select .= ' where oxartnum = ' . $o_db->quote($a_params['oxarticles__oxartnum']);
+            $s_select .= ' and oxid != ' . $o_db->quote($a_params['oxarticles__oxid']);
+            $record = Database_Provider::get_db()->select($s_select);
             if ($record && $record->count() > 0) {
-                $oArticle->assign($record->fields);
-                $this->_aViewData['errorsavingatricle'] = 1;
+                $o_article->assign($record->fields);
+                $this->_a_view_data['errorsavingatricle'] = 1;
             }
         }
-
-        $oArticle->setLanguage(0);
+        $o_article->set_language(0);
         //triming spaces from article title (M:876)
-        if (isset($aParams['oxarticles__oxtitle'])) {
-            $aParams['oxarticles__oxtitle'] = trim($aParams['oxarticles__oxtitle']);
+        if (isset($a_params['oxarticles__oxtitle'])) {
+            $a_params['oxarticles__oxtitle'] = trim($a_params['oxarticles__oxtitle']);
         }
-
-        $oArticle->assign($aParams);
-        $oArticle->setArticleLongDesc($this->processLongDesc($aParams['oxarticles__oxlongdesc']));
-        $oArticle->setLanguage($this->_iEditLang);
-        $oArticle = Registry::getUtilsFile()->processFiles($oArticle);
-        $oArticle->save();
-
+        $o_article->assign($a_params);
+        $o_article->set_article_long_desc($this->process_long_desc($a_params['oxarticles__oxlongdesc']));
+        $o_article->set_language($this->_i_edit_lang);
+        $o_article = Registry::get_utils_file()->process_files($o_article);
+        $o_article->save();
         // set oxid if inserted
-        if ($soxId == '-1') {
-            $sFastCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
-            if ($sFastCat != '-1') {
-                $this->addToCategory($sFastCat, $oArticle->getId());
+        if ($sox_id == '-1') {
+            $s_fast_cat = Registry::get_request()->get_request_escaped_parameter('art_category');
+            if ($s_fast_cat != '-1') {
+                $this->add_to_category($s_fast_cat, $o_article->get_id());
             }
         }
-
-        $oArticle = $this->saveAdditionalArticleData($oArticle, $aParams);
-
-        $this->setEditObjectId($oArticle->getId());
+        $o_article = $this->save_additional_article_data($o_article, $a_params);
+        $this->set_edit_object_id($o_article->get_id());
     }
-
     /**
      * Fixes html broken by html editor
      *
@@ -202,56 +158,45 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @return string
      */
-    protected function processLongDesc($sValue)
+    protected function process_long_desc($s_value)
     {
         // TODO: the code below is redundant, optimize it, assignments should go smooth without conversions
         // hack, if editor screws up text, htmledit tends to do so
-        $sValue = str_replace('&amp;nbsp;', '&nbsp;', $sValue);
-        $sValue = str_replace('&amp;', '&', $sValue);
-        $sValue = str_replace('&quot;', '"', $sValue);
-        $sValue = str_replace('&lang=', '&amp;lang=', $sValue);
-        $sValue = str_replace('<p>&nbsp;</p>', '', $sValue);
-
-        return str_replace('<p>&nbsp; </p>', '', $sValue);
+        $s_value = str_replace('&amp;nbsp;', '&nbsp;', $s_value);
+        $s_value = str_replace('&amp;', '&', $s_value);
+        $s_value = str_replace('&quot;', '"', $s_value);
+        $s_value = str_replace('&lang=', '&amp;lang=', $s_value);
+        $s_value = str_replace('<p>&nbsp;</p>', '', $s_value);
+        return str_replace('<p>&nbsp; </p>', '', $s_value);
     }
-
     /**
      * Resets article categories counters
      *
      * @param string $sArticleId Article id
      */
-    protected function resetCategoriesCounter($sArticleId)
+    protected function reset_categories_counter($s_article_id)
     {
-        $categories = DatabaseProvider::getDb()->getCol(
-            'select oxcatnid from oxobject2category where oxobjectid = :oxobjectid',
-            [
-            'oxobjectid' => $sArticleId,
-            ]
-        );
+        $categories = Database_Provider::get_db()->get_col('select oxcatnid from oxobject2category where oxobjectid = :oxobjectid', ['oxobjectid' => $s_article_id]);
         foreach ($categories as $category) {
-            $this->resetCounter('catArticle', $category);
+            $this->reset_counter('catArticle', $category);
         }
     }
-
     /**
      * Add article to category.
      *
      * @param string $sCatID Category id
      * @param string $sOXID  Article id
      */
-    public function addToCategory($sCatID, $sOXID): void
+    public function add_to_category($s_cat_id, $s_oxid): void
     {
-        $base = oxNew(BaseModel::class);
+        $base = ox_new(Base_Model::class);
         $base->init('oxobject2category');
-        $base->oxobject2category__oxtime = new \OxidEsales\Eshop\Core\Field(0);
-        $base->oxobject2category__oxobjectid = new \OxidEsales\Eshop\Core\Field($sOXID);
-        $base->oxobject2category__oxcatnid = new \OxidEsales\Eshop\Core\Field($sCatID);
-
-        $base = $this->updateBase($base);
-
+        $base->oxobject2category__oxtime = new \Oxid_Esales\Eshop\Core\Field(0);
+        $base->oxobject2category__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($s_oxid);
+        $base->oxobject2category__oxcatnid = new \Oxid_Esales\Eshop\Core\Field($s_cat_id);
+        $base = $this->update_base($base);
         $base->save();
     }
-
     /**
      * Copies article (with all parameters) to new articles.
      *
@@ -259,311 +204,220 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * @param string $sNewId    new product id (default null)
      * @param string $sParentId product parent id
      */
-    public function copyArticle($sOldId = null, $sNewId = null, $sParentId = null): void
+    public function copy_article($s_old_id = null, $s_new_id = null, $s_parent_id = null): void
     {
-        $myConfig = Registry::getConfig();
-
-        $sOldId = $sOldId ?: $this->getEditObjectId();
-        $sNewId = $sNewId ?: Registry::getUtilsObject()->generateUID();
-
-        $oArticle = oxNew(BaseModel::class);
-        $oArticle->init('oxarticles');
-        if ($oArticle->load($sOldId)) {
-            if ($myConfig->getConfigParam('blDisableDublArtOnCopy')) {
-                $oArticle->oxarticles__oxactive->setValue(0);
-                $oArticle->oxarticles__oxactivefrom->setValue(0);
-                $oArticle->oxarticles__oxactiveto->setValue(0);
+        $my_config = Registry::get_config();
+        $s_old_id = $s_old_id ?: $this->get_edit_object_id();
+        $s_new_id = $s_new_id ?: Registry::get_utils_object()->generate_uid();
+        $o_article = ox_new(Base_Model::class);
+        $o_article->init('oxarticles');
+        if ($o_article->load($s_old_id)) {
+            if ($my_config->get_config_param('blDisableDublArtOnCopy')) {
+                $o_article->oxarticles__oxactive->set_value(0);
+                $o_article->oxarticles__oxactivefrom->set_value(0);
+                $o_article->oxarticles__oxactiveto->set_value(0);
             }
-
             // setting parent id
-            if ($sParentId) {
-                $oArticle->oxarticles__oxparentid->setValue($sParentId);
+            if ($s_parent_id) {
+                $o_article->oxarticles__oxparentid->set_value($s_parent_id);
             }
-
             // setting oxinsert/oxtimestamp
-            $iNow = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
-            $oArticle->oxarticles__oxinsert = new \OxidEsales\Eshop\Core\Field($iNow);
-
+            $i_now = date('Y-m-d H:i:s', Registry::get_utils_date()->get_time());
+            $o_article->oxarticles__oxinsert = new \Oxid_Esales\Eshop\Core\Field($i_now);
             // mantis#0001590: OXRATING and OXRATINGCNT not set to 0 when copying article
-            $oArticle->oxarticles__oxrating = new \OxidEsales\Eshop\Core\Field(0);
-            $oArticle->oxarticles__oxratingcnt = new \OxidEsales\Eshop\Core\Field(0);
-            $oArticle->oxarticles__oxsoldamount = new \OxidEsales\Eshop\Core\Field(0);
-
-            $oArticle->setId($sNewId);
-            $oArticle->save();
-
+            $o_article->oxarticles__oxrating = new \Oxid_Esales\Eshop\Core\Field(0);
+            $o_article->oxarticles__oxratingcnt = new \Oxid_Esales\Eshop\Core\Field(0);
+            $o_article->oxarticles__oxsoldamount = new \Oxid_Esales\Eshop\Core\Field(0);
+            $o_article->set_id($s_new_id);
+            $o_article->save();
             //copy categories
-            $this->copyCategories($sOldId, $sNewId);
-
+            $this->copy_categories($s_old_id, $s_new_id);
             //atributes
-            $this->copyAttributes($sOldId, $sNewId);
-
+            $this->copy_attributes($s_old_id, $s_new_id);
             //sellist
-            $this->copySelectlists($sOldId, $sNewId);
-
+            $this->copy_selectlists($s_old_id, $s_new_id);
             //crossseling
-            $this->copyCrossseling($sOldId, $sNewId);
-
+            $this->copy_crossseling($s_old_id, $s_new_id);
             //accessoire
-            $this->copyAccessoires($sOldId, $sNewId);
-
+            $this->copy_accessoires($s_old_id, $s_new_id);
             // #983A copying staffelpreis info
-            $this->copyStaffelpreis($sOldId, $sNewId);
-
+            $this->copy_staffelpreis($s_old_id, $s_new_id);
             //copy article extends (longdescription)
-            $this->copyArtExtends($sOldId, $sNewId);
-
+            $this->copy_art_extends($s_old_id, $s_new_id);
             //files
-            $this->copyFiles($sOldId, $sNewId);
-
-            $this->resetContentCache();
-
-            $myUtilsObject = Registry::getUtilsObject();
-            $database = DatabaseProvider::getDb();
-
-            $productsIds = DatabaseProvider::getDb()->getCol(
-                'select oxid from oxarticles where oxparentid = :oxparentid',
-                [
-                    'oxparentid' => $sOldId,
-                ]
-            );
-            foreach ($productsIds as $productId) {
-                $this->copyArticle($productId, $myUtilsObject->generateUid(), $sNewId);
+            $this->copy_files($s_old_id, $s_new_id);
+            $this->reset_content_cache();
+            $my_utils_object = Registry::get_utils_object();
+            $database = Database_Provider::get_db();
+            $products_ids = Database_Provider::get_db()->get_col('select oxid from oxarticles where oxparentid = :oxparentid', ['oxparentid' => $s_old_id]);
+            foreach ($products_ids as $product_id) {
+                $this->copy_article($product_id, $my_utils_object->generate_uid(), $s_new_id);
             }
-
             // only for top articles
-            if (!$sParentId) {
-                $this->setEditObjectId($oArticle->getId());
-
+            if (!$s_parent_id) {
+                $this->set_edit_object_id($o_article->get_id());
                 //article number handling, warns for artnum duplicates
-                $sFncParameter = Registry::getRequest()->getRequestEscapedParameter('fnc');
-                $sArtNumField = 'oxarticles__oxartnum';
-                if (
-                    $myConfig->getConfigParam('blWarnOnSameArtNums') &&
-                    $oArticle->$sArtNumField->value && $sFncParameter == 'copyArticle'
-                ) {
-                    $sSelect = 'select oxid from ' . $oArticle->getCoreTableName() .
-                               ' where oxartnum = ' . $database->quote($oArticle->$sArtNumField->value) .
-                               ' and oxid != ' . $database->quote($sNewId);
-
-                    $record = $database->select($sSelect);
+                $s_fnc_parameter = Registry::get_request()->get_request_escaped_parameter('fnc');
+                $s_art_num_field = 'oxarticles__oxartnum';
+                if ($my_config->get_config_param('blWarnOnSameArtNums') && $o_article->{$s_art_num_field}->value && $s_fnc_parameter == 'copyArticle') {
+                    $s_select = 'select oxid from ' . $o_article->get_core_table_name() . ' where oxartnum = ' . $database->quote($o_article->{$s_art_num_field}->value) . ' and oxid != ' . $database->quote($s_new_id);
+                    $record = $database->select($s_select);
                     if ($record && $record->count() > 0) {
-                        $oArticle->assign($record->fields);
-                        $this->_aViewData['errorsavingatricle'] = 1;
+                        $o_article->assign($record->fields);
+                        $this->_a_view_data['errorsavingatricle'] = 1;
                     }
                 }
             }
         }
     }
-
     /**
      * Copying category assignments
      *
      * @param string $sOldId       Id from old article
      * @param string $newArticleId Id from new article
      */
-    protected function copyCategories($sOldId, $newArticleId)
+    protected function copy_categories($s_old_id, $new_article_id)
     {
-        $myUtilsObject = Registry::getUtilsObject();
-        $database = DatabaseProvider::getDb();
-
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sO2CView = $tableViewNameGenerator->getViewName('oxobject2category');
-        $categories = $database->getAll(
-            sprintf('select oxcatnid, oxtime from %s where oxobjectid = :oxobjectid', $sO2CView),
-            [
-            'oxobjectid' => $sOldId,
-            ]
-        );
+        $my_utils_object = Registry::get_utils_object();
+        $database = Database_Provider::get_db();
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_o2c_view = $table_view_name_generator->get_view_name('oxobject2category');
+        $categories = $database->get_all(sprintf('select oxcatnid, oxtime from %s where oxobjectid = :oxobjectid', $s_o2c_view), ['oxobjectid' => $s_old_id]);
         foreach ($categories as $category) {
-            $uniqueId = $myUtilsObject->generateUid();
-            $sCatId = $category['oxcatnid'];
-            $sTime = $category['oxtime'];
-            $sSql = $this->formQueryForCopyingToCategory($newArticleId, $uniqueId, $sCatId, $sTime);
-            $database->execute($sSql);
+            $unique_id = $my_utils_object->generate_uid();
+            $s_cat_id = $category['oxcatnid'];
+            $s_time = $category['oxtime'];
+            $s_sql = $this->form_query_for_copying_to_category($new_article_id, $unique_id, $s_cat_id, $s_time);
+            $database->execute($s_sql);
         }
     }
-
     /**
      * Copying attributes assignments
      *
      * @param string $sOldId Id from old article
      * @param string $sNewId Id from new article
      */
-    protected function copyAttributes($sOldId, $sNewId)
+    protected function copy_attributes($s_old_id, $s_new_id)
     {
-        $utilsObject = Registry::getUtilsObject();
-
-        $ArticleAttributesIds = DatabaseProvider::getDb()->getCol(
-            'select oxid from oxobject2attribute where oxobjectid = :oxobjectid',
-            [
-            'oxobjectid' => $sOldId,
-            ]
-        );
-
-        foreach ($ArticleAttributesIds as $articleAttributesId) {
-            $articleAttribute = oxNew(BaseModel::class);
-            $articleAttribute->init('oxobject2attribute');
-            $articleAttribute->load($articleAttributesId);
-            $articleAttribute->setId($utilsObject->generateUID());
-            $articleAttribute->oxobject2attribute__oxobjectid->setValue($sNewId);
-            $articleAttribute->save();
+        $utils_object = Registry::get_utils_object();
+        $article_attributes_ids = Database_Provider::get_db()->get_col('select oxid from oxobject2attribute where oxobjectid = :oxobjectid', ['oxobjectid' => $s_old_id]);
+        foreach ($article_attributes_ids as $article_attributes_id) {
+            $article_attribute = ox_new(Base_Model::class);
+            $article_attribute->init('oxobject2attribute');
+            $article_attribute->load($article_attributes_id);
+            $article_attribute->set_id($utils_object->generate_uid());
+            $article_attribute->oxobject2attribute__oxobjectid->set_value($s_new_id);
+            $article_attribute->save();
         }
     }
-
     /**
      * Copying files
      *
      * @param string $sOldId Id from old article
      * @param string $sNewId Id from new article
      */
-    protected function copyFiles($sOldId, $sNewId)
+    protected function copy_files($s_old_id, $s_new_id)
     {
-        $myUtilsObject = Registry::getUtilsObject();
-        $oDb = DatabaseProvider::getDb();
-
-        $sQ = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
-        $oRs = $oDb->select($sQ, [
-            'oxartid' => $sOldId,
-        ]);
-        if ($oRs !== false && $oRs->count() > 0) {
-            while (!$oRs->EOF) {
-                $oFile = oxNew(\OxidEsales\Eshop\Application\Model\File::class);
-                $oFile->setId($myUtilsObject->generateUID());
-                $oFile->oxfiles__oxartid = new \OxidEsales\Eshop\Core\Field($sNewId);
-                $oFile->oxfiles__oxfilename = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXFILENAME']);
-                $oFile->oxfiles__oxfilesize = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXFILESIZE']);
-                $oFile->oxfiles__oxstorehash = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXSTOREHASH']);
-                $oFile->oxfiles__oxpurchasedonly = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXPURCHASEDONLY']);
-                $oFile->save();
-                $oRs->fetchRow();
+        $my_utils_object = Registry::get_utils_object();
+        $o_db = Database_Provider::get_db();
+        $s_q = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
+        $o_rs = $o_db->select($s_q, ['oxartid' => $s_old_id]);
+        if ($o_rs !== false && $o_rs->count() > 0) {
+            while (!$o_rs->EOF) {
+                $o_file = ox_new(\Oxid_Esales\Eshop\Application\Model\File::class);
+                $o_file->set_id($my_utils_object->generate_uid());
+                $o_file->oxfiles__oxartid = new \Oxid_Esales\Eshop\Core\Field($s_new_id);
+                $o_file->oxfiles__oxfilename = new \Oxid_Esales\Eshop\Core\Field($o_rs->fields['OXFILENAME']);
+                $o_file->oxfiles__oxfilesize = new \Oxid_Esales\Eshop\Core\Field($o_rs->fields['OXFILESIZE']);
+                $o_file->oxfiles__oxstorehash = new \Oxid_Esales\Eshop\Core\Field($o_rs->fields['OXSTOREHASH']);
+                $o_file->oxfiles__oxpurchasedonly = new \Oxid_Esales\Eshop\Core\Field($o_rs->fields['OXPURCHASEDONLY']);
+                $o_file->save();
+                $o_rs->fetch_row();
             }
         }
     }
-
     /**
      * Copying selectlists assignments
      *
      * @param string $sOldId Id from old article
      * @param string $sNewId Id from new article
      */
-    protected function copySelectlists($sOldId, $sNewId)
+    protected function copy_selectlists($s_old_id, $s_new_id)
     {
-        $myUtilsObject = Registry::getUtilsObject();
-        $database = DatabaseProvider::getDb();
-
-        $selectListIds = $database->getCol('select oxselnid from oxobject2selectlist where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $sOldId,
-        ]);
-        foreach ($selectListIds as $selectListId) {
-            $database->execute(
-                'INSERT INTO oxobject2selectlist (oxid, oxobjectid, oxselnid) VALUES (:oxid, :oxobjectid, :oxselnid)',
-                [
-                    'oxid' => $myUtilsObject->generateUID(),
-                    'oxobjectid' => $sNewId,
-                    'oxselnid' => $selectListId,
-                ]
-            );
+        $my_utils_object = Registry::get_utils_object();
+        $database = Database_Provider::get_db();
+        $select_list_ids = $database->get_col('select oxselnid from oxobject2selectlist where oxobjectid = :oxobjectid', ['oxobjectid' => $s_old_id]);
+        foreach ($select_list_ids as $select_list_id) {
+            $database->execute('INSERT INTO oxobject2selectlist (oxid, oxobjectid, oxselnid) VALUES (:oxid, :oxobjectid, :oxselnid)', ['oxid' => $my_utils_object->generate_uid(), 'oxobjectid' => $s_new_id, 'oxselnid' => $select_list_id]);
         }
     }
-
     /**
      * Copying crossseling assignments
      *
      * @param string $sOldId Id from old article
      * @param string $sNewId Id from new article
      */
-    protected function copyCrossseling($sOldId, $sNewId)
+    protected function copy_crossseling($s_old_id, $s_new_id)
     {
-        $myUtilsObject = Registry::getUtilsObject();
-        $database = DatabaseProvider::getDb();
-
-        $objects = $database->getCol(
-            'select oxobjectid from oxobject2article where oxarticlenid = :oxarticlenid',
-            [
-            'oxarticlenid' => $sOldId,
-            ]
-        );
+        $my_utils_object = Registry::get_utils_object();
+        $database = Database_Provider::get_db();
+        $objects = $database->get_col('select oxobjectid from oxobject2article where oxarticlenid = :oxarticlenid', ['oxarticlenid' => $s_old_id]);
         foreach ($objects as $object) {
-            $query = 'INSERT INTO oxobject2article (oxid, oxobjectid, oxarticlenid) ' .
-                'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
-            $database->execute($query, [
-                'oxid' => $myUtilsObject->generateUID(),
-                'oxobjectid' => $object,
-                'oxarticlenid' => $sNewId,
-            ]);
+            $query = 'INSERT INTO oxobject2article (oxid, oxobjectid, oxarticlenid) ' . 'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
+            $database->execute($query, ['oxid' => $my_utils_object->generate_uid(), 'oxobjectid' => $object, 'oxarticlenid' => $s_new_id]);
         }
     }
-
     /**
      * Copying accessoires assignments
      *
      * @param string $sOldId Id from old article
      * @param string $sNewId Id from new article
      */
-    protected function copyAccessoires($sOldId, $sNewId)
+    protected function copy_accessoires($s_old_id, $s_new_id)
     {
-        $myUtilsObject = Registry::getUtilsObject();
-        $database = DatabaseProvider::getDb();
-
-        $accessories = $database->getCol(
-            'select oxobjectid from oxaccessoire2article where oxarticlenid = :oxarticlenid',
-            [
-                'oxarticlenid' => $sOldId,
-            ]
-        );
-        foreach ($accessories as $accessoryId) {
-            $sSql = 'INSERT INTO oxaccessoire2article (oxid, oxobjectid, oxarticlenid) ' .
-                'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
-            $database->execute($sSql, [
-                'oxid' => $myUtilsObject->generateUid(),
-                'oxobjectid' => $accessoryId,
-                'oxarticlenid' => $sNewId,
-            ]);
+        $my_utils_object = Registry::get_utils_object();
+        $database = Database_Provider::get_db();
+        $accessories = $database->get_col('select oxobjectid from oxaccessoire2article where oxarticlenid = :oxarticlenid', ['oxarticlenid' => $s_old_id]);
+        foreach ($accessories as $accessory_id) {
+            $s_sql = 'INSERT INTO oxaccessoire2article (oxid, oxobjectid, oxarticlenid) ' . 'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
+            $database->execute($s_sql, ['oxid' => $my_utils_object->generate_uid(), 'oxobjectid' => $accessory_id, 'oxarticlenid' => $s_new_id]);
         }
     }
-
     /**
      * Copying staffelpreis assignments
      *
      * @param string $sOldId Id from old article
      * @param string $sNewId Id from new article
      */
-    protected function copyStaffelpreis($sOldId, $sNewId)
+    protected function copy_staffelpreis($s_old_id, $s_new_id)
     {
-        $sShopId = Registry::getConfig()->getShopId();
-        $oPriceList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $oPriceList->init('oxbase', 'oxprice2article');
-        $sQ = 'select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid ' .
-              'and (oxamount > 0 or oxamountto > 0) order by oxamount ';
-        $oPriceList->selectString($sQ, [
-            'oxartid' => $sOldId,
-            'oxshopid' => $sShopId,
-        ]);
-        if ($oPriceList->count()) {
-            foreach ($oPriceList as $oItem) {
-                $oItem->oxprice2article__oxid->setValue($oItem->setId());
-                $oItem->oxprice2article__oxartid->setValue($sNewId);
-                $oItem->save();
+        $s_shop_id = Registry::get_config()->get_shop_id();
+        $o_price_list = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+        $o_price_list->init('oxbase', 'oxprice2article');
+        $s_q = 'select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid ' . 'and (oxamount > 0 or oxamountto > 0) order by oxamount ';
+        $o_price_list->select_string($s_q, ['oxartid' => $s_old_id, 'oxshopid' => $s_shop_id]);
+        if ($o_price_list->count()) {
+            foreach ($o_price_list as $o_item) {
+                $o_item->oxprice2article__oxid->set_value($o_item->set_id());
+                $o_item->oxprice2article__oxartid->set_value($s_new_id);
+                $o_item->save();
             }
         }
     }
-
     /**
      * Copying article extends
      *
      * @param string $sOldId Id from old article
      * @param string $sNewId Id from new article
      */
-    protected function copyArtExtends($sOldId, $sNewId)
+    protected function copy_art_extends($s_old_id, $s_new_id)
     {
-        $oExt = oxNew(BaseModel::class);
-        $oExt->init('oxartextends');
-        $oExt->load($sOldId);
-        $oExt->setId($sNewId);
-        $oExt->save();
+        $o_ext = ox_new(Base_Model::class);
+        $o_ext->init('oxartextends');
+        $o_ext->load($s_old_id);
+        $o_ext->set_id($s_new_id);
+        $o_ext->save();
     }
-
     /**
      * Saves article parameters in different language.
      */
@@ -571,7 +425,6 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         $this->save();
     }
-
     /**
      * Sets default values for empty article (currently does nothing), returns
      * array with parameters.
@@ -580,56 +433,52 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @return array
      */
-    public function addDefaultValues($aParams)
+    public function add_default_values($a_params)
     {
-        return $aParams;
+        return $a_params;
     }
-
     /**
      * Function forms article variants jump list.
      *
      * @param object $oArticle       article object
      * @param object $oParentArticle article parent object
      */
-    protected function formJumpList($oArticle, $oParentArticle)
+    protected function form_jump_list($o_article, $o_parent_article)
     {
-        $aJumpList = [];
+        $a_jump_list = [];
         //fetching parent article variants
-        $sOxIdField = 'oxarticles__oxid';
-        if (isset($oParentArticle)) {
-            $aJumpList[] = [$oParentArticle->$sOxIdField->value, $this->getTitle($oParentArticle)];
-            $sEditLanguageParameter = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
-            $oParentVariants = $oParentArticle->getAdminVariants($sEditLanguageParameter);
-            if ($oParentVariants->count()) {
-                foreach ($oParentVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
-                    if ($oVar->$sOxIdField->value == $oArticle->$sOxIdField->value) {
-                        $oVariants = $oArticle->getAdminVariants($sEditLanguageParameter);
-                        if ($oVariants->count()) {
-                            foreach ($oVariants as $oVVar) {
-                                $aJumpList[] = [$oVVar->$sOxIdField->value, ' -- ' . $this->getTitle($oVVar)];
+        $s_ox_id_field = 'oxarticles__oxid';
+        if (isset($o_parent_article)) {
+            $a_jump_list[] = [$o_parent_article->{$s_ox_id_field}->value, $this->get_title($o_parent_article)];
+            $s_edit_language_parameter = Registry::get_request()->get_request_escaped_parameter('editlanguage');
+            $o_parent_variants = $o_parent_article->get_admin_variants($s_edit_language_parameter);
+            if ($o_parent_variants->count()) {
+                foreach ($o_parent_variants as $o_var) {
+                    $a_jump_list[] = [$o_var->{$s_ox_id_field}->value, ' - ' . $this->get_title($o_var)];
+                    if ($o_var->{$s_ox_id_field}->value == $o_article->{$s_ox_id_field}->value) {
+                        $o_variants = $o_article->get_admin_variants($s_edit_language_parameter);
+                        if ($o_variants->count()) {
+                            foreach ($o_variants as $o_v_var) {
+                                $a_jump_list[] = [$o_v_var->{$s_ox_id_field}->value, ' -- ' . $this->get_title($o_v_var)];
                             }
                         }
                     }
                 }
             }
         } else {
-            $aJumpList[] = [$oArticle->$sOxIdField->value, $this->getTitle($oArticle)];
+            $a_jump_list[] = [$o_article->{$s_ox_id_field}->value, $this->get_title($o_article)];
             //fetching this article variants data
-            $oVariants = $oArticle->getAdminVariants(
-                Registry::getRequest()->getRequestEscapedParameter('editlanguage')
-            );
-            if ($oVariants && $oVariants->count()) {
-                foreach ($oVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
+            $o_variants = $o_article->get_admin_variants(Registry::get_request()->get_request_escaped_parameter('editlanguage'));
+            if ($o_variants && $o_variants->count()) {
+                foreach ($o_variants as $o_var) {
+                    $a_jump_list[] = [$o_var->{$s_ox_id_field}->value, ' - ' . $this->get_title($o_var)];
                 }
             }
         }
-        if (count($aJumpList) > 1) {
-            $this->_aViewData['thisvariantlist'] = $aJumpList;
+        if (count($a_jump_list) > 1) {
+            $this->_a_view_data['thisvariantlist'] = $a_jump_list;
         }
     }
-
     /**
      * Returns formed variant title
      *
@@ -637,55 +486,47 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @return string
      */
-    protected function getTitle($oObj)
+    protected function get_title($o_obj)
     {
-        $sTitle = $oObj->oxarticles__oxtitle->value;
-        if (!strlen((string) $sTitle)) {
-            return $oObj->oxarticles__oxvarselect->value;
+        $s_title = $o_obj->oxarticles__oxtitle->value;
+        if (!strlen((string) $s_title)) {
+            return $o_obj->oxarticles__oxvarselect->value;
         }
-
-        return $sTitle;
+        return $s_title;
     }
-
     /**
      * Returns shop manufacturers list
      *
      * @return \OxidEsales\Eshop\Application\Model\CategoryList
      */
-    public function getCategoryList()
+    public function get_category_list()
     {
-        $oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
-        $oCatTree->loadList();
-
-        return $oCatTree;
+        $o_cat_tree = ox_new(\Oxid_Esales\Eshop\Application\Model\Category_List::class);
+        $o_cat_tree->load_list();
+        return $o_cat_tree;
     }
-
     /**
      * Returns shop manufacturers list
      *
      * @return \OxidEsales\Eshop\Application\Model\VendorList
      */
-    public function getVendorList()
+    public function get_vendor_list()
     {
-        $oVendorlist = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
-        $oVendorlist->loadVendorList();
-
-        return $oVendorlist;
+        $o_vendorlist = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor_List::class);
+        $o_vendorlist->load_vendor_list();
+        return $o_vendorlist;
     }
-
     /**
      * Returns shop manufacturers list
      *
      * @return \OxidEsales\Eshop\Application\Model\ManufacturerList
      */
-    public function getManufacturerList()
+    public function get_manufacturer_list()
     {
-        $oManufacturerList = oxNew(\OxidEsales\Eshop\Application\Model\ManufacturerList::class);
-        $oManufacturerList->loadManufacturerList();
-
-        return $oManufacturerList;
+        $o_manufacturer_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer_List::class);
+        $o_manufacturer_list->load_manufacturer_list();
+        return $o_manufacturer_list;
     }
-
     /**
      * Loads language for article.
      *
@@ -694,13 +535,11 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    protected function updateArticle($oArticle, $sOxId)
+    protected function update_article($o_article, $s_ox_id)
     {
-        $oArticle->loadInLang($this->_iEditLang, $sOxId);
-
-        return $oArticle;
+        $o_article->load_in_lang($this->_i_edit_lang, $s_ox_id);
+        return $o_article;
     }
-
     /**
      * Forms query which is used for adding article to category.
      *
@@ -711,24 +550,20 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @return string
      */
-    protected function formQueryForCopyingToCategory($newArticleId, $sUid, $sCatId, $sTime)
+    protected function form_query_for_copying_to_category($new_article_id, $s_uid, $s_cat_id, $s_time)
     {
-        $oDb = DatabaseProvider::getDb();
-        return 'insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) ' .
-            'VALUES (' . $oDb->quote($sUid) . ', ' . $oDb->quote($newArticleId) . ', ' .
-            $oDb->quote($sCatId) . ', ' . $oDb->quote($sTime) . ') ';
+        $o_db = Database_Provider::get_db();
+        return 'insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) ' . 'VALUES (' . $o_db->quote($s_uid) . ', ' . $o_db->quote($new_article_id) . ', ' . $o_db->quote($s_cat_id) . ', ' . $o_db->quote($s_time) . ') ';
     }
-
     /**
      * @param \OxidEsales\Eshop\Core\Model\BaseModel $base
      *
      * @return \OxidEsales\Eshop\Core\Model\BaseModel $base
      */
-    protected function updateBase($base)
+    protected function update_base($base)
     {
         return $base;
     }
-
     /**
      * Customize article data for rendering.
      * Intended to be used by modules.
@@ -737,11 +572,10 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    protected function customizeArticleInformation($article)
+    protected function customize_article_information($article)
     {
         return $article;
     }
-
     /**
      * Save non standard article information if needed.
      * Intended to be used by modules.
@@ -751,16 +585,15 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    protected function saveAdditionalArticleData($article, $parameters)
+    protected function save_additional_article_data($article, $parameters)
     {
         return $article;
     }
-
     /**
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    protected function createArticle()
+    protected function create_article()
     {
-        return oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        return ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
     }
 }

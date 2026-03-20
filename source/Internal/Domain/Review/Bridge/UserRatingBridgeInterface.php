@@ -4,19 +4,16 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\RatingPermissionException;
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
-
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Exception\Rating_Permission_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Dao\Entry_Does_Not_Exist_Dao_Exception;
 /**
  * @stable
  * @see OxidEsales/EshopCommunity/Internal/README.md
  */
-interface UserRatingBridgeInterface
+interface User_Rating_Bridge_Interface
 {
     /**
      * Delete a Rating.
@@ -27,5 +24,5 @@ interface UserRatingBridgeInterface
      * @throws RatingPermissionException
      * @throws EntryDoesNotExistDaoException
      */
-    public function deleteRating($userId, $ratingId);
+    public function delete_rating($user_id, $rating_id);
 }

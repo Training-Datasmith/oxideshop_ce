@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin deliverysetset list manager.
@@ -15,33 +13,30 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * filter them by description, title or delete them.
  * Admin Menu: Shop Settings -> Shipping & Handling Sets.
  */
-class DeliverySetList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class Delivery_Set_List extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_List_Controller
 {
     /**
      * Name of chosen object class (default null).
      *
      * @var string
      */
-    protected $_sListClass = 'oxdeliveryset';
-
+    protected $_s_list_class = 'oxdeliveryset';
     /**
      * Type of list.
      *
      * @var string
      */
-    protected $_sListType = 'oxdeliverysetlist';
-
+    protected $_s_list_type = 'oxdeliverysetlist';
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'deliveryset_list';
-
+    protected $_s_this_template = 'deliveryset_list';
     /**
      * Default SQL sorting parameter (default null).
      *
      * @var string
      */
-    protected $_sDefSortField = 'oxpos';
+    protected $_s_def_sort_field = 'oxpos';
 }

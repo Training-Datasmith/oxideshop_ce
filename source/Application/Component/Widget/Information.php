@@ -1,68 +1,59 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Component\Widget;
+namespace Oxid_Esales\Eshop_Community\Application\Component\Widget;
 
 /**
  * List of additional shop information links widget.
  * Forms info link list.
  */
-class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetController
+class Information extends \Oxid_Esales\Eshop\Application\Component\Widget\Widget_Controller
 {
     /**
      * Current class template name
      *
      * @var string
      */
-    protected $_sThisTemplate = 'widget/footer/info';
-
+    protected $_s_this_template = 'widget/footer/info';
     /**
      * @var \OxidEsales\Eshop\Application\Model\ContentList
      */
-    protected $_oContentList;
-
+    protected $_o_content_list;
     /**
      * Returns service keys.
      *
      * @return array
      */
-    public function getServicesKeys()
+    public function get_services_keys()
     {
-        $oContentList = $this->getContentList();
-
-        return $oContentList->getServiceKeys();
+        $o_content_list = $this->get_content_list();
+        return $o_content_list->get_service_keys();
     }
-
     /**
      * Get services content list
      *
      * @return \OxidEsales\Eshop\Application\Model\ContentList
      */
-    public function getServicesList()
+    public function get_services_list()
     {
-        $oContentList = $this->getContentList();
-        $oContentList->loadServices();
-
-        return $oContentList;
+        $o_content_list = $this->get_content_list();
+        $o_content_list->load_services();
+        return $o_content_list;
     }
-
     /**
      * Returns content list object.
      *
      * @return \OxidEsales\Eshop\Application\Model\ContentList
      */
-    protected function getContentList()
+    protected function get_content_list()
     {
-        if (!$this->_oContentList) {
-            $this->_oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
+        if (!$this->_o_content_list) {
+            $this->_o_content_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Content_List::class);
         }
-
-        return $this->_oContentList;
+        return $this->_o_content_list;
     }
 }

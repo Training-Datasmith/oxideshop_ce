@@ -4,19 +4,16 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\ReviewPermissionException;
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
-
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Exception\Review_Permission_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Dao\Entry_Does_Not_Exist_Dao_Exception;
 /**
  * @stable
  * @see OxidEsales/EshopCommunity/Internal/README.md
  */
-interface UserReviewBridgeInterface
+interface User_Review_Bridge_Interface
 {
     /**
      * Delete a Review.
@@ -27,5 +24,5 @@ interface UserReviewBridgeInterface
      * @throws ReviewPermissionException
      * @throws EntryDoesNotExistDaoException
      */
-    public function deleteReview($userId, $reviewId);
+    public function delete_review($user_id, $review_id);
 }

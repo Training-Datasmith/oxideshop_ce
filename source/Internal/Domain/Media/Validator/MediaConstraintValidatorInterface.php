@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator;
 
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator;
-
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-interface MediaConstraintValidatorInterface
+use Symfony\Component\Http_Foundation\File\Uploaded_File;
+interface Media_Constraint_Validator_Interface
 {
-    public function validate(UploadedFile $uploadedFile): void;
+    public function validate(Uploaded_File $uploaded_file): void;
 }

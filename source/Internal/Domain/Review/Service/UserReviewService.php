@@ -4,20 +4,16 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Service;
-
-use Doctrine\Common\Collections\ArrayCollection;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\ReviewDaoInterface;
-
-class UserReviewService implements UserReviewServiceInterface
+use Doctrine\Common\Collections\Array_Collection;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao\Review_Dao_Interface;
+class User_Review_Service implements User_Review_Service_Interface
 {
-    public function __construct(private readonly ReviewDaoInterface $reviewDao)
+    public function __construct(private readonly Review_Dao_Interface $review_dao)
     {
     }
-
     /**
      * Returns User Reviews.
      *
@@ -25,8 +21,8 @@ class UserReviewService implements UserReviewServiceInterface
      *
      * @return ArrayCollection
      */
-    public function getReviews($userId)
+    public function get_reviews($user_id)
     {
-        return $this->reviewDao->getReviewsByUserId($userId);
+        return $this->review_dao->get_reviews_by_user_id($user_id);
     }
 }

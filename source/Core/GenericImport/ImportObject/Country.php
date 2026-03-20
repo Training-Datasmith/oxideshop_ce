@@ -1,22 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\GenericImport\ImportObject;
+namespace Oxid_Esales\Eshop_Community\Core\Generic_Import\Import_Object;
 
 /**
  * Import object for Countries.
  */
-class Country extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject
+class Country extends \Oxid_Esales\Eshop\Core\Generic_Import\Import_Object\Import_Object
 {
     /** @var string Database table name. */
-    protected $tableName = 'oxcountry';
-
+    protected $table_name = 'oxcountry';
     /** @var string Shop object name. */
-    protected $shopObjectName = 'oxcountry';
+    protected $shop_object_name = 'oxcountry';
 }

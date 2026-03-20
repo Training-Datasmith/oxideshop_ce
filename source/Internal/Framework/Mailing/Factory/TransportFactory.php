@@ -4,22 +4,18 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Mailing\Factory;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Mailing\Factory;
 
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Transport\TransportInterface;
-
-readonly class TransportFactory implements TransportFactoryInterface
+use Symfony\Component\Mailer\Transport\Transport_Interface;
+readonly class Transport_Factory implements Transport_Factory_Interface
 {
     public function __construct(private string $dsn)
     {
     }
-
-    public function create(): TransportInterface
+    public function create(): Transport_Interface
     {
-        return Transport::fromDsn($this->dsn);
+        return Transport::from_dsn($this->dsn);
     }
 }

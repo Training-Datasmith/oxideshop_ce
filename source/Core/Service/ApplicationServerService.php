@@ -1,35 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Service;
+namespace Oxid_Esales\Eshop_Community\Core\Service;
 
 /**
  * Manages application server information.
  *
  * @internal Do not make a module extension for this class.
  */
-class ApplicationServerService implements \OxidEsales\Eshop\Core\Service\ApplicationServerServiceInterface
+class Application_Server_Service implements \Oxid_Esales\Eshop\Core\Service\Application_Server_Service_Interface
 {
     /**
      * The Dao object for application server.
      *
      * @var \OxidEsales\Eshop\Core\Dao\ApplicationServerDaoInterface
      */
-    private $appServerDao;
-
+    private $app_server_dao;
     /**
      * Server data manipulation class
      *
      * @var \OxidEsales\Eshop\Core\UtilsServer
      */
-    private $utilsServer;
-
+    private $utils_server;
     /**
      * ApplicationServerService constructor.
      *
@@ -38,27 +34,26 @@ class ApplicationServerService implements \OxidEsales\Eshop\Core\Service\Applica
      * @param int                                                      $currentTime  The current time - timestamp.
      */
     public function __construct(
-        \OxidEsales\Eshop\Core\Dao\ApplicationServerDaoInterface $appServerDao,
-        $utilsServer,
+        \Oxid_Esales\Eshop\Core\Dao\Application_Server_Dao_Interface $app_server_dao,
+        $utils_server,
         /**
          * Current checking time - timestamp.
          */
-        private $currentTime
-    ) {
-        $this->appServerDao = $appServerDao;
-        $this->utilsServer = $utilsServer;
+        private $current_time
+    )
+    {
+        $this->app_server_dao = $app_server_dao;
+        $this->utils_server = $utils_server;
     }
-
     /**
      * Returns an array of all application servers.
      *
      * @return array
      */
-    public function loadAppServerList()
+    public function load_app_server_list()
     {
-        return $this->appServerDao->findAll();
+        return $this->app_server_dao->find_all();
     }
-
     /**
      * Load the application server for given id.
      *
@@ -68,96 +63,88 @@ class ApplicationServerService implements \OxidEsales\Eshop\Core\Service\Applica
      *
      * @return \OxidEsales\Eshop\Core\DataObject\ApplicationServer
      */
-    public function loadAppServer($id)
+    public function load_app_server($id)
     {
         /** @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer $appServer */
-        $appServer = $this->appServerDao->findAppServer($id);
-        if ($appServer === null) {
+        $app_server = $this->app_server_dao->find_app_server($id);
+        if ($app_server === null) {
             /** @var \OxidEsales\Eshop\Core\Exception\NoResultException $exception */
-            $exception = oxNew(\OxidEsales\Eshop\Core\Exception\NoResultException::class);
+            $exception = ox_new(\Oxid_Esales\Eshop\Core\Exception\No_Result_Exception::class);
             throw $exception;
         }
-        return $appServer;
+        return $app_server;
     }
-
     /**
      * Removes server node information.
      *
      * @param string $serverId The Id of the application server to delete.
      */
-    public function deleteAppServerById($serverId): void
+    public function delete_app_server_by_id($server_id): void
     {
-        $this->appServerDao->delete($serverId);
+        $this->app_server_dao->delete($server_id);
     }
-
     /**
      * Saves application server data.
      *
      * @param \OxidEsales\Eshop\Core\DataObject\ApplicationServer $appServer
      */
-    public function saveAppServer($appServer): void
+    public function save_app_server($app_server): void
     {
-        $this->appServerDao->save($appServer);
+        $this->app_server_dao->save($app_server);
     }
-
     /**
      * Returns an array of all only active application servers.
      */
-    public function loadActiveAppServerList(): array
+    public function load_active_app_server_list(): array
     {
-        $allFoundServers = $this->loadAppServerList();
-        return $this->filterActiveAppServers($allFoundServers);
+        $all_found_servers = $this->load_app_server_list();
+        return $this->filter_active_app_servers($all_found_servers);
     }
-
     /**
      * Filter only active application servers from given list.
      *
      * @param array $appServerList The list of application servers.
      */
-    protected function filterActiveAppServers($appServerList): array
+    protected function filter_active_app_servers($app_server_list): array
     {
-        $activeServerList = [];
+        $active_server_list = [];
         /** @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer $server */
-        foreach ($appServerList as $server) {
-            if ($server->isInUse($this->currentTime)) {
-                $activeServerList[$server->getId()] = $server;
+        foreach ($app_server_list as $server) {
+            if ($server->is_in_use($this->current_time)) {
+                $active_server_list[$server->get_id()] = $server;
             }
         }
-        return $activeServerList;
+        return $active_server_list;
     }
-
     /**
      * Deletes all application servers, that are longer not active.
      */
-    private function cleanupAppServers(): void
+    private function cleanup_app_servers(): void
     {
-        $allFoundServers = $this->loadAppServerList();
+        $all_found_servers = $this->load_app_server_list();
         /** @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer $server */
-        foreach ($allFoundServers as $server) {
-            if ($server->needToDelete($this->currentTime)) {
-                $this->deleteAppServerById($server->getId());
+        foreach ($all_found_servers as $server) {
+            if ($server->need_to_delete($this->current_time)) {
+                $this->delete_app_server_by_id($server->get_id());
             }
         }
     }
-
     /**
      * Renews application server information when it is call in admin area and
      * if it is outdated or if it does not exist.
      */
-    public function updateAppServerInformationInAdmin(): void
+    public function update_app_server_information_in_admin(): void
     {
-        $this->updateAppServerInformation(true);
+        $this->update_app_server_information(true);
     }
-
     /**
      * Renews application server information when it is call in frontend and
      * if it is outdated or if it does not exist.
      */
-    public function updateAppServerInformationInFrontend(): void
+    public function update_app_server_information_in_frontend(): void
     {
-        $this->updateAppServerInformation(false);
+        $this->update_app_server_information(false);
     }
-
     /**
      * Renews application server information if it is outdated or if it does not exist.
      *
@@ -165,63 +152,60 @@ class ApplicationServerService implements \OxidEsales\Eshop\Core\Service\Applica
      *
      * @param bool $adminMode The status of admin mode
      */
-    public function updateAppServerInformation($adminMode): void
+    public function update_app_server_information($admin_mode): void
     {
-        $this->appServerDao->startTransaction();
+        $this->app_server_dao->start_transaction();
         try {
             /** @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer $appServer */
-            $appServer = $this->appServerDao->findAppServer($this->utilsServer->getServerNodeId());
-            if ($appServer === null) {
-                $this->addNewAppServerData($adminMode);
-            } elseif ($appServer->needToUpdate($this->currentTime)) {
-                $this->updateAppServerData($appServer, $adminMode);
+            $app_server = $this->app_server_dao->find_app_server($this->utils_server->get_server_node_id());
+            if ($app_server === null) {
+                $this->add_new_app_server_data($admin_mode);
+            } elseif ($app_server->need_to_update($this->current_time)) {
+                $this->update_app_server_data($app_server, $admin_mode);
             }
         } catch (\Exception $exception) {
-            $this->appServerDao->rollbackTransaction();
+            $this->app_server_dao->rollback_transaction();
             throw $exception;
         }
-        $this->appServerDao->commitTransaction();
+        $this->app_server_dao->commit_transaction();
     }
-
     /**
      * Updates application server with the newest information.
      *
      * @param \OxidEsales\Eshop\Core\DataObject\ApplicationServer $appServer The application server to update.
      * @param bool                                                $adminMode The status of admin mode.
      */
-    private function updateAppServerData($appServer, $adminMode): void
+    private function update_app_server_data($app_server, $admin_mode): void
     {
-        $appServer->setId($this->utilsServer->getServerNodeId());
-        $appServer->setIp($this->utilsServer->getServerIp());
-        $appServer->setTimestamp($this->currentTime);
-        if ($adminMode) {
-            $appServer->setLastAdminUsage($this->currentTime);
+        $app_server->set_id($this->utils_server->get_server_node_id());
+        $app_server->set_ip($this->utils_server->get_server_ip());
+        $app_server->set_timestamp($this->current_time);
+        if ($admin_mode) {
+            $app_server->set_last_admin_usage($this->current_time);
         } else {
-            $appServer->setLastFrontendUsage($this->currentTime);
+            $app_server->set_last_frontend_usage($this->current_time);
         }
-        $this->saveAppServer($appServer);
-        $this->cleanupAppServers();
+        $this->save_app_server($app_server);
+        $this->cleanup_app_servers();
     }
-
     /**
      * Adds new application server.
      *
      * @param bool $adminMode The status of admin mode.
      */
-    private function addNewAppServerData($adminMode): void
+    private function add_new_app_server_data($admin_mode): void
     {
         /** @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer $appServer */
-        $appServer = oxNew(\OxidEsales\Eshop\Core\DataObject\ApplicationServer::class);
-
-        $appServer->setId($this->utilsServer->getServerNodeId());
-        $appServer->setIp($this->utilsServer->getServerIp());
-        $appServer->setTimestamp($this->currentTime);
-        if ($adminMode) {
-            $appServer->setLastAdminUsage($this->currentTime);
+        $app_server = ox_new(\Oxid_Esales\Eshop\Core\Data_Object\Application_Server::class);
+        $app_server->set_id($this->utils_server->get_server_node_id());
+        $app_server->set_ip($this->utils_server->get_server_ip());
+        $app_server->set_timestamp($this->current_time);
+        if ($admin_mode) {
+            $app_server->set_last_admin_usage($this->current_time);
         } else {
-            $appServer->setLastFrontendUsage($this->currentTime);
+            $app_server->set_last_frontend_usage($this->current_time);
         }
-        $this->saveAppServer($appServer);
-        $this->cleanupAppServers();
+        $this->save_app_server($app_server);
+        $this->cleanup_app_servers();
     }
 }

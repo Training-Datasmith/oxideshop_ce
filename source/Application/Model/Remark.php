@@ -1,33 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Remark manager.
  */
-class Remark extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Remark extends \Oxid_Esales\Eshop\Core\Model\Base_Model
 {
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxremark';
-
+    protected $_s_class_name = 'oxremark';
     /**
      * Skip update fields
      *
      * @var array
      */
-    protected $_aSkipSaveFields = ['oxtimestamp'];
-
+    protected $_a_skip_save_fields = ['oxtimestamp'];
     /**
      * Class constructor, initiates parent constructor (parent::oxBase()).
      */
@@ -36,7 +32,6 @@ class Remark extends \OxidEsales\Eshop\Core\Model\BaseModel
         parent::__construct();
         $this->init('oxremark');
     }
-
     /**
      * Loads object information from DB. Returns true on success.
      *
@@ -44,18 +39,14 @@ class Remark extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @return bool
      */
-    public function load($oxID)
+    public function load($ox_id)
     {
-        if ($blRet = parent::load($oxID)) {
+        if ($bl_ret = parent::load($ox_id)) {
             // convert date's to international format
-            $this->assign([
-                'oxcreate'    => \OxidEsales\Eshop\Core\Registry::getUtilsDate()->formatDBDate($this->oxremark__oxcreate->value),
-            ]);
+            $this->assign(['oxcreate' => \Oxid_Esales\Eshop\Core\Registry::get_utils_date()->format_db_date($this->oxremark__oxcreate->value)]);
         }
-
-        return $blRet;
+        return $bl_ret;
     }
-
     /**
      * Inserts object data fields in DB. Returns true on success.
      *
@@ -64,10 +55,9 @@ class Remark extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function insert()
     {
         // set oxcreate
-        $sNow = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
-        $this->oxremark__oxcreate = new \OxidEsales\Eshop\Core\Field($sNow, \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxremark__oxheader = new \OxidEsales\Eshop\Core\Field($sNow, \OxidEsales\Eshop\Core\Field::T_RAW);
-
+        $s_now = date('Y-m-d H:i:s', \Oxid_Esales\Eshop\Core\Registry::get_utils_date()->get_time());
+        $this->oxremark__oxcreate = new \Oxid_Esales\Eshop\Core\Field($s_now, \Oxid_Esales\Eshop\Core\Field::T_RAW);
+        $this->oxremark__oxheader = new \Oxid_Esales\Eshop\Core\Field($s_now, \Oxid_Esales\Eshop\Core\Field::T_RAW);
         return parent::insert();
     }
 }

@@ -1,61 +1,54 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Payment gateway manager.
  * Checks and sets payment method data, executes payment.
  */
-class PaymentGateway extends \OxidEsales\Eshop\Core\Base
+class Payment_Gateway extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Payment status (active - true/not active - false) (default false).
      *
      * @var bool
      */
-    protected $_blActive = false;
-
+    protected $_bl_active = false;
     /**
      * oUserpayment object (default null).
      *
      * @var object
      */
-    protected $_oPaymentInfo;
-
+    protected $_o_payment_info;
     /**
      * Last error nr. For backward compatibility must be >3
      *
      * @abstract
      * @var string
      */
-    protected $_iLastErrorNo = 4;
-
+    protected $_i_last_error_no = 4;
     /**
      * Last error text.
      *
      * @abstract
      * @var string
      */
-    protected $_sLastError;
-
+    protected $_s_last_error;
     /**
      * Sets payment parameters.
      *
      * @param object $oUserpayment User payment object
      */
-    public function setPaymentParams($oUserpayment): void
+    public function set_payment_params($o_userpayment): void
     {
         // store data
-        $this->_oPaymentInfo = & $oUserpayment;
+        $this->_o_payment_info =& $o_userpayment;
     }
-
     /**
      * Executes payment, returns true on success.
      *
@@ -64,51 +57,46 @@ class PaymentGateway extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function executePayment($dAmount, &$oOrder)
+    public function execute_payment($d_amount, &$o_order)
     {
-        $this->_iLastErrorNo = null;
-        $this->_sLastError = null;
-
-        if (!$this->isActive()) {
-            return true; // fake yes
+        $this->_i_last_error_no = null;
+        $this->_s_last_error = null;
+        if (!$this->is_active()) {
+            return true;
+            // fake yes
         }
-
         // proceed with no payment
         // used for other countries
-        if (@$this->_oPaymentInfo->oxuserpayments__oxpaymentsid->value == 'oxempty') {
+        if (@$this->_o_payment_info->oxuserpayments__oxpaymentsid->value == 'oxempty') {
             return true;
         }
-
         return false;
     }
-
     /**
      * Returns last payment processing error nr.
      *
      * @return int
      */
-    public function getLastErrorNo()
+    public function get_last_error_no()
     {
-        return $this->_iLastErrorNo;
+        return $this->_i_last_error_no;
     }
-
     /**
      * Returns last payment processing error.
      *
      * @return int
      */
-    public function getLastError()
+    public function get_last_error()
     {
-        return $this->_sLastError;
+        return $this->_s_last_error;
     }
-
     /**
      * Returns true is payment active.
      *
      * @return bool
      */
-    protected function isActive()
+    protected function is_active()
     {
-        return $this->_blActive;
+        return $this->_bl_active;
     }
 }

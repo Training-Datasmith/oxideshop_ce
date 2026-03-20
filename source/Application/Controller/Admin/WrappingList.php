@@ -1,35 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin wrapping list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: User Administration -> Users.
  */
-class WrappingList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class Wrapping_List extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_List_Controller
 {
     /**
      * Name of chosen object class (default null).
      *
      * @var string
      */
-    protected $_sListClass = 'oxwrapping';
-
+    protected $_s_list_class = 'oxwrapping';
     /**
      * Default SQL sorting parameter (default null).
      *
      * @var string
      */
-    protected $_sDefSortField = 'oxname';
-
+    protected $_s_def_sort_field = 'oxname';
     /**
      * Executes parent method parent::render() and returns name of template
      * file "user_list".
@@ -39,7 +35,6 @@ class WrappingList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
     public function render()
     {
         parent::render();
-
         return 'wrapping_list';
     }
 }

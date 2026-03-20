@@ -4,19 +4,16 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating;
-
-interface TemplateRendererInterface
+interface Template_Renderer_Interface
 {
     /**
      * @param string $template The template name
      * @param array  $context  An array of parameters to pass to the template
      */
-    public function renderTemplate(string $template, array $context = []): string;
-
+    public function render_template(string $template, array $context = []): string;
     /**
      * Renders a fragment of the template.
      *
@@ -24,10 +21,8 @@ interface TemplateRendererInterface
      * @param string $fragmentId The id of the fragment
      * @param array  $context    An array of parameters to pass to the template
      */
-    public function renderFragment(string $fragment, string $fragmentId, array $context = []): string;
-
-    public function getTemplateEngine(): TemplateEngineInterface;
-
+    public function render_fragment(string $fragment, string $fragment_id, array $context = []): string;
+    public function get_template_engine(): Template_Engine_Interface;
     /**
      * Returns true if the template exists.
      *

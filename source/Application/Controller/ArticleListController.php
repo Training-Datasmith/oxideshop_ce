@@ -1,52 +1,46 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Application\Model\Category;
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
-
+use Oxid_Esales\Eshop\Application\Model\Category;
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Str;
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Template_Renderer_Bridge_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Template_Renderer_Interface;
 /**
  * List of articles for a selected product group.
  * Collects list of articles, according to it generates links for list gallery,
  * meta tags (for search engines). Result - "list" template.
  * OXID eShop -> (Any selected shop product category).
  */
-class ArticleListController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Article_List_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Count of all articles in list.
      *
      * @var integer
      */
-    protected $_iAllArtCnt = 0;
-
+    protected $_i_all_art_cnt = 0;
     /**
      * Number of possible pages.
      *
      * @var integer
      */
-    protected $_iCntPages = 0;
-
+    protected $_i_cnt_pages = 0;
     /**
      * Current class default template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'page/list/list';
-
+    protected $_s_this_template = 'page/list/list';
     /**
      * New layout list template
      *
@@ -54,64 +48,55 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @var string
      */
-    protected $_sThisMoreTemplate = 'page/list/morecategories';
-
+    protected $_s_this_more_template = 'page/list/morecategories';
     /**
      * Category path string
      *
      * @var string
      */
-    protected $_sCatPathString;
-
+    protected $_s_cat_path_string;
     /**
      * Marked which defines if current view is sortable or not
      *
      * @var bool
      */
-    protected $_blShowSorting = true;
-
+    protected $_bl_show_sorting = true;
     /**
      * Category attributes.
      *
      * @var array
      */
-    protected $_aAttributes;
-
+    protected $_a_attributes;
     /**
      * Category article list
      *
      * @var array
      */
-    protected $_aCatArtList;
-
+    protected $_a_cat_art_list;
     /**
      * If category has subcategories
      *
      * @var bool
      */
-    protected $_blHasVisibleSubCats;
-
+    protected $_bl_has_visible_sub_cats;
     /**
      * List of category's subcategories
      *
      * @var array
      */
-    protected $_aSubCatList;
-
+    protected $_a_sub_cat_list;
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation;
-
+    protected $_o_page_navigation;
     /**
      * Active object is category.
      *
      * @var bool
      */
-    protected $_blIsCat;
-
+    protected $_bl_is_cat;
     /**
      * Recomendation list
      *
@@ -119,22 +104,19 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @var object
      */
-    protected $_oRecommList;
-
+    protected $_o_recomm_list;
     /**
      * Category title
      *
      * @var string
      */
-    protected $_sCatTitle;
-
+    protected $_s_cat_title;
     /**
      * Sign if to load and show bargain action
      *
      * @var bool
      */
-    protected $_blBargainAction = false;
-
+    protected $_bl_bargain_action = false;
     /**
      * Array of id to form recommendation list.
      *
@@ -142,27 +124,22 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds;
-
+    protected $_a_similar_recomm_list_ids;
     /**
      * Generates (if not generated yet) and returns view ID (for
      * template engine caching).
      *
      * @return string   $this->_sViewId view id
      */
-    protected function generateViewId()
+    protected function generate_view_id()
     {
-        $categoryId = Registry::getRequest()->getRequestEscapedParameter('cnid');
-        $activePage = $this->getActPage();
-        $articlesPerPage = Registry::getSession()->getVariable('_artperpage');
-        $listDisplayType = $this->getArticleListDisplayType();
-        $parentViewId = parent::generateViewId();
-
-        return md5(
-            $parentViewId . '|' . $categoryId . '|' . $activePage . '|' . $articlesPerPage . '|' . $listDisplayType
-        );
+        $category_id = Registry::get_request()->get_request_escaped_parameter('cnid');
+        $active_page = $this->get_act_page();
+        $articles_per_page = Registry::get_session()->get_variable('_artperpage');
+        $list_display_type = $this->get_article_list_display_type();
+        $parent_view_id = parent::generate_view_id();
+        return md5($parent_view_id . '|' . $category_id . '|' . $active_page . '|' . $articles_per_page . '|' . $list_display_type);
     }
-
     /**
      * Executes parent::render(), loads active category, prepares article
      * list sorting rules. According to category type loads list of
@@ -177,28 +154,22 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     public function render()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $category = $this->getCategoryToRender();
-
-        $isCategoryActive = $category && (bool) $category->oxcategories__oxactive->value;
-        if (!$isCategoryActive) {
-            Registry::getUtils()->redirect($config->getShopURL() . 'index.php', true, 302);
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $category = $this->get_category_to_render();
+        $is_category_active = $category && (bool) $category->oxcategories__oxactive->value;
+        if (!$is_category_active) {
+            Registry::get_utils()->redirect($config->get_shop_url() . 'index.php', true, 302);
         }
         //checking if actual pages count does not exceed real articles page count
-        $this->getArticleList();
-        if ($this->_blIsCat) {
-            $this->checkRequestedPage();
+        $this->get_article_list();
+        if ($this->_bl_is_cat) {
+            $this->check_requested_page();
         }
-
         parent::render();
-
         // processing list articles
-        $this->processListArticles();
-
-        return $this->getTemplateName();
+        $this->process_list_articles();
+        return $this->get_template_name();
     }
-
     /**
      * Returns category, which should be rendered.
      * In case of 'more categories' page is viewed, sets 'more categories' template,
@@ -206,102 +177,91 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return Category
      */
-    protected function getCategoryToRender()
+    protected function get_category_to_render()
     {
-        $this->_blIsCat = false;
-
+        $this->_bl_is_cat = false;
         // A. checking for fake "more" category
         // @deprecated oxmore feature will be removed in v8.0
-        if ('oxmore' == Registry::getRequest()->getRequestEscapedParameter('cnid')) {
+        if ('oxmore' == Registry::get_request()->get_request_escaped_parameter('cnid')) {
             // overriding some standard value and parameters
-            $this->_sThisTemplate = $this->_sThisMoreTemplate;
-            $category = oxNew(Category::class);
+            $this->_s_this_template = $this->_s_this_more_template;
+            $category = ox_new(Category::class);
             $category->oxcategories__oxactive = new Field(1, Field::T_RAW);
-            $this->setActiveCategory($category);
+            $this->set_active_category($category);
             // END deprecated
-        } elseif (($category = $this->getActiveCategory())) {
-            $this->_blIsCat = true;
-            $this->_blBargainAction = true;
+        } elseif ($category = $this->get_active_category()) {
+            $this->_bl_is_cat = true;
+            $this->_bl_bargain_action = true;
         }
-
         return $category;
     }
-
     /**
      * Checks if requested page is valid and:
      * - redirecting to first page in case requested page does not exist
      * or
      * - displays 404 error if category has no products
      */
-    protected function checkRequestedPage()
+    protected function check_requested_page()
     {
-        $pageCount = $this->getPageCount();
-        $currentPageNumber = $this->getActPage();
+        $page_count = $this->get_page_count();
+        $current_page_number = $this->get_act_page();
         // redirecting to first page in case requested page does not exist
-        if ($pageCount && (($pageCount - 1) < $currentPageNumber)) {
-            Registry::getUtils()->redirect($this->getActiveCategory()->getLink(), false);
+        if ($page_count && $page_count - 1 < $current_page_number) {
+            Registry::get_utils()->redirect($this->get_active_category()->get_link(), false);
         }
-        if (!$pageCount && $currentPageNumber) {
+        if (!$page_count && $current_page_number) {
             // display error if category has no products, but page number is entered
-            $this->_iActPage = 0;
-            error_404_handler($this->getActiveCategory()->getLink());
+            $this->_i_act_page = 0;
+            error_404_handler($this->get_active_category()->get_link());
         }
     }
-
     /**
      * Iterates through list articles and performs list view specific tasks:
      *  - sets type of link which needs to be generated (Manufacturer link)
      */
-    protected function processListArticles()
+    protected function process_list_articles()
     {
-        if ($articleList = $this->getArticleList()) {
-            $linkType = $this->getProductLinkType();
-            $dynamicParameters = $this->getAddUrlParams();
-            $seoParameters = $this->getAddSeoUrlParams();
-
-            foreach ($articleList as $article) {
+        if ($article_list = $this->get_article_list()) {
+            $link_type = $this->get_product_link_type();
+            $dynamic_parameters = $this->get_add_url_params();
+            $seo_parameters = $this->get_add_seo_url_params();
+            foreach ($article_list as $article) {
                 /** @var \OxidEsales\Eshop\Application\Model\Article $article */
-                $article->setLinkType($linkType);
-
-                if ($dynamicParameters) {
-                    $article->appendStdLink($dynamicParameters);
+                $article->set_link_type($link_type);
+                if ($dynamic_parameters) {
+                    $article->append_std_link($dynamic_parameters);
                 }
-
-                if ($seoParameters) {
-                    $article->appendLink($seoParameters);
+                if ($seo_parameters) {
+                    $article->append_link($seo_parameters);
                 }
             }
         }
     }
-
     /**
      * Returns additional URL parameters which must be added to list products dynamic urls
      *
      * @return string
      */
-    public function getAddUrlParams()
+    public function get_add_url_params()
     {
-        $dynamicParameters = parent::getAddUrlParams();
-        if (!Registry::getUtils()->seoIsActive()) {
-            $pageNumber = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
-            if ($pageNumber > 0) {
-                $dynamicParameters .= ($dynamicParameters ? '&amp;' : '') . "pgNr={$pageNumber}";
+        $dynamic_parameters = parent::get_add_url_params();
+        if (!Registry::get_utils()->seo_is_active()) {
+            $page_number = (int) Registry::get_request()->get_request_escaped_parameter('pgNr');
+            if ($page_number > 0) {
+                $dynamic_parameters .= ($dynamic_parameters ? '&amp;' : '') . "pgNr={$page_number}";
             }
         }
-
-        return $dynamicParameters;
+        return $dynamic_parameters;
     }
-
     /**
      * Returns additional URL parameters which must be added to list products seo urls
      *
      * @return string
      */
-    public function getAddSeoUrlParams()
+    public function get_add_seo_url_params()
     {
         return '';
     }
-
     /**
      * Returns product link type:
      *  - OXARTICLE_LINKTYPE_PRICECATEGORY - when active category is price category
@@ -309,15 +269,13 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return int
      */
-    protected function getProductLinkType()
+    protected function get_product_link_type()
     {
-        if (($category = $this->getActiveCategory()) && $category->isPriceCategory()) {
+        if (($category = $this->get_active_category()) && $category->is_price_category()) {
             return OXARTICLE_LINKTYPE_PRICECATEGORY;
         }
-
         return OXARTICLE_LINKTYPE_CATEGORY;
     }
-
     /**
      * Stores chosen category filter into session.
      *
@@ -326,33 +284,29 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     public function executefilter(): void
     {
-        $baseLanguageId = Registry::getLang()->getBaseLanguage();
+        $base_language_id = Registry::get_lang()->get_base_language();
         // store this into session
-        $attributeFilter = Registry::getRequest()->getRequestParameter('attrfilter');
-        $activeCategory = Registry::getRequest()->getRequestEscapedParameter('cnid');
-
-        if (!empty($attributeFilter)) {
-            $sessionFilter = Registry::getSession()->getVariable('session_attrfilter');
+        $attribute_filter = Registry::get_request()->get_request_parameter('attrfilter');
+        $active_category = Registry::get_request()->get_request_escaped_parameter('cnid');
+        if (!empty($attribute_filter)) {
+            $session_filter = Registry::get_session()->get_variable('session_attrfilter');
             //fix for #2904 - if language will be changed attributes of this category will be deleted from session
             //and new filters for active language set.
-            $sessionFilter[$activeCategory] = null;
-            $sessionFilter[$activeCategory][$baseLanguageId] = $attributeFilter;
-            Registry::getSession()->setVariable('session_attrfilter', $sessionFilter);
+            $session_filter[$active_category] = null;
+            $session_filter[$active_category][$base_language_id] = $attribute_filter;
+            Registry::get_session()->set_variable('session_attrfilter', $session_filter);
         }
     }
-
     /**
      * Reset filter.
      */
-    public function resetFilter(): void
+    public function reset_filter(): void
     {
-        $activeCategory = Registry::getRequest()->getRequestEscapedParameter('cnid');
-        $sessionFilter = Registry::getSession()->getVariable('session_attrfilter');
-
-        unset($sessionFilter[$activeCategory]);
-        Registry::getSession()->setVariable('session_attrfilter', $sessionFilter);
+        $active_category = Registry::get_request()->get_request_escaped_parameter('cnid');
+        $session_filter = Registry::get_session()->get_variable('session_attrfilter');
+        unset($session_filter[$active_category]);
+        Registry::get_session()->set_variable('session_attrfilter', $session_filter);
     }
-
     /**
      * Loads and returns article list of active category.
      *
@@ -360,52 +314,42 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return \OxidEsales\Eshop\Application\Model\ArticleList
      */
-    protected function loadArticles($category)
+    protected function load_articles($category)
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $numberOfCategoryArticles = (int) $config->getConfigParam('iNrofCatArticles');
-        $numberOfCategoryArticles = $numberOfCategoryArticles ?: 1;
-
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $number_of_category_articles = (int) $config->get_config_param('iNrofCatArticles');
+        $number_of_category_articles = $number_of_category_articles ?: 1;
         // load only articles which we show on screen
-        $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $articleList->setSqlLimit($numberOfCategoryArticles * $this->getRequestPageNr(), $numberOfCategoryArticles);
-        $articleList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
-
-        if ($category->isPriceCategory()) {
-            $priceFrom = $category->oxcategories__oxpricefrom->value;
-            $priceTo = $category->oxcategories__oxpriceto->value;
-
-            $this->_iAllArtCnt = $articleList->loadPriceArticles($priceFrom, $priceTo, $category);
+        $article_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+        $article_list->set_sql_limit($number_of_category_articles * $this->get_request_page_nr(), $number_of_category_articles);
+        $article_list->set_custom_sorting($this->get_sorting_sql($this->get_sort_ident()));
+        if ($category->is_price_category()) {
+            $price_from = $category->oxcategories__oxpricefrom->value;
+            $price_to = $category->oxcategories__oxpriceto->value;
+            $this->_i_all_art_cnt = $article_list->load_price_articles($price_from, $price_to, $category);
         } else {
-            $sessionFilter = Registry::getSession()->getVariable('session_attrfilter');
-
-            $activeCategoryId = $category->getId();
-            $this->_iAllArtCnt = $articleList->loadCategoryArticles($activeCategoryId, $sessionFilter);
+            $session_filter = Registry::get_session()->get_variable('session_attrfilter');
+            $active_category_id = $category->get_id();
+            $this->_i_all_art_cnt = $article_list->load_category_articles($active_category_id, $session_filter);
         }
-
-        $this->_iCntPages = ceil($this->_iAllArtCnt / $numberOfCategoryArticles);
-
-        return $articleList;
+        $this->_i_cnt_pages = ceil($this->_i_all_art_cnt / $number_of_category_articles);
+        return $article_list;
     }
-
     /**
      * Get actual page number.
      *
      * @return int
      */
-    public function getActPage()
+    public function get_act_page()
     {
         //Fake oxmore category has no subpages so we can set the page number to zero
         // @deprecated oxmore feature will be removed in v8.0
-        if ('oxmore' == Registry::getRequest()->getRequestEscapedParameter('cnid')) {
+        if ('oxmore' == Registry::get_request()->get_request_escaped_parameter('cnid')) {
             return 0;
         }
         // END deprecated
-
-        return $this->getRequestPageNr();
+        return $this->get_request_page_nr();
     }
-
     /**
      * Calls parent::getActPage();
      *
@@ -414,66 +358,58 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return int
      */
-    protected function getRequestPageNr()
+    protected function get_request_page_nr()
     {
-        return parent::getActPage();
+        return parent::get_act_page();
     }
-
     /**
      * Get list display type
      *
      * @return null|string
      */
-    protected function getArticleListDisplayType()
+    protected function get_article_list_display_type()
     {
-        $listDisplayType = Registry::getSession()->getVariable('ldtype');
-
-        if (is_null($listDisplayType)) {
-            return Registry::getConfig()->getConfigParam('sDefaultListDisplayType');
+        $list_display_type = Registry::get_session()->get_variable('ldtype');
+        if (is_null($list_display_type)) {
+            return Registry::get_config()->get_config_param('sDefaultListDisplayType');
         }
-
-        return $listDisplayType;
+        return $list_display_type;
     }
-
     /**
      * Returns active product id to load its seo meta info
      *
      * @return string
      */
-    protected function getSeoObjectId()
+    protected function get_seo_object_id()
     {
-        if (($category = $this->getActiveCategory())) {
-            return $category->getId();
+        if ($category = $this->get_active_category()) {
+            return $category->get_id();
         }
     }
-
     /**
      * Returns string built from category titles
      *
      * @return string
      */
-    protected function getCatPathString()
+    protected function get_cat_path_string()
     {
-        if ($this->_sCatPathString === null) {
+        if ($this->_s_cat_path_string === null) {
             // marking as already set
-            $this->_sCatPathString = false;
-
+            $this->_s_cat_path_string = false;
             //fetching category path
-            if (is_array($categoryTreePath = $this->getCatTreePath())) {
-                $stringModifier = Str::getStr();
-                $this->_sCatPathString = '';
-                foreach ($categoryTreePath as $category) {
-                    if ($this->_sCatPathString) {
-                        $this->_sCatPathString .= ', ';
+            if (is_array($category_tree_path = $this->get_cat_tree_path())) {
+                $string_modifier = Str::get_str();
+                $this->_s_cat_path_string = '';
+                foreach ($category_tree_path as $category) {
+                    if ($this->_s_cat_path_string) {
+                        $this->_s_cat_path_string .= ', ';
                     }
-                    $this->_sCatPathString .= $stringModifier->strtolower($category->oxcategories__oxtitle->value);
+                    $this->_s_cat_path_string .= $string_modifier->strtolower($category->oxcategories__oxtitle->value);
                 }
             }
         }
-
-        return $this->_sCatPathString;
+        return $this->_s_cat_path_string;
     }
-
     /**
      * Returns current view meta description data.
      *
@@ -483,54 +419,46 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return  string
      */
-    protected function prepareMetaDescription($meta, $length = 1024, $descriptionTag = false)
+    protected function prepare_meta_description($meta, $length = 1024, $description_tag = false)
     {
         $description = '';
         // appending parent title
-        if ($activeCategory = $this->getActiveCategory()) {
-            if (($parentCategory = $activeCategory->getParentCategory())) {
-                $description .= " {$parentCategory->oxcategories__oxtitle->value} -";
+        if ($active_category = $this->get_active_category()) {
+            if ($parent_category = $active_category->get_parent_category()) {
+                $description .= " {$parent_category->oxcategories__oxtitle->value} -";
             }
-
             // adding category title
-            $description .= " {$activeCategory->oxcategories__oxtitle->value}.";
+            $description .= " {$active_category->oxcategories__oxtitle->value}.";
         }
-
         // and final component ..
         //changed for #2776
-        if (($suffix = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveShop()->oxshops__oxtitleprefix->value)) {
+        if ($suffix = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_shop()->oxshops__oxtitleprefix->value) {
             $description .= " {$suffix}";
         }
-
         // making safe for output
-        $str = Str::getStr();
+        $str = Str::get_str();
         $description = $str->html_entity_decode($description);
         $description = $str->strip_tags($description);
-        $description = $str->cleanStr($description);
+        $description = $str->clean_str($description);
         $description = $str->htmlspecialchars($description);
-
         return trim((string) $description);
     }
-
     /**
      * Template variable getter. Returns meta description
      *
      * @return string
      */
-    public function getMetaDescription()
+    public function get_meta_description()
     {
-        $meta = parent::getMetaDescription();
-
-        if ($titlePageSuffix = $this->getTitlePageSuffix()) {
+        $meta = parent::get_meta_description();
+        if ($title_page_suffix = $this->get_title_page_suffix()) {
             if ($meta) {
                 $meta .= ', ';
             }
-            $meta .= $titlePageSuffix;
+            $meta .= $title_page_suffix;
         }
-
         return $meta;
     }
-
     /**
      * Meta tags - description and keywords - generator for search
      * engines. Uses string passed by parameters, cleans HTML tags,
@@ -543,56 +471,45 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return  string
      */
-    protected function collectMetaDescription($meta, $length = 1024, $descriptionTag = false)
+    protected function collect_meta_description($meta, $length = 1024, $description_tag = false)
     {
         //formatting description tag
-        $category = $this->getActiveCategory();
-
-        $additionalText = ($category instanceof Category) ? $this->collectCategoryMetaDescription($category) : '';
-
-        if (!$additionalText) {
-            $additionalText = $this->collectProductMetaDescription();
+        $category = $this->get_active_category();
+        $additional_text = $category instanceof Category ? $this->collect_category_meta_description($category) : '';
+        if (!$additional_text) {
+            $additional_text = $this->collect_product_meta_description();
         }
         if (!$meta) {
-            $meta = trim($this->getCatPathString());
+            $meta = trim($this->get_cat_path_string());
         }
-        $meta = ($meta) ? "{$meta} - {$additionalText}" : $additionalText;
-        return parent::prepareMetaDescription($meta, $length, $descriptionTag);
+        $meta = $meta ? "{$meta} - {$additional_text}" : $additional_text;
+        return parent::prepare_meta_description($meta, $length, $description_tag);
     }
-
-    private function collectCategoryMetaDescription(Category $category): string
+    private function collect_category_meta_description(Category $category): string
     {
         if (isset($category->oxcategories__oxlongdesc) && $category->oxcategories__oxlongdesc instanceof Field) {
-            $activeLanguageId = Registry::getLang()->getTplLanguage();
-            $oxid = $category->getId() . $category->getLanguage();
-            return trim($this->getRenderer()->renderFragment(
-                $category->oxcategories__oxlongdesc->getRawValue(),
-                "ox:{$oxid}{$activeLanguageId}",
-                $this->getViewData()
-            ));
+            $active_language_id = Registry::get_lang()->get_tpl_language();
+            $oxid = $category->get_id() . $category->get_language();
+            return trim($this->get_renderer()->render_fragment($category->oxcategories__oxlongdesc->get_raw_value(), "ox:{$oxid}{$active_language_id}", $this->get_view_data()));
         }
         return '';
     }
-
-    private function getRenderer(): TemplateRendererInterface
+    private function get_renderer(): Template_Renderer_Interface
     {
-        return ContainerFacade::get(TemplateRendererBridgeInterface::class)
-            ->getTemplateRenderer();
+        return Container_Facade::get(Template_Renderer_Bridge_Interface::class)->get_template_renderer();
     }
-
-    private function collectProductMetaDescription(): string
+    private function collect_product_meta_description(): string
     {
-        $articleList = $this->getArticleList();
-        if ($articleList && $articleList->count()) {
-            $articleTitles = [];
-            foreach ($articleList as $article) {
-                $articleTitles[] = $article->oxarticles__oxtitle->value;
+        $article_list = $this->get_article_list();
+        if ($article_list && $article_list->count()) {
+            $article_titles = [];
+            foreach ($article_list as $article) {
+                $article_titles[] = $article->oxarticles__oxtitle->value;
             }
-            return implode(', ', $articleTitles);
+            return implode(', ', $article_titles);
         }
         return '';
     }
-
     /**
      * Returns current view keywords separated by comma
      *
@@ -601,35 +518,29 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return string
      */
-    protected function prepareMetaKeyword($keywords, $removeDuplicatedWords = true)
+    protected function prepare_meta_keyword($keywords, $remove_duplicated_words = true)
     {
         $keywords = '';
-        if (($activeCategory = $this->getActiveCategory())) {
-            $keywordsList = [];
-
-            if ($categoryTree = $this->getCategoryTree()) {
-                foreach ($categoryTree->getPath() as $category) {
-                    $keywordsList[] = trim((string) $category->oxcategories__oxtitle->value);
+        if ($active_category = $this->get_active_category()) {
+            $keywords_list = [];
+            if ($category_tree = $this->get_category_tree()) {
+                foreach ($category_tree->get_path() as $category) {
+                    $keywords_list[] = trim((string) $category->oxcategories__oxtitle->value);
                 }
             }
-
-            $subCategories = $activeCategory->getSubCats();
-            if (is_array($subCategories)) {
-                foreach ($subCategories as $subCategory) {
-                    $keywordsList[] = $subCategory->oxcategories__oxtitle->value;
+            $sub_categories = $active_category->get_sub_cats();
+            if (is_array($sub_categories)) {
+                foreach ($sub_categories as $sub_category) {
+                    $keywords_list[] = $sub_category->oxcategories__oxtitle->value;
                 }
             }
-
-            if (count($keywordsList) > 0) {
-                $keywords = implode(', ', $keywordsList);
+            if (count($keywords_list) > 0) {
+                $keywords = implode(', ', $keywords_list);
             }
         }
-
-        $keywords = parent::prepareMetaDescription($keywords, -1, $removeDuplicatedWords);
-
+        $keywords = parent::prepare_meta_description($keywords, -1, $remove_duplicated_words);
         return trim($keywords);
     }
-
     /**
      * Creates a string of keyword filtered by the function prepareMetaDescription and without any duplicates
      * additional the admin defined strings are removed
@@ -638,29 +549,20 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return string
      */
-    protected function collectMetaKeyword($keywords)
+    protected function collect_meta_keyword($keywords)
     {
-        $maxTextLength = 60;
+        $max_text_length = 60;
         $text = '';
-
-        if (count($articleList = $this->getArticleList())) {
-            $stringModifier = Str::getStr();
-            foreach ($articleList as $article) {
+        if (count($article_list = $this->get_article_list())) {
+            $string_modifier = Str::get_str();
+            foreach ($article_list as $article) {
                 /** @var \OxidEsales\Eshop\Application\Model\Article $article */
-                $description = $stringModifier->strip_tags(
-                    trim((string) $stringModifier->strtolower($article->getLongDescription()->value))
-                );
-
+                $description = $string_modifier->strip_tags(trim((string) $string_modifier->strtolower($article->get_long_description()->value)));
                 //removing dots from string (they are not cleaned up during general string cleanup)
-                $description = $stringModifier->preg_replace("/\./", ' ', $description);
-
-                if ($stringModifier->strlen($description) > $maxTextLength) {
-                    $midText = $stringModifier->substr($description, 0, $maxTextLength);
-                    $description = $stringModifier->substr(
-                        $midText,
-                        0,
-                        ($stringModifier->strlen($midText) - $stringModifier->strpos(strrev((string) $midText), ' '))
-                    );
+                $description = $string_modifier->preg_replace("/\\./", ' ', $description);
+                if ($string_modifier->strlen($description) > $max_text_length) {
+                    $mid_text = $string_modifier->substr($description, 0, $max_text_length);
+                    $description = $string_modifier->substr($mid_text, 0, $string_modifier->strlen($mid_text) - $string_modifier->strpos(strrev((string) $mid_text), ' '));
                 }
                 if ($text) {
                     $text .= ', ';
@@ -668,18 +570,14 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
                 $text .= $description;
             }
         }
-
         if (!$keywords) {
-            $keywords = $this->getCatPathString();
+            $keywords = $this->get_cat_path_string();
         }
-
         if ($keywords) {
             $text = "{$keywords}, {$text}";
         }
-
-        return parent::prepareMetaKeyword($text);
+        return parent::prepare_meta_keyword($text);
     }
-
     /**
      * Assigns Template name ($this->_sThisTemplate) for article list
      * preview. Name of template can be defined in admin or passed by
@@ -687,17 +585,15 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return string
      */
-    public function getTemplateName()
+    public function get_template_name()
     {
-        if ($templateName = Registry::getRequest()->getRequestEscapedParameter('tpl')) {
-            $this->_sThisTemplate = 'custom/' . basename((string) $templateName);
-        } elseif (($category = $this->getActiveCategory()) && $category->getFieldData('oxtemplate')) {
-            $this->_sThisTemplate = $category->oxcategories__oxtemplate->value;
+        if ($template_name = Registry::get_request()->get_request_escaped_parameter('tpl')) {
+            $this->_s_this_template = 'custom/' . basename((string) $template_name);
+        } elseif (($category = $this->get_active_category()) && $category->get_field_data('oxtemplate')) {
+            $this->_s_this_template = $category->oxcategories__oxtemplate->value;
         }
-
-        return $this->_sThisTemplate;
+        return $this->_s_this_template;
     }
-
     /**
      * Adds page number parameter to current Url and returns formatted url
      *
@@ -707,91 +603,81 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return string
      */
-    protected function addPageNrParam($url, $currentPage, $languageId = null)
+    protected function add_page_nr_param($url, $current_page, $language_id = null)
     {
-        if (Registry::getUtils()->seoIsActive() && ($category = $this->getActiveCategory())) {
-            if ($currentPage) {
+        if (Registry::get_utils()->seo_is_active() && $category = $this->get_active_category()) {
+            if ($current_page) {
                 // only if page number > 0
-                $url = $category->getBaseSeoLink($languageId, $currentPage);
+                $url = $category->get_base_seo_link($language_id, $current_page);
             }
         } else {
-            $url = parent::addPageNrParam($url, $currentPage, $languageId);
+            $url = parent::add_page_nr_param($url, $current_page, $language_id);
         }
-
         return $url;
     }
-
     /**
      * Returns true if we have category
      *
      * @return bool
      */
-    protected function isActCategory()
+    protected function is_act_category()
     {
-        return $this->_blIsCat;
+        return $this->_bl_is_cat;
     }
-
     /**
      * Generates Url for page navigation
      *
      * @return string
      */
-    public function generatePageNavigationUrl()
+    public function generate_page_navigation_url()
     {
-        if ((Registry::getUtils()->seoIsActive() && ($category = $this->getActiveCategory()))) {
-            return $category->getLink();
+        if (Registry::get_utils()->seo_is_active() && $category = $this->get_active_category()) {
+            return $category->get_link();
         }
-
-        return parent::generatePageNavigationUrl();
+        return parent::generate_page_navigation_url();
     }
-
     /**
      * Returns default category sorting for selected category
      *
      * @return array
      */
-    public function getDefaultSorting()
+    public function get_default_sorting()
     {
-        $sorting = parent::getDefaultSorting();
-
-        $category = $this->getActiveCategory();
+        $sorting = parent::get_default_sorting();
+        $category = $this->get_active_category();
         if ($category && $category instanceof Category) {
-            if ($defaultSorting = $category->getDefaultSorting()) {
-                $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-                $articleViewName = $tableViewNameGenerator->getViewName('oxarticles');
-                $sortBy = $articleViewName . '.' . $defaultSorting;
-                $sortDirection = ($category->getDefaultSortingMode()) ? 'desc' : 'asc';
-                $sorting = ['sortby' => $sortBy, 'sortdir' => $sortDirection];
+            if ($default_sorting = $category->get_default_sorting()) {
+                $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+                $article_view_name = $table_view_name_generator->get_view_name('oxarticles');
+                $sort_by = $article_view_name . '.' . $default_sorting;
+                $sort_direction = $category->get_default_sorting_mode() ? 'desc' : 'asc';
+                $sorting = ['sortby' => $sort_by, 'sortdir' => $sort_direction];
             }
         }
-
         return $sorting;
     }
-
     /**
      * Returns title suffix used in template
      *
      * @return string
      */
-    public function getTitleSuffix()
+    public function get_title_suffix()
     {
-        if ($this->getActiveCategory()->oxcategories__oxshowsuffix->value) {
-            return \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
+        if ($this->get_active_category()->oxcategories__oxshowsuffix->value) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_shop()->oxshops__oxtitlesuffix->value;
         }
     }
-
     /**
      * Returns title page suffix used in template
      *
      * @return string
      */
-    public function getTitlePageSuffix()
+    public function get_title_page_suffix()
     {
-        if (($activePage = $this->getActPage())) {
-            return Registry::getLang()->translateString('PAGE') . ' ' . ($activePage + 1);
+        if ($active_page = $this->get_act_page()) {
+            return Registry::get_lang()->translate_string('PAGE') . ' ' . ($active_page + 1);
         }
     }
-
     /**
      * Returns object, associated with current view.
      * (the object that is shown in frontend)
@@ -800,60 +686,53 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return object
      */
-    protected function getSubject($languageId)
+    protected function get_subject($language_id)
     {
-        return $this->getActiveCategory();
+        return $this->get_active_category();
     }
-
     /**
      * Template variable getter. Returns array of attribute values
      * we do have here in this category
      *
      * @return array
      */
-    public function getAttributes()
+    public function get_attributes()
     {
-        $this->_aAttributes = false;
-
-        if (($category = $this->getActiveCategory())) {
-            $attributes = $category->getAttributes();
+        $this->_a_attributes = false;
+        if ($category = $this->get_active_category()) {
+            $attributes = $category->get_attributes();
             if (count($attributes)) {
-                $this->_aAttributes = $attributes;
+                $this->_a_attributes = $attributes;
             }
         }
-
-        return $this->_aAttributes;
+        return $this->_a_attributes;
     }
-
     /**
      * Template variable getter. Returns category's article list
      *
      * @return \OxidEsales\Eshop\Application\Model\ArticleList|null
      */
-    public function getArticleList()
+    public function get_article_list()
     {
-        if ($this->_aArticleList === null) {
-            if ($category = $this->getActiveCategory()) {
-                $articleList = $this->loadArticles($category);
-                if (count($articleList)) {
-                    $this->_aArticleList = $articleList;
+        if ($this->_a_article_list === null) {
+            if ($category = $this->get_active_category()) {
+                $article_list = $this->load_articles($category);
+                if (count($article_list)) {
+                    $this->_a_article_list = $article_list;
                 }
             }
         }
-
-        return $this->_aArticleList;
+        return $this->_a_article_list;
     }
-
     /**
      * Article count getter
      *
      * @return int
      */
-    public function getArticleCount()
+    public function get_article_count()
     {
-        return $this->_iAllArtCnt;
+        return $this->_i_all_art_cnt;
     }
-
     /**
      * Return array of id to form recommend list.
      *
@@ -861,239 +740,201 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @return array
      */
-    public function getSimilarRecommListIds()
+    public function get_similar_recomm_list_ids()
     {
-        if ($this->_aSimilarRecommListIds === null) {
-            $this->_aSimilarRecommListIds = false;
-
-            if ($categoryArticlesList = $this->getArticleList()) {
-                $this->_aSimilarRecommListIds = $categoryArticlesList->arrayKeys();
+        if ($this->_a_similar_recomm_list_ids === null) {
+            $this->_a_similar_recomm_list_ids = false;
+            if ($category_articles_list = $this->get_article_list()) {
+                $this->_a_similar_recomm_list_ids = $category_articles_list->array_keys();
             }
         }
-
-        return $this->_aSimilarRecommListIds;
+        return $this->_a_similar_recomm_list_ids;
     }
-
     /**
      * Template variable getter. Returns category path
      *
      * @return array
      */
-    public function getCatTreePath()
+    public function get_cat_tree_path()
     {
-        if ($this->_sCatTreePath === null) {
-            $this->_sCatTreePath = false;
+        if ($this->_s_cat_tree_path === null) {
+            $this->_s_cat_tree_path = false;
             // category path
-            if ($categoryTree = $this->getCategoryTree()) {
-                $this->_sCatTreePath = $categoryTree->getPath();
+            if ($category_tree = $this->get_category_tree()) {
+                $this->_s_cat_tree_path = $category_tree->get_path();
             }
         }
-
-        return $this->_sCatTreePath;
+        return $this->_s_cat_tree_path;
     }
-
     /**
      * Template variable getter. Returns category path array
      *
      * @return array
      */
-    public function getTreePath()
+    public function get_tree_path()
     {
-        if ($categoryTree = $this->getCategoryTree()) {
-            return $categoryTree->getPath();
+        if ($category_tree = $this->get_category_tree()) {
+            return $category_tree->get_path();
         }
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
         $paths = [];
-
         // @deprecated oxmore feature will be removed in v8.0
-        if ('oxmore' == Registry::getRequest()->getRequestEscapedParameter('cnid')) {
+        if ('oxmore' == Registry::get_request()->get_request_escaped_parameter('cnid')) {
             $path = [];
-            $path['title'] = Registry::getLang()->translateString(
-                'CATEGORY_OVERVIEW',
-                Registry::getLang()->getBaseLanguage(),
-                false
-            );
-            $path['link'] = $this->getLink();
-
+            $path['title'] = Registry::get_lang()->translate_string('CATEGORY_OVERVIEW', Registry::get_lang()->get_base_language(), false);
+            $path['link'] = $this->get_link();
             $paths[] = $path;
-
             return $paths;
         }
         // END deprecated
-
-        if (($categoryTree = $this->getCategoryTree()) && ($categoryPaths = $categoryTree->getPath())) {
-            foreach ($categoryPaths as $category) {
+        if (($category_tree = $this->get_category_tree()) && $category_paths = $category_tree->get_path()) {
+            foreach ($category_paths as $category) {
                 /** @var Category $category */
-                $categoryPath = [];
-
-                $categoryPath['link'] = $category->getLink();
-                $categoryPath['title'] = $category->oxcategories__oxtitle->value;
-
-                $paths[] = $categoryPath;
+                $category_path = [];
+                $category_path['link'] = $category->get_link();
+                $category_path['title'] = $category->oxcategories__oxtitle->value;
+                $paths[] = $category_path;
             }
         }
-
         return $paths;
     }
-
     /**
      * Template variable getter. Returns true if category has active
      * subcategories.
      *
      * @return bool
      */
-    public function hasVisibleSubCats()
+    public function has_visible_sub_cats()
     {
-        if ($this->_blHasVisibleSubCats === null) {
-            $this->_blHasVisibleSubCats = false;
-            if ($activeCategory = $this->getActiveCategory()) {
-                $this->_blHasVisibleSubCats = $activeCategory->getHasVisibleSubCats();
+        if ($this->_bl_has_visible_sub_cats === null) {
+            $this->_bl_has_visible_sub_cats = false;
+            if ($active_category = $this->get_active_category()) {
+                $this->_bl_has_visible_sub_cats = $active_category->get_has_visible_sub_cats();
             }
         }
-
-        return $this->_blHasVisibleSubCats;
+        return $this->_bl_has_visible_sub_cats;
     }
-
     /**
      * Template variable getter. Returns list of subcategories.
      *
      * @return array
      */
-    public function getSubCatList()
+    public function get_sub_cat_list()
     {
-        if ($this->_aSubCatList === null) {
-            $this->_aSubCatList = [];
-            if ($activeCategory = $this->getActiveCategory()) {
-                $this->_aSubCatList = $activeCategory->getSubCats();
+        if ($this->_a_sub_cat_list === null) {
+            $this->_a_sub_cat_list = [];
+            if ($active_category = $this->get_active_category()) {
+                $this->_a_sub_cat_list = $active_category->get_sub_cats();
             }
         }
-
-        return $this->_aSubCatList;
+        return $this->_a_sub_cat_list;
     }
-
     /**
      * Template variable getter. Returns page navigation
      *
      * @return object
      */
-    public function getPageNavigation()
+    public function get_page_navigation()
     {
-        if ($this->_oPageNavigation === null) {
-            $this->_oPageNavigation = $this->generatePageNavigation();
+        if ($this->_o_page_navigation === null) {
+            $this->_o_page_navigation = $this->generate_page_navigation();
         }
-
-        return $this->_oPageNavigation;
+        return $this->_o_page_navigation;
     }
-
     /**
      * Template variable getter. Returns category title.
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        if ($this->_sCatTitle === null) {
-            $this->_sCatTitle = false;
+        if ($this->_s_cat_title === null) {
+            $this->_s_cat_title = false;
             // @deprecated oxmore feature will be removed in v8.0
-            if ($this->getCategoryId() == 'oxmore') {
-                $language = Registry::getLang();
-                $baseLanguageId = $language->getBaseLanguage();
-
-                $this->_sCatTitle = $language->translateString('CATEGORY_OVERVIEW', $baseLanguageId, false);
+            if ($this->get_category_id() == 'oxmore') {
+                $language = Registry::get_lang();
+                $base_language_id = $language->get_base_language();
+                $this->_s_cat_title = $language->translate_string('CATEGORY_OVERVIEW', $base_language_id, false);
                 // END deprecated
-            } elseif (($category = $this->getActiveCategory())) {
-                $this->_sCatTitle = $category->oxcategories__oxtitle->value;
+            } elseif ($category = $this->get_active_category()) {
+                $this->_s_cat_title = $category->oxcategories__oxtitle->value;
             }
         }
-
-        return $this->_sCatTitle;
+        return $this->_s_cat_title;
     }
-
     /**
      * Template variable getter. Returns bargain article list
      *
      * @return array
      */
-    public function getBargainArticleList()
+    public function get_bargain_article_list()
     {
-        if ($this->_aBargainArticleList === null) {
-            $this->_aBargainArticleList = [];
-            if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfLoadAktion') && $this->isActCategory()) {
-                $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-                $articleList->loadActionArticles('OXBARGAIN');
-                if ($articleList->count()) {
-                    $this->_aBargainArticleList = $articleList;
+        if ($this->_a_bargain_article_list === null) {
+            $this->_a_bargain_article_list = [];
+            if (\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('bl_perfLoadAktion') && $this->is_act_category()) {
+                $article_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+                $article_list->load_action_articles('OXBARGAIN');
+                if ($article_list->count()) {
+                    $this->_a_bargain_article_list = $article_list;
                 }
             }
         }
-
-        return $this->_aBargainArticleList;
+        return $this->_a_bargain_article_list;
     }
-
     /**
      * Template variable getter. Returns active search
      *
      * @return Category
      */
-    public function getActiveCategory()
+    public function get_active_category()
     {
-        if ($this->_oActCategory === null) {
-            $this->_oActCategory = false;
-            $category = oxNew(Category::class);
-            if ($category->load($this->getCategoryId())) {
-                $this->_oActCategory = $category;
+        if ($this->_o_act_category === null) {
+            $this->_o_act_category = false;
+            $category = ox_new(Category::class);
+            if ($category->load($this->get_category_id())) {
+                $this->_o_act_category = $category;
             }
         }
-
-        return $this->_oActCategory;
+        return $this->_o_act_category;
     }
-
     /**
      * Returns view canonical url
      *
      * @return string
      */
-    public function getCanonicalUrl()
+    public function get_canonical_url()
     {
-        if (($category = $this->getActiveCategory())) {
-            $utilsUrl = Registry::getUtilsUrl();
-            if (Registry::getUtils()->seoIsActive()) {
-                return $utilsUrl->prepareCanonicalUrl(
-                    $category->getBaseSeoLink($category->getLanguage(), $this->getActPage())
-                );
+        if ($category = $this->get_active_category()) {
+            $utils_url = Registry::get_utils_url();
+            if (Registry::get_utils()->seo_is_active()) {
+                return $utils_url->prepare_canonical_url($category->get_base_seo_link($category->get_language(), $this->get_act_page()));
             }
-
-            return $utilsUrl->prepareCanonicalUrl(
-                $category->getBaseStdLink($category->getLanguage(), $this->getActPage())
-            );
+            return $utils_url->prepare_canonical_url($category->get_base_std_link($category->get_language(), $this->get_act_page()));
         }
     }
-
     /**
      * Returns config parameters blShowListDisplayType value
      *
      * @return boolean
      */
-    public function canSelectDisplayType()
+    public function can_select_display_type()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowListDisplayType');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blShowListDisplayType');
     }
-
     /**
      * Get list articles pages count
      *
      * @return int
      */
-    public function getPageCount()
+    public function get_page_count()
     {
-        return $this->_iCntPages;
+        return $this->_i_cnt_pages;
     }
 }

@@ -1,38 +1,33 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
 /**
  * Seo encoder for articles
  */
-class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
+class Seo_Encoder_Article extends \Oxid_Esales\Eshop\Core\Seo_Encoder
 {
     /**
      * Product parent title cache
      *
      * @var array
      */
-    protected static $_aTitleCache = [];
-
+    protected static $_a_title_cache = [];
     /**
      * Returns target "extension" (.html)
      *
      * @return string
      */
-    protected function getUrlExtension()
+    protected function get_url_extension()
     {
         return '.html';
     }
-
     /**
      * Checks if current article is in same language as preferred (language id passed by param).
      * In case languages are not the same - reloads article object in different language
@@ -42,18 +37,16 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    protected function getProductForLang($oArticle, $iLang)
+    protected function get_product_for_lang($o_article, $i_lang)
     {
-        if (isset($iLang) && $iLang != $oArticle->getLanguage()) {
-            $sId = $oArticle->getId();
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oArticle->setSkipAssign(true);
-            $oArticle->loadInLang($iLang, $sId);
+        if (isset($i_lang) && $i_lang != $o_article->get_language()) {
+            $s_id = $o_article->get_id();
+            $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            $o_article->set_skip_assign(true);
+            $o_article->load_in_lang($i_lang, $s_id);
         }
-
-        return $oArticle;
+        return $o_article;
     }
-
     /**
      * Returns SEO uri for passed article and active tag
      *
@@ -64,41 +57,24 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getArticleRecommUri($oArticle, $iLang)
+    public function get_article_recomm_uri($o_article, $i_lang)
     {
-        $sSeoUri = null;
-        if ($oRecomm = $this->_getRecomm($oArticle, $iLang)) {
+        $s_seo_uri = null;
+        if ($o_recomm = $this->_get_recomm($o_article, $i_lang)) {
             //load details link from DB
-            if (!($sSeoUri = $this->loadFromDb('oxarticle', $oArticle->getId(), $iLang, null, $oRecomm->getId(), true))) {
-                $oArticle = $this->getProductForLang($oArticle, $iLang);
-
+            if (!$s_seo_uri = $this->load_from_db('oxarticle', $o_article->get_id(), $i_lang, null, $o_recomm->get_id(), true)) {
+                $o_article = $this->get_product_for_lang($o_article, $i_lang);
                 // create title part for uri
-                $sTitle = $this->prepareArticleTitle($oArticle);
-
+                $s_title = $this->prepare_article_title($o_article);
                 // create uri for all categories
-                $sSeoUri = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class)->getRecommUri($oRecomm, $iLang);
-                $sSeoUri = $this->processSeoUrl($sSeoUri . $sTitle, $oArticle->getId(), $iLang);
-
-                $aStdParams = ['recommid' => $oRecomm->getId(), 'listtype' => $this->getListType()];
-                $this->saveToDb(
-                    'oxarticle',
-                    $oArticle->getId(),
-                    \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->appendUrl(
-                        $oArticle->getBaseStdLink($iLang),
-                        $aStdParams
-                    ),
-                    $sSeoUri,
-                    $iLang,
-                    null,
-                    0,
-                    $oRecomm->getId()
-                );
+                $s_seo_uri = \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Recomm::class)->get_recomm_uri($o_recomm, $i_lang);
+                $s_seo_uri = $this->process_seo_url($s_seo_uri . $s_title, $o_article->get_id(), $i_lang);
+                $a_std_params = ['recommid' => $o_recomm->get_id(), 'listtype' => $this->get_list_type()];
+                $this->save_to_db('oxarticle', $o_article->get_id(), \Oxid_Esales\Eshop\Core\Registry::get_utils_url()->append_url($o_article->get_base_std_link($i_lang), $a_std_params), $s_seo_uri, $i_lang, null, 0, $o_recomm->get_id());
             }
         }
-
-        return $sSeoUri;
+        return $s_seo_uri;
     }
-
     /**
      * Returns active recommendation list object if available
      *
@@ -109,27 +85,24 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return \OxidEsales\Eshop\Application\Model\RecommendationList|null
      */
-    protected function _getRecomm($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _get_recomm($o_article, $i_lang)
     {
-        $oList = null;
-        $oView = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView();
-        if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController) {
-            return $oView->getActiveRecommList();
+        $o_list = null;
+        $o_view = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_view();
+        if ($o_view instanceof \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller) {
+            return $o_view->get_active_recomm_list();
         }
-
-        return $oList;
+        return $o_list;
     }
-
     /**
      * Returns active list type
      *
      * @return string
      */
-    protected function getListType()
+    protected function get_list_type()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView()->getListType();
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_view()->get_list_type();
     }
-
     /**
      * create article uri for given category and save it
      *
@@ -139,40 +112,19 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    protected function createArticleCategoryUri($oArticle, $oCategory, $iLang)
+    protected function create_article_category_uri($o_article, $o_category, $i_lang)
     {
-        startProfile(__FUNCTION__);
-        $oArticle = $this->getProductForLang($oArticle, $iLang);
-
+        start_profile(__FUNCTION__);
+        $o_article = $this->get_product_for_lang($o_article, $i_lang);
         // create title part for uri
-        $sTitle = $this->prepareArticleTitle($oArticle);
-
+        $s_title = $this->prepare_article_title($o_article);
         // writing category path
-        $sSeoUri = $this->processSeoUrl(
-            \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class)->getCategoryUri($oCategory, $iLang) . $sTitle,
-            $oArticle->getId(),
-            $iLang
-        );
-        $sCatId = $oCategory->getId();
-        $this->saveToDb(
-            'oxarticle',
-            $oArticle->getId(),
-            \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->appendUrl(
-                $oArticle->getBaseStdLink($iLang),
-                ['cnid' => $sCatId]
-            ),
-            $sSeoUri,
-            $iLang,
-            null,
-            0,
-            $sCatId
-        );
-
-        stopProfile(__FUNCTION__);
-
-        return $sSeoUri;
+        $s_seo_uri = $this->process_seo_url(\Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Category::class)->get_category_uri($o_category, $i_lang) . $s_title, $o_article->get_id(), $i_lang);
+        $s_cat_id = $o_category->get_id();
+        $this->save_to_db('oxarticle', $o_article->get_id(), \Oxid_Esales\Eshop\Core\Registry::get_utils_url()->append_url($o_article->get_base_std_link($i_lang), ['cnid' => $s_cat_id]), $s_seo_uri, $i_lang, null, 0, $s_cat_id);
+        stop_profile(__FUNCTION__);
+        return $s_seo_uri;
     }
-
     /**
      * Returns SEO uri for passed article
      *
@@ -182,38 +134,28 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getArticleUri($oArticle, $iLang, $blRegenerate = false)
+    public function get_article_uri($o_article, $i_lang, $bl_regenerate = false)
     {
-        startProfile(__FUNCTION__);
-
-        $sActCatId = '';
-
-        $oActCat = $this->getCategory($oArticle, $iLang);
-
-        if ($oActCat instanceof \OxidEsales\Eshop\Application\Model\Category) {
-            $sActCatId = $oActCat->getId();
-        } elseif ($oActCat = $this->getMainCategory($oArticle)) {
-            $sActCatId = $oActCat->getId();
+        start_profile(__FUNCTION__);
+        $s_act_cat_id = '';
+        $o_act_cat = $this->get_category($o_article, $i_lang);
+        if ($o_act_cat instanceof \Oxid_Esales\Eshop\Application\Model\Category) {
+            $s_act_cat_id = $o_act_cat->get_id();
+        } elseif ($o_act_cat = $this->get_main_category($o_article)) {
+            $s_act_cat_id = $o_act_cat->get_id();
         }
-
         //load details link from DB
-        if ($blRegenerate || !($sSeoUri = $this->loadFromDb('oxarticle', $oArticle->getId(), $iLang, null, $sActCatId, true))) {
-            if ($oActCat) {
-                $blInCat = $oActCat->isPriceCategory()
-                    ? $oArticle->inPriceCategory($sActCatId)
-                    : $oArticle->inCategory($sActCatId);
-
-                if ($blInCat) {
-                    $sSeoUri = $this->createArticleCategoryUri($oArticle, $oActCat, $iLang);
+        if ($bl_regenerate || !$s_seo_uri = $this->load_from_db('oxarticle', $o_article->get_id(), $i_lang, null, $s_act_cat_id, true)) {
+            if ($o_act_cat) {
+                $bl_in_cat = $o_act_cat->is_price_category() ? $o_article->in_price_category($s_act_cat_id) : $o_article->in_category($s_act_cat_id);
+                if ($bl_in_cat) {
+                    $s_seo_uri = $this->create_article_category_uri($o_article, $o_act_cat, $i_lang);
                 }
             }
         }
-
-        stopProfile(__FUNCTION__);
-
-        return $sSeoUri;
+        stop_profile(__FUNCTION__);
+        return $s_seo_uri;
     }
-
     /**
      * Returns active category if available
      *
@@ -222,19 +164,17 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return \OxidEsales\Eshop\Application\Model\Category|null
      */
-    protected function getCategory($oArticle, $iLang)
+    protected function get_category($o_article, $i_lang)
     {
-        $oCat = null;
-        $oView = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView();
-        if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController) {
-            $oCat = $oView->getActiveCategory();
-        } elseif ($oView instanceof \OxidEsales\Eshop\Core\Controller\BaseController) {
-            $oCat = $oView->getActCategory();
+        $o_cat = null;
+        $o_view = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_view();
+        if ($o_view instanceof \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller) {
+            $o_cat = $o_view->get_active_category();
+        } elseif ($o_view instanceof \Oxid_Esales\Eshop\Core\Controller\Base_Controller) {
+            $o_cat = $o_view->get_act_category();
         }
-
-        return $oCat;
+        return $o_cat;
     }
-
     /**
      * Returns products main category id
      *
@@ -242,42 +182,33 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    protected function getMainCategory($oArticle)
+    protected function get_main_category($o_article)
     {
-        $oMainCat = null;
-
+        $o_main_cat = null;
         // if variant parent id must be used
-        $sArtId = $oArticle->getId();
-        if (isset($oArticle->oxarticles__oxparentid->value) && $oArticle->oxarticles__oxparentid->value) {
-            $sArtId = $oArticle->oxarticles__oxparentid->value;
+        $s_art_id = $o_article->get_id();
+        if (isset($o_article->oxarticles__oxparentid->value) && $o_article->oxarticles__oxparentid->value) {
+            $s_art_id = $o_article->oxarticles__oxparentid->value;
         }
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $categoryViewName = $tableViewNameGenerator->getViewName('oxobject2category');
-
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $category_view_name = $table_view_name_generator->get_view_name('oxobject2category');
         // add main category caching;
-        $sQ = 'select oxcatnid from ' . $categoryViewName . ' where oxobjectid = :oxobjectid order by oxtime';
-        $sIdent = md5($categoryViewName . $sArtId);
-
-        if (($sMainCatId = $this->loadFromCache($sIdent, 'oxarticle')) === false) {
-            $sMainCatId = $oDb->getOne($sQ, [
-                'oxobjectid' => $sArtId,
-            ]);
+        $s_q = 'select oxcatnid from ' . $category_view_name . ' where oxobjectid = :oxobjectid order by oxtime';
+        $s_ident = md5($category_view_name . $s_art_id);
+        if (($s_main_cat_id = $this->load_from_cache($s_ident, 'oxarticle')) === false) {
+            $s_main_cat_id = $o_db->get_one($s_q, ['oxobjectid' => $s_art_id]);
             // storing in cache
-            $this->saveInCache($sIdent, $sMainCatId, 'oxarticle');
+            $this->save_in_cache($s_ident, $s_main_cat_id, 'oxarticle');
         }
-
-        if ($sMainCatId) {
-            $oMainCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-            if (!$oMainCat->load($sMainCatId)) {
-                $oMainCat = null;
+        if ($s_main_cat_id) {
+            $o_main_cat = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+            if (!$o_main_cat->load($s_main_cat_id)) {
+                $o_main_cat = null;
             }
         }
-
-        return $oMainCat;
+        return $o_main_cat;
     }
-
     /**
      * Returns SEO uri for passed article
      *
@@ -286,42 +217,27 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getArticleMainUri($oArticle, $iLang)
+    public function get_article_main_uri($o_article, $i_lang)
     {
-        startProfile(__FUNCTION__);
-
-        $oMainCat = $this->getMainCategory($oArticle);
-        $sMainCatId = $oMainCat ? $oMainCat->getId() : '';
-
+        start_profile(__FUNCTION__);
+        $o_main_cat = $this->get_main_category($o_article);
+        $s_main_cat_id = $o_main_cat ? $o_main_cat->get_id() : '';
         //load default article url from DB
-        if (!($sSeoUri = $this->loadFromDb('oxarticle', $oArticle->getId(), $iLang, null, $sMainCatId, true))) {
+        if (!$s_seo_uri = $this->load_from_db('oxarticle', $o_article->get_id(), $i_lang, null, $s_main_cat_id, true)) {
             // save for main category
-            if ($oMainCat) {
-                $sSeoUri = $this->createArticleCategoryUri($oArticle, $oMainCat, $iLang);
+            if ($o_main_cat) {
+                $s_seo_uri = $this->create_article_category_uri($o_article, $o_main_cat, $i_lang);
             } else {
                 // get default article url
-                $oArticle = $this->getProductForLang($oArticle, $iLang);
-                $sSeoUri = $this->processSeoUrl($this->prepareArticleTitle($oArticle), $oArticle->getId(), $iLang);
-
+                $o_article = $this->get_product_for_lang($o_article, $i_lang);
+                $s_seo_uri = $this->process_seo_url($this->prepare_article_title($o_article), $o_article->get_id(), $i_lang);
                 // save default article url
-                $this->saveToDb(
-                    'oxarticle',
-                    $oArticle->getId(),
-                    $oArticle->getBaseStdLink($iLang),
-                    $sSeoUri,
-                    $iLang,
-                    null,
-                    0,
-                    ''
-                );
+                $this->save_to_db('oxarticle', $o_article->get_id(), $o_article->get_base_std_link($i_lang), $s_seo_uri, $i_lang, null, 0, '');
             }
         }
-
-        stopProfile(__FUNCTION__);
-
-        return $sSeoUri;
+        stop_profile(__FUNCTION__);
+        return $s_seo_uri;
     }
-
     /**
      * Returns seo title for current article (if oxTitle field is empty, oxArtnum is used).
      * Additionally - if oxVarSelect is set - title is appended with its value
@@ -330,35 +246,30 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    protected function prepareArticleTitle($oArticle)
+    protected function prepare_article_title($o_article)
     {
         // create title part for uri
-        if (!($sTitle = $oArticle->oxarticles__oxtitle->value)) {
+        if (!$s_title = $o_article->oxarticles__oxtitle->value) {
             // taking parent article title
-            if (($sParentId = $oArticle->oxarticles__oxparentid->value)) {
+            if ($s_parent_id = $o_article->oxarticles__oxparentid->value) {
                 // looking in cache ..
-                if (!isset(self::$_aTitleCache[$sParentId])) {
-                    $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-                    $sQ = 'select oxtitle from ' . $oArticle->getViewName() . ' where oxid = :oxid';
-                    self::$_aTitleCache[$sParentId] = $oDb->getOne($sQ, [
-                        'oxid' => $sParentId,
-                    ]);
+                if (!isset(self::$_a_title_cache[$s_parent_id])) {
+                    $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+                    $s_q = 'select oxtitle from ' . $o_article->get_view_name() . ' where oxid = :oxid';
+                    self::$_a_title_cache[$s_parent_id] = $o_db->get_one($s_q, ['oxid' => $s_parent_id]);
                 }
-                $sTitle = self::$_aTitleCache[$sParentId];
+                $s_title = self::$_a_title_cache[$s_parent_id];
             }
         }
-
         // variant has varselect value
-        if ($oArticle->oxarticles__oxvarselect->value) {
-            $sTitle .= ($sTitle ? ' ' : '') . $oArticle->oxarticles__oxvarselect->value . ' ';
-        } elseif (!$sTitle || ($oArticle->oxarticles__oxparentid->value)) {
+        if ($o_article->oxarticles__oxvarselect->value) {
+            $s_title .= ($s_title ? ' ' : '') . $o_article->oxarticles__oxvarselect->value . ' ';
+        } elseif (!$s_title || $o_article->oxarticles__oxparentid->value) {
             // in case nothing was found - looking for number
-            $sTitle .= ($sTitle ? ' ' : '') . $oArticle->oxarticles__oxartnum->value;
+            $s_title .= ($s_title ? ' ' : '') . $o_article->oxarticles__oxartnum->value;
         }
-
-        return $this->prepareTitle($sTitle, false, $oArticle->getLanguage()) . $this->getUrlExtension();
+        return $this->prepare_title($s_title, false, $o_article->get_language()) . $this->get_url_extension();
     }
-
     /**
      * Returns vendor seo uri for current article
      *
@@ -368,45 +279,26 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getArticleVendorUri($oArticle, $iLang, $blRegenerate = false)
+    public function get_article_vendor_uri($o_article, $i_lang, $bl_regenerate = false)
     {
-        startProfile(__FUNCTION__);
-
-        $sSeoUri = null;
-        if ($oVendor = $this->getVendor($oArticle, $iLang)) {
+        start_profile(__FUNCTION__);
+        $s_seo_uri = null;
+        if ($o_vendor = $this->get_vendor($o_article, $i_lang)) {
             //load details link from DB
-            if ($blRegenerate || !($sSeoUri = $this->loadFromDb('oxarticle', $oArticle->getId(), $iLang, null, $oVendor->getId(), true))) {
-                $oArticle = $this->getProductForLang($oArticle, $iLang);
-
+            if ($bl_regenerate || !$s_seo_uri = $this->load_from_db('oxarticle', $o_article->get_id(), $i_lang, null, $o_vendor->get_id(), true)) {
+                $o_article = $this->get_product_for_lang($o_article, $i_lang);
                 // create title part for uri
-                $sTitle = $this->prepareArticleTitle($oArticle);
-
+                $s_title = $this->prepare_article_title($o_article);
                 // create uri for all categories
-                $sSeoUri = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class)->getVendorUri($oVendor, $iLang);
-                $sSeoUri = $this->processSeoUrl($sSeoUri . $sTitle, $oArticle->getId(), $iLang);
-
-                $aStdParams = ['cnid' => 'v_' . $oVendor->getId(), 'listtype' => $this->getListType()];
-                $this->saveToDb(
-                    'oxarticle',
-                    $oArticle->getId(),
-                    \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->appendUrl(
-                        $oArticle->getBaseStdLink($iLang),
-                        $aStdParams
-                    ),
-                    $sSeoUri,
-                    $iLang,
-                    null,
-                    0,
-                    $oVendor->getId()
-                );
+                $s_seo_uri = \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Vendor::class)->get_vendor_uri($o_vendor, $i_lang);
+                $s_seo_uri = $this->process_seo_url($s_seo_uri . $s_title, $o_article->get_id(), $i_lang);
+                $a_std_params = ['cnid' => 'v_' . $o_vendor->get_id(), 'listtype' => $this->get_list_type()];
+                $this->save_to_db('oxarticle', $o_article->get_id(), \Oxid_Esales\Eshop\Core\Registry::get_utils_url()->append_url($o_article->get_base_std_link($i_lang), $a_std_params), $s_seo_uri, $i_lang, null, 0, $o_vendor->get_id());
             }
-
-            stopProfile(__FUNCTION__);
+            stop_profile(__FUNCTION__);
         }
-
-        return $sSeoUri;
+        return $s_seo_uri;
     }
-
     /**
      * Returns active vendor if available
      *
@@ -415,28 +307,25 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return \OxidEsales\Eshop\Application\Model\Vendor|null
      */
-    protected function getVendor($oArticle, $iLang)
+    protected function get_vendor($o_article, $i_lang)
     {
-        $oView = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView();
-
-        $oVendor = null;
-        if ($sActVendorId = $oArticle->oxarticles__oxvendorid->value) {
-            if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController && ($oActVendor = $oView->getActVendor())) {
-                $oVendor = $oActVendor;
+        $o_view = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_view();
+        $o_vendor = null;
+        if ($s_act_vendor_id = $o_article->oxarticles__oxvendorid->value) {
+            if ($o_view instanceof \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller && $o_act_vendor = $o_view->get_act_vendor()) {
+                $o_vendor = $o_act_vendor;
             } else {
-                $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+                $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
             }
-            if ($oVendor->getId() !== $sActVendorId) {
-                $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-                if (!$oVendor->loadInLang($iLang, $sActVendorId)) {
-                    $oVendor = null;
+            if ($o_vendor->get_id() !== $s_act_vendor_id) {
+                $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+                if (!$o_vendor->load_in_lang($i_lang, $s_act_vendor_id)) {
+                    $o_vendor = null;
                 }
             }
         }
-
-        return $oVendor;
+        return $o_vendor;
     }
-
     /**
      * Returns manufacturer seo uri for current article
      *
@@ -446,44 +335,26 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getArticleManufacturerUri($oArticle, $iLang, $blRegenerate = false)
+    public function get_article_manufacturer_uri($o_article, $i_lang, $bl_regenerate = false)
     {
-        $sSeoUri = null;
-        startProfile(__FUNCTION__);
-        if ($oManufacturer = $this->getManufacturer($oArticle, $iLang)) {
+        $s_seo_uri = null;
+        start_profile(__FUNCTION__);
+        if ($o_manufacturer = $this->get_manufacturer($o_article, $i_lang)) {
             //load details link from DB
-            if ($blRegenerate || !($sSeoUri = $this->loadFromDb('oxarticle', $oArticle->getId(), $iLang, null, $oManufacturer->getId(), true))) {
-                $oArticle = $this->getProductForLang($oArticle, $iLang);
-
+            if ($bl_regenerate || !$s_seo_uri = $this->load_from_db('oxarticle', $o_article->get_id(), $i_lang, null, $o_manufacturer->get_id(), true)) {
+                $o_article = $this->get_product_for_lang($o_article, $i_lang);
                 // create title part for uri
-                $sTitle = $this->prepareArticleTitle($oArticle);
-
+                $s_title = $this->prepare_article_title($o_article);
                 // create uri for all categories
-                $sSeoUri = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class)->getManufacturerUri($oManufacturer, $iLang);
-                $sSeoUri = $this->processSeoUrl($sSeoUri . $sTitle, $oArticle->getId(), $iLang);
-
-                $aStdParams = ['mnid' => $oManufacturer->getId(), 'listtype' => $this->getListType()];
-                $this->saveToDb(
-                    'oxarticle',
-                    $oArticle->getId(),
-                    \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->appendUrl(
-                        $oArticle->getBaseStdLink($iLang),
-                        $aStdParams
-                    ),
-                    $sSeoUri,
-                    $iLang,
-                    null,
-                    0,
-                    $oManufacturer->getId()
-                );
+                $s_seo_uri = \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Manufacturer::class)->get_manufacturer_uri($o_manufacturer, $i_lang);
+                $s_seo_uri = $this->process_seo_url($s_seo_uri . $s_title, $o_article->get_id(), $i_lang);
+                $a_std_params = ['mnid' => $o_manufacturer->get_id(), 'listtype' => $this->get_list_type()];
+                $this->save_to_db('oxarticle', $o_article->get_id(), \Oxid_Esales\Eshop\Core\Registry::get_utils_url()->append_url($o_article->get_base_std_link($i_lang), $a_std_params), $s_seo_uri, $i_lang, null, 0, $o_manufacturer->get_id());
             }
-
-            stopProfile(__FUNCTION__);
+            stop_profile(__FUNCTION__);
         }
-
-        return $sSeoUri;
+        return $s_seo_uri;
     }
-
     /**
      * Returns active manufacturer if available
      *
@@ -492,29 +363,25 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return \OxidEsales\Eshop\Application\Model\Manufacturer|null
      */
-    protected function getManufacturer($oArticle, $iLang)
+    protected function get_manufacturer($o_article, $i_lang)
     {
-        $oManufacturer = null;
-        if ($sActManufacturerId = $oArticle->oxarticles__oxmanufacturerid->value) {
-            $oView = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView();
-
-            if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController && ($oActManufacturer = $oView->getActManufacturer())) {
-                $oManufacturer = $oActManufacturer;
+        $o_manufacturer = null;
+        if ($s_act_manufacturer_id = $o_article->oxarticles__oxmanufacturerid->value) {
+            $o_view = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_view();
+            if ($o_view instanceof \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller && $o_act_manufacturer = $o_view->get_act_manufacturer()) {
+                $o_manufacturer = $o_act_manufacturer;
             } else {
-                $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+                $o_manufacturer = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer::class);
             }
-
-            if ($oManufacturer->getId() !== $sActManufacturerId || $oManufacturer->getLanguage() != $iLang) {
-                $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
-                if (!$oManufacturer->loadInLang($iLang, $sActManufacturerId)) {
-                    $oManufacturer = null;
+            if ($o_manufacturer->get_id() !== $s_act_manufacturer_id || $o_manufacturer->get_language() != $i_lang) {
+                $o_manufacturer = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer::class);
+                if (!$o_manufacturer->load_in_lang($i_lang, $s_act_manufacturer_id)) {
+                    $o_manufacturer = null;
                 }
             }
         }
-
-        return $oManufacturer;
+        return $o_manufacturer;
     }
-
     /**
      * return article main url, with path of its default category
      *
@@ -523,15 +390,13 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getArticleMainUrl($oArticle, $iLang = null)
+    public function get_article_main_url($o_article, $i_lang = null)
     {
-        if (!isset($iLang)) {
-            $iLang = $oArticle->getLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = $o_article->get_language();
         }
-
-        return $this->getFullUrl($this->getArticleMainUri($oArticle, $iLang), $iLang);
+        return $this->get_full_url($this->get_article_main_uri($o_article, $i_lang), $i_lang);
     }
-
     /**
      * Encodes article URLs into SEO format
      *
@@ -541,45 +406,35 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getArticleUrl($oArticle, $iLang = null, $iType = 0)
+    public function get_article_url($o_article, $i_lang = null, $i_type = 0)
     {
-        if (!isset($iLang)) {
-            $iLang = $oArticle->getLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = $o_article->get_language();
         }
-        $sUri = match ($iType) {
-            OXARTICLE_LINKTYPE_VENDOR => $this->getArticleVendorUri($oArticle, $iLang),
-            OXARTICLE_LINKTYPE_MANUFACTURER => $this->getArticleManufacturerUri($oArticle, $iLang),
-            OXARTICLE_LINKTYPE_RECOMM => $this->getArticleRecommUri($oArticle, $iLang),
-            default => $this->getArticleUri($oArticle, $iLang),
+        $s_uri = match ($i_type) {
+            OXARTICLE_LINKTYPE_VENDOR => $this->get_article_vendor_uri($o_article, $i_lang),
+            OXARTICLE_LINKTYPE_MANUFACTURER => $this->get_article_manufacturer_uri($o_article, $i_lang),
+            OXARTICLE_LINKTYPE_RECOMM => $this->get_article_recomm_uri($o_article, $i_lang),
+            default => $this->get_article_uri($o_article, $i_lang),
         };
-
         // if was unable to fetch type uri - returning main
-        if (!$sUri) {
-            $sUri = $this->getArticleMainUri($oArticle, $iLang);
+        if (!$s_uri) {
+            $s_uri = $this->get_article_main_uri($o_article, $i_lang);
         }
-
-        return $this->getFullUrl($sUri, $iLang);
+        return $this->get_full_url($s_uri, $i_lang);
     }
-
     /**
      * deletes article seo entries
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article to remove
      */
-    public function onDeleteArticle($oArticle): void
+    public function on_delete_article($o_article): void
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxarticle'", [
-            'oxobjectid' => $oArticle->getId(),
-        ]);
-        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $oArticle->getId(),
-        ]);
-        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $oArticle->getId(),
-        ]);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $o_db->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxarticle'", ['oxobjectid' => $o_article->get_id()]);
+        $o_db->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', ['oxobjectid' => $o_article->get_id()]);
+        $o_db->execute('delete from oxseohistory where oxobjectid = :oxobjectid', ['oxobjectid' => $o_article->get_id()]);
     }
-
     /**
      * Returns alternative uri used while updating seo
      *
@@ -588,20 +443,19 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    protected function getAltUri($sObjectId, $iLang)
+    protected function get_alt_uri($s_object_id, $i_lang)
     {
-        $sSeoUrl = null;
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $oArticle->setSkipAssign(true);
-        if ($oArticle->loadInLang($iLang, $sObjectId)) {
+        $s_seo_url = null;
+        $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+        $o_article->set_skip_assign(true);
+        if ($o_article->load_in_lang($i_lang, $s_object_id)) {
             // choosing URI type to generate
-            return match ($this->getListType()) {
-                'vendor' => $this->getArticleVendorUri($oArticle, $iLang, true),
-                'manufacturer' => $this->getArticleManufacturerUri($oArticle, $iLang, true),
-                default => $this->getArticleUri($oArticle, $iLang, true),
+            return match ($this->get_list_type()) {
+                'vendor' => $this->get_article_vendor_uri($o_article, $i_lang, true),
+                'manufacturer' => $this->get_article_manufacturer_uri($o_article, $i_lang, true),
+                default => $this->get_article_uri($o_article, $i_lang, true),
             };
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
 }

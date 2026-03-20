@@ -4,85 +4,72 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject;
-
-class ProductRating
+class Product_Rating
 {
     /**
      * @var string
      */
-    private $productId;
-
+    private $product_id;
     /**
      * @var float
      */
-    private $ratingAverage;
-
+    private $rating_average;
     /**
      * @var int
      */
-    private $ratingCount;
-
+    private $rating_count;
     /**
      * @return string
      */
-    public function getProductId()
+    public function get_product_id()
     {
-        return $this->productId;
+        return $this->product_id;
     }
-
     /**
      * @param string $productId
      *
      * @return $this
      */
-    public function setProductId($productId): static
+    public function set_product_id($product_id): static
     {
-        $this->productId = $productId;
-
+        $this->product_id = $product_id;
         return $this;
     }
-
     /**
      * @return float
      */
-    public function getRatingAverage()
+    public function get_rating_average()
     {
-        return $this->ratingAverage;
+        return $this->rating_average;
     }
-
     /**
      * @param float $ratingAverage
      *
      * @return $this
      */
-    public function setRatingAverage($ratingAverage): static
+    public function set_rating_average($rating_average): static
     {
-        $this->ratingAverage = $ratingAverage;
-
+        $this->rating_average = $rating_average;
         return $this;
     }
-
     /**
      * @return int
      */
-    public function getRatingCount()
+    public function get_rating_count()
     {
-        return $this->ratingCount;
+        return $this->rating_count;
     }
-
     /**
      * @param int $ratingCount
      *
      * @return $this
      */
-    public function setRatingCount($ratingCount): static
+    public function set_rating_count($rating_count): static
     {
-        $this->ratingCount = $ratingCount;
-
+        $this->rating_count = $rating_count;
         return $this;
     }
 }

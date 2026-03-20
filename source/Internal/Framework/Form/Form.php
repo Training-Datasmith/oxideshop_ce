@@ -4,24 +4,18 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Form;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Form;
-
-class Form implements FormInterface
+class Form implements Form_Interface
 {
     private array $fields = [];
-
     private array $errors = [];
-
     private array $validators = [];
-
-    public function add(FormFieldInterface $field): void
+    public function add(Form_Field_Interface $field): void
     {
-        $this->fields[$field->getName()] = $field;
+        $this->fields[$field->get_name()] = $field;
     }
-
     /**
      * @return FormField
      */
@@ -29,49 +23,38 @@ class Form implements FormInterface
     {
         return $this->fields[$name];
     }
-
-    public function getFields(): array
+    public function get_fields(): array
     {
         return $this->fields;
     }
-
     /**
      * @param array $request
      */
-    public function handleRequest($request): void
+    public function handle_request($request): void
     {
-        foreach ($request as $fieldName => $value) {
-            $this->$fieldName->setValue($value);
+        foreach ($request as $field_name => $value) {
+            $this->{$field_name}->set_value($value);
         }
     }
-
-    public function addValidator(FormValidatorInterface $validator): void
+    public function add_validator(Form_Validator_Interface $validator): void
     {
         $this->validators[] = $validator;
     }
-
     /**
      * @return bool
      */
-    public function isValid()
+    public function is_valid()
     {
-        $isValid = true;
-
+        $is_valid = true;
         foreach ($this->validators as $validator) {
-            if ($validator->isValid($this) !== true) {
-                $isValid = false;
-
-                $this->errors = array_merge(
-                    $this->errors,
-                    $validator->getErrors()
-                );
+            if ($validator->is_valid($this) !== true) {
+                $is_valid = false;
+                $this->errors = array_merge($this->errors, $validator->get_errors());
             }
         }
-
-        return $isValid;
+        return $is_valid;
     }
-
-    public function getErrors(): array
+    public function get_errors(): array
     {
         return $this->errors;
     }

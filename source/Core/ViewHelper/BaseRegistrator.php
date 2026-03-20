@@ -1,27 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core\View_Helper;
 
-namespace OxidEsales\EshopCommunity\Core\ViewHelper;
-
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Core\Registry;
-
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Core\Registry;
 /**
  * Base class for preparing JavaScript and Stylesheets.
  */
-abstract class BaseRegistrator
+abstract class Base_Registrator
 {
     public const TAG_NAME = 'base';
-
     /** @var \OxidEsales\Eshop\Core\Config */
     protected $config;
-
     /**
      * BaseRegistrator constructor.
      *
@@ -29,9 +24,8 @@ abstract class BaseRegistrator
      */
     public function __construct()
     {
-        $this->config = Registry::getConfig();
+        $this->config = Registry::get_config();
     }
-
     /**
      * Separate query part, appends query part if needed, append file modification timestamp.
      *
@@ -39,29 +33,26 @@ abstract class BaseRegistrator
      *
      * @return string
      */
-    protected function formLocalFileUrl($fullUrl)
+    protected function form_local_file_url($full_url)
     {
-        $parts = explode('?', $fullUrl);
+        $parts = explode('?', $full_url);
         $url = $parts[0];
         $parameters = $parts[1] ?? '';
         if (empty($parameters)) {
-            if (preg_match('#^(https?:)?//#', $fullUrl) && Registry::getUtilsUrl()->isCurrentShopHost($url)) {
-                $path = $this->getPathByUrl($url);
+            if (preg_match('#^(https?:)?//#', $full_url) && Registry::get_utils_url()->is_current_shop_host($url)) {
+                $path = $this->get_path_by_url($url);
             } else {
-                $path = $this->config->getResourcePath($url, $this->config->isAdmin());
-                $url = $this->config->getResourceUrl($url, $this->config->isAdmin());
+                $path = $this->config->get_resource_path($url, $this->config->is_admin());
+                $url = $this->config->get_resource_url($url, $this->config->is_admin());
             }
-            $parameters = $this->getFileModificationTime($path);
+            $parameters = $this->get_file_modification_time($path);
         }
-
-        if (empty($url) && ContainerFacade::getParameter('oxid_esales.debug_mode')) {
-            $error = '{' . static::TAG_NAME . '} resource not found: ' . \OxidEsales\Eshop\Core\Str::getStr()->htmlspecialchars($url);
+        if (empty($url) && Container_Facade::get_parameter('oxid_esales.debug_mode')) {
+            $error = '{' . static::TAG_NAME . '} resource not found: ' . \Oxid_Esales\Eshop\Core\Str::get_str()->htmlspecialchars($url);
             trigger_error($error, E_USER_WARNING);
         }
-
         return $url . ($parameters ? '?' . $parameters : '');
     }
-
     /**
      * Returns modification time for given file
      *
@@ -69,15 +60,13 @@ abstract class BaseRegistrator
      *
      * @return string UNIX-timestamp or empty string
      */
-    protected function getFileModificationTime($file)
+    protected function get_file_modification_time($file)
     {
         if (file_exists($file)) {
             return filemtime($file);
         }
-
         return '';
     }
-
     /**
      * get absolute path to file from url
      *
@@ -85,13 +74,9 @@ abstract class BaseRegistrator
      *
      * @return string path to file
      */
-    protected function getPathByUrl($url)
+    protected function get_path_by_url($url)
     {
-        $config = Registry::getConfig();
-        return str_replace(
-            rtrim((string) $config->getCurrentShopUrl(false), '/'),
-            rtrim((string) ContainerFacade::getParameter('oxid_esales.shop_source_directory'), '/'),
-            $url
-        );
+        $config = Registry::get_config();
+        return str_replace(rtrim((string) $config->get_current_shop_url(false), '/'), rtrim((string) Container_Facade::get_parameter('oxid_esales.shop_source_directory'), '/'), $url);
     }
 }

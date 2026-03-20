@@ -1,127 +1,110 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Article images gallery popup window.
  * If chosen article has more pictures there is ability to create
  * gallery of pictures.
  */
-class MoreDetailsController extends \OxidEsales\Eshop\Application\Controller\ArticleDetailsController
+class More_Details_Controller extends \Oxid_Esales\Eshop\Application\Controller\Article_Details_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'moredetails';
-
+    protected $_s_this_template = 'moredetails';
     /**
      * Current article id
      *
      * @var string
      */
-    protected $_sProductId;
-
+    protected $_s_product_id;
     /**
      * Active picture id
      *
      * @var string
      */
-    protected $_sActPicId;
-
+    protected $_s_act_pic_id;
     /**
      * Article zoom pictures
      *
      * @var array
      */
-    protected $_aArtZoomPics;
-
+    protected $_a_art_zoom_pics;
     /**
      * Current view search engine indexing state
      *
      * @var int
      */
-    protected $_iViewIndexState = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
-
+    protected $_i_view_index_state = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
     /**
      * Template variable getter. Returns current product id
      *
      * @return string
      */
-    public function getProductId()
+    public function get_product_id()
     {
-        if ($this->_sProductId === null) {
-            $this->_sProductId = $this->getProduct()->getId();
+        if ($this->_s_product_id === null) {
+            $this->_s_product_id = $this->get_product()->get_id();
         }
-
-        return $this->_sProductId;
+        return $this->_s_product_id;
     }
-
     /**
      * Template variable getter. Returns active picture id
      *
      * @return string
      */
-    public function getActPictureId()
+    public function get_act_picture_id()
     {
-        if ($this->_sActPicId === null) {
-            $this->_sActPicId = false;
-            $aPicGallery = $this->getProduct()->getPictureGallery();
-
-            if ($aPicGallery['ZoomPic']) {
-                $sActPicId = Registry::getRequest()->getRequestEscapedParameter('actpicid');
-                $this->_sActPicId = $sActPicId ?: 1;
+        if ($this->_s_act_pic_id === null) {
+            $this->_s_act_pic_id = false;
+            $a_pic_gallery = $this->get_product()->get_picture_gallery();
+            if ($a_pic_gallery['ZoomPic']) {
+                $s_act_pic_id = Registry::get_request()->get_request_escaped_parameter('actpicid');
+                $this->_s_act_pic_id = $s_act_pic_id ?: 1;
             }
         }
-
-        return $this->_sActPicId;
+        return $this->_s_act_pic_id;
     }
-
     /**
      * Template variable getter. Returns article zoom pictures
      *
      * @return array
      */
-    public function getArtZoomPics()
+    public function get_art_zoom_pics()
     {
-        if ($this->_aArtZoomPics === null) {
-            $this->_aArtZoomPics = false;
+        if ($this->_a_art_zoom_pics === null) {
+            $this->_a_art_zoom_pics = false;
             //Get picture gallery
-            $aPicGallery = $this->getProduct()->getPictureGallery();
-            $blArtPic = $aPicGallery['ZoomPic'];
-            $aArtPics = $aPicGallery['ZoomPics'];
-
-            if ($blArtPic) {
-                $this->_aArtZoomPics = $aArtPics;
+            $a_pic_gallery = $this->get_product()->get_picture_gallery();
+            $bl_art_pic = $a_pic_gallery['ZoomPic'];
+            $a_art_pics = $a_pic_gallery['ZoomPics'];
+            if ($bl_art_pic) {
+                $this->_a_art_zoom_pics = $a_art_pics;
             }
         }
-
-        return $this->_aArtZoomPics;
+        return $this->_a_art_zoom_pics;
     }
-
     /**
      * Template variable getter. Returns active product
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    public function getProduct()
+    public function get_product()
     {
-        if ($this->_oProduct === null) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oArticle->load(Registry::getRequest()->getRequestEscapedParameter('anid'));
-            $this->_oProduct = $oArticle;
+        if ($this->_o_product === null) {
+            $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            $o_article->load(Registry::get_request()->get_request_escaped_parameter('anid'));
+            $this->_o_product = $o_article;
         }
-
-        return $this->_oProduct;
+        return $this->_o_product;
     }
 }

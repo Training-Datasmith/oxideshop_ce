@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model\Contract;
+namespace Oxid_Esales\Eshop_Community\Application\Model\Contract;
 
 /**
  * Article interface
  */
-interface ArticleInterface
+interface Article_Interface
 {
     /**
      * Checks if stock configuration allows to buy user chosen amount $dAmount
@@ -22,8 +20,7 @@ interface ArticleInterface
      *
      * @return mixed
      */
-    public function checkForStock($dAmount, $dArtStockAmount = 0);
-
+    public function check_for_stock($d_amount, $d_art_stock_amount = 0);
     /**
      * Returns all selectlists this article has.
      *
@@ -31,8 +28,7 @@ interface ArticleInterface
      *
      * @return array
      */
-    public function getSelectLists($sKeyPrefix = null);
-
+    public function get_select_lists($s_key_prefix = null);
     /**
      * Creates, calculates and returns oxprice object for basket product.
      *
@@ -42,15 +38,13 @@ interface ArticleInterface
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getBasketPrice($dAmount, $aSelList, $oBasket);
-
+    public function get_basket_price($d_amount, $a_sel_list, $o_basket);
     /**
      * Checks if discount should be skipped for this article in basket. Returns true if yes.
      *
      * @return bool
      */
-    public function skipDiscounts();
-
+    public function skip_discounts();
     /**
      * Returns ID's of categories. where this article is assigned
      *
@@ -59,22 +53,19 @@ interface ArticleInterface
      *
      * @return array
      */
-    public function getCategoryIds($blActCats = false, $blSkipCache = false);
-
+    public function get_category_ids($bl_act_cats = false, $bl_skip_cache = false);
     /**
      * Calculates and returns price of article (adds taxes and discounts).
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getPrice();
-
+    public function get_price();
     /**
      * Returns product id (oxid)
      *
      * @return string
      */
-    public function getProductId();
-
+    public function get_product_id();
     /**
      * Returns base article price from database
      *
@@ -82,12 +73,11 @@ interface ArticleInterface
      *
      * @return double
      */
-    public function getBasePrice($dAmount = 1);
-
+    public function get_base_price($d_amount = 1);
     /**
      * Returns true if object is derived from oxorderarticle class
      *
      * @return bool
      */
-    public function isOrderArticle();
+    public function is_order_article();
 }

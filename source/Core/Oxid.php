@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Static class mostly containing static methods which are supposed to be called before the full framework initialization
@@ -24,11 +22,9 @@ class Oxid
     public static function run()
     {
         /** @var ShopControl $shopControl */
-        $shopControl = oxNew(\OxidEsales\Eshop\Core\ShopControl::class);
-
-        return $shopControl->start();
+        $shop_control = ox_new(\Oxid_Esales\Eshop\Core\Shop_Control::class);
+        return $shop_control->start();
     }
-
     /**
      * Executes shop widget controller
      *
@@ -36,11 +32,10 @@ class Oxid
      *
      * @return void
      */
-    public static function runWidget()
+    public static function run_widget()
     {
         /** @var WidgetControl $widgetControl */
-        $widgetControl = oxNew(\OxidEsales\Eshop\Core\WidgetControl::class);
-
-        return $widgetControl->start();
+        $widget_control = ox_new(\Oxid_Esales\Eshop\Core\Widget_Control::class);
+        return $widget_control->start();
     }
 }

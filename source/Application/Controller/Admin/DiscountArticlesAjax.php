@@ -1,158 +1,120 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages discount articles
  */
-class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Discount_Articles_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     public const NEW_DISCOUNT_LIST_ID = '-1';
-
     /**
      * If true extended column selection will be build
      *
      * @var bool
      */
-    protected $_blAllowExtColumns = true;
-
+    protected $_bl_allow_ext_columns = true;
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = [
+    protected $_a_columns = [
         // field , table, visible, multilanguage, id
-        'container1' => [
-            ['oxartnum', 'oxarticles', 1, 0, 0],
-            ['oxtitle', 'oxarticles', 1, 1, 0],
-            ['oxean', 'oxarticles', 1, 0, 0],
-            ['oxmpn', 'oxarticles', 0, 0, 0],
-            ['oxprice', 'oxarticles', 0, 0, 0],
-            ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1],
-        ],
-        'container2' => [
-            ['oxartnum', 'oxarticles', 1, 0, 0],
-            ['oxtitle', 'oxarticles', 1, 1, 0],
-            ['oxean', 'oxarticles', 1, 0, 0],
-            ['oxmpn', 'oxarticles', 0, 0, 0],
-            ['oxprice', 'oxarticles', 0, 0, 0],
-            ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxobject2discount', 0, 0, 1],
-        ],
+        'container1' => [['oxartnum', 'oxarticles', 1, 0, 0], ['oxtitle', 'oxarticles', 1, 1, 0], ['oxean', 'oxarticles', 1, 0, 0], ['oxmpn', 'oxarticles', 0, 0, 0], ['oxprice', 'oxarticles', 0, 0, 0], ['oxstock', 'oxarticles', 0, 0, 0], ['oxid', 'oxarticles', 0, 0, 1]],
+        'container2' => [['oxartnum', 'oxarticles', 1, 0, 0], ['oxtitle', 'oxarticles', 1, 1, 0], ['oxean', 'oxarticles', 1, 0, 0], ['oxmpn', 'oxarticles', 0, 0, 0], ['oxprice', 'oxarticles', 0, 0, 0], ['oxstock', 'oxarticles', 0, 0, 0], ['oxid', 'oxobject2discount', 0, 0, 1]],
     ];
-
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $sArticleTable = $this->getViewName('oxarticles');
-        $sO2CView = $this->getViewName('oxobject2category');
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sOxid = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $o_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $s_article_table = $this->get_view_name('oxarticles');
+        $s_o2c_view = $this->get_view_name('oxobject2category');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_oxid = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_synch_oxid = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // category selected or not ?
-        if (!$sOxid && $sSynchOxid) {
-            $sQAdd = " from $sArticleTable where 1 ";
-            $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? '' : "and $sArticleTable.oxparentid = '' ";
+        if (!$s_oxid && $s_synch_oxid) {
+            $s_q_add = " from {$s_article_table} where 1 ";
+            $s_q_add .= $o_config->get_config_param('blVariantsSelection') ? '' : "and {$s_article_table}.oxparentid = '' ";
+        } else if ($s_synch_oxid && $s_oxid != $s_synch_oxid) {
+            $s_q_add = " from {$s_o2c_view} left join {$s_article_table} on ";
+            $s_q_add .= $o_config->get_config_param('blVariantsSelection') ? "({$s_article_table}.oxid={$s_o2c_view}.oxobjectid or {$s_article_table}.oxparentid={$s_o2c_view}.oxobjectid)" : " {$s_article_table}.oxid={$s_o2c_view}.oxobjectid ";
+            $s_q_add .= " where {$s_o2c_view}.oxcatnid = " . $o_db->quote($s_oxid) . " and {$s_article_table}.oxid is not null ";
+            // resetting
+            $s_id = null;
         } else {
-            // selected category ?
-            if ($sSynchOxid && $sOxid != $sSynchOxid) {
-                $sQAdd = " from $sO2CView left join $sArticleTable on ";
-                $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? "($sArticleTable.oxid=$sO2CView.oxobjectid or $sArticleTable.oxparentid=$sO2CView.oxobjectid)" : " $sArticleTable.oxid=$sO2CView.oxobjectid ";
-                $sQAdd .= " where $sO2CView.oxcatnid = " . $oDb->quote($sOxid) . " and $sArticleTable.oxid is not null ";
-
-                // resetting
-                $sId = null;
-            } else {
-                $sQAdd = " from oxobject2discount, $sArticleTable where $sArticleTable.oxid=oxobject2discount.oxobjectid ";
-                $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sOxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
-            }
+            $s_q_add = " from oxobject2discount, {$s_article_table} where {$s_article_table}.oxid=oxobject2discount.oxobjectid ";
+            $s_q_add .= ' and oxobject2discount.oxdiscountid = ' . $o_db->quote($s_oxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
         }
-
-        if ($sSynchOxid && $sSynchOxid != $sOxid) {
+        if ($s_synch_oxid && $s_synch_oxid != $s_oxid) {
             // performance
-            $sSubSelect = " select $sArticleTable.oxid from oxobject2discount, $sArticleTable where $sArticleTable.oxid=oxobject2discount.oxobjectid ";
-            $sSubSelect .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchOxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
-
-            if (stristr($sQAdd, 'where') === false) {
-                $sQAdd .= ' where ';
+            $s_sub_select = " select {$s_article_table}.oxid from oxobject2discount, {$s_article_table} where {$s_article_table}.oxid=oxobject2discount.oxobjectid ";
+            $s_sub_select .= ' and oxobject2discount.oxdiscountid = ' . $o_db->quote($s_synch_oxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
+            if (stristr($s_q_add, 'where') === false) {
+                $s_q_add .= ' where ';
             } else {
-                $sQAdd .= ' and ';
+                $s_q_add .= ' and ';
             }
-            $sQAdd .= " $sArticleTable.oxid not in ( $sSubSelect ) ";
+            $s_q_add .= " {$s_article_table}.oxid not in ( {$s_sub_select} ) ";
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Removes selected article (articles) from discount list
      */
-    public function removeDiscArt(): void
+    public function remove_disc_art(): void
     {
-        $aChosenArt = $this->getActionIds('oxobject2discount.oxid');
-
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = parent::addFilter('delete oxobject2discount.* ' . $this->getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
-        } elseif (is_array($aChosenArt)) {
-            $sQ = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ') ';
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
+        $a_chosen_art = $this->get_action_ids('oxobject2discount.oxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_q = parent::add_filter('delete oxobject2discount.* ' . $this->get_query());
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->execute($s_q);
+        } elseif (is_array($a_chosen_art)) {
+            $s_q = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_chosen_art)) . ') ';
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->execute($s_q);
         }
     }
-
     /**
      * Adds selected article (articles) to discount list
      */
-    public function addDiscArt(): void
+    public function add_disc_art(): void
     {
-        $articleIds = $this->getActionIds('oxarticles.oxid');
-        $discountListId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $article_ids = $this->get_action_ids('oxarticles.oxid');
+        $discount_list_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // adding
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $articleTable = $this->getViewName('oxarticles');
-            $articleIds = $this->getAll(parent::addFilter("select $articleTable.oxid " . $this->getQuery()));
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $article_table = $this->get_view_name('oxarticles');
+            $article_ids = $this->get_all(parent::add_filter("select {$article_table}.oxid " . $this->get_query()));
         }
-        if ($discountListId && $discountListId != self::NEW_DISCOUNT_LIST_ID && is_array($articleIds)) {
-            foreach ($articleIds as $articleId) {
-                $this->addArticleToDiscount($discountListId, $articleId);
+        if ($discount_list_id && $discount_list_id != self::NEW_DISCOUNT_LIST_ID && is_array($article_ids)) {
+            foreach ($article_ids as $article_id) {
+                $this->add_article_to_discount($discount_list_id, $article_id);
             }
         }
     }
-
     /**
      * Adds article to discount list
      *
      * @param string $discountListId
      * @param string $articleId
      */
-    protected function addArticleToDiscount($discountListId, $articleId)
+    protected function add_article_to_discount($discount_list_id, $article_id)
     {
-        $object2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $object2Discount = ox_new(\Oxid_Esales\Eshop\Core\Model\Base_Model::class);
         $object2Discount->init('oxobject2discount');
-        $object2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($discountListId);
-        $object2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($articleId);
-        $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field('oxarticles');
-
+        $object2Discount->oxobject2discount__oxdiscountid = new \Oxid_Esales\Eshop\Core\Field($discount_list_id);
+        $object2Discount->oxobject2discount__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($article_id);
+        $object2Discount->oxobject2discount__oxtype = new \Oxid_Esales\Eshop\Core\Field('oxarticles');
         $object2Discount->save();
     }
 }

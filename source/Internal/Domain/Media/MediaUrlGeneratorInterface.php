@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media;
 
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\Media;
-
-interface MediaUrlGeneratorInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object\Media;
+interface Media_Url_Generator_Interface
 {
-    public function generateSizedImageUrl(Media $media, string $size): string;
+    public function generate_sized_image_url(Media $media, string $size): string;
 }

@@ -1,46 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Controller;
 
-namespace OxidEsales\EshopCommunity\Internal\Framework\Controller;
-
-interface ViewControllerInterface
+interface View_Controller_Interface
 {
     public function init();
-
     public function render();
-
-    public function executeFunction($function);
-
-    public function setClassKey($classKey);
-
-    public function getClassKey();
-
-    public function setFncName($fncName);
-
-    public function getFncName();
-
-    public function setViewParameters($params = null);
-
-    public function getViewParameter($key);
-
-    public function setViewData($viewData = null);
-
-    public function getViewData();
-
-    public function getViewId();
-
-    public function getIsCallForCache();
-
+    public function execute_function($function);
+    public function set_class_key($class_key);
+    public function get_class_key();
+    public function set_fnc_name($fnc_name);
+    public function get_fnc_name();
+    public function set_view_parameters($params = null);
+    public function get_view_parameter($key);
+    public function set_view_data($view_data = null);
+    public function get_view_data();
+    public function get_view_id();
+    public function get_is_call_for_cache();
     /*
      * @deprecated
      *
      * Added only for BC and will be removed in the next major with 'charset' language string.
      */
-    public function getCharSet();
+    public function get_char_set();
 }

@@ -4,44 +4,37 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Core;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Core;
 
 use Exception;
-use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
-use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-
+use Oxid_Esales\Eshop\Core\Database\Adapter\Database_Interface;
+use Oxid_Esales\Eshop\Core\Database\Adapter\Doctrine\Database;
+use Oxid_Esales\Eshop\Core\Exception\Database_Connection_Exception;
 /**
  * @deprecated since v6.4.0 (2019-09-24) use QueryBuilderFactoryInterface
  * @see \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface
  */
-class DatabaseProvider
+class Database_Provider
 {
     /**
      * @var ?DatabaseProvider
      */
     protected static $instance;
-
     /**
      * @var null|DatabaseInterface Database connection object
      */
     protected static $db;
-
     /**
      * @var array Database tables descriptions cache array
      */
-    protected static $tblDescCache = [];
-
+    protected static $tbl_desc_cache = [];
     /**
      * This class is a singleton and should be instantiated with getInstance().
      */
     private function __construct()
     {
     }
-
     /**
      * @throws Exception
      */
@@ -49,21 +42,18 @@ class DatabaseProvider
     {
         throw new Exception('This object is a singleton, thou shalt not clone.');
     }
-
     /**
      * Returns the singleton instance of this class or of a subclass of this class.
      *
      * @return DatabaseProvider The singleton instance.
      */
-    public static function getInstance()
+    public static function get_instance()
     {
         if (null === static::$instance) {
             static::$instance = new static();
         }
-
         return static::$instance;
     }
-
     /**
      * Return the database connection instance as a singleton.
      *
@@ -73,19 +63,16 @@ class DatabaseProvider
      * @throws DatabaseConnectionException Error while initiating connection to DB.
      *
      */
-    public static function getDb()
+    public static function get_db()
     {
         if (null === static::$db) {
-            $databaseFactory = static::getInstance();
-            static::$db = $databaseFactory->createDatabase();
-
+            $database_factory = static::get_instance();
+            static::$db = $database_factory->create_database();
             /** Post connect actions will be taken only once per connection */
-            $databaseFactory->onPostConnect();
+            $database_factory->on_post_connect();
         }
-
         return static::$db;
     }
-
     /**
      * Return the database master connection instance as a singleton.
      * In case the shop is not allowed a master/slave setup, this function
@@ -97,27 +84,23 @@ class DatabaseProvider
      * @throws DatabaseConnectionException Error while initiating connection to DB
      *
      */
-    public static function getMaster()
+    public static function get_master()
     {
-        static::getDb()->forceMasterConnection();
-
-        return static::getDb();
+        static::get_db()->force_master_connection();
+        return static::get_db();
     }
-
     /**
      * @param string $tableName Name of table to invest.
      *
      * @return array
      */
-    public function getTableDescription($tableName)
+    public function get_table_description($table_name)
     {
-        if (!isset(self::$tblDescCache[$tableName])) {
-            self::$tblDescCache[$tableName] = $this->fetchTableDescription($tableName);
+        if (!isset(self::$tbl_desc_cache[$table_name])) {
+            self::$tbl_desc_cache[$table_name] = $this->fetch_table_description($table_name);
         }
-
-        return self::$tblDescCache[$tableName];
+        return self::$tbl_desc_cache[$table_name];
     }
-
     /**
      * Extracts and returns table metadata from DB.
      * This method is extended in the Enterprise Edition.
@@ -126,29 +109,26 @@ class DatabaseProvider
      *
      * @return array
      */
-    protected function fetchTableDescription($tableName)
+    protected function fetch_table_description($table_name)
     {
-        return static::getDb()->metaColumns($tableName);
+        return static::get_db()->meta_columns($table_name);
     }
-
     /**
      * @return DatabaseInterface
      * @throws DatabaseConnectionException
      *
      */
-    protected function createDatabase(): \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database
+    protected function create_database(): \Oxid_Esales\Eshop\Core\Database\Adapter\Doctrine\Database
     {
-        $databaseAdapter = new Database();
-        $databaseAdapter->connect();
-
-        return $databaseAdapter;
+        $database_adapter = new Database();
+        $database_adapter->connect();
+        return $database_adapter;
     }
-
     /**
      * Post connect hook. This method is called only once per connection right after the connection to the database has
      * been established.
      */
-    protected function onPostConnect()
+    protected function on_post_connect()
     {
     }
 }

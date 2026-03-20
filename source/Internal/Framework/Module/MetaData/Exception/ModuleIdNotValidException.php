@@ -4,11 +4,9 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception;
-
-class ModuleIdNotValidException extends \Exception
+class Module_Id_Not_Valid_Exception extends \Exception
 {
 }

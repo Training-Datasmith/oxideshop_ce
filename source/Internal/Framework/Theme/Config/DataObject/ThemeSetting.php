@@ -4,71 +4,59 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Config\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Theme\Config\DataObject;
-
-class ThemeSetting
+class Theme_Setting
 {
-    private int $shopId;
+    private int $shop_id;
     private string $name;
     private string $type;
     private mixed $value;
-    private string $themeId;
-
-    public function getShopId(): int
+    private string $theme_id;
+    public function get_shop_id(): int
     {
-        return $this->shopId;
+        return $this->shop_id;
     }
-
-    public function setShopId(int $shopId): self
+    public function set_shop_id(int $shop_id): self
     {
-        $this->shopId = $shopId;
+        $this->shop_id = $shop_id;
         return $this;
     }
-
-    public function getName(): string
+    public function get_name(): string
     {
         return $this->name;
     }
-
-    public function setName(string $name): self
+    public function set_name(string $name): self
     {
         $this->name = $name;
         return $this;
     }
-
-    public function getType(): string
+    public function get_type(): string
     {
         return $this->type;
     }
-
-    public function setType(string $type): self
+    public function set_type(string $type): self
     {
         $this->type = $type;
         return $this;
     }
-
-    public function getValue(): mixed
+    public function get_value(): mixed
     {
         return $this->value;
     }
-
-    public function setValue(mixed $value): self
+    public function set_value(mixed $value): self
     {
         $this->value = $value;
         return $this;
     }
-
-    public function getThemeId(): string
+    public function get_theme_id(): string
     {
-        return $this->themeId;
+        return $this->theme_id;
     }
-
-    public function setThemeId(string $themeId): self
+    public function set_theme_id(string $theme_id): self
     {
-        $this->themeId = $themeId;
+        $this->theme_id = $theme_id;
         return $this;
     }
 }

@@ -4,41 +4,32 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Cache\Command;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Cache\Command;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Cache\ShopCacheCleanerInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service\ContainerCacheInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Cache\Shop_Cache_Cleaner_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Service\Container_Cache_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-class ClearCacheCommand extends Command
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+class Clear_Cache_Command extends Command
 {
-    public function __construct(
-        private readonly ContainerCacheInterface $containerCache,
-        private readonly ContextInterface $context,
-        private readonly ShopCacheCleanerInterface $shopCacheCleaner,
-    ) {
+    public function __construct(private readonly Container_Cache_Interface $container_cache, private readonly Context_Interface $context, private readonly Shop_Cache_Cleaner_Interface $shop_cache_cleaner)
+    {
         parent::__construct();
     }
-
     protected function configure(): void
     {
-        $this->setDescription('Clears shop cache');
+        $this->set_description('Clears shop cache');
     }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $this->shopCacheCleaner->clearAll();
-        foreach ($this->context->getAllShopIds() as $shopId) {
-            $this->containerCache->invalidate($shopId);
+        $this->shop_cache_cleaner->clear_all();
+        foreach ($this->context->get_all_shop_ids() as $shop_id) {
+            $this->container_cache->invalidate($shop_id);
         }
         $output->writeln('<info>Cleared cache files</info>');
-
         return 0;
     }
 }

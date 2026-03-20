@@ -4,14 +4,11 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Service;
-
-use Doctrine\Common\Collections\ArrayCollection;
-
-interface UserReviewAndRatingServiceInterface
+use Doctrine\Common\Collections\Array_Collection;
+interface User_Review_And_Rating_Service_Interface
 {
     /**
      * Get number of reviews by given user.
@@ -20,8 +17,7 @@ interface UserReviewAndRatingServiceInterface
      *
      * @return int
      */
-    public function getReviewAndRatingListCount($userId);
-
+    public function get_review_and_rating_list_count($user_id);
     /**
      * Returns Collection of User Ratings and Reviews.
      *
@@ -29,5 +25,5 @@ interface UserReviewAndRatingServiceInterface
      *
      * @return ArrayCollection
      */
-    public function getReviewAndRatingList($userId);
+    public function get_review_and_rating_list($user_id);
 }

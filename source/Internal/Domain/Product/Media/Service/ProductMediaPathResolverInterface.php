@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service;
 
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\MediaPath;
-
-interface ProductMediaPathResolverInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object\Media_Path;
+interface Product_Media_Path_Resolver_Interface
 {
-    public function resolve(string $productId, string $filename): MediaPath;
+    public function resolve(string $product_id, string $filename): Media_Path;
 }

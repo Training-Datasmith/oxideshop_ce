@@ -1,150 +1,132 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Defines an element of multidimentional variant name tree structure. Contains article id, variant name, URL, price, price text, and a subset of MD variants.
  */
-class MdVariant extends \OxidEsales\Eshop\Core\Base
+class Md_Variant extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * MD variant identifier
      *
      * @var string
      */
-    protected $_sId;
-
+    protected $_s_id;
     /**
      * Parent ID
      *
      * @var string
      */
-    protected $_sParentId;
-
+    protected $_s_parent_id;
     /**
      * Corresponding article id
      *
      * @var string
      */
-    protected $_sArticleId;
-
+    protected $_s_article_id;
     /**
      * Variant name
      *
      * @var string
      */
-    protected $_sName;
-
+    protected $_s_name;
     /**
      * Variant URL
      *
      * @var string
      */
-    protected $_sUrl;
-
+    protected $_s_url;
     /**
      * Variant price
      *
      * @var double
      */
-    protected $_dPrice;
-
+    protected $_d_price;
     /**
      * Variant Price text represenatation. Eg. "10,00 EUR" or "from 8,00 EUR"
      *
      * @var string
      */
-    protected $_sFPrice;
-
+    protected $_s_f_price;
     /**
      * Subvariant array
      *
      * @var \OxidEsales\Eshop\Application\Model\MdVariant[]
      */
-    protected $_aSubvariants = [];
-
+    protected $_a_subvariants = [];
     /**
      * Sets MD variant identifier
      *
      * @param string $sId New id
      */
-    public function setId($sId): void
+    public function set_id($s_id): void
     {
-        $this->_sId = $sId;
+        $this->_s_id = $s_id;
     }
-
     /**
      * Returns MD variant identifier
      *
      * @return string
      */
-    public function getId()
+    public function get_id()
     {
-        return $this->_sId;
+        return $this->_s_id;
     }
-
     /**
      * Sets parent id
      *
      * @param string $sParentId Parent id
      */
-    public function setParentId($sParentId): void
+    public function set_parent_id($s_parent_id): void
     {
-        $this->_sParentId = $sParentId;
+        $this->_s_parent_id = $s_parent_id;
     }
-
     /**
      * Returns parent id
      *
      * @return string
      */
-    public function getParentId()
+    public function get_parent_id()
     {
-        return $this->_sParentId;
+        return $this->_s_parent_id;
     }
-
     /**
      * Sets MD subvariants
      *
      * @param \OxidEsales\Eshop\Application\Model\MdVariant[] $aSubvariants Subvariants
      */
-    public function setMdSubvariants($aSubvariants): void
+    public function set_md_subvariants($a_subvariants): void
     {
-        $this->_aSubvariants = $aSubvariants;
+        $this->_a_subvariants = $a_subvariants;
     }
-
     /**
      * Returns full array of subvariants
      *
      * @return \OxidEsales\Eshop\Application\Model\MdVariant[]
      */
-    public function getMdSubvariants()
+    public function get_md_subvariants()
     {
-        return $this->_aSubvariants;
+        return $this->_a_subvariants;
     }
-
     /**
      * Returns first MD subvariant from subvariant set or null in case variant has no subvariants.
      *
      * @return \OxidEsales\Eshop\Application\Model\MdVariant
      */
-    public function getFirstMdSubvariant()
+    public function get_first_md_subvariant()
     {
-        $aMdSubvariants = $this->getMdSubvariants();
-        if (count($aMdSubvariants)) {
-            return reset($aMdSubvariants);
+        $a_md_subvariants = $this->get_md_subvariants();
+        if (count($a_md_subvariants)) {
+            return reset($a_md_subvariants);
         }
-
         return null;
     }
-
     /**
      * Checks for existing MD subvariant by name. Returns existing one or in case $sName has not been found creates an empty OxMdVariant instance.
      *
@@ -152,145 +134,125 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @return \OxidEsales\Eshop\Application\Model\MdVariant
      */
-    public function getMdSubvariantByName($sName)
+    public function get_md_subvariant_by_name($s_name)
     {
-        $aSubvariants = $this->getMdSubvariants();
-        foreach ($aSubvariants as $oMdSubvariant) {
-            if (strcasecmp((string) $oMdSubvariant->getName(), $sName) == 0) {
-                return $oMdSubvariant;
+        $a_subvariants = $this->get_md_subvariants();
+        foreach ($a_subvariants as $o_md_subvariant) {
+            if (strcasecmp((string) $o_md_subvariant->get_name(), $s_name) == 0) {
+                return $o_md_subvariant;
             }
         }
-
-        $oNewSubvariant = oxNew(\OxidEsales\Eshop\Application\Model\MdVariant::class);
-        $oNewSubvariant->setName($sName);
-        $oNewSubvariant->setId(md5($sName . $this->getId()));
-        $oNewSubvariant->setParentId($this->getId());
-        $this->addMdSubvariant($oNewSubvariant);
-
-        return $oNewSubvariant;
+        $o_new_subvariant = ox_new(\Oxid_Esales\Eshop\Application\Model\Md_Variant::class);
+        $o_new_subvariant->set_name($s_name);
+        $o_new_subvariant->set_id(md5($s_name . $this->get_id()));
+        $o_new_subvariant->set_parent_id($this->get_id());
+        $this->add_md_subvariant($o_new_subvariant);
+        return $o_new_subvariant;
     }
-
     /**
      * Returns corresponding article URL or recusively first variant URL from subvariant set
      *
      * @return string
      */
-    public function getLink()
+    public function get_link()
     {
-        $oFirstSubvariant = $this->getFirstMdSubvariant();
-        if ($oFirstSubvariant) {
-            return $oFirstSubvariant->getLink();
+        $o_first_subvariant = $this->get_first_md_subvariant();
+        if ($o_first_subvariant) {
+            return $o_first_subvariant->get_link();
         }
-
-        return $this->_sUrl;
+        return $this->_s_url;
     }
-
     /**
      * Name setter
      *
      * @param string $sName New name
      */
-    public function setName($sName): void
+    public function set_name($s_name): void
     {
-        $this->_sName = $sName;
+        $this->_s_name = $s_name;
     }
-
     /**
      * Returns MD variant name
      *
      * @return string
      */
-    public function getName()
+    public function get_name()
     {
-        return $this->_sName;
+        return $this->_s_name;
     }
-
     /**
      * Returns price
      *
      * @return double
      */
-    public function getDPrice()
+    public function get_d_price()
     {
-        return $this->_dPrice;
+        return $this->_d_price;
     }
-
     /**
      * Returns min price recursively selected from full subvariant tree.
      *
      * @return double
      */
-    public function getMinDPrice()
+    public function get_min_d_price()
     {
-        $dMinPrice = $this->getDPrice();
-        $aVariants = $this->getMdSubvariants();
-        foreach ($aVariants as $oVariant) {
-            $dMinVariantPrice = $oVariant->getMinDPrice();
-            if (is_null($dMinPrice)) {
-                $dMinPrice = $dMinVariantPrice;
+        $d_min_price = $this->get_d_price();
+        $a_variants = $this->get_md_subvariants();
+        foreach ($a_variants as $o_variant) {
+            $d_min_variant_price = $o_variant->get_min_d_price();
+            if (is_null($d_min_price)) {
+                $d_min_price = $d_min_variant_price;
             }
-            if (!is_null($dMinVariantPrice) && $dMinVariantPrice < $dMinPrice) {
-                $dMinPrice = $dMinVariantPrice;
+            if (!is_null($d_min_variant_price) && $d_min_variant_price < $d_min_price) {
+                $d_min_price = $d_min_variant_price;
             }
         }
-
-        return $dMinPrice;
+        return $d_min_price;
     }
-
     /**
      * Gets max subvariant depth. 0 means no deeper subvariants.
      *
      * @return int
      */
-    public function getMaxDepth()
+    public function get_max_depth()
     {
-        $aSubvariants = $this->getMdSubvariants();
-
-        if (!count($aSubvariants)) {
+        $a_subvariants = $this->get_md_subvariants();
+        if (!count($a_subvariants)) {
             return 0;
         }
-
-        $iMaxDepth = 0;
-        foreach ($aSubvariants as $oSubvariant) {
-            if ($oSubvariant->getMaxDepth() > $iMaxDepth) {
-                $iMaxDepth = $oSubvariant->getMaxDepth();
+        $i_max_depth = 0;
+        foreach ($a_subvariants as $o_subvariant) {
+            if ($o_subvariant->get_max_depth() > $i_max_depth) {
+                $i_max_depth = $o_subvariant->get_max_depth();
             }
         }
-
-        return $iMaxDepth + 1;
+        return $i_max_depth + 1;
     }
-
     /**
      * Returns MD variant price as a text.
      *
      * @return string
      */
-    public function getFPrice()
+    public function get_f_price()
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         // 0002030 No need to return price if it disabled for better performance.
-        if (!$myConfig->getConfigParam('bl_perfLoadPrice')) {
+        if (!$my_config->get_config_param('bl_perfLoadPrice')) {
             return;
         }
-
-        if ($this->_sFPrice) {
-            return $this->_sFPrice;
+        if ($this->_s_f_price) {
+            return $this->_s_f_price;
         }
-
-        $sFromPrefix = '';
-
-        if (!$this->isFixedPrice()) {
-            $sFromPrefix = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('PRICE_FROM') . ' ';
+        $s_from_prefix = '';
+        if (!$this->is_fixed_price()) {
+            $s_from_prefix = \Oxid_Esales\Eshop\Core\Registry::get_lang()->translate_string('PRICE_FROM') . ' ';
         }
-
-        $dMinPrice = $this->getMinDPrice();
-        $sFMinPrice = \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($dMinPrice);
-        $sCurrency = ' ' . \OxidEsales\Eshop\Core\Registry::getConfig()->getActShopCurrencyObject()->sign;
-        $this->_sFPrice = $sFromPrefix . $sFMinPrice . $sCurrency;
-
-        return $this->_sFPrice;
+        $d_min_price = $this->get_min_d_price();
+        $s_f_min_price = \Oxid_Esales\Eshop\Core\Registry::get_lang()->format_currency($d_min_price);
+        $s_currency = ' ' . \Oxid_Esales\Eshop\Core\Registry::get_config()->get_act_shop_currency_object()->sign;
+        $this->_s_f_price = $s_from_prefix . $s_f_min_price . $s_currency;
+        return $this->_s_f_price;
     }
-
     /**
      * Inits MD variant by name. In case $aNames parameter has more than one element addNames recursively adds names for subvariants.
      *
@@ -299,40 +261,35 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      * @param double $dPrice Price as double
      * @param string $sUrl   Article URL
      */
-    public function addNames($sArtId, $aNames, $dPrice, $sUrl): void
+    public function add_names($s_art_id, $a_names, $d_price, $s_url): void
     {
-        $iCount = count($aNames);
-        $sName = array_shift($aNames);
-
-        if ($iCount) {
+        $i_count = count($a_names);
+        $s_name = array_shift($a_names);
+        if ($i_count) {
             //get required subvariant
-            $oVariant = $this->getMdSubvariantByName($sName);
+            $o_variant = $this->get_md_subvariant_by_name($s_name);
             //add remaining names
-            $oVariant->addNames($sArtId, $aNames, $dPrice, $sUrl);
+            $o_variant->add_names($s_art_id, $a_names, $d_price, $s_url);
         } else {
             //means we have the deepest element and assign other attributes
-            $this->_sArticleId = $sArtId;
-            $this->_dPrice = $dPrice;
-            $this->_sUrl = $sUrl;
+            $this->_s_article_id = $s_art_id;
+            $this->_d_price = $d_price;
+            $this->_s_url = $s_url;
         }
     }
-
     /**
      * Returns corresponding article id or recusively first variant id from subvariant set
      *
      * @return string
      */
-    public function getArticleId()
+    public function get_article_id()
     {
-        $oFirstSubvariant = $this->getFirstMdSubvariant();
-
-        if ($oFirstSubvariant) {
-            return $oFirstSubvariant->getArticleId();
+        $o_first_subvariant = $this->get_first_md_subvariant();
+        if ($o_first_subvariant) {
+            return $o_first_subvariant->get_article_id();
         }
-
-        return $this->_sArticleId;
+        return $this->_s_article_id;
     }
-
     /**
      * Checks whether $sArtId is one of subtree article ids.
      *
@@ -340,54 +297,49 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function hasArticleId($sArtId)
+    public function has_article_id($s_art_id)
     {
-        if ($this->getArticleId() == $sArtId) {
+        if ($this->get_article_id() == $s_art_id) {
             return true;
         }
-
-        $aSubvariants = $this->getMdSubvariants();
-        foreach ($aSubvariants as $oSubvariant) {
-            if ($oSubvariant->hasArticleId($sArtId)) {
+        $a_subvariants = $this->get_md_subvariants();
+        foreach ($a_subvariants as $o_subvariant) {
+            if ($o_subvariant->has_article_id($s_art_id)) {
                 return true;
             }
         }
-
         return false;
     }
-
     /**
      * Adds one subvariant to subvariant set
      *
      * @param \OxidEsales\Eshop\Application\Model\MdVariant $oSubvariant Subvariant
      */
-    protected function addMdSubvariant($oSubvariant)
+    protected function add_md_subvariant($o_subvariant)
     {
-        $this->_aSubvariants[$oSubvariant->getId()] = $oSubvariant;
+        $this->_a_subvariants[$o_subvariant->get_id()] = $o_subvariant;
     }
-
     /**
      * Checks if variant price is fixed or not ("from" price)
      *
      * @return bool
      */
-    protected function isFixedPrice()
+    protected function is_fixed_price()
     {
-        $dPrice = $this->getDPrice();
-        $aVariants = $this->getMdSubvariants();
-        foreach ($aVariants as $oVariant) {
-            $dVariantPrice = $oVariant->getDPrice();
-            if (is_null($dPrice)) {
-                $dPrice = $dVariantPrice;
+        $d_price = $this->get_d_price();
+        $a_variants = $this->get_md_subvariants();
+        foreach ($a_variants as $o_variant) {
+            $d_variant_price = $o_variant->get_d_price();
+            if (is_null($d_price)) {
+                $d_price = $d_variant_price;
             }
-            if (!is_null($dVariantPrice) && $dVariantPrice != $dPrice) {
+            if (!is_null($d_variant_price) && $d_variant_price != $d_price) {
                 return false;
             }
-            if (!$oVariant->isFixedPrice()) {
+            if (!$o_variant->is_fixed_price()) {
                 return false;
             }
         }
-
         return true;
     }
 }

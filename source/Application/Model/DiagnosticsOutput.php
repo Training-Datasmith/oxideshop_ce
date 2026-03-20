@@ -1,103 +1,92 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Diagnostic tool result outputer
  * Performs OutputKey check of shop files and generates report file.
  */
-class DiagnosticsOutput
+class Diagnostics_Output
 {
     /**
      * result key
      *
      * @var string
      */
-    protected $_sOutputKey = 'diagnostic_tool_result';
-
+    protected $_s_output_key = 'diagnostic_tool_result';
     /**
      * Result file path
      *
      * @var string
      */
-    protected $_sOutputFileName = 'diagnostic_tool_result.html';
-
+    protected $_s_output_file_name = 'diagnostic_tool_result.html';
     /**
      * Utils object
      *
      * @var mixed
      */
-    protected $_oUtils;
-
+    protected $_o_utils;
     /**
      * Object constructor
      */
     public function __construct()
     {
-        $this->_oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $this->_o_utils = \Oxid_Esales\Eshop\Core\Registry::get_utils();
     }
-
     /**
      * OutputKey setter
      *
      * @param string $sOutputKey Output key.
      */
-    public function setOutputKey($sOutputKey): void
+    public function set_output_key($s_output_key): void
     {
-        if (!empty($sOutputKey)) {
-            $this->_sOutputKey = $sOutputKey;
+        if (!empty($s_output_key)) {
+            $this->_s_output_key = $s_output_key;
         }
     }
-
     /**
      * OutputKey getter
      *
      * @return string
      */
-    public function getOutputKey()
+    public function get_output_key()
     {
-        return $this->_sOutputKey;
+        return $this->_s_output_key;
     }
-
     /**
      * OutputFileName setter
      *
      * @param string $sOutputFileName Output file name.
      */
-    public function setOutputFileName($sOutputFileName): void
+    public function set_output_file_name($s_output_file_name): void
     {
-        if (!empty($sOutputFileName)) {
-            $this->_sOutputFileName = $sOutputFileName;
+        if (!empty($s_output_file_name)) {
+            $this->_s_output_file_name = $s_output_file_name;
         }
     }
-
     /**
      * OutputKey getter
      *
      * @return string
      */
-    public function getOutputFileName()
+    public function get_output_file_name()
     {
-        return $this->_sOutputFileName;
+        return $this->_s_output_file_name;
     }
-
     /**
      * Stores result file in file cache
      *
      * @param string $sResult Result.
      */
-    public function storeResult($sResult): void
+    public function store_result($s_result): void
     {
-        $this->_oUtils->toFileCache($this->_sOutputKey, $sResult);
+        $this->_o_utils->to_file_cache($this->_s_output_key, $s_result);
     }
-
     /**
      * Reads exported result file contents
      *
@@ -105,35 +94,30 @@ class DiagnosticsOutput
      *
      * @return string
      */
-    public function readResultFile($sOutputKey = null)
+    public function read_result_file($s_output_key = null)
     {
-        $sCurrentKey = (empty($sOutputKey)) ? $this->_sOutputKey : $sOutputKey;
-
-        return $this->_oUtils->fromFileCache($sCurrentKey);
+        $s_current_key = empty($s_output_key) ? $this->_s_output_key : $s_output_key;
+        return $this->_o_utils->from_file_cache($s_current_key);
     }
-
     /**
      * Sends generated file for download
      *
      * @param string $sOutputKey Output key.
      */
-    public function downloadResultFile($sOutputKey = null): void
+    public function download_result_file($s_output_key = null): void
     {
-        $sCurrentKey = (empty($sOutputKey)) ? $this->_sOutputKey : $sOutputKey;
-
-        $this->_oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
-        $content = $this->_oUtils->fromFileCache($sCurrentKey);
-        $contentLength = strlen((string) $content);
-
-        $this->_oUtils->setHeader('Pragma: public');
-        $this->_oUtils->setHeader('Expires: 0');
-        $this->_oUtils->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0, private');
-        $this->_oUtils->setHeader('Content-Disposition: attachment;filename=' . $this->_sOutputFileName);
-        $this->_oUtils->setHeader('Content-Type:text/html;charset=utf-8');
-        if ($contentLength) {
-            $this->_oUtils->setHeader('Content-Length: ' . $contentLength);
+        $s_current_key = empty($s_output_key) ? $this->_s_output_key : $s_output_key;
+        $this->_o_utils = \Oxid_Esales\Eshop\Core\Registry::get_utils();
+        $content = $this->_o_utils->from_file_cache($s_current_key);
+        $content_length = strlen((string) $content);
+        $this->_o_utils->set_header('Pragma: public');
+        $this->_o_utils->set_header('Expires: 0');
+        $this->_o_utils->set_header('Cache-Control: must-revalidate, post-check=0, pre-check=0, private');
+        $this->_o_utils->set_header('Content-Disposition: attachment;filename=' . $this->_s_output_file_name);
+        $this->_o_utils->set_header('Content-Type:text/html;charset=utf-8');
+        if ($content_length) {
+            $this->_o_utils->set_header('Content-Length: ' . $content_length);
         }
-
         echo $content;
     }
 }

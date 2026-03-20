@@ -4,32 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Dao;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao;
-
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\DataObject\DIConfigWrapper;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Event\ProjectYamlChangedEvent;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Data_Object\Di_Config_Wrapper;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Event\Project_Yaml_Changed_Event;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface;
+use Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface;
 use Symfony\Component\Filesystem\Filesystem;
-
-class ContainerAwareProjectYamlDao extends ProjectYamlDao
+class Container_Aware_Project_Yaml_Dao extends Project_Yaml_Dao
 {
-    public function __construct(
-        BasicContextInterface $context,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        Filesystem $filesystem
-    ) {
+    public function __construct(Basic_Context_Interface $context, private readonly Event_Dispatcher_Interface $event_dispatcher, Filesystem $filesystem)
+    {
         parent::__construct($context, $filesystem);
     }
-
-    public function saveProjectConfigFile(DIConfigWrapper $config): void
+    public function save_project_config_file(Di_Config_Wrapper $config): void
     {
-        parent::saveProjectConfigFile($config);
-        $this->eventDispatcher->dispatch(
-            new ProjectYamlChangedEvent()
-        );
+        parent::save_project_config_file($config);
+        $this->event_dispatcher->dispatch(new Project_Yaml_Changed_Event());
     }
 }

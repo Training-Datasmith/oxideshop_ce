@@ -1,40 +1,33 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-
+use Oxid_Esales\Eshop\Application\Model\User;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 /**
  * CVS export manager.
  * Performs export function according to user chosen categories.
  * Admin Menu: Maine Menu -> Im/Export -> Export.
  */
-class ToolsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Tools_Main extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
-        if (Registry::getConfig()->isDemoShop()) {
-            Registry::getUtils()->showMessageAndExit('Access denied !');
+        if (Registry::get_config()->is_demo_shop()) {
+            Registry::get_utils()->show_message_and_exit('Access denied !');
         }
-
         parent::render();
-
-        $oAuthUser = oxNew(User::class);
-        $oAuthUser->loadAdminUser();
-        $this->_aViewData['blIsMallAdmin'] = $oAuthUser->oxuser__oxrights->value == 'malladmin';
-
-        $this->_aViewData['showViewUpdate'] = ContainerFacade::getParameter('oxid_esales.show_update_views_button');
-
+        $o_auth_user = ox_new(User::class);
+        $o_auth_user->load_admin_user();
+        $this->_a_view_data['blIsMallAdmin'] = $o_auth_user->oxuser__oxrights->value == 'malladmin';
+        $this->_a_view_data['showViewUpdate'] = Container_Facade::get_parameter('oxid_esales.show_update_views_button');
         return 'tools_main';
     }
 }

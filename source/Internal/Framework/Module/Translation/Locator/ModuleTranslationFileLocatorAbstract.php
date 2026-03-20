@@ -4,39 +4,31 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Translation\Locator;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-
-abstract class ModuleTranslationFileLocatorAbstract
+abstract class Module_Translation_File_Locator_Abstract
 {
-    protected function checkAndAddApplicationFolder(Filesystem $filesystem, string $moduleLangPath): string
+    protected function check_and_add_application_folder(Filesystem $filesystem, string $module_lang_path): string
     {
-        $applicationFolder = Path::join($moduleLangPath, 'Application');
-
-        if ($filesystem->exists($applicationFolder)) {
-            return $applicationFolder;
+        $application_folder = Path::join($module_lang_path, 'Application');
+        if ($filesystem->exists($application_folder)) {
+            return $application_folder;
         }
-
-        return $moduleLangPath;
+        return $module_lang_path;
     }
-
-    protected function appendLangFiles(array $langFiles, string $moduleLangPath): array
+    protected function append_lang_files(array $lang_files, string $module_lang_path): array
     {
-        $files = glob(Path::join($moduleLangPath, '*_lang.php'));
-
+        $files = glob(Path::join($module_lang_path, '*_lang.php'));
         if (\is_array($files) && count($files)) {
             foreach ($files as $file) {
                 if (!strpos($file, 'cust_lang.php')) {
-                    $langFiles[] = $file;
+                    $lang_files[] = $file;
                 }
             }
         }
-
-        return $langFiles;
+        return $lang_files;
     }
 }

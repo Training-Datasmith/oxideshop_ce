@@ -1,21 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-
+use Oxid_Esales\Eshop\Core\Database_Provider;
 /**
  * Content list manager.
  * Collects list of content
  */
-class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
+class Content_List extends \Oxid_Esales\Eshop\Core\Model\List_Model
 {
     /**
      * Information content type
@@ -23,55 +20,48 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @var int
      */
     public const TYPE_INFORMATION_CONTENTS = 0;
-
     /**
      * Main menu list type
      *
      * @var int
      */
     public const TYPE_MAIN_MENU_LIST = 1;
-
     /**
      * Main menu list type
      *
      * @var int
      */
     public const TYPE_CATEGORY_MENU = 2;
-
     /**
      * Service list.
      *
      * @var int
      */
     public const TYPE_SERVICE_LIST = 3;
-
     /**
      * List of services.
      *
      * @var array
      */
-    protected $_aServiceKeys = ['oximpressum', 'oxagb', 'oxsecurityinfo', 'oxdeliveryinfo', 'oxrightofwithdrawal', 'oxorderinfo', 'oxcredits'];
-
+    protected $_a_service_keys = ['oximpressum', 'oxagb', 'oxsecurityinfo', 'oxdeliveryinfo', 'oxrightofwithdrawal', 'oxorderinfo', 'oxcredits'];
     /**
      * Sets service keys.
      *
      * @param array $aServiceKeys
      */
-    public function setServiceKeys($aServiceKeys): void
+    public function set_service_keys($a_service_keys): void
     {
-        $this->_aServiceKeys = $aServiceKeys;
+        $this->_a_service_keys = $a_service_keys;
     }
-
     /**
      * Gets services keys.
      *
      * @return array
      */
-    public function getServiceKeys()
+    public function get_service_keys()
     {
-        return $this->_aServiceKeys;
+        return $this->_a_service_keys;
     }
-
     /**
      * Class constructor, initiates parent constructor (parent::oxList()).
      */
@@ -79,37 +69,31 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
     {
         parent::__construct('oxcontent');
     }
-
     /**
      * Loads main menue entries and generates list with links
      */
-    public function loadMainMenulist(): void
+    public function load_main_menulist(): void
     {
         $this->load(self::TYPE_MAIN_MENU_LIST);
     }
-
     /**
      * Load Array of Menue items and change keys of aList to catid
      */
-    public function loadCatMenues(): void
+    public function load_cat_menues(): void
     {
         $this->load(self::TYPE_CATEGORY_MENU);
-        $aArray = [];
-
+        $a_array = [];
         if ($this->count()) {
-            foreach ($this as $oContent) {
+            foreach ($this as $o_content) {
                 // add into category tree
-                if (!isset($aArray[$oContent->getCategoryId()])) {
-                    $aArray[$oContent->getCategoryId()] = [];
+                if (!isset($a_array[$o_content->get_category_id()])) {
+                    $a_array[$o_content->get_category_id()] = [];
                 }
-
-                $aArray[$oContent->oxcontents__oxcatid->value][] = $oContent;
+                $a_array[$o_content->oxcontents__oxcatid->value][] = $o_content;
             }
         }
-
-        $this->_aArray = $aArray;
+        $this->_a_array = $a_array;
     }
-
     /**
      * Get data from db
      *
@@ -117,12 +101,11 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return array
      */
-    protected function loadFromDb($iType)
+    protected function load_from_db($i_type)
     {
-        $sSql = $this->getSQLByType($iType);
-        return DatabaseProvider::getDb()->getAll($sSql);
+        $s_sql = $this->get_sql_by_type($i_type);
+        return Database_Provider::get_db()->get_all($s_sql);
     }
-
     /**
      * Load category list data
      *
@@ -130,32 +113,28 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     protected function load($type)
     {
-        $data = $this->loadFromDb($type);
-        $this->assignArray($data);
+        $data = $this->load_from_db($type);
+        $this->assign_array($data);
     }
-
     /**
      * Load category list data.
      */
-    public function loadServices(): void
+    public function load_services(): void
     {
         $this->load(self::TYPE_SERVICE_LIST);
-        $this->extractListToArray();
+        $this->extract_list_to_array();
     }
-
     /**
      * Extract oxContentList object to associative array with oxloadid as keys.
      */
-    protected function extractListToArray()
+    protected function extract_list_to_array()
     {
-        $aExtractedContents = [];
-        foreach ($this as $oContent) {
-            $aExtractedContents[$oContent->getLoadId()] = $oContent;
+        $a_extracted_contents = [];
+        foreach ($this as $o_content) {
+            $a_extracted_contents[$o_content->get_load_id()] = $o_content;
         }
-
-        $this->_aArray = $aExtractedContents;
+        $this->_a_array = $a_extracted_contents;
     }
-
     /**
      * Creates SQL by type.
      *
@@ -163,23 +142,20 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string
      */
-    protected function getSQLByType($iType)
+    protected function get_sql_by_type($i_type)
     {
-        $sSQLAdd = '';
-        $oDb = DatabaseProvider::getDb();
-        $sSQLType = ' AND `oxtype` = ' . $oDb->quote($iType);
-
-        if ($iType == self::TYPE_CATEGORY_MENU) {
-            $sSQLAdd = " AND `oxcatid` IS NOT NULL AND `oxsnippet` = '0'";
+        $s_sql_add = '';
+        $o_db = Database_Provider::get_db();
+        $s_sql_type = ' AND `oxtype` = ' . $o_db->quote($i_type);
+        if ($i_type == self::TYPE_CATEGORY_MENU) {
+            $s_sql_add = " AND `oxcatid` IS NOT NULL AND `oxsnippet` = '0'";
         }
-
-        if ($iType == self::TYPE_SERVICE_LIST) {
-            $sIdents = implode(', ', DatabaseProvider::getDb()->quoteArray($this->getServiceKeys()));
-            $sSQLAdd = ' AND OXLOADID IN (' . $sIdents . ')';
-            $sSQLType = '';
+        if ($i_type == self::TYPE_SERVICE_LIST) {
+            $s_idents = implode(', ', Database_Provider::get_db()->quote_array($this->get_service_keys()));
+            $s_sql_add = ' AND OXLOADID IN (' . $s_idents . ')';
+            $s_sql_type = '';
         }
-        $sViewName = $this->getBaseObject()->getViewName();
-
-        return "SELECT * FROM {$sViewName} WHERE `oxactive` = '1' $sSQLType AND `oxshopid` = " . $oDb->quote($this->_sShopID) . " $sSQLAdd ORDER BY `oxloadid`";
+        $s_view_name = $this->get_base_object()->get_view_name();
+        return "SELECT * FROM {$s_view_name} WHERE `oxactive` = '1' {$s_sql_type} AND `oxshopid` = " . $o_db->quote($this->_s_shop_id) . " {$s_sql_add} ORDER BY `oxloadid`";
     }
 }

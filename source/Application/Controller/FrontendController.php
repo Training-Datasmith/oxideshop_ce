@@ -1,40 +1,37 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Controller\BaseController;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Price;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Core\SortingValidator;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
-
+use Oxid_Esales\Eshop\Core\Controller\Base_Controller;
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Price;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Request;
+use Oxid_Esales\Eshop\Core\Str;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Core\Sorting_Validator;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Review_And_Rating_Bridge_Interface;
 use function rawurlencode;
-
 use stdClass;
-
 // view indexing state for search engines:
-define('VIEW_INDEXSTATE_INDEX', 0); //  index without limitations
-define('VIEW_INDEXSTATE_NOINDEXNOFOLLOW', 1); //  no index / no follow
-define('VIEW_INDEXSTATE_NOINDEXFOLLOW', 2); //  no index / follow
-
+define('VIEW_INDEXSTATE_INDEX', 0);
+//  index without limitations
+define('VIEW_INDEXSTATE_NOINDEXNOFOLLOW', 1);
+//  no index / no follow
+define('VIEW_INDEXSTATE_NOINDEXFOLLOW', 2);
+//  no index / follow
 /**
  * Base view class.
  * Class is responsible for managing of components that must be
  * loaded and executed before any regular operation.
  */
-#[\AllowDynamicProperties]
-class FrontendController extends BaseController
+#[\Allow_Dynamic_Properties]
+class Frontend_Controller extends Base_Controller
 {
     private const SEARCH_PARAM = 'searchparam';
     private const SEARCH_CATEGORY_ID = 'searchcnid';
@@ -54,190 +51,163 @@ class FrontendController extends BaseController
      *
      * @var string
      */
-    protected $_sRemoveMetaChars = '.\+*?[^]$(){}=!<>|:&';
-
+    protected $_s_remove_meta_chars = '.\+*?[^]$(){}=!<>|:&';
     /**
      * Array of component objects.
      *
      * @var array of object
      */
-    protected $_oaComponents = [];
-
+    protected $_oa_components = [];
     /**
      * Flag if current view is an order view
      *
      * @var bool
      */
-    protected $_blIsOrderStep = false;
-
+    protected $_bl_is_order_step = false;
     /**
      * List type
      *
      * @var string
      */
-    protected $_sListType;
-
+    protected $_s_list_type;
     /**
      * Possible list display types
      *
      * @var array
      */
-    protected $_aListDisplayTypes = ['grid', 'line', 'infogrid'];
-
+    protected $_a_list_display_types = ['grid', 'line', 'infogrid'];
     /**
      * List display type
      *
      * @var string
      */
-    protected $_sListDisplayType;
-
+    protected $_s_list_display_type;
     /**
      * List display type
      *
      * @var string
      */
-    protected $_sCustomListDisplayType;
-
+    protected $_s_custom_list_display_type;
     /**
      * Active articles category object.
      *
      * @var \OxidEsales\Eshop\Application\Model\Category
      */
-    protected $_oActCategory;
-
+    protected $_o_act_category;
     /**
      * Active Manufacturer object.
      *
      * @var \OxidEsales\Eshop\Application\Model\Manufacturer
      */
-    protected $_oActManufacturer;
-
+    protected $_o_act_manufacturer;
     /**
      * Active vendor object.
      *
      * @var \OxidEsales\Eshop\Application\Model\Vendor
      */
-    protected $_oActVendor;
-
+    protected $_o_act_vendor;
     /**
      * Active recommendation's list
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      */
-    protected $_oActiveRecommList;
-
+    protected $_o_active_recomm_list;
     /**
      * Active search object - stdClass object which keeps navigation info
      *
      * @var stdClass
      */
-    protected $_oActSearch;
-
+    protected $_o_act_search;
     /**
      * Marked which defines if current view is sortable or not
      *
      * @var bool
      */
-    protected $_blShowSorting = false;
-
+    protected $_bl_show_sorting = false;
     /**
      * Load currency option
      *
      * @var bool
      */
-    protected $_blLoadCurrency;
-
+    protected $_bl_load_currency;
     /**
      * Load Manufacturers option
      *
      * @var bool
      */
-    protected $_blLoadManufacturerTree;
-
+    protected $_bl_load_manufacturer_tree;
     /**
      * Don't show empty cats
      *
      * @var bool
      */
-    protected $_blDontShowEmptyCats;
-
+    protected $_bl_dont_show_empty_cats;
     /**
      * Load language option
      *
      * @var bool
      */
-    protected $_blLoadLanguage;
-
+    protected $_bl_load_language;
     /**
      * Item count in category top navigation
      *
      * @var integer
      */
-    protected $_iTopCatNavItmCnt;
-
+    protected $_i_top_cat_nav_itm_cnt;
     /**
      * List's "order by"
      *
      * @var string
      */
-    protected $_sListOrderBy;
-
+    protected $_s_list_order_by;
     /**
      * Order direction of list
      *
      * @var string
      */
-    protected $_sListOrderDir;
-
+    protected $_s_list_order_dir;
     /**
      * Meta description
      *
      * @var string
      */
-    protected $_sMetaDescription;
-
+    protected $_s_meta_description;
     /**
      * Meta keywords
      *
      * @var string
      */
-    protected $_sMetaKeywords;
-
+    protected $_s_meta_keywords;
     /**
      * Start page meta description CMS ident
      *
      * @var string
      */
-    protected $_sMetaDescriptionIdent;
-
+    protected $_s_meta_description_ident;
     /**
      * Start page meta keywords CMS ident
      *
      * @var string
      */
-    protected $_sMetaKeywordsIdent;
-
+    protected $_s_meta_keywords_ident;
     /**
      * Additional params for url.
      *
      * @var string
      */
-    protected $_sAdditionalParams;
-
+    protected $_s_additional_params;
     /**
      * Active currency object.
      *
      * @var object
      */
-    protected $_oActCurrency;
-
+    protected $_o_act_currency;
     /**
      * Private sales on/off state
      *
      * @var bool
      */
-    protected $_blEnabledPrivateSales;
-
+    protected $_bl_enabled_private_sales;
     /**
      * Sign if any new component is added. On this case will be
      * executed components stored in oxBaseView::_aComponentNames
@@ -245,204 +215,154 @@ class FrontendController extends BaseController
      *
      * @var bool
      */
-    protected $_blCommonAdded = false;
-
+    protected $_bl_common_added = false;
     /**
      * Current view search engine indexing state:
      *     VIEW_INDEXSTATE_INDEX - index without limitations
      *     VIEW_INDEXSTATE_NOINDEXNOFOLLOW - no index / no follow
      *     VIEW_INDEXSTATE_NOINDEXFOLLOW - no index / follow
      */
-    protected $_iViewIndexState = VIEW_INDEXSTATE_INDEX;
-
+    protected $_i_view_index_state = VIEW_INDEXSTATE_INDEX;
     /**
      * If true, forces FrontendController::noIndex returns VIEW_INDEXSTATE_NOINDEXFOLLOW
      * (FrontendController::$_iViewIndexState = VIEW_INDEXSTATE_NOINDEXFOLLOW; index / follow)
      *
      * @var bool
      */
-    protected $_blForceNoIndex = false;
-
+    protected $_bl_force_no_index = false;
     /**
      * Number of products in compare list.
      *
      * @var integer
      */
-    protected $_iCompItemsCnt;
-
+    protected $_i_comp_items_cnt;
     /**
      * Default content id
      *
      * @return string
      */
-    protected $_sContentId;
-
+    protected $_s_content_id;
     /** @return \OxidEsales\Eshop\Application\Model\Content Default content. */
-    protected $_oContent;
-
+    protected $_o_content;
     /** @var string View id. */
-    protected $_sViewResetID;
-
+    protected $_s_view_reset_id;
     /** @var array Menu list. */
-    protected $_aMenueList;
-
+    protected $_a_menue_list;
     /**
      * Names of components (classes) that are initiated and executed
      * before any other regular operation.
      *
      * @var array
      */
-    protected $_aComponentNames = [
-        'oxcmp_user'       => 1, // 0 means dont init if cached
-        'oxcmp_lang'       => 0,
-        'oxcmp_cur'        => 1,
-        'oxcmp_shop'       => 1,
+    protected $_a_component_names = [
+        'oxcmp_user' => 1,
+        // 0 means dont init if cached
+        'oxcmp_lang' => 0,
+        'oxcmp_cur' => 1,
+        'oxcmp_shop' => 1,
         'oxcmp_categories' => 0,
-        'oxcmp_utils'      => 1,
-        'oxcmp_basket'     => 1,
+        'oxcmp_utils' => 1,
+        'oxcmp_basket' => 1,
     ];
-
     /**
      * Names of components (classes) that are initiated and executed
      * before any other regular operation. User may modify this himself.
      *
      * @var array
      */
-    protected $_aUserComponentNames = [];
-
+    protected $_a_user_component_names = [];
     /** @var \OxidEsales\Eshop\Application\Model\Article Current view product object. */
-    protected $_oProduct;
-
+    protected $_o_product;
     /** @var int Number of current list page. */
-    protected $_iActPage;
-
+    protected $_i_act_page;
     /** @var array A list of articles. */
-    protected $_aArticleList;
-
+    protected $_a_article_list;
     /** @var \OxidEsales\Eshop\Application\Model\ManufacturerList Manufacturer list object. */
-    protected $_oManufacturerTree;
-
+    protected $_o_manufacturer_tree;
     /** @var \OxidEsales\Eshop\Application\Model\CategoryList Category tree object. */
-    protected $_oCategoryTree;
-
+    protected $_o_category_tree;
     /** @var array Top 5 article list. */
-    protected $_aTop5ArticleList;
-
+    protected $_a_top5article_list;
     /** @var array Bargain article list. */
-    protected $_aBargainArticleList;
-
+    protected $_a_bargain_article_list;
     /** @var integer If order price to low. */
-    protected $_blLowOrderPrice;
-
+    protected $_bl_low_order_price;
     /** @var string Min order price. */
-    protected $_sMinOrderPrice;
-
+    protected $_s_min_order_price;
     /** @var string Real newsletter status. */
-    protected $_iNewsRealStatus;
-
+    protected $_i_news_real_status;
     /** @return array Url parameters which block redirection. */
-    protected $_aBlockRedirectParams = ['fnc', 'stoken', 'force_sid', 'force_admin_sid'];
-
+    protected $_a_block_redirect_params = ['fnc', 'stoken', 'force_sid', 'force_admin_sid'];
     /** @var \OxidEsales\Eshop\Application\Model\Vendor Root vendor object. */
-    protected $_oRootVendor;
-
+    protected $_o_root_vendor;
     /** @var string Vendor id. */
-    protected $_sVendorId;
-
+    protected $_s_vendor_id;
     /** @var array Manufacturer list for search. */
-    protected $_aManufacturerlist;
-
+    protected $_a_manufacturerlist;
     /** @var \OxidEsales\Eshop\Application\Model\Manufacturer Root manufacturer object. */
-    protected $_oRootManufacturer;
-
+    protected $_o_root_manufacturer;
     /** @var string Manufacturer id. */
-    protected $_sManufacturerId;
-
+    protected $_s_manufacturer_id;
     /** @var bool Has user newsletter subscribed. */
-    protected $_blNewsSubscribed;
-
+    protected $_bl_news_subscribed;
     /** @var \OxidEsales\Eshop\Application\Model\Address Delivery address. */
-    protected $_oDelAddress;
-
+    protected $_o_del_address;
     /** @var array Category tree path. */
-    protected $_sCatTreePath;
-
+    protected $_s_cat_tree_path;
     /** @var array Loaded contents array (cache). */
-    protected $_aContents = [];
-
+    protected $_a_contents = [];
     /** @var bool Sign if to load and show top5articles action. */
-    protected $_blTop5Action = false;
-
+    protected $_bl_top5action = false;
     /** @var bool Sign if to load and show bargain action. */
-    protected $_blBargainAction = false;
-
+    protected $_bl_bargain_action = false;
     /** @var array check all "must-be-fields" if they are completely. */
-    protected $_aMustFillFields;
-
+    protected $_a_must_fill_fields;
     /** @var bool If active root category was changed. */
-    protected $_blRootCatChanged = false;
-
+    protected $_bl_root_cat_changed = false;
     /** @var array User address. */
-    protected $_aInvoiceAddress;
-
+    protected $_a_invoice_address;
     /** @var array User delivery address. */
-    protected $_aDeliveryAddress;
-
+    protected $_a_delivery_address;
     /** @var string Logged in user name. */
-    protected $_sActiveUsername;
-
+    protected $_s_active_username;
     /** @var boolean is VAT included in prices */
-    protected $_blIsVatIncluded;
-
+    protected $_bl_is_vat_included;
     /** @var array Components which needs to be initialized/rendered (depending on cache and its cache status). */
-    protected static $_aCollectedComponentNames;
-
+    protected static $_a_collected_component_names;
     /** @var array If active load components. By default active. */
-    protected $_blLoadComponents = true;
-
+    protected $_bl_load_components = true;
     /** @var array Sorting columns list. */
-    protected $_aSortColumns;
-
+    protected $_a_sort_columns;
     /** @var StdClass Page navigation. */
-    protected $_oPageNavigation;
-
+    protected $_o_page_navigation;
     /** @var integer Number of possible pages. */
-    protected $_iCntPages;
-
+    protected $_i_cnt_pages;
     /** @var string Form id. */
-    protected $_sFormId;
-
+    protected $_s_form_id;
     /** @var bool Whether session form id matches with request form id. */
-    protected $_blCanAcceptFormData;
-
+    protected $_bl_can_accept_form_data;
     /**
      * Return true, if the review manager should be shown.
      *
      * @return bool
      */
-    public function isUserAllowedToManageOwnReviews()
+    public function is_user_allowed_to_manage_own_reviews()
     {
-        return (bool) Registry::getConfig()->getConfigParam('blAllowUsersToManageTheirReviews');
+        return (bool) Registry::get_config()->get_config_param('blAllowUsersToManageTheirReviews');
     }
-
     /**
      * Get the total number of reviews for the active user.
      *
      * @return integer Number of reviews
      */
-    public function getReviewAndRatingItemsCount()
+    public function get_review_and_rating_items_count()
     {
-        $user = $this->getUser();
+        $user = $this->get_user();
         if ($user) {
-            return ContainerFacade::get(UserReviewAndRatingBridgeInterface::class)
-                ->getReviewAndRatingListCount(
-                    $user->getId()
-                );
+            return Container_Facade::get(User_Review_And_Rating_Bridge_Interface::class)->get_review_and_rating_list_count($user->get_id());
         }
-
         return 0;
     }
-
     /**
      * Returns component names.
      *
@@ -450,191 +370,161 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    protected function getComponentNames()
+    protected function get_component_names()
     {
-        if (self::$_aCollectedComponentNames === null) {
-            self::$_aCollectedComponentNames = array_merge($this->_aComponentNames, $this->_aUserComponentNames);
-
-            if ($userComponentNames = ContainerFacade::getParameter('oxid_esales.cacheable_user_components')) {
-                self::$_aCollectedComponentNames = array_merge(self::$_aCollectedComponentNames, $userComponentNames);
+        if (self::$_a_collected_component_names === null) {
+            self::$_a_collected_component_names = array_merge($this->_a_component_names, $this->_a_user_component_names);
+            if ($user_component_names = Container_Facade::get_parameter('oxid_esales.cacheable_user_components')) {
+                self::$_a_collected_component_names = array_merge(self::$_a_collected_component_names, $user_component_names);
             }
-
-            if (Registry::getRequest()->getRequestEscapedParameter('_force_no_basket_cmp')) {
-                unset(self::$_aCollectedComponentNames['oxcmp_basket']);
+            if (Registry::get_request()->get_request_escaped_parameter('_force_no_basket_cmp')) {
+                unset(self::$_a_collected_component_names['oxcmp_basket']);
             }
         }
-
-        reset(self::$_aCollectedComponentNames);
-
-        return self::$_aCollectedComponentNames;
+        reset(self::$_a_collected_component_names);
+        return self::$_a_collected_component_names;
     }
-
     /**
      * In non admin mode checks if request was NOT processed by seo handler.
      * If NOT, then tries to load alternative SEO url and if url is available -
      * redirects to it. If no alternative path was found - 404 header is emitted
      * and page is rendered
      */
-    protected function processRequest()
+    protected function process_request()
     {
-        $utils = Registry::getUtils();
-        $requestUrl = Registry::get(Request::class)->getRequestUrl();
+        $utils = Registry::get_utils();
+        $request_url = Registry::get(Request::class)->get_request_url();
         // non admin, request is not empty and was not processed by seo engine
-        if (!isSearchEngineUrl() && $utils->seoIsActive() && $requestUrl) {
+        if (!is_search_engine_url() && $utils->seo_is_active() && $request_url) {
             // fetching standard url and looking for it in seo table
-            if ($this->canRedirect() && ($redirectUrl = Registry::getSeoEncoder()->fetchSeoUrl($requestUrl))) {
-                $utils->redirect(Registry::getConfig()->getCurrentShopUrl() . $redirectUrl, false, 301);
-            } elseif (VIEW_INDEXSTATE_INDEX == $this->noIndex()) {
+            if ($this->can_redirect() && $redirect_url = Registry::get_seo_encoder()->fetch_seo_url($request_url)) {
+                $utils->redirect(Registry::get_config()->get_current_shop_url() . $redirect_url, false, 301);
+            } elseif (VIEW_INDEXSTATE_INDEX == $this->no_index()) {
                 // forcing to set no index/follow meta
-                $this->forceNoIndex();
-
-                if (ContainerFacade::getParameter('oxid_esales.log_not_seo_urls')) {
-                    $shopId = Registry::getConfig()->getShopId();
-                    $languageId = Registry::getLang()->getBaseLanguage();
-                    $id = md5(strtolower((string) $requestUrl) . $shopId . $languageId);
-
+                $this->force_no_index();
+                if (Container_Facade::get_parameter('oxid_esales.log_not_seo_urls')) {
+                    $shop_id = Registry::get_config()->get_shop_id();
+                    $language_id = Registry::get_lang()->get_base_language();
+                    $id = md5(strtolower((string) $request_url) . $shop_id . $language_id);
                     // logging "not found" url
-                    $database = DatabaseProvider::getDb();
-                    $database->execute(
-                        'replace oxseologs ( oxstdurl, oxident, oxshopid, oxlang ) values ( ?, ?, ?, ? ) ',
-                        [$requestUrl, $id, $shopId, $languageId]
-                    );
+                    $database = Database_Provider::get_db();
+                    $database->execute('replace oxseologs ( oxstdurl, oxident, oxshopid, oxlang ) values ( ?, ?, ?, ? ) ', [$request_url, $id, $shop_id, $language_id]);
                 }
             }
         }
     }
-
     /**
      * Calls self::_processRequest(), initializes components which needs to
      * be loaded, sets current list type, calls parent::init()
      */
     public function init(): void
     {
-        $this->processRequest();
-
+        $this->process_request();
         // storing current view
-        $shouldInitialize = $this->shouldInitializeComponents();
-
+        $should_initialize = $this->should_initialize_components();
         // init all components if there are any
-        if ($this->_blLoadComponents) {
-            foreach ($this->getComponentNames() as $componentName => $isNotCacheable) {
+        if ($this->_bl_load_components) {
+            foreach ($this->get_component_names() as $component_name => $is_not_cacheable) {
                 // do not override initiated components
-                if (!isset($this->_oaComponents[$componentName])) {
+                if (!isset($this->_oa_components[$component_name])) {
                     // component objects MUST be created to support user called functions
-                    $component = oxNew($componentName);
-                    $component->setParent($this);
-                    $component->setThisAction($componentName);
-                    $this->_oaComponents[$componentName] = $component;
+                    $component = ox_new($component_name);
+                    $component->set_parent($this);
+                    $component->set_this_action($component_name);
+                    $this->_oa_components[$component_name] = $component;
                 }
-
                 // do we really need to initiate them ?
-                if ($shouldInitialize) {
-                    $this->_oaComponents[$componentName]->init();
-
+                if ($should_initialize) {
+                    $this->_oa_components[$component_name]->init();
                     // executing only is view does not have action method
-                    if (!method_exists($this, (string)$this->getFncName())) {
-                        $this->_oaComponents[$componentName]->executeFunction($this->getFncName());
+                    if (!method_exists($this, (string) $this->get_fnc_name())) {
+                        $this->_oa_components[$component_name]->execute_function($this->get_fnc_name());
                     }
                 }
             }
         }
-
         parent::init();
     }
-
     /**
      * Returns whether init() should initialize created components.
      *
      * @return bool
      */
-    protected function shouldInitializeComponents()
+    protected function should_initialize_components()
     {
         return true;
     }
-
     /**
      * If current view ID is not set - forms and returns view ID
      * according to language and currency.
      *
      * @return string $this->_sViewId
      */
-    public function getViewId()
+    public function get_view_id()
     {
-        return $this->_sViewId ?? $this->_sViewId = $this->generateViewId();
+        return $this->_s_view_id ?? $this->_s_view_id = $this->generate_view_id();
     }
-
     /**
      * Generates current view id.
      *
      * @return string
      */
-    protected function generateViewId()
+    protected function generate_view_id()
     {
-        $config = Registry::getConfig();
-        $viewId = $this->generateViewIdBase();
-
-        $viewId .= '|' . ((int) $this->_blForceNoIndex) . '|' . ((int) $this->isRootCatChanged());
-
+        $config = Registry::get_config();
+        $view_id = $this->generate_view_id_base();
+        $view_id .= '|' . (int) $this->_bl_force_no_index . '|' . (int) $this->is_root_cat_changed();
         // #0004798: SSL should be included in viewId
-        if ($config->isSsl()) {
-            $viewId .= '|ssl';
+        if ($config->is_ssl()) {
+            $view_id .= '|ssl';
         }
-
         // #0002866: external global viewID addition
         if (function_exists('customGetViewId')) {
-            $externalViewId = customGetViewId();
-
-            if ($externalViewId !== null) {
-                $viewId .= '|' . md5(serialize($externalViewId));
+            $external_view_id = custom_get_view_id();
+            if ($external_view_id !== null) {
+                $view_id .= '|' . md5(serialize($external_view_id));
             }
         }
-
-        return $viewId;
+        return $view_id;
     }
-
     /**
      * Generates base for view id.
      *
      * @return string
      */
-    protected function generateViewIdBase()
+    protected function generate_view_id_base()
     {
-        $languageId = Registry::getLang()->getBaseLanguage();
-        $currencyId = (int) Registry::getConfig()->getShopCurrency();
-
-        return "ox|$languageId|$currencyId";
+        $language_id = Registry::get_lang()->get_base_language();
+        $currency_id = (int) Registry::get_config()->get_shop_currency();
+        return "ox|{$language_id}|{$currency_id}";
     }
-
     /**
      * Template variable getter. Returns true if sorting is on
      *
      * @return bool
      */
-    public function showSorting()
+    public function show_sorting()
     {
-        return $this->_blShowSorting && Registry::getConfig()->getConfigParam('blShowSorting');
+        return $this->_bl_show_sorting && Registry::get_config()->get_config_param('blShowSorting');
     }
-
     /**
      * Set array of component objects
      *
      * @param array $components array of components objects
      */
-    public function setComponents($components = null): void
+    public function set_components($components = null): void
     {
-        $this->_oaComponents = $components;
+        $this->_oa_components = $components;
     }
-
     /**
      * Get array of component objects
      *
      * @return array
      */
-    public function getComponents()
+    public function get_components()
     {
-        return $this->_oaComponents;
+        return $this->_oa_components;
     }
-
     /**
      * Get component object
      *
@@ -642,256 +532,224 @@ class FrontendController extends BaseController
      *
      * @return object
      */
-    public function getComponent($name)
+    public function get_component($name)
     {
-        if (isset($name) && isset($this->_oaComponents[$name])) {
-            return $this->_oaComponents[$name];
+        if (isset($name) && isset($this->_oa_components[$name])) {
+            return $this->_oa_components[$name];
         }
     }
-
     /**
      * Set flag if current view is an order view
      *
      * @param bool $isOrderStep flag if current view is an order view
      */
-    public function setIsOrderStep($isOrderStep = null): void
+    public function set_is_order_step($is_order_step = null): void
     {
-        $this->_blIsOrderStep = $isOrderStep;
+        $this->_bl_is_order_step = $is_order_step;
     }
-
     /**
      * Get flag if current view is an order view
      *
      * @return bool
      */
-    public function getIsOrderStep()
+    public function get_is_order_step()
     {
-        return $this->_blIsOrderStep;
+        return $this->_bl_is_order_step;
     }
-
     /**
      * Active category setter
      *
      * @param \OxidEsales\Eshop\Application\Model\Category $category active category
      */
-    public function setActiveCategory($category): void
+    public function set_active_category($category): void
     {
-        $this->_oActCategory = $category;
+        $this->_o_act_category = $category;
     }
-
     /**
      * Returns active category
      *
      * @return \OxidEsales\Eshop\Application\Model\Category|null
      */
-    public function getActiveCategory()
+    public function get_active_category()
     {
-        return $this->_oActCategory;
+        return $this->_o_act_category;
     }
-
     /**
      * Get list type
      *
      * @return string list type
      */
-    public function getListType()
+    public function get_list_type()
     {
-        if ($this->_sListType == null) {
-            if ($listType = Registry::getRequest()->getRequestEscapedParameter('listtype')) {
-                $this->_sListType = $listType;
-            } elseif ($listType = Registry::getConfig()->getGlobalParameter('listtype')) {
-                $this->_sListType = $listType;
+        if ($this->_s_list_type == null) {
+            if ($list_type = Registry::get_request()->get_request_escaped_parameter('listtype')) {
+                $this->_s_list_type = $list_type;
+            } elseif ($list_type = Registry::get_config()->get_global_parameter('listtype')) {
+                $this->_s_list_type = $list_type;
             }
         }
-
-        return $this->_sListType;
+        return $this->_s_list_type;
     }
-
     /**
      * Returns list type
      *
      * @return string
      */
-    public function getListDisplayType()
+    public function get_list_display_type()
     {
-        if ($this->_sListDisplayType == null) {
-            $this->_sListDisplayType = $this->getCustomListDisplayType();
-
-            if (!$this->_sListDisplayType) {
-                $this->_sListDisplayType = Registry::getConfig()->getConfigParam('sDefaultListDisplayType');
+        if ($this->_s_list_display_type == null) {
+            $this->_s_list_display_type = $this->get_custom_list_display_type();
+            if (!$this->_s_list_display_type) {
+                $this->_s_list_display_type = Registry::get_config()->get_config_param('sDefaultListDisplayType');
             }
-
-            $this->_sListDisplayType = in_array((string) $this->_sListDisplayType, $this->_aListDisplayTypes) ?
-                $this->_sListDisplayType : 'infogrid';
-
+            $this->_s_list_display_type = in_array((string) $this->_s_list_display_type, $this->_a_list_display_types) ? $this->_s_list_display_type : 'infogrid';
             // writing to session
-            if (Registry::getRequest()->getRequestEscapedParameter('ldtype')) {
-                Registry::getSession()->setVariable('ldtype', $this->_sListDisplayType);
+            if (Registry::get_request()->get_request_escaped_parameter('ldtype')) {
+                Registry::get_session()->set_variable('ldtype', $this->_s_list_display_type);
             }
         }
-
-        return $this->_sListDisplayType;
+        return $this->_s_list_display_type;
     }
-
     /**
      * Returns changed default list type
      *
      * @return string
      */
-    public function getCustomListDisplayType()
+    public function get_custom_list_display_type()
     {
-        if ($this->_sCustomListDisplayType == null) {
-            $this->_sCustomListDisplayType = Registry::getRequest()->getRequestEscapedParameter('ldtype');
-
-            if (!$this->_sCustomListDisplayType) {
-                $this->_sCustomListDisplayType = Registry::getSession()->getVariable('ldtype');
+        if ($this->_s_custom_list_display_type == null) {
+            $this->_s_custom_list_display_type = Registry::get_request()->get_request_escaped_parameter('ldtype');
+            if (!$this->_s_custom_list_display_type) {
+                $this->_s_custom_list_display_type = Registry::get_session()->get_variable('ldtype');
             }
         }
-
-        return $this->_sCustomListDisplayType;
+        return $this->_s_custom_list_display_type;
     }
-
     /**
      * List type setter
      *
      * @param string $type type of list
      */
-    public function setListType($type): void
+    public function set_list_type($type): void
     {
-        $this->_sListType = $type;
-        Registry::getConfig()->setGlobalParameter('listtype', $type);
+        $this->_s_list_type = $type;
+        Registry::get_config()->set_global_parameter('listtype', $type);
     }
-
     /**
      * Returns currency switching option
      *
      * @return bool
      */
-    public function loadCurrency()
+    public function load_currency()
     {
-        if ($this->_blLoadCurrency == null) {
-            $this->_blLoadCurrency = false;
-            if ($loadCurrency = Registry::getConfig()->getConfigParam('bl_perfLoadCurrency')) {
-                $this->_blLoadCurrency = $loadCurrency;
+        if ($this->_bl_load_currency == null) {
+            $this->_bl_load_currency = false;
+            if ($load_currency = Registry::get_config()->get_config_param('bl_perfLoadCurrency')) {
+                $this->_bl_load_currency = $load_currency;
             }
         }
-
-        return $this->_blLoadCurrency;
+        return $this->_bl_load_currency;
     }
-
     /**
      * Returns true if empty categories are not loaded
      *
      * @return bool
      */
-    public function dontShowEmptyCategories()
+    public function dont_show_empty_categories()
     {
-        if ($this->_blDontShowEmptyCats == null) {
-            $this->_blDontShowEmptyCats = false;
-            if ($dontShowEmptyCats = Registry::getConfig()->getConfigParam('blDontShowEmptyCategories')) {
-                $this->_blDontShowEmptyCats = $dontShowEmptyCats;
+        if ($this->_bl_dont_show_empty_cats == null) {
+            $this->_bl_dont_show_empty_cats = false;
+            if ($dont_show_empty_cats = Registry::get_config()->get_config_param('blDontShowEmptyCategories')) {
+                $this->_bl_dont_show_empty_cats = $dont_show_empty_cats;
             }
         }
-
-        return $this->_blDontShowEmptyCats;
+        return $this->_bl_dont_show_empty_cats;
     }
-
     /**
      * Returns true if empty categories are not loaded
      *
      * @return bool
      */
-    public function showCategoryArticlesCount()
+    public function show_category_articles_count()
     {
-        return Registry::getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt');
+        return Registry::get_config()->get_config_param('bl_perfShowActionCatArticleCnt');
     }
-
     /**
      * Returns if language should be loaded
      *
      * @return bool
      */
-    public function isLanguageLoaded()
+    public function is_language_loaded()
     {
-        if ($this->_blLoadLanguage == null) {
-            $this->_blLoadLanguage = false;
-            if ($loadLanguage = Registry::getConfig()->getConfigParam('bl_perfLoadLanguages')) {
-                $this->_blLoadLanguage = $loadLanguage;
+        if ($this->_bl_load_language == null) {
+            $this->_bl_load_language = false;
+            if ($load_language = Registry::get_config()->get_config_param('bl_perfLoadLanguages')) {
+                $this->_bl_load_language = $load_language;
             }
         }
-
-        return $this->_blLoadLanguage;
+        return $this->_bl_load_language;
     }
-
     /**
      * Returns item count in top navigation of categories
      *
      * @return integer
      */
-    public function getTopNavigationCatCnt()
+    public function get_top_navigation_cat_cnt()
     {
-        if ($this->_iTopCatNavItmCnt == null) {
-            $topCategoryNavigationItemsCount = Registry::getConfig()->getConfigParam('iTopNaviCatCount');
-            $this->_iTopCatNavItmCnt = $topCategoryNavigationItemsCount ?: 5;
+        if ($this->_i_top_cat_nav_itm_cnt == null) {
+            $top_category_navigation_items_count = Registry::get_config()->get_config_param('iTopNaviCatCount');
+            $this->_i_top_cat_nav_itm_cnt = $top_category_navigation_items_count ?: 5;
         }
-
-        return $this->_iTopCatNavItmCnt;
+        return $this->_i_top_cat_nav_itm_cnt;
     }
-
     /**
      * Returns sorted column parameter name
      *
      * @return string
      */
-    public function getSortOrderByParameterName()
+    public function get_sort_order_by_parameter_name()
     {
         return 'listorderby';
     }
-
     /**
      * Returns sorted column direction parameter name
      *
      * @return string
      */
-    public function getSortOrderParameterName()
+    public function get_sort_order_parameter_name()
     {
         return 'listorder';
     }
-
     /**
      * Returns page sort ident. It is used as ident in session variable aSorting[ident]
      *
      * @return string
      */
-    public function getSortIdent()
+    public function get_sort_ident()
     {
         return 'alist';
     }
-
     /**
      * Returns default category sorting for selected category
      */
-    public function getDefaultSorting()
+    public function get_default_sorting()
     {
         return null;
     }
-
     /**
      * Returns default category sorting for selected category
      *
      * @return array
      */
-    public function getUserSelectedSorting()
+    public function get_user_selected_sorting()
     {
-        $request = Registry::get(\OxidEsales\Eshop\Core\Request::class);
-        $sortBy = $request->getRequestParameter($this->getSortOrderByParameterName());
-        $sortOrder = $request->getRequestParameter($this->getSortOrderParameterName());
-
-        if ((new SortingValidator())->isValid($sortBy, $sortOrder)) {
-            return ['sortby' => $sortBy, 'sortdir' => $sortOrder];
+        $request = Registry::get(\Oxid_Esales\Eshop\Core\Request::class);
+        $sort_by = $request->get_request_parameter($this->get_sort_order_by_parameter_name());
+        $sort_order = $request->get_request_parameter($this->get_sort_order_parameter_name());
+        if ((new Sorting_Validator())->is_valid($sort_by, $sort_order)) {
+            return ['sortby' => $sort_by, 'sortdir' => $sort_order];
         }
     }
-
     /**
      * Returns sorting variable from session
      *
@@ -899,80 +757,72 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    public function getSavedSorting($sortIdent)
+    public function get_saved_sorting($sort_ident)
     {
-        $sorting = Registry::getSession()->getVariable('aSorting');
-        if (isset($sorting[$sortIdent])) {
-            return $sorting[$sortIdent];
+        $sorting = Registry::get_session()->get_variable('aSorting');
+        if (isset($sorting[$sort_ident])) {
+            return $sorting[$sort_ident];
         }
     }
-
     /**
      * Set sorting column name
      *
      * @param string $column - column name
      */
-    public function setListOrderBy($column): void
+    public function set_list_order_by($column): void
     {
-        $this->_sListOrderBy = $column;
+        $this->_s_list_order_by = $column;
     }
-
     /**
      * Set sorting directions
      *
      * @param string $direction - direction desc / asc
      */
-    public function setListOrderDirection($direction): void
+    public function set_list_order_direction($direction): void
     {
-        $this->_sListOrderDir = $direction;
+        $this->_s_list_order_dir = $direction;
     }
-
     /**
      * Template variable getter. Returns string after the list is ordered by
      *
      * @return array
      */
-    public function getListOrderBy()
+    public function get_list_order_by()
     {
         //if column is with table name split it
-        $columns = $this->_sListOrderBy ? explode('.', $this->_sListOrderBy) : [];
+        $columns = $this->_s_list_order_by ? explode('.', $this->_s_list_order_by) : [];
         if (count($columns) > 1) {
             return $columns[1];
         }
-
-        return $this->_sListOrderBy;
+        return $this->_s_list_order_by;
     }
-
     /**
      * Template variable getter. Returns list order direction
      *
      * @return array
      */
-    public function getListOrderDirection()
+    public function get_list_order_direction()
     {
-        return $this->_sListOrderDir;
+        return $this->_s_list_order_dir;
     }
-
     /**
      * Sets the view parameter "meta_description"
      *
      * @param string $description prepared string for description
      */
-    public function setMetaDescription($description)
+    public function set_meta_description($description)
     {
-        return $this->_sMetaDescription = $description;
+        return $this->_s_meta_description = $description;
     }
-
     /**
      * Sets the view parameter 'meta_keywords'
      *
      * @param string $keywords prepared string for meta keywords
      */
-    public function setMetaKeywords($keywords)
+    public function set_meta_keywords($keywords)
     {
-        return $this->_sMetaKeywords = $keywords;
+        return $this->_s_meta_keywords = $keywords;
     }
-
     /**
      * Fetches meta data (description or keywords) from seo table
      *
@@ -980,20 +830,15 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    protected function getMetaFromSeo($dataType)
+    protected function get_meta_from_seo($data_type)
     {
-        $seoObjectId = $this->getSeoObjectId();
-        $baseLanguageId = Registry::getLang()->getBaseLanguage();
-        $shopId = Registry::getConfig()->getShopId();
-
-        if (
-            $seoObjectId && Registry::getUtils()->seoIsActive() &&
-            ($keywords = Registry::getSeoEncoder()->getMetaData($seoObjectId, $dataType, $shopId, $baseLanguageId))
-        ) {
+        $seo_object_id = $this->get_seo_object_id();
+        $base_language_id = Registry::get_lang()->get_base_language();
+        $shop_id = Registry::get_config()->get_shop_id();
+        if ($seo_object_id && Registry::get_utils()->seo_is_active() && $keywords = Registry::get_seo_encoder()->get_meta_data($seo_object_id, $data_type, $shop_id, $base_language_id)) {
             return $keywords;
         }
     }
-
     /**
      * Fetches meta data (description or keywords) from content table
      *
@@ -1001,211 +846,180 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    protected function getMetaFromContent($metaIdent)
+    protected function get_meta_from_content($meta_ident)
     {
-        if ($metaIdent) {
-            $content = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
-            if (
-                $content->loadByIdent($metaIdent) &&
-                $content->oxcontents__oxactive->value
-            ) {
-                return Str::getStr()->strip_tags($content->oxcontents__oxcontent->value);
+        if ($meta_ident) {
+            $content = ox_new(\Oxid_Esales\Eshop\Application\Model\Content::class);
+            if ($content->load_by_ident($meta_ident) && $content->oxcontents__oxactive->value) {
+                return Str::get_str()->strip_tags($content->oxcontents__oxcontent->value);
             }
         }
     }
-
     /**
      * Template variable getter. Returns meta keywords
      *
      * @return string
      */
-    public function getMetaKeywords()
+    public function get_meta_keywords()
     {
-        if ($this->_sMetaKeywords === null) {
-            $this->_sMetaKeywords = false;
-
+        if ($this->_s_meta_keywords === null) {
+            $this->_s_meta_keywords = false;
             // set special meta keywords ?
-            if (($keywords = $this->getMetaFromSeo('oxkeywords'))) {
-                $this->_sMetaKeywords = $keywords;
-            } elseif (($keywords = $this->getMetaFromContent($this->_sMetaKeywordsIdent))) {
-                $this->_sMetaKeywords = $this->prepareMetaKeyword($keywords, false);
+            if ($keywords = $this->get_meta_from_seo('oxkeywords')) {
+                $this->_s_meta_keywords = $keywords;
+            } elseif ($keywords = $this->get_meta_from_content($this->_s_meta_keywords_ident)) {
+                $this->_s_meta_keywords = $this->prepare_meta_keyword($keywords, false);
             } else {
-                $this->_sMetaKeywords = $this->prepareMetaKeyword(false, true);
+                $this->_s_meta_keywords = $this->prepare_meta_keyword(false, true);
             }
         }
-
-        return $this->_sMetaKeywords;
+        return $this->_s_meta_keywords;
     }
-
     /**
      * Template variable getter. Returns meta description
      *
      * @return string
      */
-    public function getMetaDescription()
+    public function get_meta_description()
     {
-        if ($this->_sMetaDescription === null) {
-            $this->_sMetaDescription = false;
-
+        if ($this->_s_meta_description === null) {
+            $this->_s_meta_description = false;
             // set special meta description ?
-            if (($description = $this->getMetaFromSeo('oxdescription'))) {
-                $this->_sMetaDescription = $description;
-            } elseif (($description = $this->getMetaFromContent($this->_sMetaDescriptionIdent))) {
-                $this->_sMetaDescription = $this->prepareMetaDescription($description);
+            if ($description = $this->get_meta_from_seo('oxdescription')) {
+                $this->_s_meta_description = $description;
+            } elseif ($description = $this->get_meta_from_content($this->_s_meta_description_ident)) {
+                $this->_s_meta_description = $this->prepare_meta_description($description);
             } else {
-                $this->_sMetaDescription = $this->prepareMetaDescription(false);
+                $this->_s_meta_description = $this->prepare_meta_description(false);
             }
         }
-
-        return $this->_sMetaDescription;
+        return $this->_s_meta_description;
     }
-
     /**
      * Get active currency
      *
      * @return object
      */
-    public function getActCurrency()
+    public function get_act_currency()
     {
-        return $this->_oActCurrency;
+        return $this->_o_act_currency;
     }
-
     /**
      * Active currency setter
      *
      * @param object $currency Currency object
      */
-    public function setActCurrency($currency): void
+    public function set_act_currency($currency): void
     {
-        $this->_oActCurrency = $currency;
+        $this->_o_act_currency = $currency;
     }
-
     /**
      * Template variable getter. Returns comparison article list count.
      *
      * @return integer
      */
-    public function getCompareItemCount()
+    public function get_compare_item_count()
     {
-        if ($this->_iCompItemsCnt === null) {
-            $items = Registry::getSession()->getVariable('aFiltcompproducts');
-            $this->_iCompItemsCnt = is_array($items) ? count($items) : 0;
+        if ($this->_i_comp_items_cnt === null) {
+            $items = Registry::get_session()->get_variable('aFiltcompproducts');
+            $this->_i_comp_items_cnt = is_array($items) ? count($items) : 0;
         }
-
-        return $this->_iCompItemsCnt;
+        return $this->_i_comp_items_cnt;
     }
-
     /**
      * Forces output no index meta data for current view
      */
-    protected function forceNoIndex()
+    protected function force_no_index()
     {
-        $this->_blForceNoIndex = true;
+        $this->_bl_force_no_index = true;
     }
-
     /**
      * Marks that current view is marked as no index, no follow and
      * article details links must contain no follow tags
      *
      * @return int
      */
-    public function noIndex()
+    public function no_index()
     {
-        if ($this->_blForceNoIndex) {
-            $this->_iViewIndexState = VIEW_INDEXSTATE_NOINDEXFOLLOW;
-        } elseif (Registry::getRequest()->getRequestEscapedParameter('cur')) {
-            $this->_iViewIndexState = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
-        } elseif (0 < Registry::getRequest()->getRequestEscapedParameter(self::PAGE_NUMBER)) {
-            $this->_iViewIndexState = VIEW_INDEXSTATE_NOINDEXFOLLOW;
+        if ($this->_bl_force_no_index) {
+            $this->_i_view_index_state = VIEW_INDEXSTATE_NOINDEXFOLLOW;
+        } elseif (Registry::get_request()->get_request_escaped_parameter('cur')) {
+            $this->_i_view_index_state = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
+        } elseif (0 < Registry::get_request()->get_request_escaped_parameter(self::PAGE_NUMBER)) {
+            $this->_i_view_index_state = VIEW_INDEXSTATE_NOINDEXFOLLOW;
         } else {
-            switch (Registry::getRequest()->getRequestEscapedParameter('fnc')) {
+            switch (Registry::get_request()->get_request_escaped_parameter('fnc')) {
                 case 'tocomparelist':
                 case 'tobasket':
-                    $this->_iViewIndexState = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
+                    $this->_i_view_index_state = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
                     break;
             }
         }
-
-        return $this->_iViewIndexState;
+        return $this->_i_view_index_state;
     }
-
     /**
      * Template variable getter. Returns header menu list
      *
      * @return array
      */
-    public function getMenueList()
+    public function get_menue_list()
     {
-        return $this->_aMenueList;
+        return $this->_a_menue_list;
     }
-
     /**
      * Header menu list setter
      *
      * @param array $menu menu list
      */
-    public function setMenueList($menu): void
+    public function set_menue_list($menu): void
     {
-        $this->_aMenueList = $menu;
+        $this->_a_menue_list = $menu;
     }
-
     /**
      * Sets number of articles per page to config value
      */
-    protected function setNrOfArtPerPage()
+    protected function set_nr_of_art_per_page()
     {
-        $config = Registry::getConfig();
-
+        $config = Registry::get_config();
         //setting default values to avoid possible errors showing article list
-        $numberOfCategoryArticles = $config->getConfigParam('iNrofCatArticles');
-
-        $numberOfCategoryArticles = $numberOfCategoryArticles ?: 10;
-
+        $number_of_category_articles = $config->get_config_param('iNrofCatArticles');
+        $number_of_category_articles = $number_of_category_articles ?: 10;
         // checking if all needed data is set
-        $numbersOfCategoryArticles = match ($this->getListDisplayType()) {
-            'grid' => $config->getConfigParam('aNrofCatArticlesInGrid'),
-            default => $config->getConfigParam('aNrofCatArticles'),
+        $numbers_of_category_articles = match ($this->get_list_display_type()) {
+            'grid' => $config->get_config_param('aNrofCatArticlesInGrid'),
+            default => $config->get_config_param('aNrofCatArticles'),
         };
-
-        if (!is_array($numbersOfCategoryArticles) || !isset($numbersOfCategoryArticles[0])) {
-            $numbersOfCategoryArticles = [$numberOfCategoryArticles];
-            $config->setConfigParam('aNrofCatArticles', $numbersOfCategoryArticles);
+        if (!is_array($numbers_of_category_articles) || !isset($numbers_of_category_articles[0])) {
+            $numbers_of_category_articles = [$number_of_category_articles];
+            $config->set_config_param('aNrofCatArticles', $numbers_of_category_articles);
         } else {
-            $numberOfCategoryArticles = $numbersOfCategoryArticles[0];
+            $number_of_category_articles = $numbers_of_category_articles[0];
         }
-
-        $viewConfig = $this->getViewConfig();
+        $view_config = $this->get_view_config();
         //value from user input
-        $session = Registry::getSession();
-        if (($articlesPerPage = (int) Registry::getRequest()->getRequestEscapedParameter('_artperpage'))) {
+        $session = Registry::get_session();
+        if ($articles_per_page = (int) Registry::get_request()->get_request_escaped_parameter('_artperpage')) {
             // M45 Possibility to push any "Show articles per page" number parameter
-            $numberOfCategoryArticles = (in_array($articlesPerPage, $numbersOfCategoryArticles))
-                ? $articlesPerPage
-                : $numberOfCategoryArticles;
-            $viewConfig->setViewConfigParam('iartPerPage', $numberOfCategoryArticles);
-            $session->setVariable('_artperpage', $numberOfCategoryArticles);
-        } elseif (($sessArtPerPage = $session->getVariable('_artperpage')) && is_numeric($sessArtPerPage)) {
+            $number_of_category_articles = in_array($articles_per_page, $numbers_of_category_articles) ? $articles_per_page : $number_of_category_articles;
+            $view_config->set_view_config_param('iartPerPage', $number_of_category_articles);
+            $session->set_variable('_artperpage', $number_of_category_articles);
+        } elseif (($sess_art_per_page = $session->get_variable('_artperpage')) && is_numeric($sess_art_per_page)) {
             // M45 Possibility to push any "Show articles per page" number parameter
-            $numberOfCategoryArticles = (in_array($sessArtPerPage, $numbersOfCategoryArticles))
-                ? $sessArtPerPage
-                : $numberOfCategoryArticles;
-            $viewConfig->setViewConfigParam('iartPerPage', $numberOfCategoryArticles);
-            $session->setVariable('_artperpage', $numberOfCategoryArticles);
+            $number_of_category_articles = in_array($sess_art_per_page, $numbers_of_category_articles) ? $sess_art_per_page : $number_of_category_articles;
+            $view_config->set_view_config_param('iartPerPage', $number_of_category_articles);
+            $session->set_variable('_artperpage', $number_of_category_articles);
         } else {
-            $viewConfig->setViewConfigParam('iartPerPage', $numberOfCategoryArticles);
+            $view_config->set_view_config_param('iartPerPage', $number_of_category_articles);
         }
-
         //setting number of articles per page to config value
-        $config->setConfigParam('iNrofCatArticles', $numberOfCategoryArticles);
+        $config->set_config_param('iNrofCatArticles', $number_of_category_articles);
     }
-
     /**
      * Override this function to return object it which is used to identify its seo meta info
      */
-    protected function getSeoObjectId()
+    protected function get_seo_object_id()
     {
     }
-
     /**
      * Returns current view meta description data
      *
@@ -1215,44 +1029,38 @@ class FrontendController extends BaseController
      *
      * @return  string  $string    converted string
      */
-    protected function prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false)
+    protected function prepare_meta_description($meta, $length = 1024, $remove_duplicated_words = false)
     {
         if ($meta) {
-            $stringModifier = Str::getStr();
+            $string_modifier = Str::get_str();
             if ($length != -1) {
                 /* *
                  * performance - we do not need a huge amount of initial text.
                  * assume that effective text may be double longer than $length
                  * and simple truncate it
                  */
-                $doubleLength = ($length * 2);
-                $meta = $stringModifier->substr($meta, 0, $doubleLength);
+                $double_length = $length * 2;
+                $meta = $string_modifier->substr($meta, 0, $double_length);
             }
-
             // decoding html entities
-            $meta = $stringModifier->html_entity_decode($meta);
+            $meta = $string_modifier->html_entity_decode($meta);
             // stripping HTML tags
-            $meta = $stringModifier->strip_tags($meta);
-
+            $meta = $string_modifier->strip_tags($meta);
             // removing some special chars
-            $meta = $stringModifier->cleanStr($meta);
-
+            $meta = $string_modifier->clean_str($meta);
             // removing duplicate words
-            if ($removeDuplicatedWords) {
-                $meta = $this->removeDuplicatedWords($meta, Registry::getConfig()->getConfigParam('aSkipTags'));
+            if ($remove_duplicated_words) {
+                $meta = $this->remove_duplicated_words($meta, Registry::get_config()->get_config_param('aSkipTags'));
             }
-
             // some special cases
             $meta = str_replace(' ,', ',', $meta);
-            $pattern = ["/,[\s+\-*]*,/", "/\s+,/"];
-            $meta = $stringModifier->preg_replace($pattern, ',', $meta);
-            $meta = Registry::getUtilsString()->minimizeTruncateString($meta, $length);
-            $meta = $stringModifier->htmlspecialchars($meta);
-
+            $pattern = ["/,[\\s+\\-*]*,/", "/\\s+,/"];
+            $meta = $string_modifier->preg_replace($pattern, ',', $meta);
+            $meta = Registry::get_utils_string()->minimize_truncate_string($meta, $length);
+            $meta = $string_modifier->htmlspecialchars($meta);
             return trim((string) $meta);
         }
     }
-
     /**
      * Returns current view keywords separated by comma
      *
@@ -1261,17 +1069,14 @@ class FrontendController extends BaseController
      *
      * @return string of keywords separated by comma
      */
-    protected function prepareMetaKeyword($keywords, $removeDuplicatedWords = true)
+    protected function prepare_meta_keyword($keywords, $remove_duplicated_words = true)
     {
-        $string = $this->prepareMetaDescription($keywords, -1, false);
-
-        if ($removeDuplicatedWords) {
-            $string = $this->removeDuplicatedWords($string, Registry::getConfig()->getConfigParam('aSkipTags'));
+        $string = $this->prepare_meta_description($keywords, -1, false);
+        if ($remove_duplicated_words) {
+            $string = $this->remove_duplicated_words($string, Registry::get_config()->get_config_param('aSkipTags'));
         }
-
         return trim($string);
     }
-
     /**
      * Removes duplicated words (not case sensitive)
      *
@@ -1280,37 +1085,32 @@ class FrontendController extends BaseController
      *
      * @return string of words separated by comma
      */
-    protected function removeDuplicatedWords($input, $skipTags = [])
+    protected function remove_duplicated_words($input, $skip_tags = [])
     {
-        $stringModifier = Str::getStr();
+        $string_modifier = Str::get_str();
         if (is_array($input)) {
             $input = implode(' ', $input);
         }
-
         // removing some usually met characters..
-        $input = $stringModifier->preg_replace('/[' . preg_quote($this->_sRemoveMetaChars, '/') . ']/', ' ', $input);
-
+        $input = $string_modifier->preg_replace('/[' . preg_quote($this->_s_remove_meta_chars, '/') . ']/', ' ', $input);
         // splitting by word
-        $strings = $stringModifier->preg_split("/[\s,]+/", $input);
-
-        if ($count = count($skipTags)) {
+        $strings = $string_modifier->preg_split("/[\\s,]+/", $input);
+        if ($count = count($skip_tags)) {
             for ($num = 0; $num < $count; $num++) {
-                $skipTags[$num] = $stringModifier->strtolower($skipTags[$num]);
+                $skip_tags[$num] = $string_modifier->strtolower($skip_tags[$num]);
             }
         }
         $count = count($strings);
         for ($num = 0; $num < $count; $num++) {
-            $strings[$num] = $stringModifier->strtolower($strings[$num]);
+            $strings[$num] = $string_modifier->strtolower($strings[$num]);
             // removing in admin defined strings
-            if (!$strings[$num] || in_array($strings[$num], $skipTags)) {
+            if (!$strings[$num] || in_array($strings[$num], $skip_tags)) {
                 unset($strings[$num]);
             }
         }
-
         // duplicates
         return implode(', ', array_unique($strings));
     }
-
     /**
      * Returns array of params => values which are used in hidden forms and as additional url params.
      * NOTICE: this method SHOULD return raw (non encoded into entities) parameters, because values
@@ -1318,33 +1118,24 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    public function getNavigationParams()
+    public function get_navigation_params()
     {
-        Registry::getConfig();
-        $params[self::CATEGORY_ID] = $this->getCategoryId();
-        $params[self::MANUFACTURER_ID] = Registry::getRequest()->getRequestEscapedParameter(self::MANUFACTURER_ID);
-
-        $params['listtype'] = $this->getListType();
-        $params['ldtype'] = $this->getCustomListDisplayType();
-        $params['actcontrol'] = $this->getClassKey();
-
+        Registry::get_config();
+        $params[self::CATEGORY_ID] = $this->get_category_id();
+        $params[self::MANUFACTURER_ID] = Registry::get_request()->get_request_escaped_parameter(self::MANUFACTURER_ID);
+        $params['listtype'] = $this->get_list_type();
+        $params['ldtype'] = $this->get_custom_list_display_type();
+        $params['actcontrol'] = $this->get_class_key();
         // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-        $params[self::RECOMMENDATION_ID] = Registry::getRequest()->getRequestEscapedParameter(self::RECOMMENDATION_ID);
-
-        $params[self::SEARCH_RECOMMENDATION] = Registry::getRequest()
-            ->getRequestEscapedParameter(self::SEARCH_RECOMMENDATION);
+        $params[self::RECOMMENDATION_ID] = Registry::get_request()->get_request_escaped_parameter(self::RECOMMENDATION_ID);
+        $params[self::SEARCH_RECOMMENDATION] = Registry::get_request()->get_request_escaped_parameter(self::SEARCH_RECOMMENDATION);
         // END deprecated
-        $params[self::SEARCH_PARAM] = Registry::getRequest()->getRequestEscapedParameter(self::SEARCH_PARAM);
-
-        $params[self::SEARCH_VENDOR] = Registry::getRequest()->getRequestEscapedParameter(self::SEARCH_VENDOR);
-        $params[self::SEARCH_CATEGORY_ID] = Registry::getRequest()
-            ->getRequestEscapedParameter(self::SEARCH_CATEGORY_ID);
-        $params[self::SEARCH_MANUFACTURER] = Registry::getRequest()
-            ->getRequestEscapedParameter(self::SEARCH_MANUFACTURER);
-
-        return array_merge($params, $this->getViewConfig()->getAdditionalNavigationParameters());
+        $params[self::SEARCH_PARAM] = Registry::get_request()->get_request_escaped_parameter(self::SEARCH_PARAM);
+        $params[self::SEARCH_VENDOR] = Registry::get_request()->get_request_escaped_parameter(self::SEARCH_VENDOR);
+        $params[self::SEARCH_CATEGORY_ID] = Registry::get_request()->get_request_escaped_parameter(self::SEARCH_CATEGORY_ID);
+        $params[self::SEARCH_MANUFACTURER] = Registry::get_request()->get_request_escaped_parameter(self::SEARCH_MANUFACTURER);
+        return array_merge($params, $this->get_view_config()->get_additional_navigation_parameters());
     }
-
     /**
      * Sets sorting item config
      *
@@ -1352,15 +1143,13 @@ class FrontendController extends BaseController
      * @param string $sortBy    sort field
      * @param string $sortDir   sort direction (optional)
      */
-    public function setItemSorting($sortIdent, $sortBy, $sortDir = null): void
+    public function set_item_sorting($sort_ident, $sort_by, $sort_dir = null): void
     {
-        $sorting = Registry::getSession()->getVariable('aSorting');
-        $sorting[$sortIdent]['sortby'] = $sortBy;
-        $sorting[$sortIdent]['sortdir'] = $sortDir ?: null;
-
-        Registry::getSession()->setVariable('aSorting', $sorting);
+        $sorting = Registry::get_session()->get_variable('aSorting');
+        $sorting[$sort_ident]['sortby'] = $sort_by;
+        $sorting[$sort_ident]['sortdir'] = $sort_dir ?: null;
+        Registry::get_session()->set_variable('aSorting', $sorting);
     }
-
     /**
      * Returns sorting config for current item
      *
@@ -1368,24 +1157,20 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    public function getSorting($sortIdent)
+    public function get_sorting($sort_ident)
     {
         $sorting = null;
-
-        if ($sorting = $this->getUserSelectedSorting()) {
-            $this->setItemSorting($sortIdent, $sorting['sortby'], $sorting['sortdir']);
-        } elseif (!$sorting = $this->getSavedSorting($sortIdent)) {
-            $sorting = $this->getDefaultSorting();
+        if ($sorting = $this->get_user_selected_sorting()) {
+            $this->set_item_sorting($sort_ident, $sorting['sortby'], $sorting['sortdir']);
+        } elseif (!$sorting = $this->get_saved_sorting($sort_ident)) {
+            $sorting = $this->get_default_sorting();
         }
-
         if ($sorting) {
-            $this->setListOrderBy($sorting['sortby']);
-            $this->setListOrderDirection($sorting['sortdir']);
+            $this->set_list_order_by($sorting['sortby']);
+            $this->set_list_order_direction($sorting['sortdir']);
         }
-
         return $sorting;
     }
-
     /**
      * Returns part of SQL query with sorting params
      *
@@ -1393,64 +1178,57 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    public function getSortingSql($ident)
+    public function get_sorting_sql($ident)
     {
-        $sorting = $this->getSorting($ident);
+        $sorting = $this->get_sorting($ident);
         if (is_array($sorting)) {
-            $sortDir = $sorting['sortdir'] ?? '';
-            if ($this->isAllowedSortingOrder($sortDir)) {
-                $sortBy = DatabaseProvider::getDb()->quoteIdentifier($sorting['sortby']);
-                return trim($sortBy . ' ' . $sortDir);
+            $sort_dir = $sorting['sortdir'] ?? '';
+            if ($this->is_allowed_sorting_order($sort_dir)) {
+                $sort_by = Database_Provider::get_db()->quote_identifier($sorting['sortby']);
+                return trim($sort_by . ' ' . $sort_dir);
             }
         }
     }
-
     /**
      * Returns title suffix used in template
      *
      * @return string
      */
-    public function getTitleSuffix()
+    public function get_title_suffix()
     {
-        return Registry::getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
+        return Registry::get_config()->get_active_shop()->oxshops__oxtitlesuffix->value;
     }
-
     /**
      * Returns title page suffix used in template in lists
      */
-    public function getTitlePageSuffix()
+    public function get_title_page_suffix()
     {
     }
-
     /**
      * Returns title prefix used in template
      *
      * @return string
      */
-    public function getTitlePrefix()
+    public function get_title_prefix()
     {
-        return Registry::getConfig()->getActiveShop()->oxshops__oxtitleprefix->value;
+        return Registry::get_config()->get_active_shop()->oxshops__oxtitleprefix->value;
     }
-
     /**
      * Returns full page title
      *
      * @return string
      */
-    public function getPageTitle()
+    public function get_page_title()
     {
-        $titleParts = [];
-        $titleParts[] = $this->getTitlePrefix();
-        $titleParts[] = $this->getTitle();
-        $titleParts[] = $this->getTitleSuffix();
-        $titleParts[] = $this->getTitlePageSuffix();
-
-        $titleParts = array_filter($titleParts);
-        $title = implode(' | ', $titleParts);
-
-        return $this->replaceDoubleQuotesWithHTMLCharacters($title);
+        $title_parts = [];
+        $title_parts[] = $this->get_title_prefix();
+        $title_parts[] = $this->get_title();
+        $title_parts[] = $this->get_title_suffix();
+        $title_parts[] = $this->get_title_page_suffix();
+        $title_parts = array_filter($title_parts);
+        $title = implode(' | ', $title_parts);
+        return $this->replace_double_quotes_with_html_characters($title);
     }
-
     /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
@@ -1459,37 +1237,33 @@ class FrontendController extends BaseController
      *
      * @return object
      */
-    protected function getSubject($languageId)
+    protected function get_subject($language_id)
     {
         return null;
     }
-
     /**
      * returns additional url params for dynamic url building
      *
      * @return string
      */
-    public function getDynUrlParams()
+    public function get_dyn_url_params()
     {
         $result = '';
-        $listType = $this->getListType();
-
-        switch ($listType) {
+        $list_type = $this->get_list_type();
+        switch ($list_type) {
             default:
-                $result .= $this->getViewConfig()->getDynUrlParameters($listType);
+                $result .= $this->get_view_config()->get_dyn_url_parameters($list_type);
                 break;
             case 'search':
-                $result .= "&amp;listtype={$listType}";
-                $result .= $this->appendUnescapedEncodedValue(self::SEARCH_PARAM);
-                $result .= $this->appendUnescapedValue(self::SEARCH_CATEGORY_ID);
-                $result .= $this->appendUnescapedValue(self::SEARCH_VENDOR);
-                $result .= $this->appendUnescapedValue(self::SEARCH_MANUFACTURER);
+                $result .= "&amp;listtype={$list_type}";
+                $result .= $this->append_unescaped_encoded_value(self::SEARCH_PARAM);
+                $result .= $this->append_unescaped_value(self::SEARCH_CATEGORY_ID);
+                $result .= $this->append_unescaped_value(self::SEARCH_VENDOR);
+                $result .= $this->append_unescaped_value(self::SEARCH_MANUFACTURER);
                 break;
         }
-
         return $result;
     }
-
     /**
      * Get base link of current view
      *
@@ -1497,32 +1271,27 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    public function getBaseLink($languageId = null)
+    public function get_base_link($language_id = null)
     {
-        if (!isset($languageId)) {
-            $languageId = Registry::getLang()->getBaseLanguage();
+        if (!isset($language_id)) {
+            $language_id = Registry::get_lang()->get_base_language();
         }
-
-        $config = Registry::getConfig();
-
-        if (Registry::getUtils()->seoIsActive()) {
-            if ($displayObj = $this->getSubject($languageId)) {
-                $url = $displayObj->getLink($languageId);
+        $config = Registry::get_config();
+        if (Registry::get_utils()->seo_is_active()) {
+            if ($display_obj = $this->get_subject($language_id)) {
+                $url = $display_obj->get_link($language_id);
             } else {
-                $encoder = Registry::getSeoEncoder();
-                $constructedUrl = $config->getShopHomeUrl($languageId) . $this->getSeoRequestParams();
-                $url = $encoder->getStaticUrl($constructedUrl, $languageId);
+                $encoder = Registry::get_seo_encoder();
+                $constructed_url = $config->get_shop_home_url($language_id) . $this->get_seo_request_params();
+                $url = $encoder->get_static_url($constructed_url, $language_id);
             }
         }
-
         if (!$url) {
-            $constructedUrl = $config->getShopCurrentURL($languageId) . $this->getRequestParams();
-            $url = Registry::getUtilsUrl()->processUrl($constructedUrl, true, null, $languageId);
+            $constructed_url = $config->get_shop_current_url($language_id) . $this->get_request_params();
+            $url = Registry::get_utils_url()->process_url($constructed_url, true, null, $language_id);
         }
-
         return $url;
     }
-
     /**
      * Get link of current view. In url its include also page number if it is list page
      *
@@ -1530,18 +1299,16 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    public function getLink($languageId = null)
+    public function get_link($language_id = null)
     {
-        return $this->addPageNrParam($this->getBaseLink($languageId), $this->getActPage(), $languageId);
+        return $this->add_page_nr_param($this->get_base_link($language_id), $this->get_act_page(), $language_id);
     }
-
     /**
      * Returns view object canonical url
      */
-    public function getCanonicalUrl()
+    public function get_canonical_url()
     {
     }
-
     /**
      * Return array of id to form recommend list.
      * Should be overridden if need.
@@ -1550,19 +1317,17 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    public function getSimilarRecommListIds()
+    public function get_similar_recomm_list_ids()
     {
         return false;
     }
-
     /**
      * Template variable getter. Returns search parameter for Html
      * So far this method is implemented in search (search.php) view.
      */
-    public function getSearchParamForHtml()
+    public function get_search_param_for_html()
     {
     }
-
     /**
      * collects _GET parameters used by eShop and returns uri
      *
@@ -1570,69 +1335,54 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    protected function getRequestParams($addPageNumber = true)
+    protected function get_request_params($add_page_number = true)
     {
-        $class = $this->getClassKey();
-        $function = $this->getFncName();
-
-        $forbiddenFunctions = [
-            'tobasket',
-            'login_noredirect',
-            'addVoucher',
-            'moveleft',
-            'moveright',
-            'deleteReviewAndRating',
-        ];
-
-        if (\in_array($function, $forbiddenFunctions, true)) {
+        $class = $this->get_class_key();
+        $function = $this->get_fnc_name();
+        $forbidden_functions = ['tobasket', 'login_noredirect', 'addVoucher', 'moveleft', 'moveright', 'deleteReviewAndRating'];
+        if (\in_array($function, $forbidden_functions, true)) {
             $function = '';
         }
-
         // #680
         $url = "cl={$class}";
         if ($function) {
             $url .= "&amp;fnc={$function}";
         }
-        $url .= $this->appendValue(self::CATEGORY_ID);
-        $url .= $this->appendValue(self::MANUFACTURER_ID);
-        $url .= $this->appendValue(self::ACTIVE_PRODUCT_ID);
-        $url .= $this->appendBasenameValue(self::PAGE);
-        $url .= $this->appendBasenameValue(self::TEMPLATE);
-        $url .= $this->appendValue(self::LOAD_ID);
+        $url .= $this->append_value(self::CATEGORY_ID);
+        $url .= $this->append_value(self::MANUFACTURER_ID);
+        $url .= $this->append_value(self::ACTIVE_PRODUCT_ID);
+        $url .= $this->append_basename_value(self::PAGE);
+        $url .= $this->append_basename_value(self::TEMPLATE);
+        $url .= $this->append_value(self::LOAD_ID);
         // don't include page number for navigation
         // it will be done in \OxidEsales\Eshop\Application\Controller\FrontendController::generatePageNavigation
-        if ($addPageNumber) {
-            $url .= $this->appendValue(self::PAGE_NUMBER);
+        if ($add_page_number) {
+            $url .= $this->append_value(self::PAGE_NUMBER);
         }
         // #1184M - specialchar search
-        $url .= $this->appendUnescapedEncodedValue(self::SEARCH_PARAM);
-        $url .= $this->appendValue(self::SEARCH_CATEGORY_ID);
-        $url .= $this->appendValue(self::SEARCH_VENDOR);
-        $url .= $this->appendValue(self::SEARCH_MANUFACTURER);
-        $url .= $this->appendValue(self::SEARCH_RECOMMENDATION);
-
+        $url .= $this->append_unescaped_encoded_value(self::SEARCH_PARAM);
+        $url .= $this->append_value(self::SEARCH_CATEGORY_ID);
+        $url .= $this->append_value(self::SEARCH_VENDOR);
+        $url .= $this->append_value(self::SEARCH_MANUFACTURER);
+        $url .= $this->append_value(self::SEARCH_RECOMMENDATION);
         // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-        $url .= $this->appendValue(self::RECOMMENDATION_ID);
+        $url .= $this->append_value(self::RECOMMENDATION_ID);
         // END deprecated
-
-        $url .= $this->getViewConfig()->addRequestParameters();
-
+        $url .= $this->get_view_config()->add_request_parameters();
         return $url;
     }
-
     /**
      * collects _GET parameters used by eShop SEO and returns uri
      *
      * @return string
      */
-    protected function getSeoRequestParams()
+    protected function get_seo_request_params()
     {
-        $class = $this->getClassKey();
-        $function = $this->getFncName();
-
+        $class = $this->get_class_key();
+        $function = $this->get_fnc_name();
         // #921 S
-        $forbiddenFunctions = ['tobasket', 'login_noredirect', 'addVoucher'];
-        if (\in_array($function, $forbiddenFunctions, true)) {
+        $forbidden_functions = ['tobasket', 'login_noredirect', 'addVoucher'];
+        if (\in_array($function, $forbidden_functions, true)) {
             $function = '';
         }
         // #680
@@ -1640,64 +1390,55 @@ class FrontendController extends BaseController
         if ($function) {
             $url .= "&amp;fnc={$function}";
         }
-
-        $url .= $this->appendBasenameValue(self::PAGE);
-        $url .= $this->appendBasenameValue(self::TEMPLATE);
-        $url .= $this->appendValue(self::LOAD_ID);
-
-        return $url . $this->appendValue(self::PAGE_NUMBER);
+        $url .= $this->append_basename_value(self::PAGE);
+        $url .= $this->append_basename_value(self::TEMPLATE);
+        $url .= $this->append_value(self::LOAD_ID);
+        return $url . $this->append_value(self::PAGE_NUMBER);
     }
-
     /**
      * Returns show category search
      *
      * @return bool
      */
-    public function showSearch()
+    public function show_search()
     {
-        return !(Registry::getConfig()->getConfigParam('blDisableNavBars') && $this->getIsOrderStep());
+        return !(Registry::get_config()->get_config_param('blDisableNavBars') && $this->get_is_order_step());
     }
-
     /**
      * Template variable getter. Returns sorting columns
      *
      * @return array
      */
-    public function getSortColumns()
+    public function get_sort_columns()
     {
-        if ($this->_aSortColumns === null) {
-            $this->setSortColumns(Registry::getConfig()->getConfigParam('aSortCols'));
+        if ($this->_a_sort_columns === null) {
+            $this->set_sort_columns(Registry::get_config()->get_config_param('aSortCols'));
         }
-
-        return $this->_aSortColumns;
+        return $this->_a_sort_columns;
     }
-
     /**
      * Set sorting columns
      *
      * @param array $sortColumns array of column names array('name1', 'name2',...)
      */
-    public function setSortColumns($sortColumns): void
+    public function set_sort_columns($sort_columns): void
     {
-        $this->_aSortColumns = $sortColumns;
+        $this->_a_sort_columns = $sort_columns;
     }
-
     /**
      * Template variable getter. Returns search string
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      */
-    public function getRecommSearch()
+    public function get_recomm_search()
     {
     }
-
     /**
      * Template variable getter. Returns payment id
      */
-    public function getPaymentList()
+    public function get_payment_list()
     {
     }
-
     /**
      * Template variable getter. Returns active recommendation lists
      *
@@ -1705,83 +1446,74 @@ class FrontendController extends BaseController
      *
      * @return \OxidEsales\Eshop\Application\Model\RecommendationList|false
      */
-    public function getActiveRecommList()
+    public function get_active_recomm_list()
     {
-        if ($this->_oActiveRecommList === null) {
-            $this->_oActiveRecommList = false;
-            if ($recommendationListId = Registry::getRequest()->getRequestEscapedParameter(self::RECOMMENDATION_ID)) {
-                $this->_oActiveRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
-                $this->_oActiveRecommList->load($recommendationListId);
+        if ($this->_o_active_recomm_list === null) {
+            $this->_o_active_recomm_list = false;
+            if ($recommendation_list_id = Registry::get_request()->get_request_escaped_parameter(self::RECOMMENDATION_ID)) {
+                $this->_o_active_recomm_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Recommendation_List::class);
+                $this->_o_active_recomm_list->load($recommendation_list_id);
             }
         }
-
-        return $this->_oActiveRecommList;
+        return $this->_o_active_recomm_list;
     }
-
     /**
      * Template variable getter. Returns accessoires of article
      */
-    public function getAccessoires()
+    public function get_accessoires()
     {
     }
-
     /**
      * Template variable getter. Returns crosssellings
      */
-    public function getCrossSelling()
+    public function get_cross_selling()
     {
     }
-
     /**
      * Template variable getter. Returns similar article list
      */
-    public function getSimilarProducts()
+    public function get_similar_products()
     {
     }
-
     /**
      * Template variable getter. Returns list of customer also bought thies products
      */
-    public function getAlsoBoughtTheseProducts()
+    public function get_also_bought_these_products()
     {
     }
-
     /**
      * Return the active article id
      */
-    public function getArticleId()
+    public function get_article_id()
     {
     }
-
     /**
      * Returns current view title. Default is search for translation of PAGE_TITLE_{view_class_name}
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        $language = Registry::getLang();
-        $translationName = 'PAGE_TITLE_' . strtoupper((string) Registry::getConfig()->getActiveView()->getClassKey());
-        $translated = $language->translateString($translationName, Registry::getLang()->getBaseLanguage(), false);
-
-        return $translationName == $translated ? null : $translated;
+        $language = Registry::get_lang();
+        $translation_name = 'PAGE_TITLE_' . strtoupper((string) Registry::get_config()->get_active_view()->get_class_key());
+        $translated = $language->translate_string($translation_name, Registry::get_lang()->get_base_language(), false);
+        return $translation_name == $translated ? null : $translated;
     }
-
     /**
      * Returns active lang suffix
      * usally it used in html lang attr to allow the browser to interpret the page in the right language
      * e.g. to support hyphons
      * @return string
      */
-    public function getActiveLangAbbr()
+    public function get_active_lang_abbr()
     {
-        if (!isset($this->_sActiveLangAbbr)) {
-            $languageService = Registry::getLang();
-            if (Registry::getConfig()->getConfigParam('bl_perfLoadLanguages')) {
-                $languages = $languageService->getLanguageArray();
+        if (!isset($this->_s_active_lang_abbr)) {
+            $language_service = Registry::get_lang();
+            if (Registry::get_config()->get_config_param('bl_perfLoadLanguages')) {
+                $languages = $language_service->get_language_array();
                 foreach ($languages as $language) {
                     if ($language->selected) {
-                        $this->_sActiveLangAbbr = $language->abbr;
+                        $this->_s_active_lang_abbr = $language->abbr;
                         break;
                     }
                 }
@@ -1789,13 +1521,11 @@ class FrontendController extends BaseController
                 // Performance
                 // use oxid shop internal languageAbbr, this might be correct in the most cases but not guaranteed to
                 // be that configured in the admin backend for that language
-                $this->_sActiveLangAbbr = $languageService->getLanguageAbbr();
+                $this->_s_active_lang_abbr = $language_service->get_language_abbr();
             }
         }
-
-        return $this->_sActiveLangAbbr;
+        return $this->_s_active_lang_abbr;
     }
-
     /**
      * Sets and caches default parameters for shop object and returns it.
      *
@@ -1803,51 +1533,43 @@ class FrontendController extends BaseController
      *
      * @return \OxidEsales\Eshop\Core\ViewConfig Current shop object
      */
-    public function addGlobalParams($shop = null)
+    public function add_global_params($shop = null)
     {
-        $viewConfig = parent::addGlobalParams($shop);
-
-        $this->setNrOfArtPerPage();
-
-        return $viewConfig;
+        $view_config = parent::add_global_params($shop);
+        $this->set_nr_of_art_per_page();
+        return $view_config;
     }
-
     /**
      * Template variable getter. Returns additional params for url
      *
      * @return string
      */
-    public function getAdditionalParams()
+    public function get_additional_params()
     {
-        if ($this->_sAdditionalParams === null) {
+        if ($this->_s_additional_params === null) {
             // #1018A
-            $this->_sAdditionalParams = parent::getAdditionalParams();
-            $this->_sAdditionalParams .= 'cl=' . Registry::getConfig()->getTopActiveView()->getClassKey();
-
+            $this->_s_additional_params = parent::get_additional_params();
+            $this->_s_additional_params .= 'cl=' . Registry::get_config()->get_top_active_view()->get_class_key();
             // #1834M - special char search
-            $this->_sAdditionalParams .= $this->appendUnescapedEncodedValue(self::SEARCH_PARAM);
-            $this->_sAdditionalParams .= $this->appendValue(self::SEARCH_CATEGORY_ID);
-            $this->_sAdditionalParams .= $this->appendValue(self::SEARCH_VENDOR);
-            $this->_sAdditionalParams .= $this->appendValue(self::SEARCH_MANUFACTURER);
-            $this->_sAdditionalParams .= $this->appendValue(self::CATEGORY_ID);
-            $this->_sAdditionalParams .= $this->appendValue(self::MANUFACTURER_ID);
-
-            $this->_sAdditionalParams .= $this->getViewConfig()->getAdditionalParameters();
+            $this->_s_additional_params .= $this->append_unescaped_encoded_value(self::SEARCH_PARAM);
+            $this->_s_additional_params .= $this->append_value(self::SEARCH_CATEGORY_ID);
+            $this->_s_additional_params .= $this->append_value(self::SEARCH_VENDOR);
+            $this->_s_additional_params .= $this->append_value(self::SEARCH_MANUFACTURER);
+            $this->_s_additional_params .= $this->append_value(self::CATEGORY_ID);
+            $this->_s_additional_params .= $this->append_value(self::MANUFACTURER_ID);
+            $this->_s_additional_params .= $this->get_view_config()->get_additional_parameters();
         }
-
-        return $this->_sAdditionalParams;
+        return $this->_s_additional_params;
     }
-
     /**
      * Generates URL for page navigation
      *
      * @return string $url String with working page url.
      */
-    public function generatePageNavigationUrl()
+    public function generate_page_navigation_url()
     {
-        return Registry::getConfig()->getShopHomeUrl() . $this->getRequestParams(false);
+        return Registry::get_config()->get_shop_home_url() . $this->get_request_params(false);
     }
-
     /**
      * Adds page number parameter to url and returns modified url, if page number 0 drops from url
      *
@@ -1857,13 +1579,13 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    protected function addPageNrParam($url, $page, $languageId = null)
+    protected function add_page_nr_param($url, $page, $language_id = null)
     {
         if ($page) {
-            if ((strpos($url, 'pgNr='))) {
+            if (strpos($url, 'pgNr=')) {
                 $url = preg_replace('/pgNr=[0-9]*/', 'pgNr=' . $page, $url);
             } else {
-                $url .= ((!str_contains($url, '?')) ? '?' : '&amp;') . 'pgNr=' . $page;
+                $url .= (!str_contains($url, '?') ? '?' : '&amp;') . 'pgNr=' . $page;
             }
         } else {
             $url = preg_replace('/pgNr=[0-9]*/', '', $url);
@@ -1871,17 +1593,14 @@ class FrontendController extends BaseController
             $url = preg_replace('/\?\&amp\;/', '?', (string) $url);
             $url = preg_replace('/\&amp\;$/', '', (string) $url);
         }
-
         return $url;
     }
-
     /**
      * Template variable getter. Returns page navigation
      */
-    public function getPageNavigation()
+    public function get_page_navigation()
     {
     }
-
     /**
      * Template variable getter. Returns page navigation with default 7 positions
      *
@@ -1889,11 +1608,10 @@ class FrontendController extends BaseController
      *
      * @return StdClass
      */
-    public function getPageNavigationLimitedTop($positionCount = 7)
+    public function get_page_navigation_limited_top($position_count = 7)
     {
-        return $this->_oPageNavigation = $this->generatePageNavigation($positionCount);
+        return $this->_o_page_navigation = $this->generate_page_navigation($position_count);
     }
-
     /**
      * Template variable getter. Returns page navigation with default 11 positions
      *
@@ -1901,11 +1619,10 @@ class FrontendController extends BaseController
      *
      * @return StdClass
      */
-    public function getPageNavigationLimitedBottom($positionCount = 11)
+    public function get_page_navigation_limited_bottom($position_count = 11)
     {
-        return $this->_oPageNavigation = $this->generatePageNavigation($positionCount);
+        return $this->_o_page_navigation = $this->generate_page_navigation($position_count);
     }
-
     /**
      * Generates variables for page navigation
      *
@@ -1913,69 +1630,58 @@ class FrontendController extends BaseController
      *
      * @return StdClass Object with page navigation data
      */
-    public function generatePageNavigation($positionCount = 0)
+    public function generate_page_navigation($position_count = 0)
     {
-        startProfile('generatePageNavigation');
-
-        $pageNavigation = new StdClass();
-
-        $pageNavigation->NrOfPages = $this->_iCntPages;
-        $activePage = $this->getActPage();
-        $pageNavigation->actPage = $activePage + 1;
-        $url = $this->generatePageNavigationUrl();
-
-        if ($positionCount == 0 || ($positionCount >= $pageNavigation->NrOfPages)) {
-            $startNo = 2;
-            $finishNo = $pageNavigation->NrOfPages;
+        start_profile('generatePageNavigation');
+        $page_navigation = new Std_Class();
+        $page_navigation->nr_of_pages = $this->_i_cnt_pages;
+        $active_page = $this->get_act_page();
+        $page_navigation->act_page = $active_page + 1;
+        $url = $this->generate_page_navigation_url();
+        if ($position_count == 0 || $position_count >= $page_navigation->nr_of_pages) {
+            $start_no = 2;
+            $finish_no = $page_navigation->nr_of_pages;
         } else {
-            $tmpVal = $positionCount - 3;
-            $tmpVal2 = floor(($positionCount - 4) / 2);
-
+            $tmp_val = $position_count - 3;
+            $tmp_val2 = floor(($position_count - 4) / 2);
             // actual page is at the start
-            if ($pageNavigation->actPage <= $tmpVal) {
-                $startNo = 2;
-                $finishNo = $tmpVal + 1;
+            if ($page_navigation->act_page <= $tmp_val) {
+                $start_no = 2;
+                $finish_no = $tmp_val + 1;
                 // actual page is at the end
-            } elseif ($pageNavigation->actPage >= $pageNavigation->NrOfPages - $tmpVal + 1) {
-                $startNo = $pageNavigation->NrOfPages - $tmpVal;
-                $finishNo = $pageNavigation->NrOfPages - 1;
+            } elseif ($page_navigation->act_page >= $page_navigation->nr_of_pages - $tmp_val + 1) {
+                $start_no = $page_navigation->nr_of_pages - $tmp_val;
+                $finish_no = $page_navigation->nr_of_pages - 1;
                 // actual page is in the middle
             } else {
-                $startNo = $pageNavigation->actPage - $tmpVal2;
-                $finishNo = $pageNavigation->actPage + $tmpVal2;
+                $start_no = $page_navigation->act_page - $tmp_val2;
+                $finish_no = $page_navigation->act_page + $tmp_val2;
             }
         }
-
-        $pageNavigation->previousPage = null;
-        if ($activePage > 0) {
-            $pageNavigation->previousPage = $this->addPageNrParam($url, $activePage - 1);
+        $page_navigation->previous_page = null;
+        if ($active_page > 0) {
+            $page_navigation->previous_page = $this->add_page_nr_param($url, $active_page - 1);
         }
-
-        $pageNavigation->nextPage = null;
-        if ($activePage < $pageNavigation->NrOfPages - 1) {
-            $pageNavigation->nextPage = $this->addPageNrParam($url, $activePage + 1);
+        $page_navigation->next_page = null;
+        if ($active_page < $page_navigation->nr_of_pages - 1) {
+            $page_navigation->next_page = $this->add_page_nr_param($url, $active_page + 1);
         }
-
-        if ($pageNavigation->NrOfPages > 1) {
-            for ($i = 1; $i < $pageNavigation->NrOfPages + 1; $i++) {
-                if ($i == 1 || $i == $pageNavigation->NrOfPages || ($i >= $startNo && $i <= $finishNo)) {
+        if ($page_navigation->nr_of_pages > 1) {
+            for ($i = 1; $i < $page_navigation->nr_of_pages + 1; $i++) {
+                if ($i == 1 || $i == $page_navigation->nr_of_pages || $i >= $start_no && $i <= $finish_no) {
                     $page = new stdClass();
-                    $page->url = $this->addPageNrParam($url, $i - 1);
-                    $page->selected = ($i == $pageNavigation->actPage) ? 1 : 0;
-                    $pageNavigation->changePage[$i] = $page;
+                    $page->url = $this->add_page_nr_param($url, $i - 1);
+                    $page->selected = $i == $page_navigation->act_page ? 1 : 0;
+                    $page_navigation->change_page[$i] = $page;
                 }
             }
-
             // first/last one
-            $pageNavigation->firstpage = $this->addPageNrParam($url, 0);
-            $pageNavigation->lastpage = $this->addPageNrParam($url, $pageNavigation->NrOfPages - 1);
+            $page_navigation->firstpage = $this->add_page_nr_param($url, 0);
+            $page_navigation->lastpage = $this->add_page_nr_param($url, $page_navigation->nr_of_pages - 1);
         }
-
-        stopProfile('generatePageNavigation');
-
-        return $pageNavigation;
+        stop_profile('generatePageNavigation');
+        return $page_navigation;
     }
-
     /**
      * While ordering disables navigation controls if \OxidEsales\Eshop\Core\Config::blDisableNavBars
      * is on and executes parent::render()
@@ -1984,100 +1690,85 @@ class FrontendController extends BaseController
      */
     public function render()
     {
-        foreach (array_keys($this->_oaComponents) as $componentName) {
-            $this->_aViewData[$componentName] = $this->_oaComponents[$componentName]->render();
+        foreach (array_keys($this->_oa_components) as $component_name) {
+            $this->_a_view_data[$component_name] = $this->_oa_components[$component_name]->render();
         }
-
         parent::render();
-
-        if ($this->getIsOrderStep()) {
+        if ($this->get_is_order_step()) {
             // disabling navigation during order ...
-            if (Registry::getConfig()->getConfigParam('blDisableNavBars')) {
-                $this->_iNewsRealStatus = 1;
-                $this->setShowNewsletter(0);
+            if (Registry::get_config()->get_config_param('blDisableNavBars')) {
+                $this->_i_news_real_status = 1;
+                $this->set_show_newsletter(0);
             }
         }
-
-        $this->addListIdAndWidgetIdToViewData();
-
-        $config = Registry::getConfig();
-        $this->_aViewData['defaultLang'] = $config->getConfigParam('sDefaultLang');
-        $this->_aViewData['shopURLParam'] = ContainerFacade::getParameter('oxid_esales.shop_url');
-
-        return $this->_sThisTemplate;
+        $this->add_list_id_and_widget_id_to_view_data();
+        $config = Registry::get_config();
+        $this->_a_view_data['defaultLang'] = $config->get_config_param('sDefaultLang');
+        $this->_a_view_data['shopURLParam'] = Container_Facade::get_parameter('oxid_esales.shop_url');
+        return $this->_s_this_template;
     }
-
-    private function addListIdAndWidgetIdToViewData(): void
+    private function add_list_id_and_widget_id_to_view_data(): void
     {
-        $config = Registry::getConfig();
-
-        $className = Registry::getRequest()->getRequestEscapedParameter('actcl');
-        $listId = null;
-        $widgetId = null;
-
-        if ($className === 'start' && $config->getConfigParam('blEcondaRecommendationsStart')) {
-            $listId = 'recommendationsStart';
-            $widgetId = $config->getConfigParam('sEcondaWidgetIdStart');
-        } elseif ($className === 'alist' && $config->getConfigParam('blEcondaRecommendationsList')) {
-            $listId = 'recommendationsList';
-            $widgetId = $config->getConfigParam('sEcondaWidgetIdList');
-        } elseif ($className === 'details' && $config->getConfigParam('blEcondaRecommendationsDetails')) {
-            $listId = 'recommendationsDetails';
-            $widgetId = $config->getConfigParam('sEcondaWidgetIdDetails');
-        } elseif ($className === 'basket' && $config->getConfigParam('blEcondaRecommendationsBasket')) {
-            $listId = 'recommendationsBasket';
-            $widgetId = $config->getConfigParam('sEcondaWidgetIdBasket');
+        $config = Registry::get_config();
+        $class_name = Registry::get_request()->get_request_escaped_parameter('actcl');
+        $list_id = null;
+        $widget_id = null;
+        if ($class_name === 'start' && $config->get_config_param('blEcondaRecommendationsStart')) {
+            $list_id = 'recommendationsStart';
+            $widget_id = $config->get_config_param('sEcondaWidgetIdStart');
+        } elseif ($class_name === 'alist' && $config->get_config_param('blEcondaRecommendationsList')) {
+            $list_id = 'recommendationsList';
+            $widget_id = $config->get_config_param('sEcondaWidgetIdList');
+        } elseif ($class_name === 'details' && $config->get_config_param('blEcondaRecommendationsDetails')) {
+            $list_id = 'recommendationsDetails';
+            $widget_id = $config->get_config_param('sEcondaWidgetIdDetails');
+        } elseif ($class_name === 'basket' && $config->get_config_param('blEcondaRecommendationsBasket')) {
+            $list_id = 'recommendationsBasket';
+            $widget_id = $config->get_config_param('sEcondaWidgetIdBasket');
         }
-
-        $this->_aViewData['sListId'] = $listId;
-        $this->_aViewData['sWidgetId'] = $widgetId;
+        $this->_a_view_data['sListId'] = $list_id;
+        $this->_a_view_data['sWidgetId'] = $widget_id;
     }
-
     /**
      * Returns current view product object (if it is loaded)
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    public function getViewProduct()
+    public function get_view_product()
     {
-        return $this->getProduct();
+        return $this->get_product();
     }
-
     /**
      * Sets view product
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $product view product object
      */
-    public function setViewProduct($product): void
+    public function set_view_product($product): void
     {
-        $this->_oProduct = $product;
+        $this->_o_product = $product;
     }
-
     /**
      * Returns view product list
      *
      * @return array
      */
-    public function getViewProductList()
+    public function get_view_product_list()
     {
-        return $this->_aArticleList;
+        return $this->_a_article_list;
     }
-
     /**
      * Active page getter
      *
      * @return int
      */
-    public function getActPage()
+    public function get_act_page()
     {
-        if ($this->_iActPage === null) {
-            $this->_iActPage = (int) Registry::getRequest()->getRequestEscapedParameter(self::PAGE_NUMBER);
-            $this->_iActPage = ($this->_iActPage < 0) ? 0 : $this->_iActPage;
+        if ($this->_i_act_page === null) {
+            $this->_i_act_page = (int) Registry::get_request()->get_request_escaped_parameter(self::PAGE_NUMBER);
+            $this->_i_act_page = $this->_i_act_page < 0 ? 0 : $this->_i_act_page;
         }
-
-        return $this->_iActPage;
+        return $this->_i_act_page;
     }
-
     /**
      * Returns active vendor set by categories component; if vendor is
      * not set by component - will create vendor object and will try to
@@ -2085,24 +1776,22 @@ class FrontendController extends BaseController
      *
      * @return \OxidEsales\Eshop\Application\Model\Vendor
      */
-    public function getActVendor()
+    public function get_act_vendor()
     {
         // if active vendor is not set yet - trying to load it from request params
         // this may be useful when category component was unable to load active vendor
         // and we still need some object to mount navigation info
-        if ($this->_oActVendor === null) {
-            $this->_oActVendor = false;
-            $vendorId = Registry::getRequest()->getRequestEscapedParameter(self::CATEGORY_ID);
-            $vendorId = $vendorId ? str_replace('v_', '', $vendorId) : $vendorId;
-            $vendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-            if ($vendor->load($vendorId)) {
-                $this->_oActVendor = $vendor;
+        if ($this->_o_act_vendor === null) {
+            $this->_o_act_vendor = false;
+            $vendor_id = Registry::get_request()->get_request_escaped_parameter(self::CATEGORY_ID);
+            $vendor_id = $vendor_id ? str_replace('v_', '', $vendor_id) : $vendor_id;
+            $vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+            if ($vendor->load($vendor_id)) {
+                $this->_o_act_vendor = $vendor;
             }
         }
-
-        return $this->_oActVendor;
+        return $this->_o_act_vendor;
     }
-
     /**
      * Returns active Manufacturer set by categories component; if Manufacturer is
      * not set by component - will create Manufacturer object and will try to
@@ -2110,106 +1799,95 @@ class FrontendController extends BaseController
      *
      * @return \OxidEsales\Eshop\Application\Model\Manufacturer
      */
-    public function getActManufacturer()
+    public function get_act_manufacturer()
     {
         // if active Manufacturer is not set yet - trying to load it from request params
         // this may be useful when category component was unable to load active Manufacturer
         // and we still need some object to mount navigation info
-        if ($this->_oActManufacturer === null) {
-            $this->_oActManufacturer = false;
-            $manufacturerId = Registry::getRequest()->getRequestEscapedParameter(self::MANUFACTURER_ID);
-            $manufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
-            if ($manufacturer->load($manufacturerId)) {
-                $this->_oActManufacturer = $manufacturer;
+        if ($this->_o_act_manufacturer === null) {
+            $this->_o_act_manufacturer = false;
+            $manufacturer_id = Registry::get_request()->get_request_escaped_parameter(self::MANUFACTURER_ID);
+            $manufacturer = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer::class);
+            if ($manufacturer->load($manufacturer_id)) {
+                $this->_o_act_manufacturer = $manufacturer;
             }
         }
-
-        return $this->_oActManufacturer;
+        return $this->_o_act_manufacturer;
     }
-
     /**
      * Active vendor setter
      *
      * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor active vendor
      */
-    public function setActVendor($vendor): void
+    public function set_act_vendor($vendor): void
     {
-        $this->_oActVendor = $vendor;
+        $this->_o_act_vendor = $vendor;
     }
-
     /**
      * Active Manufacturer setter
      *
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $manufacturer active Manufacturer
      */
-    public function setActManufacturer($manufacturer): void
+    public function set_act_manufacturer($manufacturer): void
     {
-        $this->_oActManufacturer = $manufacturer;
+        $this->_o_act_manufacturer = $manufacturer;
     }
-
     /**
      * Returns fake object which is used to mount navigation info
      *
      * @return stdClass
      */
-    public function getActSearch()
+    public function get_act_search()
     {
-        if ($this->_oActSearch === null) {
-            $this->_oActSearch = new stdClass();
-            $url = Registry::getConfig()->getShopHomeUrl();
-            $this->_oActSearch->link = "{$url}cl=search";
+        if ($this->_o_act_search === null) {
+            $this->_o_act_search = new stdClass();
+            $url = Registry::get_config()->get_shop_home_url();
+            $this->_o_act_search->link = "{$url}cl=search";
         }
-
-        return $this->_oActSearch;
+        return $this->_o_act_search;
     }
-
     /**
      * Returns category tree (if it is loaded)
      *
      * @return \OxidEsales\Eshop\Application\Model\CategoryList
      */
-    public function getCategoryTree()
+    public function get_category_tree()
     {
-        return $this->_oCategoryTree;
+        return $this->_o_category_tree;
     }
-
     /**
      * Category list setter
      *
      * @param \OxidEsales\Eshop\Application\Model\CategoryList $categoryTree category tree
      */
-    public function setCategoryTree($categoryTree): void
+    public function set_category_tree($category_tree): void
     {
-        $this->_oCategoryTree = $categoryTree;
+        $this->_o_category_tree = $category_tree;
     }
-
     /**
      * Returns Manufacturer tree (if it is loaded0
      *
      * @return \OxidEsales\Eshop\Application\Model\ManufacturerList
      */
-    public function getManufacturerTree()
+    public function get_manufacturer_tree()
     {
-        return $this->_oManufacturerTree;
+        return $this->_o_manufacturer_tree;
     }
-
     /**
      * Manufacturer tree setter
      *
      * @param \OxidEsales\Eshop\Application\Model\ManufacturerList $manufacturerTree Manufacturer tree
      */
-    public function setManufacturerTree($manufacturerTree): void
+    public function set_manufacturer_tree($manufacturer_tree): void
     {
-        $this->_oManufacturerTree = $manufacturerTree;
+        $this->_o_manufacturer_tree = $manufacturer_tree;
     }
-
     /**
      * Returns additional URL parameters which must be added to list products urls
      */
-    public function getAddUrlParams()
+    public function get_add_url_params()
     {
     }
-
     /**
      * Template variable getter. Returns Top 5 article list.
      * Parameter \OxidEsales\Eshop\Application\Controller\FrontendController::$_blTop5Action must be set to true.
@@ -2218,50 +1896,46 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    public function getTop5ArticleList($count = null)
+    public function get_top5article_list($count = null)
     {
-        if ($this->_blTop5Action) {
-            if ($this->_aTop5ArticleList === null) {
-                $this->_aTop5ArticleList = false;
-                $config = Registry::getConfig();
-                if ($config->getConfigParam('bl_perfLoadAktion')) {
+        if ($this->_bl_top5action) {
+            if ($this->_a_top5article_list === null) {
+                $this->_a_top5article_list = false;
+                $config = Registry::get_config();
+                if ($config->get_config_param('bl_perfLoadAktion')) {
                     // top 5 articles
-                    $artList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-                    $artList->loadTop5Articles($count);
-                    if ($artList->count()) {
-                        $this->_aTop5ArticleList = $artList;
+                    $art_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+                    $art_list->load_top5articles($count);
+                    if ($art_list->count()) {
+                        $this->_a_top5article_list = $art_list;
                     }
                 }
             }
         }
-
-        return $this->_aTop5ArticleList;
+        return $this->_a_top5article_list;
     }
-
     /**
      * Template variable getter. Returns bargain article list
      * Parameter \OxidEsales\Eshop\Application\Controller\FrontendController::$_blBargainAction must be set to true.
      *
      * @return array
      */
-    public function getBargainArticleList()
+    public function get_bargain_article_list()
     {
-        if ($this->_blBargainAction) {
-            if ($this->_aBargainArticleList === null) {
-                $this->_aBargainArticleList = [];
-                if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
-                    $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-                    $articleList->loadActionArticles('OXBARGAIN');
-                    if ($articleList->count()) {
-                        $this->_aBargainArticleList = $articleList;
+        if ($this->_bl_bargain_action) {
+            if ($this->_a_bargain_article_list === null) {
+                $this->_a_bargain_article_list = [];
+                if (Registry::get_config()->get_config_param('bl_perfLoadAktion')) {
+                    $article_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+                    $article_list->load_action_articles('OXBARGAIN');
+                    if ($article_list->count()) {
+                        $this->_a_bargain_article_list = $article_list;
                     }
                 }
             }
         }
-
-        return $this->_aBargainArticleList;
+        return $this->_a_bargain_article_list;
     }
-
     /**
      * Template variable getter. Returns if order price is lower than
      * minimum order price setup (config param "iMinOrderPrice")
@@ -2270,16 +1944,14 @@ class FrontendController extends BaseController
      *
      * @return bool
      */
-    public function isLowOrderPrice()
+    public function is_low_order_price()
     {
-        $session = Registry::getSession();
-        if ($this->_blLowOrderPrice === null && ($basket = $session->getBasket())) {
-            $this->_blLowOrderPrice = $basket->isBelowMinOrderPrice();
+        $session = Registry::get_session();
+        if ($this->_bl_low_order_price === null && $basket = $session->get_basket()) {
+            $this->_bl_low_order_price = $basket->is_below_min_order_price();
         }
-
-        return $this->_blLowOrderPrice;
+        return $this->_bl_low_order_price;
     }
-
     /**
      * Template variable getter. Returns formatted min order price value
      *
@@ -2287,143 +1959,127 @@ class FrontendController extends BaseController
      *
      * @return string
      */
-    public function getMinOrderPrice()
+    public function get_min_order_price()
     {
-        if ($this->_sMinOrderPrice === null && $this->isLowOrderPrice()) {
-            $minOrderPrice = Price::getPriceInActCurrency(Registry::getConfig()->getConfigParam('iMinOrderPrice'));
-            $this->_sMinOrderPrice = Registry::getLang()->formatCurrency($minOrderPrice);
+        if ($this->_s_min_order_price === null && $this->is_low_order_price()) {
+            $min_order_price = Price::get_price_in_act_currency(Registry::get_config()->get_config_param('iMinOrderPrice'));
+            $this->_s_min_order_price = Registry::get_lang()->format_currency($min_order_price);
         }
-
-        return $this->_sMinOrderPrice;
+        return $this->_s_min_order_price;
     }
-
     /**
      * Template variable getter. Returns if newsletter is really active (for "user" template)
      *
      * @return integer
      */
-    public function getNewsRealStatus()
+    public function get_news_real_status()
     {
-        return $this->_iNewsRealStatus;
+        return $this->_i_news_real_status;
     }
-
     /**
      * Checks if current request parameters does not block SEO redirection process
      *
      * @return bool
      */
-    protected function canRedirect()
+    protected function can_redirect()
     {
-        foreach ($this->_aBlockRedirectParams as $param) {
-            if (Registry::getRequest()->getRequestEscapedParameter($param) !== null) {
+        foreach ($this->_a_block_redirect_params as $param) {
+            if (Registry::get_request()->get_request_escaped_parameter($param) !== null) {
                 return false;
             }
         }
-
         return true;
     }
-
     /**
      * Empty active product getter
      */
-    public function getProduct()
+    public function get_product()
     {
     }
-
     /**
      * Template variable getter. Returns Manufacturer list for search
      *
      * @return array
      */
-    public function getManufacturerList()
+    public function get_manufacturer_list()
     {
-        return $this->_aManufacturerlist;
+        return $this->_a_manufacturerlist;
     }
-
     /**
      * Sets Manufacturer list for search
      *
      * @param array $list manufacturer list
      */
-    public function setManufacturerList($list): void
+    public function set_manufacturer_list($list): void
     {
-        $this->_aManufacturerlist = $list;
+        $this->_a_manufacturerlist = $list;
     }
-
     /**
      * Sets root vendor
      *
      * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor vendor object
      */
-    public function setRootVendor($vendor): void
+    public function set_root_vendor($vendor): void
     {
-        $this->_oRootVendor = $vendor;
+        $this->_o_root_vendor = $vendor;
     }
-
     /**
      * Template variable getter. Returns root vendor
      *
      * @return \OxidEsales\Eshop\Application\Model\Vendor
      */
-    public function getRootVendor()
+    public function get_root_vendor()
     {
-        return $this->_oRootVendor;
+        return $this->_o_root_vendor;
     }
-
     /**
      * Sets root Manufacturer
      *
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $manufacturer manufacturer object
      */
-    public function setRootManufacturer($manufacturer): void
+    public function set_root_manufacturer($manufacturer): void
     {
-        $this->_oRootManufacturer = $manufacturer;
+        $this->_o_root_manufacturer = $manufacturer;
     }
-
     /**
      * Template variable getter. Returns root Manufacturer
      *
      * @return \OxidEsales\Eshop\Application\Model\Manufacturer
      */
-    public function getRootManufacturer()
+    public function get_root_manufacturer()
     {
-        return $this->_oRootManufacturer;
+        return $this->_o_root_manufacturer;
     }
-
     /**
      * Template variable getter. Returns vendor id
      *
      * @return string
      */
-    public function getVendorId()
+    public function get_vendor_id()
     {
-        if ($this->_sVendorId === null) {
-            $this->_sVendorId = false;
-            if (($vendor = $this->getActVendor())) {
-                $this->_sVendorId = $vendor->getId();
+        if ($this->_s_vendor_id === null) {
+            $this->_s_vendor_id = false;
+            if ($vendor = $this->get_act_vendor()) {
+                $this->_s_vendor_id = $vendor->get_id();
             }
         }
-
-        return $this->_sVendorId;
+        return $this->_s_vendor_id;
     }
-
     /**
      * Template variable getter. Returns Manufacturer id
      *
      * @return string
      */
-    public function getManufacturerId()
+    public function get_manufacturer_id()
     {
-        if ($this->_sManufacturerId === null) {
-            $this->_sManufacturerId = false;
-            if (($manufacturer = $this->getActManufacturer())) {
-                $this->_sManufacturerId = $manufacturer->getId();
+        if ($this->_s_manufacturer_id === null) {
+            $this->_s_manufacturer_id = false;
+            if ($manufacturer = $this->get_act_manufacturer()) {
+                $this->_s_manufacturer_id = $manufacturer->get_id();
             }
         }
-
-        return $this->_sManufacturerId;
+        return $this->_s_manufacturer_id;
     }
-
     /**
      * Template variable getter. Returns more category
      *
@@ -2431,21 +2087,19 @@ class FrontendController extends BaseController
      *
      * @return object
      */
-    public function getCatMoreUrl()
+    public function get_cat_more_url()
     {
-        return Registry::getConfig()->getShopHomeUrl() . 'cnid=oxmore';
+        return Registry::get_config()->get_shop_home_url() . 'cnid=oxmore';
     }
-
     /**
      * Template variable getter. Returns category path
      *
      * @return array
      */
-    public function getCatTreePath()
+    public function get_cat_tree_path()
     {
-        return $this->_sCatTreePath;
+        return $this->_s_cat_tree_path;
     }
-
     /**
      * Loads and returns oxContent object requested by its ident
      *
@@ -2453,46 +2107,40 @@ class FrontendController extends BaseController
      *
      * @return \OxidEsales\Eshop\Application\Model\Content
      */
-    public function getContentByIdent($ident)
+    public function get_content_by_ident($ident)
     {
-        if (!isset($this->_aContents[$ident])) {
-            $this->_aContents[$ident] = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
-            $this->_aContents[$ident]->loadByIdent($ident);
+        if (!isset($this->_a_contents[$ident])) {
+            $this->_a_contents[$ident] = ox_new(\Oxid_Esales\Eshop\Application\Model\Content::class);
+            $this->_a_contents[$ident]->load_by_ident($ident);
         }
-
-        return $this->_aContents[$ident];
+        return $this->_a_contents[$ident];
     }
-
     /**
      * Default content category getter, returns FALSE by default
      *
      * @return bool
      */
-    public function getContentCategory()
+    public function get_content_category()
     {
         return false;
     }
-
     /**
      * Returns array of fields which must be filled during registration
      *
      * @return array|bool
      */
-    public function getMustFillFields()
+    public function get_must_fill_fields()
     {
-        if ($this->_aMustFillFields === null) {
-            $this->_aMustFillFields = false;
-
+        if ($this->_a_must_fill_fields === null) {
+            $this->_a_must_fill_fields = false;
             // passing must-be-filled-fields info
-            $mustFillFields = Registry::getConfig()->getConfigParam('aMustFillFields');
-            if (is_array($mustFillFields)) {
-                $this->_aMustFillFields = array_flip($mustFillFields);
+            $must_fill_fields = Registry::get_config()->get_config_param('aMustFillFields');
+            if (is_array($must_fill_fields)) {
+                $this->_a_must_fill_fields = array_flip($must_fill_fields);
             }
         }
-
-        return $this->_aMustFillFields;
+        return $this->_a_must_fill_fields;
     }
-
     /**
      * Returns if field is required.
      *
@@ -2500,296 +2148,259 @@ class FrontendController extends BaseController
      *
      * @return array|bool
      */
-    public function isFieldRequired($field)
+    public function is_field_required($field)
     {
-        return isset($this->getMustFillFields()[$field]);
+        return isset($this->get_must_fill_fields()[$field]);
     }
-
     /**
      * Form id getter. This id used to prevent double review entry submit
      *
      * @return string
      */
-    public function getFormId()
+    public function get_form_id()
     {
-        if ($this->_sFormId === null) {
-            $this->_sFormId = Registry::getUtilsObject()->generateUId();
-            Registry::getSession()->setVariable('sessionuformid', $this->_sFormId);
+        if ($this->_s_form_id === null) {
+            $this->_s_form_id = Registry::get_utils_object()->generate_u_id();
+            Registry::get_session()->set_variable('sessionuformid', $this->_s_form_id);
         }
-
-        return $this->_sFormId;
+        return $this->_s_form_id;
     }
-
     /**
      * Checks if session form id matches with request form id
      *
      * @return bool
      */
-    public function canAcceptFormData()
+    public function can_accept_form_data()
     {
-        if ($this->_blCanAcceptFormData === null) {
-            $this->_blCanAcceptFormData = false;
-
-            $formId = Registry::getRequest()->getRequestEscapedParameter('uformid');
-            $sessionFormId = Registry::getSession()->getVariable('sessionuformid');
-
+        if ($this->_bl_can_accept_form_data === null) {
+            $this->_bl_can_accept_form_data = false;
+            $form_id = Registry::get_request()->get_request_escaped_parameter('uformid');
+            $session_form_id = Registry::get_session()->get_variable('sessionuformid');
             // testing if form and session ids matches
-            if ($formId && $formId === $sessionFormId) {
-                $this->_blCanAcceptFormData = true;
+            if ($form_id && $form_id === $session_form_id) {
+                $this->_bl_can_accept_form_data = true;
             }
-
             // regenerating form data
-            $this->getFormId();
+            $this->get_form_id();
         }
-
-        return $this->_blCanAcceptFormData;
+        return $this->_bl_can_accept_form_data;
     }
-
     /**
      * return last finished promotion list
      *
      * @return \OxidEsales\Eshop\Application\Model\ActionList
      */
-    public function getPromoFinishedList()
+    public function get_promo_finished_list()
     {
-        if (isset($this->_oPromoFinishedList)) {
-            return $this->_oPromoFinishedList;
+        if (isset($this->_o_promo_finished_list)) {
+            return $this->_o_promo_finished_list;
         }
-        $this->_oPromoFinishedList = oxNew(\OxidEsales\Eshop\Application\Model\ActionList::class);
-        $this->_oPromoFinishedList->loadFinishedByCount(2);
-
-        return $this->_oPromoFinishedList;
+        $this->_o_promo_finished_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Action_List::class);
+        $this->_o_promo_finished_list->load_finished_by_count(2);
+        return $this->_o_promo_finished_list;
     }
-
     /**
      * return current promotion list
      *
      * @return \OxidEsales\Eshop\Application\Model\ActionList
      */
-    public function getPromoCurrentList()
+    public function get_promo_current_list()
     {
-        if (isset($this->_oPromoCurrentList)) {
-            return $this->_oPromoCurrentList;
+        if (isset($this->_o_promo_current_list)) {
+            return $this->_o_promo_current_list;
         }
-        $this->_oPromoCurrentList = oxNew(\OxidEsales\Eshop\Application\Model\ActionList::class);
-        $this->_oPromoCurrentList->loadCurrent();
-
-        return $this->_oPromoCurrentList;
+        $this->_o_promo_current_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Action_List::class);
+        $this->_o_promo_current_list->load_current();
+        return $this->_o_promo_current_list;
     }
-
     /**
      * return future promotion list
      *
      * @return \OxidEsales\Eshop\Application\Model\ActionList
      */
-    public function getPromoFutureList()
+    public function get_promo_future_list()
     {
-        if (isset($this->_oPromoFutureList)) {
-            return $this->_oPromoFutureList;
+        if (isset($this->_o_promo_future_list)) {
+            return $this->_o_promo_future_list;
         }
-        $this->_oPromoFutureList = oxNew(\OxidEsales\Eshop\Application\Model\ActionList::class);
-        $this->_oPromoFutureList->loadFutureByCount(2);
-
-        return $this->_oPromoFutureList;
+        $this->_o_promo_future_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Action_List::class);
+        $this->_o_promo_future_list->load_future_by_count(2);
+        return $this->_o_promo_future_list;
     }
-
     /**
      * should promotions list be shown?
      *
      * @return bool
      */
-    public function getShowPromotionList()
+    public function get_show_promotion_list()
     {
-        if (isset($this->_blShowPromotions)) {
-            return $this->_blShowPromotions;
+        if (isset($this->_bl_show_promotions)) {
+            return $this->_bl_show_promotions;
         }
-        $this->_blShowPromotions = false;
-        if (oxNew(\OxidEsales\Eshop\Application\Model\ActionList::class)->areAnyActivePromotions()) {
-            $this->_blShowPromotions = (count($this->getPromoFinishedList()) + count($this->getPromoCurrentList()) +
-                                        count($this->getPromoFutureList())) > 0;
+        $this->_bl_show_promotions = false;
+        if (ox_new(\Oxid_Esales\Eshop\Application\Model\Action_List::class)->are_any_active_promotions()) {
+            $this->_bl_show_promotions = count($this->get_promo_finished_list()) + count($this->get_promo_current_list()) + count($this->get_promo_future_list()) > 0;
         }
-
-        return $this->_blShowPromotions;
+        return $this->_bl_show_promotions;
     }
-
     /**
      * Checks if private sales is on
      *
      * @return bool
      */
-    public function isEnabledPrivateSales()
+    public function is_enabled_private_sales()
     {
-        if ($this->_blEnabledPrivateSales === null) {
-            $this->_blEnabledPrivateSales = (bool) Registry::getConfig()->getConfigParam('blPsLoginEnabled');
-            if ($this->_blEnabledPrivateSales && ($canPreview = Registry::getUtils()->canPreview()) !== null) {
-                $this->_blEnabledPrivateSales = !$canPreview;
+        if ($this->_bl_enabled_private_sales === null) {
+            $this->_bl_enabled_private_sales = (bool) Registry::get_config()->get_config_param('blPsLoginEnabled');
+            if ($this->_bl_enabled_private_sales && ($can_preview = Registry::get_utils()->can_preview()) !== null) {
+                $this->_bl_enabled_private_sales = !$can_preview;
             }
         }
-
-        return $this->_blEnabledPrivateSales;
+        return $this->_bl_enabled_private_sales;
     }
-
     /**
      * Returns input field validation error array (if available)
      *
      * @return array
      */
-    public function getFieldValidationErrors()
+    public function get_field_validation_errors()
     {
-        return Registry::getInputValidator()->getFieldValidationErrors();
+        return Registry::get_input_validator()->get_field_validation_errors();
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
         return null;
     }
-
     /**
      * Sets if active root category was changed
      *
      * @param bool $rootCategoryChanged root category changed
      */
-    public function setRootCatChanged($rootCategoryChanged): void
+    public function set_root_cat_changed($root_category_changed): void
     {
-        $this->_blRootCatChanged = $rootCategoryChanged;
+        $this->_bl_root_cat_changed = $root_category_changed;
     }
-
     /**
      * Template variable getter. Returns true if active root category was changed
      *
      * @return bool
      */
-    public function isRootCatChanged()
+    public function is_root_cat_changed()
     {
-        return $this->_blRootCatChanged;
+        return $this->_bl_root_cat_changed;
     }
-
     /**
      * Template variable getter. Returns user address
      *
      * @return array
      */
-    public function getInvoiceAddress()
+    public function get_invoice_address()
     {
-        if ($this->_aInvoiceAddress == null) {
-            $invoiceAddress = Registry::getRequest()->getRequestEscapedParameter('invadr');
-            if ($invoiceAddress) {
-                $this->_aInvoiceAddress = $invoiceAddress;
+        if ($this->_a_invoice_address == null) {
+            $invoice_address = Registry::get_request()->get_request_escaped_parameter('invadr');
+            if ($invoice_address) {
+                $this->_a_invoice_address = $invoice_address;
             }
         }
-
-        return $this->_aInvoiceAddress;
+        return $this->_a_invoice_address;
     }
-
     /**
      * Template variable getter. Returns user delivery address
      *
      * @return array
      */
-    public function getDeliveryAddress()
+    public function get_delivery_address()
     {
-        if ($this->_aDeliveryAddress == null) {
-            $config = Registry::getConfig();
+        if ($this->_a_delivery_address == null) {
+            $config = Registry::get_config();
             //do not show deladr if address was reloaded
-            if (!Registry::getRequest()->getRequestEscapedParameter('reloadaddress')) {
-                $this->_aDeliveryAddress = Registry::getRequest()->getRequestEscapedParameter('deladr');
+            if (!Registry::get_request()->get_request_escaped_parameter('reloadaddress')) {
+                $this->_a_delivery_address = Registry::get_request()->get_request_escaped_parameter('deladr');
             }
         }
-
-        return $this->_aDeliveryAddress;
+        return $this->_a_delivery_address;
     }
-
     /**
      * Template variable setter. Sets user delivery address
      *
      * @param array $deliveryAddress delivery address
      */
-    public function setDeliveryAddress($deliveryAddress): void
+    public function set_delivery_address($delivery_address): void
     {
-        $this->_aDeliveryAddress = $deliveryAddress;
+        $this->_a_delivery_address = $delivery_address;
     }
-
     /**
      * Template variable setter. Sets user address
      *
      * @param array $address user address
      */
-    public function setInvoiceAddress($address): void
+    public function set_invoice_address($address): void
     {
-        $this->_aInvoiceAddress = $address;
+        $this->_a_invoice_address = $address;
     }
-
     /**
      * Template variable getter. Returns logged in user name
      *
      * @return string
      */
-    public function getActiveUsername()
+    public function get_active_username()
     {
-        if ($this->_sActiveUsername == null) {
-            $this->_sActiveUsername = false;
-            $username = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
+        if ($this->_s_active_username == null) {
+            $this->_s_active_username = false;
+            $username = Registry::get_request()->get_request_escaped_parameter('lgn_usr');
             if ($username) {
-                $this->_sActiveUsername = $username;
-            } elseif ($user = $this->getUser()) {
-                $this->_sActiveUsername = $user->oxuser__oxusername->value;
+                $this->_s_active_username = $username;
+            } elseif ($user = $this->get_user()) {
+                $this->_s_active_username = $user->oxuser__oxusername->value;
             }
         }
-
-        return $this->_sActiveUsername;
+        return $this->_s_active_username;
     }
-
     /**
      * Template variable getter. Returns user id from wish list
      *
      * @return string
      */
-    public function getWishlistUserId()
+    public function get_wishlist_user_id()
     {
-        return Registry::getRequest()->getRequestEscapedParameter('wishid');
+        return Registry::get_request()->get_request_escaped_parameter('wishid');
     }
-
     /**
      * Template variable getter. Returns searched category id
      */
-    public function getSearchCatId()
+    public function get_search_cat_id()
     {
     }
-
     /**
      * Template variable getter. Returns searched vendor id
      */
-    public function getSearchVendor()
+    public function get_search_vendor()
     {
     }
-
     /**
      * Template variable getter. Returns searched Manufacturer id
      */
-    public function getSearchManufacturer()
+    public function get_search_manufacturer()
     {
     }
-
     /**
      * Template variable getter. Returns last seen products
      */
-    public function getLastProducts()
+    public function get_last_products()
     {
     }
-
     /**
      * Returns added basket item notification message type
      *
      * @return int
      */
-    public function getNewBasketItemMsgType()
+    public function get_new_basket_item_msg_type()
     {
-        return (int) Registry::getConfig()->getConfigParam('iNewBasketItemMessage');
+        return (int) Registry::get_config()->get_config_param('iNewBasketItemMessage');
     }
-
     /**
      * Checks if feature is enabled
      *
@@ -2797,44 +2408,40 @@ class FrontendController extends BaseController
      *
      * @return bool
      */
-    public function isActive($name)
+    public function is_active($name)
     {
-        return Registry::getConfig()->getConfigParam('bl' . $name . 'Enabled');
+        return Registry::get_config()->get_config_param('bl' . $name . 'Enabled');
     }
-
     /**
      * Checks if downloadable files are turned on
      *
      * @return bool
      */
-    public function isEnabledDownloadableFiles()
+    public function is_enabled_downloadable_files()
     {
-        return (bool) Registry::getConfig()->getConfigParam('blEnableDownloads');
+        return (bool) Registry::get_config()->get_config_param('blEnableDownloads');
     }
-
     /**
      * Returns true if "Remember me" are ON
      *
      * @return boolean
      */
-    public function showRememberMe()
+    public function show_remember_me()
     {
-        return (bool) Registry::getConfig()->getConfigParam('blShowRememberMe');
+        return (bool) Registry::get_config()->get_config_param('blShowRememberMe');
     }
-
     /**
      * Returns true if articles shown in shop with VAT.
      * Checks country VAT and options (show vat only in basket and check if b2b mode is activated).
      *
      * @return boolean
      */
-    public function isVatIncluded()
+    public function is_vat_included()
     {
-        if ($this->_blIsVatIncluded !== null) {
-            return $this->_blIsVatIncluded;
+        if ($this->_bl_is_vat_included !== null) {
+            return $this->_bl_is_vat_included;
         }
-
-        $config = Registry::getConfig();
+        $config = Registry::get_config();
         /*
          * Do not show "inclusive VAT" when:
          *
@@ -2847,128 +2454,105 @@ class FrontendController extends BaseController
          * oxcountry__oxvatstatus: Vat status: 0 - Do not bill VAT, 1 - Do not bill VAT only if provided valid VAT ID
          * if country is not available (no session) oxvatstatus->value will return null
          */
-        if ($config->getConfigParam('blShowNetPrice') || $config->getConfigParam('bl_perfCalcVatOnlyForBasketOrder')) {
-            return $this->_blIsVatIncluded = false;
+        if ($config->get_config_param('blShowNetPrice') || $config->get_config_param('bl_perfCalcVatOnlyForBasketOrder')) {
+            return $this->_bl_is_vat_included = false;
         }
-
-        $user = $this->getUser();
+        $user = $this->get_user();
         if ($user !== false) {
-            if ($user->getFieldData('oxustid') && $user->getFieldData('oxustidstatus') == 1) {
-                return $this->_blIsVatIncluded = false;
+            if ($user->get_field_data('oxustid') && $user->get_field_data('oxustidstatus') == 1) {
+                return $this->_bl_is_vat_included = false;
             }
         } else {
-            $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $user = ox_new(\Oxid_Esales\Eshop\Application\Model\User::class);
         }
-
-        $activeCountry = $user->getActiveCountry();
-        if ($activeCountry !== '') {
-            $country = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
-            if (
-                $country->load($activeCountry) &&
-                $country->oxcountry__oxvatstatus->value !== null &&
-                $country->oxcountry__oxvatstatus->value == 0
-            ) {
-                return $this->_blIsVatIncluded = false;
+        $active_country = $user->get_active_country();
+        if ($active_country !== '') {
+            $country = ox_new(\Oxid_Esales\Eshop\Application\Model\Country::class);
+            if ($country->load($active_country) && $country->oxcountry__oxvatstatus->value !== null && $country->oxcountry__oxvatstatus->value == 0) {
+                return $this->_bl_is_vat_included = false;
             }
         }
-
-        return $this->_blIsVatIncluded = true;
+        return $this->_bl_is_vat_included = true;
     }
-
     /**
      * Returns true if price calculation is activated
      *
      * @return boolean
      */
-    public function isPriceCalculated()
+    public function is_price_calculated()
     {
-        return (bool) Registry::getConfig()->getConfigParam('bl_perfLoadPrice');
+        return (bool) Registry::get_config()->get_config_param('bl_perfLoadPrice');
     }
-
     /**
      * Template variable getter. Returns user name of searched wishlist
      *
      * @return string
      */
-    public function getWishlistName()
+    public function get_wishlist_name()
     {
-        if ($this->getUser()) {
-            $wishId = Registry::getRequest()->getRequestEscapedParameter('wishid');
-            $userId = $wishId ?: Registry::getSession()->getVariable('wishid');
-            if ($userId) {
-                $wishUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-                if ($wishUser->load($userId)) {
-                    return $wishUser;
+        if ($this->get_user()) {
+            $wish_id = Registry::get_request()->get_request_escaped_parameter('wishid');
+            $user_id = $wish_id ?: Registry::get_session()->get_variable('wishid');
+            if ($user_id) {
+                $wish_user = ox_new(\Oxid_Esales\Eshop\Application\Model\User::class);
+                if ($wish_user->load($user_id)) {
+                    return $wish_user;
                 }
             }
         }
-
         return false;
     }
-
     /**
      * Get widget link for Ajax calls
      *
      * @return string
      */
-    public function getWidgetLink()
+    public function get_widget_link()
     {
-        return Registry::getConfig()->getWidgetUrl();
+        return Registry::get_config()->get_widget_url();
     }
-
     /**
      * Template variable getter. Returns article list count in comparison.
      *
      * @return integer
      */
-    public function getCompareItemsCnt()
+    public function get_compare_items_cnt()
     {
-        $compareController = oxNew(\OxidEsales\Eshop\Application\Controller\CompareController::class);
-
-        return $compareController->getCompareItemsCnt();
+        $compare_controller = ox_new(\Oxid_Esales\Eshop\Application\Controller\Compare_Controller::class);
+        return $compare_controller->get_compare_items_cnt();
     }
-
     /**
      * @param string $sortOrder
      *
      * @return array
      */
-    private function isAllowedSortingOrder($sortOrder): bool
+    private function is_allowed_sorting_order($sort_order): bool
     {
-        $allowedSortOrders = array_merge((new SortingValidator())->getSortingOrders(), ['']);
-        return in_array(strtolower($sortOrder), $allowedSortOrders);
+        $allowed_sort_orders = array_merge((new Sorting_Validator())->get_sorting_orders(), ['']);
+        return in_array(strtolower($sort_order), $allowed_sort_orders);
     }
-
-    private function replaceDoubleQuotesWithHTMLCharacters(string $title): string
+    private function replace_double_quotes_with_html_characters(string $title): string
     {
         return str_replace('"', '&quot;', $title);
     }
-
-    private function appendValue(string $param): string
+    private function append_value(string $param): string
     {
-        $value = Registry::getRequest()->getRequestEscapedParameter($param);
-
-        return $value ? "&amp;$param=$value" : '';
+        $value = Registry::get_request()->get_request_escaped_parameter($param);
+        return $value ? "&amp;{$param}={$value}" : '';
     }
-
-    private function appendBasenameValue(string $param): string
+    private function append_basename_value(string $param): string
     {
-        $value = Registry::getRequest()->getRequestEscapedParameter($param);
-
-        return $value ? "&amp;$param=" . basename((string) $value) : '';
+        $value = Registry::get_request()->get_request_escaped_parameter($param);
+        return $value ? "&amp;{$param}=" . basename((string) $value) : '';
     }
-
-    private function appendUnescapedEncodedValue(string $param): string
+    private function append_unescaped_encoded_value(string $param): string
     {
-        $value = Registry::getRequest()->getRequestParameter($param);
-
-        return $value ? "&amp;$param=" . rawurlencode((string) $value) : '';
+        $value = Registry::get_request()->get_request_parameter($param);
+        return $value ? "&amp;{$param}=" . rawurlencode((string) $value) : '';
     }
-
-    private function appendUnescapedValue(string $param): string
+    private function append_unescaped_value(string $param): string
     {
-        $value = Registry::getRequest()->getRequestParameter($param);
-
-        return $value ? "&amp;$param=$value" : '';
+        $value = Registry::get_request()->get_request_parameter($param);
+        return $value ? "&amp;{$param}={$value}" : '';
     }
 }

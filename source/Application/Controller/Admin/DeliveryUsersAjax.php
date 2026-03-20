@@ -1,27 +1,25 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages delivery users
  */
-class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Delivery_Users_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
+    protected $_a_columns = ['container1' => [
+        // field , table,  visible, multilanguage, ident
         ['oxusername', 'oxuser', 1, 0, 0],
         ['oxlname', 'oxuser', 0, 0, 0],
         ['oxfname', 'oxuser', 0, 0, 0],
@@ -32,98 +30,76 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         ['oxfon', 'oxuser', 0, 0, 0],
         ['oxbirthdate', 'oxuser', 0, 0, 0],
         ['oxid', 'oxuser', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxusername', 'oxuser', 1, 0, 0],
-                                     ['oxlname', 'oxuser', 0, 0, 0],
-                                     ['oxfname', 'oxuser', 0, 0, 0],
-                                     ['oxstreet', 'oxuser', 0, 0, 0],
-                                     ['oxstreetnr', 'oxuser', 0, 0, 0],
-                                     ['oxcity', 'oxuser', 0, 0, 0],
-                                     ['oxzip', 'oxuser', 0, 0, 0],
-                                     ['oxfon', 'oxuser', 0, 0, 0],
-                                     ['oxbirthdate', 'oxuser', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                 ],
-    ];
-
+    ], 'container2' => [['oxusername', 'oxuser', 1, 0, 0], ['oxlname', 'oxuser', 0, 0, 0], ['oxfname', 'oxuser', 0, 0, 0], ['oxstreet', 'oxuser', 0, 0, 0], ['oxstreetnr', 'oxuser', 0, 0, 0], ['oxcity', 'oxuser', 0, 0, 0], ['oxzip', 'oxuser', 0, 0, 0], ['oxfon', 'oxuser', 0, 0, 0], ['oxbirthdate', 'oxuser', 0, 0, 0], ['oxid', 'oxobject2delivery', 0, 0, 1]]];
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $sUserTable = $this->getViewName('oxuser');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $s_user_table = $this->get_view_name('oxuser');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_synch_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // category selected or not ?
-        if (!$sId) {
-            $sQAdd = " from $sUserTable where 1 ";
-            if (!$myConfig->getConfigParam('blMallUsers')) {
-                $sQAdd .= " and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
+        if (!$s_id) {
+            $s_q_add = " from {$s_user_table} where 1 ";
+            if (!$my_config->get_config_param('blMallUsers')) {
+                $s_q_add .= " and {$s_user_table}.oxshopid = '" . $my_config->get_shop_id() . "' ";
             }
-        } elseif ($sSynchId && $sSynchId != $sId) {
+        } elseif ($s_synch_id && $s_synch_id != $s_id) {
             // selected group ?
-            $sQAdd = " from oxobject2group left join $sUserTable on $sUserTable.oxid = oxobject2group.oxobjectid ";
-            $sQAdd .= ' where oxobject2group.oxgroupsid = ' . $oDb->quote($sId);
-            if (!$myConfig->getConfigParam('blMallUsers')) {
-                $sQAdd .= " and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
+            $s_q_add = " from oxobject2group left join {$s_user_table} on {$s_user_table}.oxid = oxobject2group.oxobjectid ";
+            $s_q_add .= ' where oxobject2group.oxgroupsid = ' . $o_db->quote($s_id);
+            if (!$my_config->get_config_param('blMallUsers')) {
+                $s_q_add .= " and {$s_user_table}.oxshopid = '" . $my_config->get_shop_id() . "' ";
             }
         } else {
-            $sQAdd = " from oxobject2delivery left join $sUserTable on $sUserTable.oxid=oxobject2delivery.oxobjectid ";
-            $sQAdd .= ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ";
+            $s_q_add = " from oxobject2delivery left join {$s_user_table} on {$s_user_table}.oxid=oxobject2delivery.oxobjectid ";
+            $s_q_add .= ' where oxobject2delivery.oxdeliveryid = ' . $o_db->quote($s_id) . " and oxobject2delivery.oxtype = 'oxuser' and {$s_user_table}.oxid IS NOT NULL ";
         }
-
-        if ($sSynchId && $sSynchId != $sId) {
-            $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from oxobject2delivery left join $sUserTable on $sUserTable.oxid=oxobject2delivery.oxobjectid ";
-            $sQAdd .= ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ) ";
+        if ($s_synch_id && $s_synch_id != $s_id) {
+            $s_q_add .= " and {$s_user_table}.oxid not in ( select {$s_user_table}.oxid from oxobject2delivery left join {$s_user_table} on {$s_user_table}.oxid=oxobject2delivery.oxobjectid ";
+            $s_q_add .= ' where oxobject2delivery.oxdeliveryid = ' . $o_db->quote($s_synch_id) . " and oxobject2delivery.oxtype = 'oxuser' and {$s_user_table}.oxid IS NOT NULL ) ";
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Removes user from delivery configuration
      */
-    public function removeUserFromDel(): void
+    public function remove_user_from_del(): void
     {
-        $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
-        } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        $a_remove_groups = $this->get_action_ids('oxobject2delivery.oxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_q = $this->add_filter('delete oxobject2delivery.* ' . $this->get_query());
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
+        } elseif ($a_remove_groups && is_array($a_remove_groups)) {
+            $s_q = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_remove_groups)) . ') ';
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
         }
     }
-
     /**
      * Adds user from delivery configuration
      */
-    public function addUserToDel(): void
+    public function add_user_to_del(): void
     {
-        $aChosenUsr = $this->getActionIds('oxuser.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $a_chosen_usr = $this->get_action_ids('oxuser.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // adding
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sUserTable = $this->getViewName('oxuser');
-            $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_user_table = $this->get_view_name('oxuser');
+            $a_chosen_usr = $this->get_all($this->add_filter("select {$s_user_table}.oxid " . $this->get_query()));
         }
-
-        if ($soxId && $soxId != '-1' && is_array($aChosenUsr)) {
-            foreach ($aChosenUsr as $sChosenUsr) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenUsr);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field('oxuser');
-                $oObject2Delivery->save();
+        if ($sox_id && $sox_id != '-1' && is_array($a_chosen_usr)) {
+            foreach ($a_chosen_usr as $s_chosen_usr) {
+                $o_object2delivery = ox_new(\Oxid_Esales\Eshop\Core\Model\Base_Model::class);
+                $o_object2delivery->init('oxobject2delivery');
+                $o_object2delivery->oxobject2delivery__oxdeliveryid = new \Oxid_Esales\Eshop\Core\Field($sox_id);
+                $o_object2delivery->oxobject2delivery__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($s_chosen_usr);
+                $o_object2delivery->oxobject2delivery__oxtype = new \Oxid_Esales\Eshop\Core\Field('oxuser');
+                $o_object2delivery->save();
             }
         }
     }

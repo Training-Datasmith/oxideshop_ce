@@ -1,121 +1,96 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages delivery categories
  */
-class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Delivery_Categories_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_a_columns = ['container1' => [
+        // field , table,         visible, multilanguage, ident
         ['oxtitle', 'oxcategories', 1, 1, 0],
         ['oxdesc', 'oxcategories', 1, 1, 0],
         ['oxid', 'oxcategories', 0, 0, 0],
         ['oxid', 'oxcategories', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxcategories', 1, 1, 0],
-                                     ['oxdesc', 'oxcategories', 1, 1, 0],
-                                     ['oxid', 'oxcategories', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                     ['oxid', 'oxcategories', 0, 0, 1],
-                                 ],
-    ];
-
+    ], 'container2' => [['oxtitle', 'oxcategories', 1, 1, 0], ['oxdesc', 'oxcategories', 1, 1, 0], ['oxid', 'oxcategories', 0, 0, 0], ['oxid', 'oxobject2delivery', 0, 0, 1], ['oxid', 'oxcategories', 0, 0, 1]]];
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
         // looking for table/view
-        $sCatTable = $this->getViewName('oxcategories');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sDelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $s_cat_table = $this->get_view_name('oxcategories');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_del_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_synch_del_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // category selected or not ?
-        if (!$sDelId) {
-            $sQAdd = " from {$sCatTable} ";
+        if (!$s_del_id) {
+            $s_q_add = " from {$s_cat_table} ";
         } else {
-            $sQAdd = " from oxobject2delivery left join {$sCatTable} " .
-                     "on {$sCatTable}.oxid=oxobject2delivery.oxobjectid " .
-                     ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sDelId) .
-                     " and oxobject2delivery.oxtype = 'oxcategories' ";
+            $s_q_add = " from oxobject2delivery left join {$s_cat_table} " . "on {$s_cat_table}.oxid=oxobject2delivery.oxobjectid " . ' where oxobject2delivery.oxdeliveryid = ' . $o_db->quote($s_del_id) . " and oxobject2delivery.oxtype = 'oxcategories' ";
         }
-
-        if ($sSynchDelId && $sSynchDelId != $sDelId) {
+        if ($s_synch_del_id && $s_synch_del_id != $s_del_id) {
             // performance
-            $sSubSelect = " select {$sCatTable}.oxid from oxobject2delivery left join {$sCatTable} " .
-                          "on {$sCatTable}.oxid=oxobject2delivery.oxobjectid " .
-                          ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchDelId) .
-                          " and oxobject2delivery.oxtype = 'oxcategories' ";
-            if (stristr($sQAdd, 'where') === false) {
-                $sQAdd .= ' where ';
+            $s_sub_select = " select {$s_cat_table}.oxid from oxobject2delivery left join {$s_cat_table} " . "on {$s_cat_table}.oxid=oxobject2delivery.oxobjectid " . ' where oxobject2delivery.oxdeliveryid = ' . $o_db->quote($s_synch_del_id) . " and oxobject2delivery.oxtype = 'oxcategories' ";
+            if (stristr($s_q_add, 'where') === false) {
+                $s_q_add .= ' where ';
             } else {
-                $sQAdd .= ' and ';
+                $s_q_add .= ' and ';
             }
-            $sQAdd .= " {$sCatTable}.oxid not in ( $sSubSelect ) ";
+            $s_q_add .= " {$s_cat_table}.oxid not in ( {$s_sub_select} ) ";
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Removes category from delivery configuration
      */
-    public function removeCatFromDel(): void
+    public function remove_cat_from_del(): void
     {
-        $aChosenCat = $this->getActionIds('oxobject2delivery.oxid');
-
+        $a_chosen_cat = $this->get_action_ids('oxobject2delivery.oxid');
         // removing all
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
-        } elseif (is_array($aChosenCat)) {
-            $sChosenCategoriess = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCat));
-            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . $sChosenCategoriess . ') ';
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_q = $this->add_filter('delete oxobject2delivery.* ' . $this->get_query());
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
+        } elseif (is_array($a_chosen_cat)) {
+            $s_chosen_categoriess = implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_chosen_cat));
+            $s_q = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . $s_chosen_categoriess . ') ';
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
         }
     }
-
     /**
      * Adds category to delivery configuration
      */
-    public function addCatToDel(): void
+    public function add_cat_to_del(): void
     {
-        $aChosenCat = $this->getActionIds('oxcategories.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $a_chosen_cat = $this->get_action_ids('oxcategories.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // adding
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sCatTable = $this->getViewName('oxcategories');
-            $aChosenCat = $this->getAll($this->addFilter("select $sCatTable.oxid " . $this->getQuery()));
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_cat_table = $this->get_view_name('oxcategories');
+            $a_chosen_cat = $this->get_all($this->add_filter("select {$s_cat_table}.oxid " . $this->get_query()));
         }
-
-        if (isset($soxId) && $soxId != '-1' && isset($aChosenCat) && $aChosenCat) {
-            foreach ($aChosenCat as $sChosenCat) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCat);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field('oxcategories');
-                $oObject2Delivery->save();
+        if (isset($sox_id) && $sox_id != '-1' && isset($a_chosen_cat) && $a_chosen_cat) {
+            foreach ($a_chosen_cat as $s_chosen_cat) {
+                $o_object2delivery = ox_new(\Oxid_Esales\Eshop\Core\Model\Base_Model::class);
+                $o_object2delivery->init('oxobject2delivery');
+                $o_object2delivery->oxobject2delivery__oxdeliveryid = new \Oxid_Esales\Eshop\Core\Field($sox_id);
+                $o_object2delivery->oxobject2delivery__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($s_chosen_cat);
+                $o_object2delivery->oxobject2delivery__oxtype = new \Oxid_Esales\Eshop\Core\Field('oxcategories');
+                $o_object2delivery->save();
             }
         }
     }

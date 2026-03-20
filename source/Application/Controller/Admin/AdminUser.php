@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin user manager.
@@ -15,12 +13,12 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * and "user_main") to frame.
  * Admin Menu: User Administration -> Users.
  */
-class AdminUser extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Admin_User extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'user';
+    protected $_s_this_template = 'user';
 }

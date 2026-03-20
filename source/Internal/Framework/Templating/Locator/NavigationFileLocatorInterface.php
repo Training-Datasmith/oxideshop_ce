@@ -4,16 +4,14 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Locator;
 
 /**
  * Interface NavigationFileLocatorInterface
  * @package OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator
  */
-interface NavigationFileLocatorInterface
+interface Navigation_File_Locator_Interface
 {
     /**
      * Returns a full path for a given file name.

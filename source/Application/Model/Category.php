@@ -1,138 +1,119 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
 /**
  * Category manager.
  * Collects category information (articles, etc.), performs insertion/deletion
  * of categories nodes. By recursion methods are set structure of category.
  */
-#[\AllowDynamicProperties]
-class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+#[\Allow_Dynamic_Properties]
+class Category extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model implements \Oxid_Esales\Eshop\Core\Contract\I_Url
 {
     /**
      * Subcategories array.
      *
      * @var array
      */
-    protected $_aSubCats = [];
-
+    protected $_a_sub_cats = [];
     /**
      * Content category array.
      *
      * @var array
      */
-    protected $_aContentCats = [];
-
+    protected $_a_content_cats = [];
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxcategory';
-
+    protected $_s_class_name = 'oxcategory';
     /**
      * number of articles in the current category
      *
      * @var int
      */
-    protected $_iNrOfArticles;
-
+    protected $_i_nr_of_articles;
     /**
      * visibility of a category
      *
      * @var int
      */
-    protected $_blIsVisible;
-
+    protected $_bl_is_visible;
     /**
      * expanded state of a category
      *
      * @var int
      */
-    protected $_blExpanded;
-
+    protected $_bl_expanded;
     /**
      * visibility of a category
      *
      * @var int
      */
-    protected $_blHasSubCats;
-
+    protected $_bl_has_sub_cats;
     /**
      * has visible sub categories state of a category
      *
      * @var int
      */
-    protected $_blHasVisibleSubCats;
-
+    protected $_bl_has_visible_sub_cats;
     /**
      * Marks that current object is managed by SEO
      *
      * @var bool
      */
-    protected $_blIsSeoObject = true;
-
+    protected $_bl_is_seo_object = true;
     /**
      * Set $_blUseLazyLoading to true if you want to load only actually used fields not full object, depending on views.
      *
      * @var bool
      */
-    protected $_blUseLazyLoading = false;
-
+    protected $_bl_use_lazy_loading = false;
     /**
      * Dyn image dir
      *
      * @var string
      */
-    protected $_sDynImageDir;
-
+    protected $_s_dyn_image_dir;
     /**
      * Top category marker
      *
      * @var bool
      */
-    protected $_blTopCategory;
-
+    protected $_bl_top_category;
     /**
      * Standard/dynamic article urls for languages
      *
      * @var array
      */
-    protected $_aStdUrls = [];
-
+    protected $_a_std_urls = [];
     /**
      * Seo article urls for languages
      *
      * @var array
      */
-    protected $_aSeoUrls = [];
-
+    protected $_a_seo_urls = [];
     /**
      * Category attributes cache
      *
      * @var array
      */
-    protected static $_aCatAttributes = [];
-
+    protected static $_a_cat_attributes = [];
     /**
      * Parent category object container.
      *
      * @var \OxidEsales\Eshop\Application\Model\Category
      */
-    protected $_oParent;
-
+    protected $_o_parent;
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
      */
@@ -141,25 +122,22 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
         parent::__construct();
         $this->init('oxcategories');
     }
-
     /**
      * Gets default sorting value
      */
-    public function getDefaultSorting()
+    public function get_default_sorting()
     {
-        return $this->getFieldData('oxdefsort');
+        return $this->get_field_data('oxdefsort');
     }
-
     /**
      * Gets default sorting mode value
      *
      * @return string
      */
-    public function getDefaultSortingMode()
+    public function get_default_sorting_mode()
     {
         return $this->oxcategories__oxdefsortmode->value;
     }
-
     /**
      * Extra getter to guarantee compatibility with templates
      *
@@ -167,24 +145,23 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return string
      */
-    public function __get($sName)
+    public function __get($s_name)
     {
-        return match ($sName) {
-            'aSubCats' => $this->_aSubCats,
-            'aContent' => $this->_aContentCats,
-            'iArtCnt' => $this->getNrOfArticles(),
-            'isVisible' => $this->getIsVisible(),
-            'expanded' => $this->getExpanded(),
-            'hasSubCats' => $this->getHasSubCats(),
-            'hasVisibleSubCats' => $this->getHasVisibleSubCats(),
+        return match ($s_name) {
+            'aSubCats' => $this->_a_sub_cats,
+            'aContent' => $this->_a_content_cats,
+            'iArtCnt' => $this->get_nr_of_articles(),
+            'isVisible' => $this->get_is_visible(),
+            'expanded' => $this->get_expanded(),
+            'hasSubCats' => $this->get_has_sub_cats(),
+            'hasVisibleSubCats' => $this->get_has_visible_sub_cats(),
             //case 'toListLink':
             //case 'noparamlink':
-            'openlink', 'closelink', 'link' => $this->getLink(),
-            'dimagedir' => $this->getPictureUrl(),
-            default => parent::__get($sName),
+            'openlink', 'closelink', 'link' => $this->get_link(),
+            'dimagedir' => $this->get_picture_url(),
+            default => parent::__get($s_name),
         };
     }
-
     /**
      * Get data from db
      *
@@ -192,13 +169,11 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return array
      */
-    protected function loadFromDb($sOXID)
+    protected function load_from_db($s_oxid)
     {
-        $sSelect = $this->buildSelectString(["`{$this->getViewName()}`.`oxid`" => $sOXID]);
-
-        return DatabaseProvider::getDb()->getRow($sSelect);
+        $s_select = $this->build_select_string(["`{$this->get_view_name()}`.`oxid`" => $s_oxid]);
+        return Database_Provider::get_db()->get_row($s_select);
     }
-
     /**
      * Load category data
      *
@@ -206,34 +181,28 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return bool
      */
-    public function load($sOXID)
+    public function load($s_oxid)
     {
-        $aData = $this->loadFromDb($sOXID);
-
-        if ($aData) {
-            $this->assign($aData);
-            $this->_isLoaded = true;
+        $a_data = $this->load_from_db($s_oxid);
+        if ($a_data) {
+            $this->assign($a_data);
+            $this->_is_loaded = true;
             return true;
         }
-
         return false;
     }
-
     /**
      * Loads and assigns object data from DB.
      *
      * @param mixed $dbRecord database record array
      */
-    public function assign($dbRecord)
+    public function assign($db_record)
     {
-        $this->_iNrOfArticles = null;
-
+        $this->_i_nr_of_articles = null;
         //clear seo urls
-        $this->_aSeoUrls = [];
-
-        return parent::assign($dbRecord);
+        $this->_a_seo_urls = [];
+        return parent::assign($db_record);
     }
-
     /**
      * Delete empty categories, returns true on success.
      *
@@ -241,102 +210,57 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return bool
      */
-    public function delete($sOXID = null)
+    public function delete($s_oxid = null)
     {
-        if (!$this->getId()) {
-            $this->load($sOXID);
+        if (!$this->get_id()) {
+            $this->load($s_oxid);
         }
-
-        $sOXID ??= $this->getId();
-
-        $myConfig = Registry::getConfig();
-        $oDb = DatabaseProvider::getDb();
-        $blRet = false;
-
-        if ($this->oxcategories__oxright->value == ($this->oxcategories__oxleft->value + 1)) {
-            $myUtilsPic = Registry::getUtilsPic();
-            $sDir = $myConfig->getPictureDir(false);
-
+        $s_oxid ??= $this->get_id();
+        $my_config = Registry::get_config();
+        $o_db = Database_Provider::get_db();
+        $bl_ret = false;
+        if ($this->oxcategories__oxright->value == $this->oxcategories__oxleft->value + 1) {
+            $my_utils_pic = Registry::get_utils_pic();
+            $s_dir = $my_config->get_picture_dir(false);
             // only delete empty categories
             // #1173M - not all pic are deleted, after article is removed
-            $myUtilsPic->safePictureDelete(
-                $this->getFieldData('oxthumb'),
-                $sDir . Registry::getUtilsFile()->getImageDirByType('TC'),
-                'oxcategories',
-                'oxthumb'
-            );
-            $myUtilsPic->safePictureDelete(
-                $this->getFieldData('oxicon'),
-                $sDir . Registry::getUtilsFile()->getImageDirByType('CICO'),
-                'oxcategories',
-                'oxicon'
-            );
-            $myUtilsPic->safePictureDelete(
-                $this->getFieldData('oxpromoicon'),
-                $sDir . Registry::getUtilsFile()->getImageDirByType('PICO'),
-                'oxcategories',
-                'oxpromoicon'
-            );
-
+            $my_utils_pic->safe_picture_delete($this->get_field_data('oxthumb'), $s_dir . Registry::get_utils_file()->get_image_dir_by_type('TC'), 'oxcategories', 'oxthumb');
+            $my_utils_pic->safe_picture_delete($this->get_field_data('oxicon'), $s_dir . Registry::get_utils_file()->get_image_dir_by_type('CICO'), 'oxcategories', 'oxicon');
+            $my_utils_pic->safe_picture_delete($this->get_field_data('oxpromoicon'), $s_dir . Registry::get_utils_file()->get_image_dir_by_type('PICO'), 'oxcategories', 'oxpromoicon');
             $query = 'UPDATE oxcategories SET OXLEFT = OXLEFT - 2
                       WHERE OXROOTID = :oxrootid AND
                             OXLEFT > :oxleft AND
                             OXSHOPID = :oxshopid';
-            $oDb->execute($query, [
-                'oxrootid' => $this->oxcategories__oxrootid->value,
-                'oxleft' => (int) $this->oxcategories__oxleft->value,
-                'oxshopid' => $this->getShopId(),
-            ]);
-
+            $o_db->execute($query, ['oxrootid' => $this->oxcategories__oxrootid->value, 'oxleft' => (int) $this->oxcategories__oxleft->value, 'oxshopid' => $this->get_shop_id()]);
             $query = 'UPDATE oxcategories SET OXRIGHT = OXRIGHT - 2
                       WHERE OXROOTID = :oxrootid AND
                             OXRIGHT > :oxright AND
                             OXSHOPID = :oxshopid';
-            $oDb->execute($query, [
-                'oxrootid' => $this->oxcategories__oxrootid->value,
-                'oxright' => (int) $this->oxcategories__oxright->value,
-                'oxshopid' => $this->getShopId(),
-            ]);
-
+            $o_db->execute($query, ['oxrootid' => $this->oxcategories__oxrootid->value, 'oxright' => (int) $this->oxcategories__oxright->value, 'oxshopid' => $this->get_shop_id()]);
             // delete entry
-            $blRet = parent::delete($sOXID);
-
+            $bl_ret = parent::delete($s_oxid);
             // delete links to articles
-            $oDb->execute('delete from oxobject2category where oxobject2category.oxcatnid = :oxid', [
-                'oxid' => $sOXID,
-            ]);
-
+            $o_db->execute('delete from oxobject2category where oxobject2category.oxcatnid = :oxid', ['oxid' => $s_oxid]);
             // #657 ADDITIONAL delete links to attributes
-            $oDb->execute('delete from oxcategory2attribute where oxcategory2attribute.oxobjectid = :oxid', [
-                'oxid' => $sOXID,
-            ]);
-
+            $o_db->execute('delete from oxcategory2attribute where oxcategory2attribute.oxobjectid = :oxid', ['oxid' => $s_oxid]);
             // A. removing assigned:
             // - deliveries
-            $oDb->execute('delete from oxobject2delivery where oxobject2delivery.oxobjectid = :oxid', [
-                'oxid' => $sOXID,
-            ]);
+            $o_db->execute('delete from oxobject2delivery where oxobject2delivery.oxobjectid = :oxid', ['oxid' => $s_oxid]);
             // - discounts
-            $oDb->execute('delete from oxobject2discount where oxobject2discount.oxobjectid = :oxid', [
-                'oxid' => $sOXID,
-            ]);
-
-            Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class)->onDeleteCategory($this);
+            $o_db->execute('delete from oxobject2discount where oxobject2discount.oxobjectid = :oxid', ['oxid' => $s_oxid]);
+            Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Category::class)->on_delete_category($this);
         }
-
-        return $blRet;
+        return $bl_ret;
     }
-
     /**
      * returns the sub category array
      *
      * @return array
      */
-    public function getSubCats()
+    public function get_sub_cats()
     {
-        return $this->_aSubCats;
+        return $this->_a_sub_cats;
     }
-
     /**
      * returns a specific sub category
      *
@@ -344,30 +268,26 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return object
      */
-    public function getSubCat($sKey)
+    public function get_sub_cat($s_key)
     {
-        return $this->_aSubCats[$sKey];
+        return $this->_a_sub_cats[$s_key];
     }
-
     /**
      * Sets an array of sub categories, also handles parent hasVisibleSubCats
      *
      * @param array $aCats array of categories
      */
-    public function setSubCats($aCats): void
+    public function set_sub_cats($a_cats): void
     {
-        $this->_aSubCats = $aCats;
-
-        foreach ($aCats as $oCat) {
+        $this->_a_sub_cats = $a_cats;
+        foreach ($a_cats as $o_cat) {
             // keeping ref. to parent
-            $oCat->setParentCategory($this);
-
-            if ($oCat->getIsVisible()) {
-                $this->setHasVisibleSubCats(true);
+            $o_cat->set_parent_category($this);
+            if ($o_cat->get_is_visible()) {
+                $this->set_has_visible_sub_cats(true);
             }
         }
     }
-
     /**
      * sets a single category, handles sorting and parent hasVisibleSubCats
      *
@@ -375,42 +295,37 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      * @param string                                       $sKey (optional, default=null)  the key for that category,
      *                                                           without a key, the category is just added to the array
      */
-    public function setSubCat($oCat, $sKey = null): void
+    public function set_sub_cat($o_cat, $s_key = null): void
     {
-        if ($sKey) {
-            $this->_aSubCats[$sKey] = $oCat;
+        if ($s_key) {
+            $this->_a_sub_cats[$s_key] = $o_cat;
         } else {
-            $this->_aSubCats[] = $oCat;
+            $this->_a_sub_cats[] = $o_cat;
         }
-
         // keeping ref. to parent
-        $oCat->setParentCategory($this);
-
-        if ($oCat->getIsVisible()) {
-            $this->setHasVisibleSubCats(true);
+        $o_cat->set_parent_category($this);
+        if ($o_cat->get_is_visible()) {
+            $this->set_has_visible_sub_cats(true);
         }
     }
-
     /**
      * returns the content category array
      *
      * @return array
      */
-    public function getContentCats()
+    public function get_content_cats()
     {
-        return $this->_aContentCats;
+        return $this->_a_content_cats;
     }
-
     /**
      * Sets an array of content categories
      *
      * @param array $aContent array of content
      */
-    public function setContentCats($aContent): void
+    public function set_content_cats($a_content): void
     {
-        $this->_aContentCats = $aContent;
+        $this->_a_content_cats = $a_content;
     }
-
     /**
      * sets a single category
      *
@@ -418,103 +333,79 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      * @param string                                       $sKey     optional, the key for that category,
      *                                                               without a key, the category is just added to the array
      */
-    public function setContentCat($oContent, $sKey = null): void
+    public function set_content_cat($o_content, $s_key = null): void
     {
-        if ($sKey) {
-            $this->_aContentCats[$sKey] = $oContent;
+        if ($s_key) {
+            $this->_a_content_cats[$s_key] = $o_content;
         } else {
-            $this->_aContentCats[] = $oContent;
+            $this->_a_content_cats[] = $o_content;
         }
     }
-
     /**
      * returns number or articles in category
      *
      * @return integer
      */
-    public function getNrOfArticles()
+    public function get_nr_of_articles()
     {
-        $myConfig = Registry::getConfig();
-
-        if (
-            !isset($this->_iNrOfArticles)
-            && !$this->isAdmin()
-            && (
-                $myConfig->getConfigParam('bl_perfShowActionCatArticleCnt')
-                || $myConfig->getConfigParam('blDontShowEmptyCategories')
-            )
-        ) {
-            if ($this->isPriceCategory()) {
-                $this->_iNrOfArticles = Registry::getUtilsCount()
-                    ->getPriceCatArticleCount(
-                        $this->getId(),
-                        $this->getFieldData('oxpricefrom'),
-                        $this->getFieldData('oxpriceto')
-                    );
+        $my_config = Registry::get_config();
+        if (!isset($this->_i_nr_of_articles) && !$this->is_admin() && ($my_config->get_config_param('bl_perfShowActionCatArticleCnt') || $my_config->get_config_param('blDontShowEmptyCategories'))) {
+            if ($this->is_price_category()) {
+                $this->_i_nr_of_articles = Registry::get_utils_count()->get_price_cat_article_count($this->get_id(), $this->get_field_data('oxpricefrom'), $this->get_field_data('oxpriceto'));
             } else {
-                $this->_iNrOfArticles = Registry::getUtilsCount()
-                    ->getCatArticleCount($this->getId());
+                $this->_i_nr_of_articles = Registry::get_utils_count()->get_cat_article_count($this->get_id());
             }
         }
-
-        return (int) $this->_iNrOfArticles;
+        return (int) $this->_i_nr_of_articles;
     }
-
     /**
      * sets the number or articles in category
      *
      * @param int $iNum category product count setter
      */
-    public function setNrOfArticles($iNum): void
+    public function set_nr_of_articles($i_num): void
     {
-        $this->_iNrOfArticles = $iNum;
+        $this->_i_nr_of_articles = $i_num;
     }
-
     /**
      * returns the visibility of a category, handles hidden and empty categories
      *
      * @return bool
      */
-    public function getIsVisible()
+    public function get_is_visible()
     {
-        if (!isset($this->_blIsVisible)) {
-            if (Registry::getConfig()->getConfigParam('blDontShowEmptyCategories')) {
-                $blEmpty = ($this->getNrOfArticles() < 1) && !$this->getHasVisibleSubCats();
+        if (!isset($this->_bl_is_visible)) {
+            if (Registry::get_config()->get_config_param('blDontShowEmptyCategories')) {
+                $bl_empty = $this->get_nr_of_articles() < 1 && !$this->get_has_visible_sub_cats();
             } else {
-                $blEmpty = false;
+                $bl_empty = false;
             }
-
-            $this->_blIsVisible = !($blEmpty || $this->oxcategories__oxhidden->value);
+            $this->_bl_is_visible = !($bl_empty || $this->oxcategories__oxhidden->value);
         }
-
-        return $this->_blIsVisible;
+        return $this->_bl_is_visible;
     }
-
     /**
      * sets the visibility of a category
      *
      * @param bool $blVisible category visibility status setter
      */
-    public function setIsVisible($blVisible): void
+    public function set_is_visible($bl_visible): void
     {
-        $this->_blIsVisible = $blVisible;
+        $this->_bl_is_visible = $bl_visible;
     }
-
     /**
      * Returns dyn image dir
      *
      * @return string
      */
-    public function getPictureUrl()
+    public function get_picture_url()
     {
-        if ($this->_sDynImageDir === null) {
-            $sThisShop = $this->oxcategories__oxshopid->value;
-            $this->_sDynImageDir = Registry::getConfig()->getPictureUrl(null, false, null, null, $sThisShop);
+        if ($this->_s_dyn_image_dir === null) {
+            $s_this_shop = $this->oxcategories__oxshopid->value;
+            $this->_s_dyn_image_dir = Registry::get_config()->get_picture_url(null, false, null, null, $s_this_shop);
         }
-
-        return $this->_sDynImageDir;
+        return $this->_s_dyn_image_dir;
     }
-
     /**
      * Returns raw category seo url
      *
@@ -523,16 +414,14 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return string
      */
-    public function getBaseSeoLink($iLang, $iPage = 0)
+    public function get_base_seo_link($i_lang, $i_page = 0)
     {
-        $oEncoder = Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class);
-        if (!$iPage) {
-            return $oEncoder->getCategoryUrl($this, $iLang);
+        $o_encoder = Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Category::class);
+        if (!$i_page) {
+            return $o_encoder->get_category_url($this, $i_lang);
         }
-
-        return $oEncoder->getCategoryPageUrl($this, $iPage, $iLang);
+        return $o_encoder->get_category_page_url($this, $i_page, $i_lang);
     }
-
     /**
      * returns the url of the category
      *
@@ -540,41 +429,33 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function get_link($i_lang = null)
     {
-        if (
-            !Registry::getUtils()->seoIsActive() ||
-            $this->getFieldData('oxextlink')
-        ) {
-            return $this->getStdLink($iLang);
+        if (!Registry::get_utils()->seo_is_active() || $this->get_field_data('oxextlink')) {
+            return $this->get_std_link($i_lang);
         }
-
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        if (!isset($this->_aSeoUrls[$iLang])) {
-            $this->_aSeoUrls[$iLang] = $this->getBaseSeoLink($iLang);
+        if (!isset($this->_a_seo_urls[$i_lang])) {
+            $this->_a_seo_urls[$i_lang] = $this->get_base_seo_link($i_lang);
         }
-
-        return $this->_aSeoUrls[$iLang];
+        return $this->_a_seo_urls[$i_lang];
     }
-
     /**
      * sets the url of the category
      *
      * @param string $sLink category url
      */
-    public function setLink($sLink): void
+    public function set_link($s_link): void
     {
-        $iLang = $this->getLanguage();
-        if (Registry::getUtils()->seoIsActive()) {
-            $this->_aSeoUrls[$iLang] = $sLink;
+        $i_lang = $this->get_language();
+        if (Registry::get_utils()->seo_is_active()) {
+            $this->_a_seo_urls[$i_lang] = $s_link;
         } else {
-            $this->_aStdUrls[$iLang] = $sLink;
+            $this->_a_std_urls[$i_lang] = $s_link;
         }
     }
-
     /**
      * Returns SQL select string with checks if items are available
      *
@@ -582,28 +463,24 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return string
      */
-    public function getSqlActiveSnippet($blForceCoreTable = null)
+    public function get_sql_active_snippet($bl_force_core_table = null)
     {
-        $sQ = parent::getSqlActiveSnippet($blForceCoreTable);
-
-        $sTable = $this->getViewName($blForceCoreTable);
-        $sQ .= (strlen($sQ) ? ' and ' : '') . " $sTable.oxhidden = '0' ";
-        $sQ .= $this->getAdditionalSqlFilter($blForceCoreTable);
-
-        return "( $sQ ) ";
+        $s_q = parent::get_sql_active_snippet($bl_force_core_table);
+        $s_table = $this->get_view_name($bl_force_core_table);
+        $s_q .= (strlen($s_q) ? ' and ' : '') . " {$s_table}.oxhidden = '0' ";
+        $s_q .= $this->get_additional_sql_filter($bl_force_core_table);
+        return "( {$s_q} ) ";
     }
-
     /**
      * Additional SQL conditions for selecting articles snippet
      *
      * @param bool $forceCoreTable
      * @return string
      */
-    protected function getAdditionalSqlFilter($forceCoreTable)
+    protected function get_additional_sql_filter($force_core_table)
     {
         return '';
     }
-
     /**
      * Returns base dynamic url: shopUrl/index.php?cl=details
      *
@@ -613,23 +490,20 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return string
      */
-    public function getBaseStdLink($iLang, $blAddId = true, $blFull = true)
+    public function get_base_std_link($i_lang, $bl_add_id = true, $bl_full = true)
     {
-        $externalLink = $this->getFieldData('oxextlink');
-        if ($externalLink) {
-            return $externalLink;
+        $external_link = $this->get_field_data('oxextlink');
+        if ($external_link) {
+            return $external_link;
         }
-
-        $sUrl = '';
-        if ($blFull) {
+        $s_url = '';
+        if ($bl_full) {
             //always returns shop url, not admin
-            $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
+            $s_url = Registry::get_config()->get_shop_url($i_lang, false);
         }
-
         //always returns shop url, not admin
-        return $sUrl . 'index.php?cl=alist' . ($blAddId ? '&amp;cnid=' . $this->getId() : '');
+        return $s_url . 'index.php?cl=alist' . ($bl_add_id ? '&amp;cnid=' . $this->get_id() : '');
     }
-
     /**
      * Returns standard URL to category
      *
@@ -638,107 +512,93 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return string
      */
-    public function getStdLink($iLang = null, $aParams = [])
+    public function get_std_link($i_lang = null, $a_params = [])
     {
-        $externalLink = $this->getFieldData('oxextlink');
-        if ($externalLink) {
-            return Registry::getUtilsUrl()->processUrl($externalLink);
+        $external_link = $this->get_field_data('oxextlink');
+        if ($external_link) {
+            return Registry::get_utils_url()->process_url($external_link);
         }
-
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        if (!isset($this->_aStdUrls[$iLang])) {
-            $this->_aStdUrls[$iLang] = $this->getBaseStdLink($iLang);
+        if (!isset($this->_a_std_urls[$i_lang])) {
+            $this->_a_std_urls[$i_lang] = $this->get_base_std_link($i_lang);
         }
-
-        return Registry::getUtilsUrl()->processUrl($this->_aStdUrls[$iLang], true, $aParams, $iLang);
+        return Registry::get_utils_url()->process_url($this->_a_std_urls[$i_lang], true, $a_params, $i_lang);
     }
-
     /**
      * returns the expanded state of the category
      *
      * @return bool
      */
-    public function getExpanded()
+    public function get_expanded()
     {
-        return $this->_blExpanded;
+        return $this->_bl_expanded;
     }
-
     /**
      * set the expanded state of the category
      *
      * @param bool $blExpanded expanded status setter
      */
-    public function setExpanded($blExpanded): void
+    public function set_expanded($bl_expanded): void
     {
-        $this->_blExpanded = $blExpanded;
+        $this->_bl_expanded = $bl_expanded;
     }
-
     /**
      * returns if a category has sub categories
      *
      * @return bool
      */
-    public function getHasSubCats()
+    public function get_has_sub_cats()
     {
-        if (!isset($this->_blHasSubCats)) {
-            $this->_blHasSubCats = $this->oxcategories__oxright->value > $this->oxcategories__oxleft->value + 1;
+        if (!isset($this->_bl_has_sub_cats)) {
+            $this->_bl_has_sub_cats = $this->oxcategories__oxright->value > $this->oxcategories__oxleft->value + 1;
         }
-
-        return $this->_blHasSubCats;
+        return $this->_bl_has_sub_cats;
     }
-
     /**
      * returns if a category has visible sub categories
      *
      * @return bool
      */
-    public function getHasVisibleSubCats()
+    public function get_has_visible_sub_cats()
     {
-        if (!isset($this->_blHasVisibleSubCats)) {
-            $this->_blHasVisibleSubCats = false;
+        if (!isset($this->_bl_has_visible_sub_cats)) {
+            $this->_bl_has_visible_sub_cats = false;
         }
-
-        return $this->_blHasVisibleSubCats;
+        return $this->_bl_has_visible_sub_cats;
     }
-
     /**
      * sets the state of has visible sub categories for the category
      *
      * @param bool $blHasVisibleSubcats marker if category has visible subcategories
      */
-    public function setHasVisibleSubCats($blHasVisibleSubcats): void
+    public function set_has_visible_sub_cats($bl_has_visible_subcats): void
     {
-        if ($blHasVisibleSubcats && !$this->_blHasVisibleSubCats) {
-            unset($this->_blIsVisible);
-            if ($this->_oParent instanceof \OxidEsales\Eshop\Application\Model\Category) {
-                $this->_oParent->setHasVisibleSubCats(true);
+        if ($bl_has_visible_subcats && !$this->_bl_has_visible_sub_cats) {
+            unset($this->_bl_is_visible);
+            if ($this->_o_parent instanceof \Oxid_Esales\Eshop\Application\Model\Category) {
+                $this->_o_parent->set_has_visible_sub_cats(true);
             }
         }
-        $this->_blHasVisibleSubCats = $blHasVisibleSubcats;
+        $this->_bl_has_visible_sub_cats = $bl_has_visible_subcats;
     }
-
     /**
      * Loads and returns attribute list associated with this category
      *
      * @return \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    public function getAttributes()
+    public function get_attributes()
     {
-        $sActCat = $this->getId();
-
-        $sKey = md5($sActCat . serialize(Registry::getSession()->getVariable('session_attrfilter')));
-        if (!isset(self::$_aCatAttributes[$sKey])) {
-            $oAttrList = oxNew(\OxidEsales\Eshop\Application\Model\AttributeList::class);
-            $oAttrList->getCategoryAttributes($sActCat, $this->getLanguage());
-            self::$_aCatAttributes[$sKey] = $oAttrList;
+        $s_act_cat = $this->get_id();
+        $s_key = md5($s_act_cat . serialize(Registry::get_session()->get_variable('session_attrfilter')));
+        if (!isset(self::$_a_cat_attributes[$s_key])) {
+            $o_attr_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Attribute_List::class);
+            $o_attr_list->get_category_attributes($s_act_cat, $this->get_language());
+            self::$_a_cat_attributes[$s_key] = $o_attr_list;
         }
-
-        return self::$_aCatAttributes[$sKey];
+        return self::$_a_cat_attributes[$s_key];
     }
-
     /**
      * Loads and returns category in base language
      *
@@ -746,56 +606,50 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return object
      */
-    public function getCatInLang($oActCategory = null)
+    public function get_cat_in_lang($o_act_category = null)
     {
-        $oCategoryInDefaultLanguage = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        if ($this->isPriceCategory()) {
+        $o_category_in_default_language = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+        if ($this->is_price_category()) {
             // get it in base language
-            $oCategoryInDefaultLanguage->loadInLang(0, $this->getId());
+            $o_category_in_default_language->load_in_lang(0, $this->get_id());
         } else {
-            $oCategoryInDefaultLanguage->loadInLang(0, $oActCategory->getId());
+            $o_category_in_default_language->load_in_lang(0, $o_act_category->get_id());
         }
-
-        return $oCategoryInDefaultLanguage;
+        return $o_category_in_default_language;
     }
-
     /**
      * Set parent category object for internal usage only.
      *
      * @param \OxidEsales\Eshop\Application\Model\Category $oCategory parent category object
      */
-    public function setParentCategory($oCategory): void
+    public function set_parent_category($o_category): void
     {
-        $this->_oParent = $oCategory;
+        $this->_o_parent = $o_category;
     }
-
     /**
      * Returns parent category object for current category (if it is available).
      *
      * @return \OxidEsales\Eshop\Application\Model\Category
      */
-    public function getParentCategory()
+    public function get_parent_category()
     {
         $category = null;
-
-        $parentCategoryId = $this->getFieldData('oxparentid');
-        if ($parentCategoryId !== 'oxrootid') {
+        $parent_category_id = $this->get_field_data('oxparentid');
+        if ($parent_category_id !== 'oxrootid') {
             // checking if object itself has ref to parent
-            if ($this->_oParent) {
-                $category = $this->_oParent;
+            if ($this->_o_parent) {
+                $category = $this->_o_parent;
             } else {
-                $category = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-                if (!$category->load($parentCategoryId)) {
+                $category = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+                if (!$category->load($parent_category_id)) {
                     $category = null;
                 } else {
-                    $this->_oParent = $category;
+                    $this->_o_parent = $category;
                 }
             }
         }
-
         return $category;
     }
-
     /**
      * Returns root category id of a child category
      *
@@ -803,19 +657,15 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return integer
      */
-    public static function getRootId($sCategoryId)
+    public static function get_root_id($s_category_id)
     {
-        if (!isset($sCategoryId)) {
+        if (!isset($s_category_id)) {
             return;
         }
-        $oDb = DatabaseProvider::getDb();
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        return $oDb
-            ->getOne('select oxrootid from ' . $tableViewNameGenerator->getViewName('oxcategories') . ' where oxid = :oxid', [
-            'oxid' => $sCategoryId,
-        ]);
+        $o_db = Database_Provider::get_db();
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        return $o_db->get_one('select oxrootid from ' . $table_view_name_generator->get_view_name('oxcategories') . ' where oxid = :oxid', ['oxid' => $s_category_id]);
     }
-
     /**
      * Before assigning the record from SQL it checks for viewable rights
      *
@@ -823,15 +673,13 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return bool
      */
-    public function assignViewableRecord($sSelect)
+    public function assign_viewable_record($s_select)
     {
-        if ($this->assignRecord($sSelect)) {
+        if ($this->assign_record($s_select)) {
             return true;
         }
-
         return false;
     }
-
     /**
      * Inserts new category (and updates existing node oxLeft amd oxRight accordingly). Returns true on success.
      *
@@ -839,59 +687,44 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      */
     protected function insert()
     {
-        $parentCategoryId = $this->getFieldData('oxparentid');
-        if ($parentCategoryId !== 'oxrootid') {
+        $parent_category_id = $this->get_field_data('oxparentid');
+        if ($parent_category_id !== 'oxrootid') {
             // load parent
-            $oParent = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+            $o_parent = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
             //#M317 check if parent is loaded
-            if (!$oParent->load($parentCategoryId)) {
+            if (!$o_parent->load($parent_category_id)) {
                 return false;
             }
-
             // update existing nodes
-            $oDb = DatabaseProvider::getDb();
+            $o_db = Database_Provider::get_db();
             $query = 'UPDATE oxcategories SET OXLEFT = OXLEFT + 2
                       WHERE OXROOTID = :oxrootid AND
                             OXLEFT > :oxleft AND
                             OXRIGHT >= :oxright AND
                             OXSHOPID = :oxshopid ';
-            $oDb->execute($query, [
-                'oxrootid' => $oParent->oxcategories__oxrootid->value,
-                'oxleft' => (int) $oParent->oxcategories__oxright->value,
-                'oxright' => (int) $oParent->oxcategories__oxright->value,
-                'oxshopid' => $this->getShopId(),
-            ]);
-
+            $o_db->execute($query, ['oxrootid' => $o_parent->oxcategories__oxrootid->value, 'oxleft' => (int) $o_parent->oxcategories__oxright->value, 'oxright' => (int) $o_parent->oxcategories__oxright->value, 'oxshopid' => $this->get_shop_id()]);
             $query = 'UPDATE oxcategories SET OXRIGHT = OXRIGHT + 2
                       WHERE OXROOTID = :oxrootid AND
                             OXRIGHT >= :oxright AND
                             OXSHOPID = :oxshopid';
-            $oDb->execute($query, [
-                'oxrootid' => $oParent->oxcategories__oxrootid->value,
-                'oxright' => (int) $oParent->oxcategories__oxright->value,
-                'oxshopid' => $this->getShopId(),
-            ]);
-
-            if (!$this->getId()) {
-                $this->setId();
+            $o_db->execute($query, ['oxrootid' => $o_parent->oxcategories__oxrootid->value, 'oxright' => (int) $o_parent->oxcategories__oxright->value, 'oxshopid' => $this->get_shop_id()]);
+            if (!$this->get_id()) {
+                $this->set_id();
             }
-
-            $this->oxcategories__oxrootid = new \OxidEsales\Eshop\Core\Field($oParent->oxcategories__oxrootid->value, \OxidEsales\Eshop\Core\Field::T_RAW);
-            $this->oxcategories__oxleft = new \OxidEsales\Eshop\Core\Field($oParent->oxcategories__oxright->value, \OxidEsales\Eshop\Core\Field::T_RAW);
-            $this->oxcategories__oxright = new \OxidEsales\Eshop\Core\Field($oParent->oxcategories__oxright->value + 1, \OxidEsales\Eshop\Core\Field::T_RAW);
-
+            $this->oxcategories__oxrootid = new \Oxid_Esales\Eshop\Core\Field($o_parent->oxcategories__oxrootid->value, \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $this->oxcategories__oxleft = new \Oxid_Esales\Eshop\Core\Field($o_parent->oxcategories__oxright->value, \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $this->oxcategories__oxright = new \Oxid_Esales\Eshop\Core\Field($o_parent->oxcategories__oxright->value + 1, \Oxid_Esales\Eshop\Core\Field::T_RAW);
             return parent::insert();
         }
         // root entry
-        if (!$this->getId()) {
-            $this->setId();
+        if (!$this->get_id()) {
+            $this->set_id();
         }
-        $this->oxcategories__oxrootid = new \OxidEsales\Eshop\Core\Field($this->getId(), \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxcategories__oxleft = new \OxidEsales\Eshop\Core\Field(1, \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxcategories__oxright = new \OxidEsales\Eshop\Core\Field(2, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxcategories__oxrootid = new \Oxid_Esales\Eshop\Core\Field($this->get_id(), \Oxid_Esales\Eshop\Core\Field::T_RAW);
+        $this->oxcategories__oxleft = new \Oxid_Esales\Eshop\Core\Field(1, \Oxid_Esales\Eshop\Core\Field::T_RAW);
+        $this->oxcategories__oxright = new \Oxid_Esales\Eshop\Core\Field(2, \Oxid_Esales\Eshop\Core\Field::T_RAW);
         return parent::insert();
     }
-
     /**
      * Updates category tree, returns true on success.
      *
@@ -899,22 +732,16 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      */
     protected function update()
     {
-        $this->setUpdateSeo(true);
-        $this->setUpdateSeoOnFieldChange('oxtitle');
-
+        $this->set_update_seo(true);
+        $this->set_update_seo_on_field_change('oxtitle');
         // Function is called from inside a transaction in Category::save (see ESDEV-3804 and ESDEV-3822).
         // No need to explicitly force master here.
-        $database = DatabaseProvider::getDb();
-        $sOldParentID = $database->getOne('select oxparentid from oxcategories where oxid = :oxid', [
-            'oxid' => $this->getId(),
-        ]);
-
-        if ($this->_blIsSeoObject && $this->isAdmin()) {
-            Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class)->markRelatedAsExpired($this);
+        $database = Database_Provider::get_db();
+        $s_old_parent_id = $database->get_one('select oxparentid from oxcategories where oxid = :oxid', ['oxid' => $this->get_id()]);
+        if ($this->_bl_is_seo_object && $this->is_admin()) {
+            Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Category::class)->mark_related_as_expired($this);
         }
-
-        $blRes = parent::update();
-
+        $bl_res = parent::update();
         // #872C - need to update category tree oxleft and oxright values (nested sets),
         // then sub trees are moved inside one root, or to another root.
         // this is done in 3 basic steps
@@ -922,84 +749,55 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
         // 2. modify current subtree, we want to move by adding $iDelta to it's oxleft and oxright,  where oxleft>=$sOldParentLeft and oxright<=$sOldParentRight values,
         //    in this step we also modify rootid's if they were changed
         // 3. decreasing oxleft and oxright values of current root tree, where oxleft >= $sOldParentRight+1 , oxright >= $sOldParentRight+1
-
         // did we change position in tree ?
-        $parentCategoryId = $this->getFieldData('oxparentid');
-        if ($parentCategoryId != $sOldParentID) {
-            $sOldParentLeft = $this->oxcategories__oxleft->value;
-            $sOldParentRight = $this->oxcategories__oxright->value;
-
-            $iTreeSize = $sOldParentRight - $sOldParentLeft + 1;
-
-            $sNewRootID = $database->getOne('select oxrootid from oxcategories where oxid = :oxid', [
-                'oxid' => $parentCategoryId,
-            ]);
-
+        $parent_category_id = $this->get_field_data('oxparentid');
+        if ($parent_category_id != $s_old_parent_id) {
+            $s_old_parent_left = $this->oxcategories__oxleft->value;
+            $s_old_parent_right = $this->oxcategories__oxright->value;
+            $i_tree_size = $s_old_parent_right - $s_old_parent_left + 1;
+            $s_new_root_id = $database->get_one('select oxrootid from oxcategories where oxid = :oxid', ['oxid' => $parent_category_id]);
             //If empty rootID, we set it to categorys oxid
-            if ($sNewRootID == '') {
-                $sNewRootID = $this->getId();
+            if ($s_new_root_id == '') {
+                $s_new_root_id = $this->get_id();
             }
-            $sNewParentLeft = $database->getOne('select oxleft from oxcategories where oxid = :oxid', [
-                'oxid' => $parentCategoryId,
-            ]);
-
-            $iMoveAfter = $sNewParentLeft + 1;
-
+            $s_new_parent_left = $database->get_one('select oxleft from oxcategories where oxid = :oxid', ['oxid' => $parent_category_id]);
+            $i_move_after = $s_new_parent_left + 1;
             //New parentid can not be set to it's child
-            if ($sNewParentLeft > $sOldParentLeft && $sNewParentLeft < $sOldParentRight && $this->oxcategories__oxrootid->value == $sNewRootID) {
-
+            if ($s_new_parent_left > $s_old_parent_left && $s_new_parent_left < $s_old_parent_right && $this->oxcategories__oxrootid->value == $s_new_root_id) {
                 //Restoring old parentid, stoping further actions
-                $sRestoreOld = 'UPDATE oxcategories SET OXPARENTID = :oxparentid WHERE oxid = :oxid';
-                $database->execute($sRestoreOld, [
-                    'oxparentid' => $sOldParentID,
-                    'oxid' => $this->getId(),
-                ]);
-
+                $s_restore_old = 'UPDATE oxcategories SET OXPARENTID = :oxparentid WHERE oxid = :oxid';
+                $database->execute($s_restore_old, ['oxparentid' => $s_old_parent_id, 'oxid' => $this->get_id()]);
                 return false;
             }
-
             //Old parent will be shifted too, if it is in the same tree
-            if ($sOldParentLeft > $iMoveAfter && $this->oxcategories__oxrootid->value == $sNewRootID) {
-                $sOldParentLeft += $iTreeSize;
-                $sOldParentRight += $iTreeSize;
+            if ($s_old_parent_left > $i_move_after && $this->oxcategories__oxrootid->value == $s_new_root_id) {
+                $s_old_parent_left += $i_tree_size;
+                $s_old_parent_right += $i_tree_size;
             }
-
-            $iDelta = $iMoveAfter - $sOldParentLeft;
-            $sAddOld = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($this->oxcategories__oxrootid->value) . ';';
-            $sAddNew = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($sNewRootID) . ';';
-
+            $i_delta = $i_move_after - $s_old_parent_left;
+            $s_add_old = " and oxshopid = '" . $this->get_shop_id() . "' and OXROOTID = " . $database->quote($this->oxcategories__oxrootid->value) . ';';
+            $s_add_new = " and oxshopid = '" . $this->get_shop_id() . "' and OXROOTID = " . $database->quote($s_new_root_id) . ';';
             //Updating everything after new position
-            $params = ['treeSize' => $iTreeSize, 'offset' => $iMoveAfter];
-            $database->execute('UPDATE oxcategories SET OXLEFT = (OXLEFT + :treeSize) WHERE OXLEFT >= :offset' . $sAddNew, $params);
-            $database->execute('UPDATE oxcategories SET OXRIGHT = (OXRIGHT + :treeSize) WHERE OXRIGHT >= :offset' . $sAddNew, $params);
-
-            $sChangeRootID = '';
-            if ($this->oxcategories__oxrootid->value != $sNewRootID) {
-                $sChangeRootID = ', OXROOTID=' . $database->quote($sNewRootID);
+            $params = ['treeSize' => $i_tree_size, 'offset' => $i_move_after];
+            $database->execute('UPDATE oxcategories SET OXLEFT = (OXLEFT + :treeSize) WHERE OXLEFT >= :offset' . $s_add_new, $params);
+            $database->execute('UPDATE oxcategories SET OXRIGHT = (OXRIGHT + :treeSize) WHERE OXRIGHT >= :offset' . $s_add_new, $params);
+            $s_change_root_id = '';
+            if ($this->oxcategories__oxrootid->value != $s_new_root_id) {
+                $s_change_root_id = ', OXROOTID=' . $database->quote($s_new_root_id);
             }
-
             //Updating subtree
-            $query = 'UPDATE oxcategories SET OXLEFT = (OXLEFT + :delta), OXRIGHT = (OXRIGHT + :delta) ' . $sChangeRootID .
-                     'WHERE OXLEFT >= :oxleft AND OXRIGHT <= :oxright' . $sAddOld;
-            $database->execute($query, [
-                'delta' => $iDelta,
-                'oxleft' => $sOldParentLeft,
-                'oxright' => $sOldParentRight,
-            ]);
-
+            $query = 'UPDATE oxcategories SET OXLEFT = (OXLEFT + :delta), OXRIGHT = (OXRIGHT + :delta) ' . $s_change_root_id . 'WHERE OXLEFT >= :oxleft AND OXRIGHT <= :oxright' . $s_add_old;
+            $database->execute($query, ['delta' => $i_delta, 'oxleft' => $s_old_parent_left, 'oxright' => $s_old_parent_right]);
             //Updating everything after old position
-            $params = ['treeSize' => $iTreeSize, 'offset' => $sOldParentRight + 1];
-            $database->execute('UPDATE oxcategories SET OXLEFT = (OXLEFT - :treeSize) WHERE OXLEFT >= :offset' . $sAddOld, $params);
-            $database->execute('UPDATE oxcategories SET OXRIGHT = (OXRIGHT - :treeSize) WHERE OXRIGHT >= :offset' . $sAddOld, $params);
+            $params = ['treeSize' => $i_tree_size, 'offset' => $s_old_parent_right + 1];
+            $database->execute('UPDATE oxcategories SET OXLEFT = (OXLEFT - :treeSize) WHERE OXLEFT >= :offset' . $s_add_old, $params);
+            $database->execute('UPDATE oxcategories SET OXRIGHT = (OXRIGHT - :treeSize) WHERE OXRIGHT >= :offset' . $s_add_old, $params);
         }
-
-        if ($blRes && $this->_blIsSeoObject && $this->isAdmin()) {
-            Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class)->markRelatedAsExpired($this);
+        if ($bl_res && $this->_bl_is_seo_object && $this->is_admin()) {
+            Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Category::class)->mark_related_as_expired($this);
         }
-
-        return $blRes;
+        return $bl_res;
     }
-
     /**
      * Sets data field value
      *
@@ -1007,66 +805,58 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      * @param string $value     value of data field
      * @param int    $dataType  field type
      */
-    protected function setFieldData($fieldName, $value, $dataType = \OxidEsales\Eshop\Core\Field::T_TEXT)
+    protected function set_field_data($field_name, $value, $data_type = \Oxid_Esales\Eshop\Core\Field::T_TEXT)
     {
         //preliminary quick check saves 3% of execution time in category lists by avoiding redundant strtolower() call
-        $fieldNameIndex2 = $fieldName[2];
-        if ($fieldNameIndex2 === 'l' || $fieldNameIndex2 === 'L' || (isset($fieldName[16]) && ($fieldName[16] == 'l' || $fieldName[16] == 'L'))) {
-            $loweredFieldName = strtolower($fieldName);
-            if ('oxlongdesc' === $loweredFieldName || 'oxcategories__oxlongdesc' === $loweredFieldName) {
-                $dataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+        $field_name_index2 = $field_name[2];
+        if ($field_name_index2 === 'l' || $field_name_index2 === 'L' || isset($field_name[16]) && ($field_name[16] == 'l' || $field_name[16] == 'L')) {
+            $lowered_field_name = strtolower($field_name);
+            if ('oxlongdesc' === $lowered_field_name || 'oxcategories__oxlongdesc' === $lowered_field_name) {
+                $data_type = \Oxid_Esales\Eshop\Core\Field::T_RAW;
             }
         }
-
-        return parent::setFieldData($fieldName, $value, $dataType);
+        return parent::set_field_data($field_name, $value, $data_type);
     }
-
     /**
      * Returns category icon picture url if exist, false - if not
      *
      * @return mixed
      */
-    public function getIconUrl()
+    public function get_icon_url()
     {
-        if (($sIcon = $this->oxcategories__oxicon->value)) {
-            $oConfig = Registry::getConfig();
-            $sSize = $oConfig->getConfigParam('sCatIconsize');
-            if (!isset($sSize)) {
-                $sSize = $oConfig->getConfigParam('sIconsize');
+        if ($s_icon = $this->oxcategories__oxicon->value) {
+            $o_config = Registry::get_config();
+            $s_size = $o_config->get_config_param('sCatIconsize');
+            if (!isset($s_size)) {
+                $s_size = $o_config->get_config_param('sIconsize');
             }
-
-            return Registry::getPictureHandler()->getPicUrl('category/icon/', $sIcon, $sSize);
+            return Registry::get_picture_handler()->get_pic_url('category/icon/', $s_icon, $s_size);
         }
     }
-
     /**
      * Returns category thumbnail picture url if exist, false - if not
      *
      * @return mixed
      */
-    public function getThumbUrl()
+    public function get_thumb_url()
     {
-        if (($sIcon = $this->oxcategories__oxthumb->value)) {
-            $sSize = Registry::getConfig()->getConfigParam('sCatThumbnailsize');
-
-            return Registry::getPictureHandler()->getPicUrl('category/thumb/', $sIcon, $sSize);
+        if ($s_icon = $this->oxcategories__oxthumb->value) {
+            $s_size = Registry::get_config()->get_config_param('sCatThumbnailsize');
+            return Registry::get_picture_handler()->get_pic_url('category/thumb/', $s_icon, $s_size);
         }
     }
-
     /**
      * Returns category promotion icon picture url if exist, false - if not
      *
      * @return mixed
      */
-    public function getPromotionIconUrl()
+    public function get_promotion_icon_url()
     {
-        if (($sIcon = $this->oxcategories__oxpromoicon->value)) {
-            $sSize = Registry::getConfig()->getConfigParam('sCatPromotionsize');
-
-            return Registry::getPictureHandler()->getPicUrl('category/promo_icon/', $sIcon, $sSize);
+        if ($s_icon = $this->oxcategories__oxpromoicon->value) {
+            $s_size = Registry::get_config()->get_config_param('sCatPromotionsize');
+            return Registry::get_picture_handler()->get_pic_url('category/promo_icon/', $s_icon, $s_size);
         }
     }
-
     /**
      * Returns category picture url if exist, false - if not
      *
@@ -1075,58 +865,52 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return mixed
      */
-    public function getPictureUrlForType($sPicName, $sPicType)
+    public function get_picture_url_for_type($s_pic_name, $s_pic_type)
     {
-        if ($sPicName) {
-            return $this->getPictureUrl() . $sPicType . '/' . $sPicName;
+        if ($s_pic_name) {
+            return $this->get_picture_url() . $s_pic_type . '/' . $s_pic_name;
         }
         return false;
     }
-
     /**
      * Returns true if category parentid is 'oxrootid'
      *
      * @return bool
      */
-    public function isTopCategory()
+    public function is_top_category()
     {
-        if ($this->_blTopCategory == null) {
-            $this->_blTopCategory = $this->getFieldData('oxparentid') === 'oxrootid';
+        if ($this->_bl_top_category == null) {
+            $this->_bl_top_category = $this->get_field_data('oxparentid') === 'oxrootid';
         }
-
-        return $this->_blTopCategory;
+        return $this->_bl_top_category;
     }
-
     /**
      * Returns true if current category is price type ( ( oxpricefrom || oxpriceto ) > 0 )
      *
      * @return bool
      */
-    public function isPriceCategory()
+    public function is_price_category()
     {
         return $this->oxcategories__oxpricefrom->value || $this->oxcategories__oxpriceto->value;
     }
-
     /**
      * Returns short description
      *
      * @return string
      */
-    public function getShortDescription()
+    public function get_short_description()
     {
         return $this->oxcategories__oxdesc->value;
     }
-
     /**
      * Returns category title
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
         return $this->oxcategories__oxtitle->value;
     }
-
     /**
      * Gets one field from all of subcategories.
      * Default is set to 'OXID'
@@ -1136,21 +920,17 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @return array
      */
-    public function getFieldFromSubCategories($sField = 'OXID', $sOXID = null)
+    public function get_field_from_sub_categories($s_field = 'OXID', $s_oxid = null)
     {
-        if (!$sOXID) {
-            $sOXID = $this->getId();
+        if (!$s_oxid) {
+            $s_oxid = $this->get_id();
         }
-        if (!$sOXID) {
+        if (!$s_oxid) {
             return false;
         }
-
-        $sTable = $this->getViewName();
-        $sField = "`{$sTable}`.`{$sField}`";
-        $sSql = "SELECT $sField FROM `{$sTable}` WHERE `OXROOTID` = :oxrootid AND `OXPARENTID` != 'oxrootid'";
-
-        return DatabaseProvider::getDb()->getCol($sSql, [
-            'oxrootid' => $sOXID,
-        ]);
+        $s_table = $this->get_view_name();
+        $s_field = "`{$s_table}`.`{$s_field}`";
+        $s_sql = "SELECT {$s_field} FROM `{$s_table}` WHERE `OXROOTID` = :oxrootid AND `OXPARENTID` != 'oxrootid'";
+        return Database_Provider::get_db()->get_col($s_sql, ['oxrootid' => $s_oxid]);
     }
 }

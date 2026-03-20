@@ -1,45 +1,39 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * List of articles for a selected Manufacturer.
  * Collects list of articles, according to it generates links for list gallery,
  * metatags (for search engines). Result - "manufacturerlist" template.
  * OXID eShop -> (Any selected shop product category).
  */
-class ManufacturerListController extends \OxidEsales\Eshop\Application\Controller\ArticleListController
+class Manufacturer_List_Controller extends \Oxid_Esales\Eshop\Application\Controller\Article_List_Controller
 {
     /**
      * List type
      *
      * @var string
      */
-    protected $_sListType = 'manufacturer';
-
+    protected $_s_list_type = 'manufacturer';
     /**
      * List type
      *
      * @var string
      */
-    protected $_blVisibleSubCats;
-
+    protected $_bl_visible_sub_cats;
     /**
      * List type
      *
      * @var string
      */
-    protected $_oSubCatList;
-
+    protected $_o_sub_cat_list;
     /**
      * Recommlist
      *
@@ -47,43 +41,37 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @var object
      */
-    protected $_oRecommList;
-
+    protected $_o_recomm_list;
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sTplLocation;
-
+    protected $_s_tpl_location;
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sCatTitle;
-
+    protected $_s_cat_title;
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation;
-
+    protected $_o_page_navigation;
     /**
      * Marked which defines if current view is sortable or not
      *
      * @var bool
      */
-    protected $_blShowSorting = true;
-
+    protected $_bl_show_sorting = true;
     /**
      * Current view search engine indexing state
      *
      * @var int
      */
-    protected $_iViewIndexState = VIEW_INDEXSTATE_INDEX;
-
+    protected $_i_view_index_state = VIEW_INDEXSTATE_INDEX;
     /**
      * Executes parent::render(), loads active Manufacturer, prepares article
      * list sorting rules. Loads list of articles which belong to this Manufacturer
@@ -96,37 +84,31 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      */
     public function render()
     {
-        \OxidEsales\Eshop\Application\Controller\FrontendController::render();
-
+        \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller::render();
         // load Manufacturer
-        if ($this->getManufacturerTree()) {
-            if (($oManufacturer = $this->getActManufacturer())) {
-                if ($oManufacturer->getId() != 'root') {
+        if ($this->get_manufacturer_tree()) {
+            if ($o_manufacturer = $this->get_act_manufacturer()) {
+                if ($o_manufacturer->get_id() != 'root') {
                     // load the articles
-                    $this->getArticleList();
-
+                    $this->get_article_list();
                     // checking if requested page is correct
-                    $this->checkRequestedPage();
-
+                    $this->check_requested_page();
                     // processing list articles
-                    $this->processListArticles();
+                    $this->process_list_articles();
                 }
             }
         }
-
-        return $this->_sThisTemplate;
+        return $this->_s_this_template;
     }
-
     /**
      * Returns product link type (OXARTICLE_LINKTYPE_MANUFACTURER)
      *
      * @return int
      */
-    protected function getProductLinkType()
+    protected function get_product_link_type()
     {
         return OXARTICLE_LINKTYPE_MANUFACTURER;
     }
-
     /**
      * Loads and returns article list of active Manufacturer.
      *
@@ -134,39 +116,32 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @return array
      */
-    protected function loadArticles($oManufacturer)
+    protected function load_articles($o_manufacturer)
     {
-        $sManufacturerId = $oManufacturer->getId();
-
+        $s_manufacturer_id = $o_manufacturer->get_id();
         // load only articles which we show on screen
-        $iNrofCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-        $iNrofCatArticles = $iNrofCatArticles ?: 1;
-
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oArtList->setSqlLimit($iNrofCatArticles * $this->getRequestPageNr(), $iNrofCatArticles);
-        $oArtList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
-
+        $i_nrof_cat_articles = (int) \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iNrofCatArticles');
+        $i_nrof_cat_articles = $i_nrof_cat_articles ?: 1;
+        $o_art_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+        $o_art_list->set_sql_limit($i_nrof_cat_articles * $this->get_request_page_nr(), $i_nrof_cat_articles);
+        $o_art_list->set_custom_sorting($this->get_sorting_sql($this->get_sort_ident()));
         // load the articles
-        $this->_iAllArtCnt = $oArtList->loadManufacturerArticles($sManufacturerId, $oManufacturer);
-
+        $this->_i_all_art_cnt = $o_art_list->load_manufacturer_articles($s_manufacturer_id, $o_manufacturer);
         // counting pages
-        $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
-
-        return [$oArtList, $this->_iAllArtCnt];
+        $this->_i_cnt_pages = ceil($this->_i_all_art_cnt / $i_nrof_cat_articles);
+        return [$o_art_list, $this->_i_all_art_cnt];
     }
-
     /**
      * Returns active product id to load its seo meta info
      *
      * @return string
      */
-    protected function getSeoObjectId()
+    protected function get_seo_object_id()
     {
-        if (($oManufacturer = $this->getActManufacturer())) {
-            return $oManufacturer->getId();
+        if ($o_manufacturer = $this->get_act_manufacturer()) {
+            return $o_manufacturer->get_id();
         }
     }
-
     /**
      * Modifies url by adding page parameters. When seo is on, url is additionally
      * formatted by SEO engine
@@ -177,174 +152,157 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @return string
      */
-    protected function addPageNrParam($sUrl, $iPage, $iLang = null)
+    protected function add_page_nr_param($s_url, $i_page, $i_lang = null)
     {
-        if (!Registry::getUtils()->seoIsActive()) {
-            return parent::addPageNrParam($sUrl, $iPage, $iLang);
+        if (!Registry::get_utils()->seo_is_active()) {
+            return parent::add_page_nr_param($s_url, $i_page, $i_lang);
         }
-        if (!$oManufacturer = $this->getActManufacturer()) {
-            return parent::addPageNrParam($sUrl, $iPage, $iLang);
+        if (!$o_manufacturer = $this->get_act_manufacturer()) {
+            return parent::add_page_nr_param($s_url, $i_page, $i_lang);
         }
-        if ($iPage) {
+        if ($i_page) {
             // only if page number > 0
-            return $oManufacturer->getBaseSeoLink($iLang, $iPage);
+            return $o_manufacturer->get_base_seo_link($i_lang, $i_page);
         }
-        return parent::addPageNrParam($sUrl, $iPage, $iLang);
+        return parent::add_page_nr_param($s_url, $i_page, $i_lang);
     }
-
     /**
      * Returns current view Url
      *
      * @return string
      */
-    public function generatePageNavigationUrl()
+    public function generate_page_navigation_url()
     {
-        if ((Registry::getUtils()->seoIsActive() && ($oManufacturer = $this->getActManufacturer()))) {
-            return $oManufacturer->getLink();
+        if (Registry::get_utils()->seo_is_active() && $o_manufacturer = $this->get_act_manufacturer()) {
+            return $o_manufacturer->get_link();
         }
-        return parent::generatePageNavigationUrl();
+        return parent::generate_page_navigation_url();
     }
-
     /**
      * Template variable getter. Returns active object's reviews
      *
      * @return array
      */
-    public function hasVisibleSubCats()
+    public function has_visible_sub_cats()
     {
-        if ($this->_blVisibleSubCats === null) {
-            $this->_blVisibleSubCats = false;
-            if (($oManufacturerTree = $this->getManufacturerTree())) {
-                if (($oManufacturer = $this->getActManufacturer())) {
-                    if ($oManufacturer->getId() == 'root') {
-                        $this->_blVisibleSubCats = $oManufacturerTree->count();
-                        $this->_oSubCatList = $oManufacturerTree;
+        if ($this->_bl_visible_sub_cats === null) {
+            $this->_bl_visible_sub_cats = false;
+            if ($o_manufacturer_tree = $this->get_manufacturer_tree()) {
+                if ($o_manufacturer = $this->get_act_manufacturer()) {
+                    if ($o_manufacturer->get_id() == 'root') {
+                        $this->_bl_visible_sub_cats = $o_manufacturer_tree->count();
+                        $this->_o_sub_cat_list = $o_manufacturer_tree;
                     }
                 }
             }
         }
-
-        return $this->_blVisibleSubCats;
+        return $this->_bl_visible_sub_cats;
     }
-
     /**
      * Template variable getter. Returns active object's reviews
      *
      * @return array
      */
-    public function getSubCatList()
+    public function get_sub_cat_list()
     {
-        if ($this->_oSubCatList === null) {
-            $this->_oSubCatList = $this->hasVisibleSubCats() ? $this->_oSubCatList : [];
+        if ($this->_o_sub_cat_list === null) {
+            $this->_o_sub_cat_list = $this->has_visible_sub_cats() ? $this->_o_sub_cat_list : [];
         }
-
-        return $this->_oSubCatList;
+        return $this->_o_sub_cat_list;
     }
-
     /**
      * Template variable getter. Returns active object's reviews
      *
      * @return array
      */
-    public function getArticleList()
+    public function get_article_list()
     {
-        if ($this->_aArticleList === null) {
-            $this->_aArticleList = [];
-            if (($oManufacturerTree = $this->getManufacturerTree())) {
-                $oManufacturer = $this->getActManufacturer();
-                if ($oManufacturer && ($oManufacturer->getId() != 'root') && $oManufacturer->getIsVisible()) {
-                    [$aArticleList, $iAllArtCnt] = $this->loadArticles($oManufacturer);
-                    if ($iAllArtCnt) {
-                        $this->_aArticleList = $aArticleList;
+        if ($this->_a_article_list === null) {
+            $this->_a_article_list = [];
+            if ($o_manufacturer_tree = $this->get_manufacturer_tree()) {
+                $o_manufacturer = $this->get_act_manufacturer();
+                if ($o_manufacturer && $o_manufacturer->get_id() != 'root' && $o_manufacturer->get_is_visible()) {
+                    [$a_article_list, $i_all_art_cnt] = $this->load_articles($o_manufacturer);
+                    if ($i_all_art_cnt) {
+                        $this->_a_article_list = $a_article_list;
                     }
                 }
             }
         }
-
-        return $this->_aArticleList;
+        return $this->_a_article_list;
     }
-
     /**
      * Template variable getter. Returns template location
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        if ($this->_sCatTitle === null) {
-            $this->_sCatTitle = '';
-            if ($oManufacturerTree = $this->getManufacturerTree()) {
-                if ($oManufacturer = $this->getActManufacturer()) {
-                    $this->_sCatTitle = $oManufacturer->oxmanufacturers__oxtitle->value;
+        if ($this->_s_cat_title === null) {
+            $this->_s_cat_title = '';
+            if ($o_manufacturer_tree = $this->get_manufacturer_tree()) {
+                if ($o_manufacturer = $this->get_act_manufacturer()) {
+                    $this->_s_cat_title = $o_manufacturer->oxmanufacturers__oxtitle->value;
                 }
             }
         }
-
-        return $this->_sCatTitle;
+        return $this->_s_cat_title;
     }
-
     /**
      * Template variable getter. Returns category path array
      *
      * @return array
      */
-    public function getTreePath()
+    public function get_tree_path()
     {
-        if ($oManufacturerTree = $this->getManufacturerTree()) {
-            return $oManufacturerTree->getPath();
+        if ($o_manufacturer_tree = $this->get_manufacturer_tree()) {
+            return $o_manufacturer_tree->get_path();
         }
     }
-
     /**
      * Template variable getter. Returns active Manufacturer
      *
      * @return object
      */
-    public function getActiveCategory()
+    public function get_active_category()
     {
-        if ($this->_oActCategory === null) {
-            $this->_oActCategory = false;
-            if (($oManufacturerTree = $this->getManufacturerTree())) {
-                if ($oManufacturer = $this->getActManufacturer()) {
-                    $this->_oActCategory = $oManufacturer;
+        if ($this->_o_act_category === null) {
+            $this->_o_act_category = false;
+            if ($o_manufacturer_tree = $this->get_manufacturer_tree()) {
+                if ($o_manufacturer = $this->get_act_manufacturer()) {
+                    $this->_o_act_category = $o_manufacturer;
                 }
             }
         }
-
-        return $this->_oActCategory;
+        return $this->_o_act_category;
     }
-
     /**
      * Template variable getter. Returns template location
      *
      * @return string
      */
-    public function getCatTreePath()
+    public function get_cat_tree_path()
     {
-        if ($this->_sCatTreePath === null) {
-            $this->_sCatTreePath = false;
-            if (($oManufacturerTree = $this->getManufacturerTree())) {
-                $this->_sCatTreePath = $oManufacturerTree->getPath();
+        if ($this->_s_cat_tree_path === null) {
+            $this->_s_cat_tree_path = false;
+            if ($o_manufacturer_tree = $this->get_manufacturer_tree()) {
+                $this->_s_cat_tree_path = $o_manufacturer_tree->get_path();
             }
         }
-
-        return $this->_sCatTreePath;
+        return $this->_s_cat_tree_path;
     }
-
     /**
      * Returns title suffix used in template
      *
      * @return string
      */
-    public function getTitleSuffix()
+    public function get_title_suffix()
     {
-        if (is_object($this->getActManufacturer()->oxmanufacturers__oxshowsuffix) && $this->getActManufacturer()->oxmanufacturers__oxshowsuffix->value) {
-            return \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
+        if (is_object($this->get_act_manufacturer()->oxmanufacturers__oxshowsuffix) && $this->get_act_manufacturer()->oxmanufacturers__oxshowsuffix->value) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_shop()->oxshops__oxtitlesuffix->value;
         }
-
         return '';
     }
-
     /**
      * Calls and returns result of parent:: collectMetaKeyword();
      *
@@ -353,11 +311,10 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @return string
      */
-    protected function prepareMetaKeyword($aCatPath, $blRemoveDuplicatedWords = true)
+    protected function prepare_meta_keyword($a_cat_path, $bl_remove_duplicated_words = true)
     {
-        return parent::collectMetaKeyword($aCatPath);
+        return parent::collect_meta_keyword($a_cat_path);
     }
-
     /**
      * Meta tags - description and keywords - generator for search
      * engines. Uses string passed by parameters, cleans HTML tags,
@@ -370,11 +327,10 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @return  string  $sString    converted string
      */
-    protected function prepareMetaDescription($aCatPath, $iLength = 1024, $blDescTag = false)
+    protected function prepare_meta_description($a_cat_path, $i_length = 1024, $bl_desc_tag = false)
     {
-        return parent::collectMetaDescription($aCatPath, $iLength, $blDescTag);
+        return parent::collect_meta_description($a_cat_path, $i_length, $bl_desc_tag);
     }
-
     /**
      * returns object, assosiated with current view.
      * (the object that is shown in frontend)
@@ -383,58 +339,50 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      *
      * @return object
      */
-    protected function getSubject($iLang)
+    protected function get_subject($i_lang)
     {
-        return $this->getActManufacturer();
+        return $this->get_act_manufacturer();
     }
-
     /**
      * Returns additional URL parameters which must be added to list products dynamic urls
      *
      * @return string
      */
-    public function getAddUrlParams()
+    public function get_add_url_params()
     {
-        $sAddParams = parent::getAddUrlParams();
-        $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
-        if ($oManufacturer = $this->getActManufacturer()) {
-            $sAddParams .= '&amp;mnid=' . $oManufacturer->getId();
+        $s_add_params = parent::get_add_url_params();
+        $s_add_params .= ($s_add_params ? '&amp;' : '') . "listtype={$this->_s_list_type}";
+        if ($o_manufacturer = $this->get_act_manufacturer()) {
+            $s_add_params .= '&amp;mnid=' . $o_manufacturer->get_id();
         }
-
-        return $sAddParams;
+        return $s_add_params;
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        $aPaths = [];
-
-        $oCatTree = $this->getManufacturerTree();
-
-        if ($oCatTree) {
-            foreach ($oCatTree->getPath() as $oCat) {
-                $aCatPath = [];
-                $aCatPath['link'] = $oCat->getLink();
-                $aCatPath['title'] = $oCat->oxmanufacturers__oxtitle->value;
-
-                $aPaths[] = $aCatPath;
+        $a_paths = [];
+        $o_cat_tree = $this->get_manufacturer_tree();
+        if ($o_cat_tree) {
+            foreach ($o_cat_tree->get_path() as $o_cat) {
+                $a_cat_path = [];
+                $a_cat_path['link'] = $o_cat->get_link();
+                $a_cat_path['title'] = $o_cat->oxmanufacturers__oxtitle->value;
+                $a_paths[] = $a_cat_path;
             }
         }
-
-        return $aPaths;
+        return $a_paths;
     }
-
     /**
      * Template variable getter. Returns array of attribute values
      * we do have here in this category
      *
      * @return array
      */
-    public function getAttributes()
+    public function get_attributes()
     {
         return null;
     }

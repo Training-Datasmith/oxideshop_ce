@@ -4,23 +4,18 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Database;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Database;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Configuration\DataObject\DatabaseConfiguration;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-
-readonly class ConnectionParameterProvider implements ConnectionParameterProviderInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Configuration\Data_Object\Database_Configuration;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface;
+readonly class Connection_Parameter_Provider implements Connection_Parameter_Provider_Interface
 {
-    public function __construct(
-        private BasicContextInterface $basicContext,
-    ) {
-    }
-
-    public function getParameters(): array
+    public function __construct(private Basic_Context_Interface $basic_context)
     {
-        return (new DatabaseConfiguration($this->basicContext->getDatabaseUrl()))->getConnectionParameters();
+    }
+    public function get_parameters(): array
+    {
+        return (new Database_Configuration($this->basic_context->get_database_url()))->get_connection_parameters();
     }
 }

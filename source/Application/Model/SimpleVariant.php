@@ -1,268 +1,235 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Lightweight variant handler. Implemnets only absolutely needed oxArticle methods.
  */
-class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class Simple_Variant extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model implements \Oxid_Esales\Eshop\Core\Contract\I_Url
 {
     /**
      * Use lazy loading for this item
      *
      * @var bool
      */
-    protected $_blUseLazyLoading = true;
-
+    protected $_bl_use_lazy_loading = true;
     /**
      * Variant price
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice;
-
+    protected $_o_price;
     /**
      * Parent article
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oParent;
-
+    protected $_o_parent;
     /**
      * Stardard/dynamic article urls for languages
      *
      * @var array
      */
-    protected $_aStdUrls = [];
-
+    protected $_a_std_urls = [];
     /**
      * Stardard/dynamic article urls for languages
      *
      * @var array
      */
-    protected $_aBaseStdUrls = [];
-
+    protected $_a_base_std_urls = [];
     /**
      * Seo article urls for languages
      *
      * @var array
      */
-    protected $_aSeoUrls = [];
-
+    protected $_a_seo_urls = [];
     /**
      * user object
      *
      * @var \OxidEsales\Eshop\Application\Model\User
      */
-    protected $_oUser;
-
+    protected $_o_user;
     /**
      * Initializes instance
      */
     public function __construct()
     {
         parent::__construct();
-        $this->_sCacheKey = 'simplevariants';
+        $this->_s_cache_key = 'simplevariants';
         $this->init('oxarticles');
     }
-
     /**
      * Implementing (fakeing) performance friendly method from oxArticle
      * oxbase
      */
-    public function getSelectLists()
+    public function get_select_lists()
     {
         return null;
     }
-
     /**
      * Returns article user
      *
      * @return \OxidEsales\Eshop\Application\Model\User
      */
-    public function getArticleUser()
+    public function get_article_user()
     {
-        if ($this->_oUser === null) {
-            $this->_oUser = $this->getUser();
+        if ($this->_o_user === null) {
+            $this->_o_user = $this->get_user();
         }
-
-        return $this->_oUser;
+        return $this->_o_user;
     }
-
     /**
      * get user Group A, B or C price, returns db price if user is not in groups
      *
      * @return double
      */
-    protected function getGroupPrice()
+    protected function get_group_price()
     {
-        $dPrice = $this->oxarticles__oxprice->value;
-        if ($oUser = $this->getArticleUser()) {
-            if ($oUser->inGroup('oxidpricea')) {
-                $dPrice = $this->oxarticles__oxpricea->value;
-            } elseif ($oUser->inGroup('oxidpriceb')) {
-                $dPrice = $this->oxarticles__oxpriceb->value;
-            } elseif ($oUser->inGroup('oxidpricec')) {
-                $dPrice = $this->oxarticles__oxpricec->value;
+        $d_price = $this->oxarticles__oxprice->value;
+        if ($o_user = $this->get_article_user()) {
+            if ($o_user->in_group('oxidpricea')) {
+                $d_price = $this->oxarticles__oxpricea->value;
+            } elseif ($o_user->in_group('oxidpriceb')) {
+                $d_price = $this->oxarticles__oxpriceb->value;
+            } elseif ($o_user->in_group('oxidpricec')) {
+                $d_price = $this->oxarticles__oxpricec->value;
             }
         }
-
         // #1437/1436C - added config option, and check for zero A,B,C price values
-        if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices') && (float) $dPrice == 0) {
+        if (Registry::get_config()->get_config_param('blOverrideZeroABCPrices') && (float) $d_price == 0) {
             return $this->oxarticles__oxprice->value;
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Implementing (faking) performance friendly method from oxArticle
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getPrice()
+    public function get_price()
     {
-        $myConfig = Registry::getConfig();
+        $my_config = Registry::get_config();
         // 0002030 No need to return price if it disabled for better performance.
-        if (!$myConfig->getConfigParam('bl_perfLoadPrice')) {
+        if (!$my_config->get_config_param('bl_perfLoadPrice')) {
             return;
         }
-
-        if ($this->_oPrice === null) {
-            $this->_oPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
-            if (($dPrice = $this->getGroupPrice())) {
-                $dPrice = $this->modifyGroupPrice($dPrice);
-                $this->_oPrice->setPrice($dPrice, $this->_dVat);
-
-                $this->applyParentVat($this->_oPrice);
-                $this->applyCurrency($this->_oPrice);
+        if ($this->_o_price === null) {
+            $this->_o_price = ox_new(\Oxid_Esales\Eshop\Core\Price::class);
+            if ($d_price = $this->get_group_price()) {
+                $d_price = $this->modify_group_price($d_price);
+                $this->_o_price->set_price($d_price, $this->_d_vat);
+                $this->apply_parent_vat($this->_o_price);
+                $this->apply_currency($this->_o_price);
                 // apply discounts
-                $this->applyParentDiscounts($this->_oPrice);
-            } elseif (($oParent = $this->getParent())) {
-                $this->_oPrice = $oParent->getPrice();
+                $this->apply_parent_discounts($this->_o_price);
+            } elseif ($o_parent = $this->get_parent()) {
+                $this->_o_price = $o_parent->get_price();
             }
         }
-
-        return $this->_oPrice;
+        return $this->_o_price;
     }
-
     /**
      * Make changes to price on getting price.
      *
      * @param float $price
      * @return float
      */
-    public function modifyGroupPrice($price)
+    public function modify_group_price($price)
     {
         return $price;
     }
-
     /**
      * Applies currency factor
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
      * @param object                       $oCur   Currency object
      */
-    protected function applyCurrency(\OxidEsales\Eshop\Core\Price $oPrice, $oCur = null)
+    protected function apply_currency(\Oxid_Esales\Eshop\Core\Price $o_price, $o_cur = null)
     {
-        if (!$oCur) {
-            $oCur = Registry::getConfig()->getActShopCurrencyObject();
+        if (!$o_cur) {
+            $o_cur = Registry::get_config()->get_act_shop_currency_object();
         }
-
-        $oPrice->multiply($oCur->rate);
+        $o_price->multiply($o_cur->rate);
     }
-
     /**
      * Applies discounts which should be applied in general case (for 0 amount)
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
      */
-    protected function applyParentDiscounts($oPrice)
+    protected function apply_parent_discounts($o_price)
     {
-        if (($oParent = $this->getParent())) {
-            $oParent->applyDiscountsForVariant($oPrice);
+        if ($o_parent = $this->get_parent()) {
+            $o_parent->apply_discounts_for_variant($o_price);
         }
     }
-
     /**
      * apply parent article VAT to given price
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice price object
      */
-    protected function applyParentVat($oPrice)
+    protected function apply_parent_vat($o_price)
     {
-        if (($oParent = $this->getParent()) && !Registry::getConfig()->getConfigParam('bl_perfCalcVatOnlyForBasketOrder')) {
-            $oParent->applyVats($oPrice);
+        if (($o_parent = $this->get_parent()) && !Registry::get_config()->get_config_param('bl_perfCalcVatOnlyForBasketOrder')) {
+            $o_parent->apply_vats($o_price);
         }
     }
-
     /**
      * Price setter
      *
      * @param object $oPrice price object
      */
-    public function setPrice($oPrice): void
+    public function set_price($o_price): void
     {
-        $this->_oPrice = $oPrice;
+        $this->_o_price = $o_price;
     }
-
     /**
      * Returns formated product price.
      *
      * @return double
      */
-    public function getFPrice()
+    public function get_f_price()
     {
-        if (($oPrice = $this->getPrice())) {
-            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice());
+        if ($o_price = $this->get_price()) {
+            return Registry::get_lang()->format_currency($o_price->get_brutto_price());
         }
-
         return null;
     }
-
     /**
      * Sets parent article
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $oParent Parent article
      */
-    public function setParent($oParent): void
+    public function set_parent($o_parent): void
     {
-        $this->_oParent = $oParent;
+        $this->_o_parent = $o_parent;
     }
-
     /**
      * Parent article getter.
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    public function getParent()
+    public function get_parent()
     {
-        return $this->_oParent;
+        return $this->_o_parent;
     }
-
     /**
      * Get link type
      *
      * @return int
      */
-    public function getLinkType()
+    public function get_link_type()
     {
-        if (($oParent = $this->getParent())) {
-            return $oParent->getLinkType();
+        if ($o_parent = $this->get_parent()) {
+            return $o_parent->get_link_type();
         }
-
         return 0;
     }
-
     /**
      * Checks if article is assigned to category
      *
@@ -270,15 +237,13 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @return bool
      */
-    public function inCategory($sCatNid)
+    public function in_category($s_cat_nid)
     {
-        if (($oParent = $this->getParent())) {
-            return $oParent->inCategory($sCatNid);
+        if ($o_parent = $this->get_parent()) {
+            return $o_parent->in_category($s_cat_nid);
         }
-
         return false;
     }
-
     /**
      * Checks if article is assigned to price category $sCatNID
      *
@@ -286,15 +251,13 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @return bool
      */
-    public function inPriceCategory($sCatNid)
+    public function in_price_category($s_cat_nid)
     {
-        if (($oParent = $this->getParent())) {
-            return $oParent->inPriceCategory($sCatNid);
+        if ($o_parent = $this->get_parent()) {
+            return $o_parent->in_price_category($s_cat_nid);
         }
-
         return false;
     }
-
     /**
      * Returns base dynamic url: shopurl/index.php?cl=details
      *
@@ -304,18 +267,16 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @return string
      */
-    public function getBaseStdLink($iLang, $blAddId = true, $blFull = true)
+    public function get_base_std_link($i_lang, $bl_add_id = true, $bl_full = true)
     {
-        if (!isset($this->_aBaseStdUrls[$iLang][$iLinkType])) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oArticle->setId($this->getId());
-            $oArticle->setLinkType($iLinkType);
-            $this->_aBaseStdUrls[$iLang][$iLinkType] = $oArticle->getBaseStdLink($iLang, $blAddId, $blFull);
+        if (!isset($this->_a_base_std_urls[$i_lang][$i_link_type])) {
+            $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            $o_article->set_id($this->get_id());
+            $o_article->set_link_type($i_link_type);
+            $this->_a_base_std_urls[$i_lang][$i_link_type] = $o_article->get_base_std_link($i_lang, $bl_add_id, $bl_full);
         }
-
-        return $this->_aBaseStdUrls[$iLang][$iLinkType];
+        return $this->_a_base_std_urls[$i_lang][$i_link_type];
     }
-
     /**
      * Gets article link
      *
@@ -324,23 +285,20 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @return string
      */
-    public function getStdLink($iLang = null, $aParams = [])
+    public function get_std_link($i_lang = null, $a_params = [])
     {
-        if ($iLang === null) {
-            $iLang = (int) $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = (int) $this->get_language();
         }
-
-        $iLinkType = $this->getLinkType();
-        if (!isset($this->_aStdUrls[$iLang][$iLinkType])) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oArticle->setId($this->getId());
-            $oArticle->setLinkType($iLinkType);
-            $this->_aStdUrls[$iLang][$iLinkType] = $oArticle->getStdLink($iLang, $aParams);
+        $i_link_type = $this->get_link_type();
+        if (!isset($this->_a_std_urls[$i_lang][$i_link_type])) {
+            $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            $o_article->set_id($this->get_id());
+            $o_article->set_link_type($i_link_type);
+            $this->_a_std_urls[$i_lang][$i_link_type] = $o_article->get_std_link($i_lang, $a_params);
         }
-
-        return $this->_aStdUrls[$iLang][$iLinkType];
+        return $this->_a_std_urls[$i_lang][$i_link_type];
     }
-
     /**
      * Returns raw recommlist seo url
      *
@@ -348,11 +306,10 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @return string
      */
-    public function getBaseSeoLink($iLang)
+    public function get_base_seo_link($i_lang)
     {
-        return Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class)->getArticleUrl($this, $iLang, $iLinkType);
+        return Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Article::class)->get_article_url($this, $i_lang, $i_link_type);
     }
-
     /**
      * Gets article link
      *
@@ -360,21 +317,18 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function get_link($i_lang = null)
     {
-        if ($iLang === null) {
-            $iLang = (int) $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = (int) $this->get_language();
         }
-
-        if (!Registry::getUtils()->seoIsActive()) {
-            return $this->getStdLink($iLang);
+        if (!Registry::get_utils()->seo_is_active()) {
+            return $this->get_std_link($i_lang);
         }
-
-        $iLinkType = $this->getLinkType();
-        if (!isset($this->_aSeoUrls[$iLang][$iLinkType])) {
-            $this->_aSeoUrls[$iLang][$iLinkType] = $this->getBaseSeoLink($iLang);
+        $i_link_type = $this->get_link_type();
+        if (!isset($this->_a_seo_urls[$i_lang][$i_link_type])) {
+            $this->_a_seo_urls[$i_lang][$i_link_type] = $this->get_base_seo_link($i_lang);
         }
-
-        return $this->_aSeoUrls[$iLang][$iLinkType];
+        return $this->_a_seo_urls[$i_lang][$i_link_type];
     }
 }

@@ -4,43 +4,31 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object;
 
 use ArrayIterator;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
-
-readonly class ProductMediaSorting implements \Stringable
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Id;
+readonly class Product_Media_Sorting implements \Stringable
 {
     private ArrayIterator $sorting;
-
-    public function __construct(
-        array $sortedIds
-    ) {
+    public function __construct(array $sorted_ids)
+    {
         $this->sorting = new ArrayIterator([]);
-        foreach ($sortedIds as $id) {
-            $this->sorting->append(
-                Id::fromString($id)
-            );
+        foreach ($sorted_ids as $id) {
+            $this->sorting->append(Id::from_string($id));
         }
     }
-
-    public function getSorting(): ArrayIterator
+    public function get_sorting(): ArrayIterator
     {
         return $this->sorting;
     }
-
     public function __toString(): string
     {
         $ids = '';
         foreach ($this->sorting as $id) {
-            $ids .= "'$id',";
+            $ids .= "'{$id}',";
         }
-        return rtrim(
-            $ids,
-            ','
-        );
+        return rtrim($ids, ',');
     }
 }

@@ -1,29 +1,26 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Seo encoder base
  */
-class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
+class Seo_Encoder_Content extends \Oxid_Esales\Eshop\Core\Seo_Encoder
 {
     /**
      * Returns target "extension" (/)
      *
      * @return string
      */
-    protected function getUrlExtension()
+    protected function get_url_extension()
     {
         return '/';
     }
-
     /**
      * Returns SEO uri for content object. Includes parent category path info if
      * content is assigned to it
@@ -34,42 +31,37 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getContentUri($oCont, $iLang = null, $blRegenerate = false)
+    public function get_content_uri($o_cont, $i_lang = null, $bl_regenerate = false)
     {
-        if (!isset($iLang)) {
-            $iLang = $oCont->getLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = $o_cont->get_language();
         }
         //load details link from DB
-        if ($blRegenerate || !($sSeoUrl = $this->loadFromDb('oxContent', $oCont->getId(), $iLang))) {
-            if ($iLang != $oCont->getLanguage()) {
-                $sId = $oCont->getId();
-                $oCont = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
-                $oCont->loadInLang($iLang, $sId);
+        if ($bl_regenerate || !$s_seo_url = $this->load_from_db('oxContent', $o_cont->get_id(), $i_lang)) {
+            if ($i_lang != $o_cont->get_language()) {
+                $s_id = $o_cont->get_id();
+                $o_cont = ox_new(\Oxid_Esales\Eshop\Application\Model\Content::class);
+                $o_cont->load_in_lang($i_lang, $s_id);
             }
-
-            $sSeoUrl = '';
-            if ($oCont->getCategoryId() && $oCont->getType() === 2) {
-                $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-                if ($oCat->loadInLang($iLang, $oCont->oxcontents__oxcatid->value)) {
-                    $sParentId = $oCat->oxcategories__oxparentid->value;
-                    if ($sParentId && $sParentId != 'oxrootid') {
-                        $oParentCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-                        if ($oParentCat->loadInLang($iLang, $oCat->oxcategories__oxparentid->value)) {
-                            $sSeoUrl .= \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class)->getCategoryUri($oParentCat);
+            $s_seo_url = '';
+            if ($o_cont->get_category_id() && $o_cont->get_type() === 2) {
+                $o_cat = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+                if ($o_cat->load_in_lang($i_lang, $o_cont->oxcontents__oxcatid->value)) {
+                    $s_parent_id = $o_cat->oxcategories__oxparentid->value;
+                    if ($s_parent_id && $s_parent_id != 'oxrootid') {
+                        $o_parent_cat = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+                        if ($o_parent_cat->load_in_lang($i_lang, $o_cat->oxcategories__oxparentid->value)) {
+                            $s_seo_url .= \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Category::class)->get_category_uri($o_parent_cat);
                         }
                     }
                 }
             }
-
-            $sSeoUrl .= $this->prepareTitle($oCont->oxcontents__oxtitle->value, false, $oCont->getLanguage()) . '/';
-            $sSeoUrl = $this->processSeoUrl($sSeoUrl, $oCont->getId(), $iLang);
-
-            $this->saveToDb('oxcontent', $oCont->getId(), $oCont->getBaseStdLink($iLang), $sSeoUrl, $iLang);
+            $s_seo_url .= $this->prepare_title($o_cont->oxcontents__oxtitle->value, false, $o_cont->get_language()) . '/';
+            $s_seo_url = $this->process_seo_url($s_seo_url, $o_cont->get_id(), $i_lang);
+            $this->save_to_db('oxcontent', $o_cont->get_id(), $o_cont->get_base_std_link($i_lang), $s_seo_url, $i_lang);
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * encodeContentUrl encodes content link
      *
@@ -78,34 +70,25 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string|bool
      */
-    public function getContentUrl($oCont, $iLang = null)
+    public function get_content_url($o_cont, $i_lang = null)
     {
-        if (!isset($iLang)) {
-            $iLang = $oCont->getLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = $o_cont->get_language();
         }
-
-        return $this->getFullUrl($this->getContentUri($oCont, $iLang), $iLang);
+        return $this->get_full_url($this->get_content_uri($o_cont, $i_lang), $i_lang);
     }
-
     /**
      * deletes content seo entries
      *
      * @param string $sId content ids
      */
-    public function onDeleteContent($sId): void
+    public function on_delete_content($s_id): void
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcontent'", [
-            'oxobjectid' => $sId,
-        ]);
-        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $sId,
-        ]);
-        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $sId,
-        ]);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $o_db->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcontent'", ['oxobjectid' => $s_id]);
+        $o_db->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', ['oxobjectid' => $s_id]);
+        $o_db->execute('delete from oxseohistory where oxobjectid = :oxobjectid', ['oxobjectid' => $s_id]);
     }
-
     /**
      * Returns alternative uri used while updating seo
      *
@@ -114,14 +97,13 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    protected function getAltUri($sObjectId, $iLang)
+    protected function get_alt_uri($s_object_id, $i_lang)
     {
-        $sSeoUrl = null;
-        $oCont = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
-        if ($oCont->loadInLang($iLang, $sObjectId)) {
-            return $this->getContentUri($oCont, $iLang, true);
+        $s_seo_url = null;
+        $o_cont = ox_new(\Oxid_Esales\Eshop\Application\Model\Content::class);
+        if ($o_cont->load_in_lang($i_lang, $s_object_id)) {
+            return $this->get_content_uri($o_cont, $i_lang, true);
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
 }

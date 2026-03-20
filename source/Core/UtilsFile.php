@@ -1,189 +1,117 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
-use OxidEsales\Eshop\Core\Exception\StandardException;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Bridge\MasterImageHandlerBridgeInterface;
+use Oxid_Esales\Eshop\Core\Exception\Exception_To_Display;
+use Oxid_Esales\Eshop\Core\Exception\Standard_Exception;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Str;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Bridge\Master_Image_Handler_Bridge_Interface;
 use Symfony\Component\Filesystem\Path;
-
-class UtilsFile extends \OxidEsales\Eshop\Core\Base
+class Utils_File extends \Oxid_Esales\Eshop\Core\Base
 {
     public const PROMO_PICTURE_DIR = 'promo';
-
-    protected $_aTypeToPath = [
-        'TC'    => 'master/category/thumb',
-        'CICO'  => 'master/category/icon',
-        'PICO'  => 'master/category/promo_icon',
-        'MTHU'  => 'master/manufacturer/thumb',
-        'MPIC'  => 'master/manufacturer/picture',
-        'MICO'  => 'master/manufacturer/icon',
-        'MPICO' => 'master/manufacturer/promo_icon',
-        'VICO'  => 'master/vendor/icon',
-        'PROMO' => self::PROMO_PICTURE_DIR,
-        'ICO'   => 'master/product/icon',
-        'TH'    => 'master/product/thumb',
-        'M1'    => 'master/product/1',
-        'M2'    => 'master/product/2',
-        'M3'    => 'master/product/3',
-        'M4'    => 'master/product/4',
-        'M5'    => 'master/product/5',
-        'M6'    => 'master/product/6',
-        'M7'    => 'master/product/7',
-        'M8'    => 'master/product/8',
-        'M9'    => 'master/product/9',
-        'M10'   => 'master/product/10',
-        'M11'   => 'master/product/11',
-        'M12'   => 'master/product/12',
-
-        'P1'    => '1',
-        'P2'    => '2',
-        'P3'    => '3',
-        'P4'    => '4',
-        'P5'    => '5',
-        'P6'    => '6',
-        'P7'    => '7',
-        'P8'    => '8',
-        'P9'    => '9',
-        'P10'   => '10',
-        'P11'   => '11',
-        'P12'   => '12',
-        'Z1'    => 'z1',
-        'Z2'    => 'z2',
-        'Z3'    => 'z3',
-        'Z4'    => 'z4',
-        'Z5'    => 'z5',
-        'Z6'    => 'z6',
-        'Z7'    => 'z7',
-        'Z8'    => 'z8',
-        'Z9'    => 'z9',
-        'Z10'   => 'z10',
-        'Z11'   => 'z11',
-        'Z12'   => 'z12',
-
-        'WP'    => 'master/wrapping',
-        'FL'    => 'media',
-    ];
-
+    protected $_a_type_to_path = ['TC' => 'master/category/thumb', 'CICO' => 'master/category/icon', 'PICO' => 'master/category/promo_icon', 'MTHU' => 'master/manufacturer/thumb', 'MPIC' => 'master/manufacturer/picture', 'MICO' => 'master/manufacturer/icon', 'MPICO' => 'master/manufacturer/promo_icon', 'VICO' => 'master/vendor/icon', 'PROMO' => self::PROMO_PICTURE_DIR, 'ICO' => 'master/product/icon', 'TH' => 'master/product/thumb', 'M1' => 'master/product/1', 'M2' => 'master/product/2', 'M3' => 'master/product/3', 'M4' => 'master/product/4', 'M5' => 'master/product/5', 'M6' => 'master/product/6', 'M7' => 'master/product/7', 'M8' => 'master/product/8', 'M9' => 'master/product/9', 'M10' => 'master/product/10', 'M11' => 'master/product/11', 'M12' => 'master/product/12', 'P1' => '1', 'P2' => '2', 'P3' => '3', 'P4' => '4', 'P5' => '5', 'P6' => '6', 'P7' => '7', 'P8' => '8', 'P9' => '9', 'P10' => '10', 'P11' => '11', 'P12' => '12', 'Z1' => 'z1', 'Z2' => 'z2', 'Z3' => 'z3', 'Z4' => 'z4', 'Z5' => 'z5', 'Z6' => 'z6', 'Z7' => 'z7', 'Z8' => 'z8', 'Z9' => 'z9', 'Z10' => 'z10', 'Z11' => 'z11', 'Z12' => 'z12', 'WP' => 'master/wrapping', 'FL' => 'media'];
     /**
      * Denied file types
      *
      * @var array
      */
-    protected $_aBadFiles = ['php', 'php3', 'php4', 'php5', 'phps', 'php6', 'jsp', 'cgi', 'cmf', 'exe', 'phtml', 'pht', 'phar'];
-
+    protected $_a_bad_files = ['php', 'php3', 'php4', 'php5', 'phps', 'php6', 'jsp', 'cgi', 'cmf', 'exe', 'phtml', 'pht', 'phar'];
     /**
      * Allowed to upload files in demo mode ( "white list")
      *
      * @var array
      */
-    protected $_aAllowedFiles = ['gif', 'jpg', 'jpeg', 'png', 'webp', 'pdf'];
-
+    protected $_a_allowed_files = ['gif', 'jpg', 'jpeg', 'png', 'webp', 'pdf'];
     /**
      * Counts how many new files added.
      *
      * @var integer
      */
-    protected $_iNewFilesCounter = 0;
-
-    public function getNewFilesCounter()
+    protected $_i_new_files_counter = 0;
+    public function get_new_files_counter()
     {
-        return $this->_iNewFilesCounter;
+        return $this->_i_new_files_counter;
     }
-
-    protected function setNewFilesCounter($iNewFilesCounter)
+    protected function set_new_files_counter($i_new_files_counter)
     {
-        $this->_iNewFilesCounter = (int) $iNewFilesCounter;
+        $this->_i_new_files_counter = (int) $i_new_files_counter;
     }
-
-    public function normalizeDir($sDir)
+    public function normalize_dir($s_dir)
     {
-        if (isset($sDir) && $sDir != '' && !str_ends_with((string) $sDir, '/')) {
-            $sDir .= '/';
+        if (isset($s_dir) && $s_dir != '' && !str_ends_with((string) $s_dir, '/')) {
+            $s_dir .= '/';
         }
-
-        return $sDir;
+        return $s_dir;
     }
-
-    public function copyDir($sSourceDir, $sTargetDir): void
+    public function copy_dir($s_source_dir, $s_target_dir): void
     {
-        $oStr = Str::getStr();
-        $handle = opendir($sSourceDir);
-        while (false !== ($file = readdir($handle))) {
+        $o_str = Str::get_str();
+        $handle = opendir($s_source_dir);
+        while (false !== $file = readdir($handle)) {
             if ($file != '.' && $file != '..') {
-                if (is_dir($sSourceDir . '/' . $file)) {
-                    $sNewSourceDir = $sSourceDir . '/' . $file;
-                    $sNewTargetDir = $sTargetDir . '/' . $file;
+                if (is_dir($s_source_dir . '/' . $file)) {
+                    $s_new_source_dir = $s_source_dir . '/' . $file;
+                    $s_new_target_dir = $s_target_dir . '/' . $file;
                     if (strcasecmp($file, 'CVS') && strcasecmp($file, '.svn')) {
-                        @mkdir($sNewTargetDir, 0777);
-                        $this->copyDir($sNewSourceDir, $sNewTargetDir);
+                        @mkdir($s_new_target_dir, 0777);
+                        $this->copy_dir($s_new_source_dir, $s_new_target_dir);
                     }
                 } else {
-                    $sSourceFile = $sSourceDir . '/' . $file;
-                    $sTargetFile = $sTargetDir . '/' . $file;
-
-                    if (!$oStr->strstr($sSourceDir, 'dyn_images') || $file == 'nopic.jpg' || $file == 'nopic_ico.jpg') {
-                        @copy($sSourceFile, $sTargetFile);
+                    $s_source_file = $s_source_dir . '/' . $file;
+                    $s_target_file = $s_target_dir . '/' . $file;
+                    if (!$o_str->strstr($s_source_dir, 'dyn_images') || $file == 'nopic.jpg' || $file == 'nopic_ico.jpg') {
+                        @copy($s_source_file, $s_target_file);
                     }
                 }
             }
         }
         closedir($handle);
     }
-
-    public function deleteDir($sSourceDir)
+    public function delete_dir($s_source_dir)
     {
-        if (is_dir($sSourceDir)) {
-            if ($oDir = dir($sSourceDir)) {
-                while (false !== $sFile = $oDir->read()) {
-                    if ($sFile == '.') {
+        if (is_dir($s_source_dir)) {
+            if ($o_dir = dir($s_source_dir)) {
+                while (false !== $s_file = $o_dir->read()) {
+                    if ($s_file == '.') {
                         continue;
                     }
-                    if ($sFile == '..') {
+                    if ($s_file == '..') {
                         continue;
                     }
-                    if (!$this->deleteDir($oDir->path . DIRECTORY_SEPARATOR . $sFile)) {
-                        $oDir->close();
-
+                    if (!$this->delete_dir($o_dir->path . DIRECTORY_SEPARATOR . $s_file)) {
+                        $o_dir->close();
                         return false;
                     }
                 }
-
-                $oDir->close();
-
-                return rmdir($sSourceDir);
+                $o_dir->close();
+                return rmdir($s_source_dir);
             }
-        } elseif (file_exists($sSourceDir)) {
-            return unlink($sSourceDir);
+        } elseif (file_exists($s_source_dir)) {
+            return unlink($s_source_dir);
         }
     }
-
-    public function readRemoteFileAsString($sPath)
+    public function read_remote_file_as_string($s_path)
     {
-        $sRet = '';
-        $hFile = @fopen($sPath, 'r');
-        if ($hFile) {
-            socket_set_timeout($hFile, 2);
-            while (!feof($hFile)) {
-                $sLine = fgets($hFile, 4096);
-                $sRet .= $sLine;
+        $s_ret = '';
+        $h_file = @fopen($s_path, 'r');
+        if ($h_file) {
+            socket_set_timeout($h_file, 2);
+            while (!feof($h_file)) {
+                $s_line = fgets($h_file, 4096);
+                $s_ret .= $s_line;
             }
-            fclose($hFile);
+            fclose($h_file);
         }
-
-        return $sRet;
+        return $s_ret;
     }
-
     /**
      * Prepares image file name
      *
@@ -195,31 +123,28 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function prepareImageName($sValue, $sType, $blDemo, $sImagePath, $blUnique = true)
+    protected function prepare_image_name($s_value, $s_type, $bl_demo, $s_image_path, $bl_unique = true)
     {
-        if ($sValue) {
+        if ($s_value) {
             // add type to name
-            $aFilename = explode('.', $sValue);
-
-            $sFileType = trim($aFilename[count($aFilename) - 1]);
+            $a_filename = explode('.', $s_value);
+            $s_file_type = trim($a_filename[count($a_filename) - 1]);
             // unallowed files ?
-            if (in_array($sFileType, $this->_aBadFiles) || ($blDemo && !in_array($sFileType, $this->_aAllowedFiles))) {
-                Registry::getUtils()->showMessageAndExit("File didn't pass our allowed files filter.");
+            if (in_array($s_file_type, $this->_a_bad_files) || $bl_demo && !in_array($s_file_type, $this->_a_allowed_files)) {
+                Registry::get_utils()->show_message_and_exit("File didn't pass our allowed files filter.");
             }
             // removing file type
-            if (count($aFilename) > 0) {
-                unset($aFilename[count($aFilename) - 1]);
+            if (count($a_filename) > 0) {
+                unset($a_filename[count($a_filename) - 1]);
             }
-            $sFName = '';
-            if (isset($aFilename[0])) {
-                $sFName = Str::getStr()->preg_replace('/[^a-zA-Z0-9()_\.-]/', '', implode('.', $aFilename));
+            $s_f_name = '';
+            if (isset($a_filename[0])) {
+                $s_f_name = Str::get_str()->preg_replace('/[^a-zA-Z0-9()_\.-]/', '', implode('.', $a_filename));
             }
-            $sValue = $this->getUniqueFileName($sImagePath, "{$sFName}", $sFileType, '', $blUnique);
+            $s_value = $this->get_unique_file_name($s_image_path, "{$s_f_name}", $s_file_type, '', $bl_unique);
         }
-
-        return $sValue;
+        return $s_value;
     }
-
     /**
      * Returns image storage path
      *
@@ -227,13 +152,11 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getImagePath($sType)
+    protected function get_image_path($s_type)
     {
-        $sFolder = array_key_exists($sType, $this->_aTypeToPath) ? $this->_aTypeToPath[$sType] : '0';
-
-        return $this->normalizeDir(Registry::getConfig()->getPictureDir(false)) . "{$sFolder}/";
+        $s_folder = array_key_exists($s_type, $this->_a_type_to_path) ? $this->_a_type_to_path[$s_type] : '0';
+        return $this->normalize_dir(Registry::get_config()->get_picture_dir(false)) . "{$s_folder}/";
     }
-
     /**
      * Uploaded file processor (filters, etc), sets configuration parameters to
      * passed object and returns it.
@@ -245,71 +168,57 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @return object
      */
-    public function processFiles($oObject = null, $aFiles = [], $blUseMasterImage = false, $blUnique = true)
+    public function process_files($o_object = null, $a_files = [], $bl_use_master_image = false, $bl_unique = true)
     {
-        $aFiles = $aFiles ?: $_FILES;
-        if (isset($aFiles['myfile']['name'])) {
-            $oConfig = Registry::getConfig();
-
+        $a_files = $a_files ?: $_FILES;
+        if (isset($a_files['myfile']['name'])) {
+            $o_config = Registry::get_config();
             // A. protection for demoshops - strictly defining allowed file extensions
-            $blDemo = (bool) $oConfig->isDemoShop();
-
+            $bl_demo = (bool) $o_config->is_demo_shop();
             // folder where images will be processed
-            $sTmpFolder = ContainerFacade::getParameter('oxid_esales.build_directory');
-
-            $iNewFilesCounter = 0;
-            $aSource = $aFiles['myfile']['tmp_name'];
-            $aError = $aFiles['myfile']['error'] ?? [];
-
-            $oEx = oxNew(ExceptionToDisplay::class);
+            $s_tmp_folder = Container_Facade::get_parameter('oxid_esales.build_directory');
+            $i_new_files_counter = 0;
+            $a_source = $a_files['myfile']['tmp_name'];
+            $a_error = $a_files['myfile']['error'] ?? [];
+            $o_ex = ox_new(Exception_To_Display::class);
             // process all files
-            foreach ($aFiles['myfile']['name'] as $sKey => $sValue) {
-                $sSource = $aSource[$sKey];
-                $iError = $aError[$sKey] ?? null;
-                $aFiletype = explode('@', (string) $sKey);
-                $sKey = $aFiletype[1] ?? null;
-                $sType = $aFiletype[0];
-
-                $sValue = strtolower((string) $sValue);
-                $sImagePath = $this->getImagePath($sType);
-
+            foreach ($a_files['myfile']['name'] as $s_key => $s_value) {
+                $s_source = $a_source[$s_key];
+                $i_error = $a_error[$s_key] ?? null;
+                $a_filetype = explode('@', (string) $s_key);
+                $s_key = $a_filetype[1] ?? null;
+                $s_type = $a_filetype[0];
+                $s_value = strtolower((string) $s_value);
+                $s_image_path = $this->get_image_path($s_type);
                 // Should translate error to user if file was uploaded
-                if (UPLOAD_ERR_OK !== $iError && UPLOAD_ERR_NO_FILE !== $iError) {
-                    $sErrorsDescription = $this->translateError($iError);
-                    $oEx->setMessage($sErrorsDescription);
-                    Registry::getUtilsView()->addErrorToDisplay($oEx, false);
+                if (UPLOAD_ERR_OK !== $i_error && UPLOAD_ERR_NO_FILE !== $i_error) {
+                    $s_errors_description = $this->translate_error($i_error);
+                    $o_ex->set_message($s_errors_description);
+                    Registry::get_utils_view()->add_error_to_display($o_ex, false);
                 }
-
                 // checking file type and building final file name
-                if ($sSource && ($sValue = $this->prepareImageName($sValue, $sType, $blDemo, $sImagePath, $blUnique))) {
+                if ($s_source && $s_value = $this->prepare_image_name($s_value, $s_type, $bl_demo, $s_image_path, $bl_unique)) {
                     // moving to tmp folder for processing as safe mode or spec. open_basedir setup
                     // usually does not allow file modification in php's temp folder
-                    $sProcessPath = $sTmpFolder . basename((string) $sSource);
-
-                    if ($sProcessPath) {
-                        $destination = Path::join("$sImagePath$sValue");
-                        $blMoved = $blUseMasterImage
-                            ? $this->copyMasterImage($sSource, $destination)
-                            : $this->uploadMasterImage($sSource, $destination);
-
-                        if ($blMoved) {
+                    $s_process_path = $s_tmp_folder . basename((string) $s_source);
+                    if ($s_process_path) {
+                        $destination = Path::join("{$s_image_path}{$s_value}");
+                        $bl_moved = $bl_use_master_image ? $this->copy_master_image($s_source, $destination) : $this->upload_master_image($s_source, $destination);
+                        if ($bl_moved) {
                             // New image successfully add.
-                            $iNewFilesCounter++;
+                            $i_new_files_counter++;
                             // assign the name
-                            if ($oObject && isset($oObject->$sKey)) {
-                                $oObject->{$sKey}->setValue($sValue);
+                            if ($o_object && isset($o_object->{$s_key})) {
+                                $o_object->{$s_key}->set_value($s_value);
                             }
                         }
                     }
                 }
             }
-
-            $this->setNewFilesCounter($iNewFilesCounter);
+            $this->set_new_files_counter($i_new_files_counter);
         }
-
-        return $oObject;
+        return $o_object;
     }
-
     /**
      * Checks if passed file exists and may be opened for reading. Returns true
      * on success.
@@ -318,25 +227,20 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function checkFile($sFile)
+    public function check_file($s_file)
     {
-        $aCheckCache = Registry::getSession()->getVariable('checkcache');
-
-        if (isset($aCheckCache[$sFile])) {
-            return $aCheckCache[$sFile];
+        $a_check_cache = Registry::get_session()->get_variable('checkcache');
+        if (isset($a_check_cache[$s_file])) {
+            return $a_check_cache[$s_file];
         }
-
-        $blRet = true;
-        if (!is_readable($sFile)) {
-            $blRet = $this->urlValidate($sFile);
+        $bl_ret = true;
+        if (!is_readable($s_file)) {
+            $bl_ret = $this->url_validate($s_file);
         }
-
-        $aCheckCache[$sFile] = $blRet;
-        Registry::getSession()->setVariable('checkcache', $aCheckCache);
-
-        return $blRet;
+        $a_check_cache[$s_file] = $bl_ret;
+        Registry::get_session()->set_variable('checkcache', $a_check_cache);
+        return $bl_ret;
     }
-
     /**
      * Checks if given URL is accessible (HTTP-Code: 200)
      *
@@ -344,12 +248,10 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @return boolean
      */
-    public function urlValidate($url)
+    public function url_validate($url)
     {
-        return $this->isUrlSchemaValid($url)
-            && $this->isUrlAccessible($url);
+        return $this->is_url_schema_valid($url) && $this->is_url_accessible($url);
     }
-
     /**
      * Process uploaded files. Returns unique file name, on fail false
      *
@@ -360,49 +262,34 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      * @return string
      * @throws StandardException if file is not valid
      */
-    public function processFile($filename, $uploadPath)
+    public function process_file($filename, $upload_path)
     {
-        $fileInfo = $_FILES[$filename];
-
-        $absoluteUploadPath = Path::join(
-            ContainerFacade::getParameter('oxid_esales.shop_source_directory'),
-            $uploadPath
-        );
-
-        if (!isset($fileInfo['name']) || !isset($fileInfo['tmp_name'])) {
-            throw oxNew(StandardException::class, 'EXCEPTION_NOFILE');
+        $file_info = $_FILES[$filename];
+        $absolute_upload_path = Path::join(Container_Facade::get_parameter('oxid_esales.shop_source_directory'), $upload_path);
+        if (!isset($file_info['name']) || !isset($file_info['tmp_name'])) {
+            throw ox_new(Standard_Exception::class, 'EXCEPTION_NOFILE');
         }
-
-        if (!Str::getStr()->preg_match('/^[\-_a-z0-9\.]+$/i', $fileInfo['name'])) {
-            throw oxNew(StandardException::class, 'EXCEPTION_FILENAMEINVALIDCHARS');
+        if (!Str::get_str()->preg_match('/^[\-_a-z0-9\.]+$/i', $file_info['name'])) {
+            throw ox_new(Standard_Exception::class, 'EXCEPTION_FILENAMEINVALIDCHARS');
         }
-
-        if (isset($fileInfo['error']) && $fileInfo['error']) {
-            throw oxNew(StandardException::class, 'EXCEPTION_FILEUPLOADERROR_' . ((int)$fileInfo['error']));
+        if (isset($file_info['error']) && $file_info['error']) {
+            throw ox_new(Standard_Exception::class, 'EXCEPTION_FILEUPLOADERROR_' . (int) $file_info['error']);
         }
-
-        $pathInfo = pathinfo((string) $fileInfo['name']);
-
-        $extension = $pathInfo['extension'];
-        $filename = $pathInfo['filename'];
-
-        $allowedUploadTypes = ContainerFacade::getParameter('oxid_esales.allowed_uploaded_types');
-        $allowedUploadTypes = array_map(strtolower(...), $allowedUploadTypes);
-
-        if (!\in_array(strtolower($extension), $allowedUploadTypes, true)) {
-            throw oxNew(StandardException::class, 'EXCEPTION_NOTALLOWEDTYPE');
+        $path_info = pathinfo((string) $file_info['name']);
+        $extension = $path_info['extension'];
+        $filename = $path_info['filename'];
+        $allowed_upload_types = Container_Facade::get_parameter('oxid_esales.allowed_uploaded_types');
+        $allowed_upload_types = array_map(strtolower(...), $allowed_upload_types);
+        if (!\in_array(strtolower($extension), $allowed_upload_types, true)) {
+            throw ox_new(Standard_Exception::class, 'EXCEPTION_NOTALLOWEDTYPE');
         }
-
-        $filename = $this->getUniqueFileName($absoluteUploadPath, $filename, $extension);
-
-        $destination = Path::join($absoluteUploadPath, $filename);
-        if ($this->uploadMasterImage($fileInfo['tmp_name'], $destination)) {
+        $filename = $this->get_unique_file_name($absolute_upload_path, $filename, $extension);
+        $destination = Path::join($absolute_upload_path, $filename);
+        if ($this->upload_master_image($file_info['tmp_name'], $destination)) {
             return $filename;
         }
-
         return false;
     }
-
     /**
      * @param string $directory
      * @param string $filename
@@ -411,29 +298,24 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      * @param bool $unique
      * @return string
      */
-    protected function getUniqueFileName($directory, $filename, $extension, $suffix = '', $unique = true)
+    protected function get_unique_file_name($directory, $filename, $extension, $suffix = '', $unique = true)
     {
         if (!$unique) {
-            return "$filename$suffix.$extension";
+            return "{$filename}{$suffix}.{$extension}";
         }
-        $directory = $this->normalizeDir($directory);
-        $fileCounter = 0;
-        $temporaryName = $filename;
-        $stringHandler = Str::getStr();
-        $masterImageHandler = ContainerFacade::get(MasterImageHandlerBridgeInterface::class);
-        while (
-            $masterImageHandler->exists(
-                $this->makePathRelativeToShopSource(Path::join($directory, "$filename$suffix.$extension"))
-            )
-        ) {
-            $fileCounter++;
+        $directory = $this->normalize_dir($directory);
+        $file_counter = 0;
+        $temporary_name = $filename;
+        $string_handler = Str::get_str();
+        $master_image_handler = Container_Facade::get(Master_Image_Handler_Bridge_Interface::class);
+        while ($master_image_handler->exists($this->make_path_relative_to_shop_source(Path::join($directory, "{$filename}{$suffix}.{$extension}")))) {
+            $file_counter++;
             //removing "(any digit)" from file name end
-            $temporaryName = $stringHandler->preg_replace("/\($fileCounter\)/", '', $temporaryName);
-            $filename = "{$temporaryName}($fileCounter)";
+            $temporary_name = $string_handler->preg_replace("/\\({$file_counter}\\)/", '', $temporary_name);
+            $filename = "{$temporary_name}({$file_counter})";
         }
-        return "$filename$suffix.$extension";
+        return "{$filename}{$suffix}.{$extension}";
     }
-
     /**
      * Returns image storage path
      *
@@ -442,18 +324,15 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getImageDirByType($sType, $blGenerated = false)
+    public function get_image_dir_by_type($s_type, $bl_generated = false)
     {
-        $sFolder = array_key_exists($sType, $this->_aTypeToPath) ? $this->_aTypeToPath[$sType] : '0';
-        $sDir = $this->normalizeDir($sFolder);
-
-        if ($blGenerated === true) {
-            return str_replace('master/', 'generated/', $sDir);
+        $s_folder = array_key_exists($s_type, $this->_a_type_to_path) ? $this->_a_type_to_path[$s_type] : '0';
+        $s_dir = $this->normalize_dir($s_folder);
+        if ($bl_generated === true) {
+            return str_replace('master/', 'generated/', $s_dir);
         }
-
-        return $sDir;
+        return $s_dir;
     }
-
     /**
      * Translate php file upload errors to user readable format.
      *
@@ -461,84 +340,61 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function translateError($iError)
+    public function translate_error($i_error)
     {
         // Translate only if translation exist
-        if ($iError > 0 && $iError < 9 && 5 !== $iError) {
-            return 'EXCEPTION_FILEUPLOADERROR_' . ((int) $iError);
+        if ($i_error > 0 && $i_error < 9 && 5 !== $i_error) {
+            return 'EXCEPTION_FILEUPLOADERROR_' . (int) $i_error;
         }
-
         return '';
     }
-
-    private function isUrlSchemaValid(string $url): bool
+    private function is_url_schema_valid(string $url): bool
     {
         return filter_var($url, FILTER_VALIDATE_URL) === false ? false : true;
     }
-
-    private function isUrlAccessible(string $url): bool
+    private function is_url_accessible(string $url): bool
     {
         $curl = curl_init($url);
-
         curl_setopt($curl, CURLOPT_NOBODY, true);
-
         $result = curl_exec($curl);
-
         if ($result !== false) {
-            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-            if ($statusCode === 200) {
+            $status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($status_code === 200) {
                 return true;
             }
         }
         return false;
     }
-
-    private function copyMasterImage(string $source, string $destination): bool
+    private function copy_master_image(string $source, string $destination): bool
     {
         $copied = false;
         try {
-            ContainerFacade::get(MasterImageHandlerBridgeInterface::class)
-                ->copy(
-                    $source,
-                    $this->makePathRelativeToShopSource($destination)
-                );
+            Container_Facade::get(Master_Image_Handler_Bridge_Interface::class)->copy($source, $this->make_path_relative_to_shop_source($destination));
             $copied = true;
         } catch (\Throwable $exception) {
-            $this->addErrorMessageToDisplay($exception->getMessage());
+            $this->add_error_message_to_display($exception->get_message());
         }
         return $copied;
     }
-
-    private function uploadMasterImage(string $source, string $destination): bool
+    private function upload_master_image(string $source, string $destination): bool
     {
         $uploaded = false;
         try {
-            ContainerFacade::get(MasterImageHandlerBridgeInterface::class)
-                ->upload(
-                    $source,
-                    $this->makePathRelativeToShopSource($destination)
-                );
+            Container_Facade::get(Master_Image_Handler_Bridge_Interface::class)->upload($source, $this->make_path_relative_to_shop_source($destination));
             $uploaded = true;
         } catch (\Throwable $exception) {
-            $this->addErrorMessageToDisplay($exception->getMessage());
+            $this->add_error_message_to_display($exception->get_message());
         }
         return $uploaded;
     }
-
-    private function addErrorMessageToDisplay(string $message): void
+    private function add_error_message_to_display(string $message): void
     {
-        $exception = oxNew(ExceptionToDisplay::class);
-        $exception->setMessage($message);
-        Registry::getUtilsView()->addErrorToDisplay($exception, false);
+        $exception = ox_new(Exception_To_Display::class);
+        $exception->set_message($message);
+        Registry::get_utils_view()->add_error_to_display($exception, false);
     }
-
-    private function makePathRelativeToShopSource(string $path): string
+    private function make_path_relative_to_shop_source(string $path): string
     {
-
-        return Path::makeRelative(
-            $path,
-            ContainerFacade::getParameter('oxid_esales.shop_source_directory')
-        );
+        return Path::make_relative($path, Container_Facade::get_parameter('oxid_esales.shop_source_directory'));
     }
 }

@@ -4,124 +4,89 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Newsletter\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Newsletter\DataObject;
-
-class NewsletterRecipient
+class Newsletter_Recipient
 {
     private ?string $salutation = null;
-
-    private ?string $fistName = null;
-
-    private ?string $lastName = null;
-
+    private ?string $fist_name = null;
+    private ?string $last_name = null;
     private ?string $email = null;
-
     /**
      * @var string
      */
-    private $otpInState;
-
+    private $otp_in_state;
     private ?string $country = null;
-
-    private ?string $userGroups = null;
-
+    private ?string $user_groups = null;
     private const OPT_IN_STATE_SUBSCRIBED = 'subscribed';
     private const OPT_IN_STATE_NOT_CONFIRMED = 'not confirmed';
     private const OPT_IN_STATE_NOT_SUBSCRIBED = 'not subscribed';
-
-    private array $otpInStateList = [
-        0 => self::OPT_IN_STATE_NOT_SUBSCRIBED,
-        1 => self::OPT_IN_STATE_SUBSCRIBED,
-        2 => self::OPT_IN_STATE_NOT_CONFIRMED,
-    ];
-
-    public function getSalutation(): string
+    private array $otp_in_state_list = [0 => self::OPT_IN_STATE_NOT_SUBSCRIBED, 1 => self::OPT_IN_STATE_SUBSCRIBED, 2 => self::OPT_IN_STATE_NOT_CONFIRMED];
+    public function get_salutation(): string
     {
         return $this->salutation;
     }
-
-    public function setSalutation(string $salutation): NewsletterRecipient
+    public function set_salutation(string $salutation): Newsletter_Recipient
     {
         $this->salutation = $salutation;
-
         return $this;
     }
-
-    public function getFistName(): string
+    public function get_fist_name(): string
     {
-        return $this->fistName;
+        return $this->fist_name;
     }
-
-    public function setFistName(string $fistName): NewsletterRecipient
+    public function set_fist_name(string $fist_name): Newsletter_Recipient
     {
-        $this->fistName = $fistName;
-
+        $this->fist_name = $fist_name;
         return $this;
     }
-
-    public function getLastName(): string
+    public function get_last_name(): string
     {
-        return $this->lastName;
+        return $this->last_name;
     }
-
-    public function setLastName(string $lastName): NewsletterRecipient
+    public function set_last_name(string $last_name): Newsletter_Recipient
     {
-        $this->lastName = $lastName;
-
+        $this->last_name = $last_name;
         return $this;
     }
-
-    public function getEmail(): string
+    public function get_email(): string
     {
         return $this->email;
     }
-
-    public function setEmail(string $email): NewsletterRecipient
+    public function set_email(string $email): Newsletter_Recipient
     {
         $this->email = $email;
-
         return $this;
     }
-
-    public function getOtpInState(): string
+    public function get_otp_in_state(): string
     {
-        return $this->otpInState;
+        return $this->otp_in_state;
     }
-
-    public function setOtpInState(string $otpInState): NewsletterRecipient
+    public function set_otp_in_state(string $otp_in_state): Newsletter_Recipient
     {
-        $this->otpInState = self::OPT_IN_STATE_NOT_SUBSCRIBED;
-        if (array_key_exists($otpInState, $this->otpInStateList)) {
-            $this->otpInState = $this->otpInStateList[$otpInState];
+        $this->otp_in_state = self::OPT_IN_STATE_NOT_SUBSCRIBED;
+        if (array_key_exists($otp_in_state, $this->otp_in_state_list)) {
+            $this->otp_in_state = $this->otp_in_state_list[$otp_in_state];
         }
-
         return $this;
     }
-
-    public function getCountry(): string
+    public function get_country(): string
     {
         return $this->country;
     }
-
-    public function setCountry(string $country): NewsletterRecipient
+    public function set_country(string $country): Newsletter_Recipient
     {
         $this->country = $country;
-
         return $this;
     }
-
-    public function getUserGroups(): string
+    public function get_user_groups(): string
     {
-        return $this->userGroups;
+        return $this->user_groups;
     }
-
-    public function setUserGroups(string $userGroups): NewsletterRecipient
+    public function set_user_groups(string $user_groups): Newsletter_Recipient
     {
-        $this->userGroups = $userGroups;
-
+        $this->user_groups = $user_groups;
         return $this;
     }
 }

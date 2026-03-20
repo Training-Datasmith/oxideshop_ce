@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin voucherserie manager.
@@ -15,12 +13,12 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * and "voucherserie_main") to frame.
  * Admin Menu: Shop Settings -> Vouchers.
  */
-class VoucherSerieController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Voucher_Serie_Controller extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'voucherserie';
+    protected $_s_this_template = 'voucherserie';
 }

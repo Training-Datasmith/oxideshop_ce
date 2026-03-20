@@ -1,27 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 /**
  * Generates view name for given table name.
  */
-class TableViewNameGenerator
+class Table_View_Name_Generator
 {
     /** @var \OxidEsales\Eshop\Core\Config */
     private $config;
-
     /** @var \OxidEsales\Eshop\Core\Language */
     private $language;
-
     /**
      * @param \OxidEsales\Eshop\Core\Config   $config
      * @param \OxidEsales\Eshop\Core\Language $language
@@ -29,16 +24,14 @@ class TableViewNameGenerator
     public function __construct($config = null, $language = null)
     {
         if (!$config) {
-            $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+            $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         }
         $this->config = $config;
-
         if (!$language) {
-            $language = \OxidEsales\Eshop\Core\Registry::getLang();
+            $language = \Oxid_Esales\Eshop\Core\Registry::get_lang();
         }
         $this->language = $language;
     }
-
     /**
      * Return the view name of the given table if a view exists, otherwise the table name itself.
      * Views usage can be disabled with blSkipViewUsage config option in case admin area is not reachable
@@ -50,25 +43,21 @@ class TableViewNameGenerator
      *
      * @return string
      */
-    public function getViewName($table, $languageId = null, $shopId = null)
+    public function get_view_name($table, $language_id = null, $shop_id = null)
     {
-        $config = $this->getConfig();
-
-        if (!ContainerFacade::getParameter('oxid_esales.skip_database_views_usage')) {
-            $language = $this->getLanguage();
-            $languageId ??= $language->getBaseLanguage();
-            $shopId ??= $config->getShopId();
-            $isMultiLang = in_array($table, $language->getMultiLangTables());
-            $viewSuffix = $this->getViewSuffix($table, $languageId, $shopId, $isMultiLang);
-
-            if ($viewSuffix || (($languageId == -1 || $shopId == -1) && $isMultiLang)) {
-                return "oxv_{$table}{$viewSuffix}";
+        $config = $this->get_config();
+        if (!Container_Facade::get_parameter('oxid_esales.skip_database_views_usage')) {
+            $language = $this->get_language();
+            $language_id ??= $language->get_base_language();
+            $shop_id ??= $config->get_shop_id();
+            $is_multi_lang = in_array($table, $language->get_multi_lang_tables());
+            $view_suffix = $this->get_view_suffix($table, $language_id, $shop_id, $is_multi_lang);
+            if ($view_suffix || ($language_id == -1 || $shop_id == -1) && $is_multi_lang) {
+                return "oxv_{$table}{$view_suffix}";
             }
         }
-
         return $table;
     }
-
     /**
      * Generates view suffix.
      *
@@ -77,29 +66,26 @@ class TableViewNameGenerator
      * @param int    $shopId
      * @param bool   $isMultiLang
      */
-    protected function getViewSuffix($table, $languageId, $shopId, $isMultiLang): string
+    protected function get_view_suffix($table, $language_id, $shop_id, $is_multi_lang): string
     {
-        $viewSuffix = '';
-        if ($languageId != -1 && $isMultiLang) {
-            $languageAbbreviation = $this->getLanguage()->getLanguageAbbr($languageId);
-            $viewSuffix .= "_{$languageAbbreviation}";
+        $view_suffix = '';
+        if ($language_id != -1 && $is_multi_lang) {
+            $language_abbreviation = $this->get_language()->get_language_abbr($language_id);
+            $view_suffix .= "_{$language_abbreviation}";
         }
-
-        return $viewSuffix;
+        return $view_suffix;
     }
-
     /**
      * @return \OxidEsales\Eshop\Core\Config
      */
-    protected function getConfig()
+    protected function get_config()
     {
         return $this->config;
     }
-
     /**
      * @return \OxidEsales\Eshop\Core\Language
      */
-    protected function getLanguage()
+    protected function get_language()
     {
         return $this->language;
     }

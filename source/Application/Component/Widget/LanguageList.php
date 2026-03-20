@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Component\Widget;
+namespace Oxid_Esales\Eshop_Community\Application\Component\Widget;
 
 /**
  * Language selection list widget
  */
-class LanguageList extends \OxidEsales\Eshop\Application\Component\Widget\WidgetController
+class Language_List extends \Oxid_Esales\Eshop\Application\Component\Widget\Widget_Controller
 {
     /**
      * Names of components (classes) that are initiated and executed
@@ -21,12 +19,11 @@ class LanguageList extends \OxidEsales\Eshop\Application\Component\Widget\Widget
      *
      * @var array
      */
-    protected $_aComponentNames = ['oxcmp_lang' => 0];
-
+    protected $_a_component_names = ['oxcmp_lang' => 0];
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'widget/header/languages';
+    protected $_s_this_template = 'widget/header/languages';
 }

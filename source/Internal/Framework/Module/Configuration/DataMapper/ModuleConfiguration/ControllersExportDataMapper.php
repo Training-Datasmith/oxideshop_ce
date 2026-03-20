@@ -4,35 +4,25 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\{
-    DataMapper\ModuleConfigurationExportDataMapperInterface, DataObject\ModuleConfiguration
-};
-
-class ControllersExportDataMapper implements ModuleConfigurationExportDataMapperInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\{Data_Mapper\Module_Configuration_Export_Data_Mapper_Interface, Data_Object\Module_Configuration};
+class Controllers_Export_Data_Mapper implements Module_Configuration_Export_Data_Mapper_Interface
 {
-    public function toData(ModuleConfiguration $configuration): array
+    public function to_data(Module_Configuration $configuration): array
     {
-        return ['controllers' => $this->getControllers($configuration)];
+        return ['controllers' => $this->get_controllers($configuration)];
     }
-    private function getControllers(ModuleConfiguration $configuration): array
+    private function get_controllers(Module_Configuration $configuration): array
     {
         $controllers = [];
-
-        if ($configuration->hasControllers()) {
+        if ($configuration->has_controllers()) {
             $controllers['controller'] = [];
-            foreach ($configuration->getControllers() as $controller) {
-                $controllers['controller'][] = [
-                    'id' => $controller->getId(),
-                    'controllerClassNameSpace' => $controller->getControllerClassNameSpace(),
-                ];
+            foreach ($configuration->get_controllers() as $controller) {
+                $controllers['controller'][] = ['id' => $controller->get_id(), 'controllerClassNameSpace' => $controller->get_controller_class_name_space()];
             }
         }
-
         return $controllers;
     }
 }

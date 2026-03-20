@@ -4,14 +4,11 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-
-interface ModuleConfigurationValidatorInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration;
+interface Module_Configuration_Validator_Interface
 {
-    public function validate(ModuleConfiguration $configuration, int $shopId): void;
+    public function validate(Module_Configuration $configuration, int $shop_id): void;
 }

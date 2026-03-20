@@ -4,23 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Edition;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Edition;
-
-enum EditionPaths: string
+enum Edition_Paths : string
 {
     case Community = Edition::Community->value;
     case Professional = Edition::Professional->value;
     case Enterprise = Edition::Enterprise->value;
-
-    public function getVendorFolderName(): string
+    public function get_vendor_folder_name(): string
     {
         return 'oxid-esales';
     }
-
-    public function getProjectFolderName(): string
+    public function get_project_folder_name(): string
     {
         return match ($this) {
             self::Community => 'oxideshop-ce',
@@ -28,8 +24,7 @@ enum EditionPaths: string
             self::Enterprise => 'oxideshop-ee',
         };
     }
-
-    public function getSourceFolderName(): string
+    public function get_source_folder_name(): string
     {
         return match ($this) {
             self::Community => 'source',

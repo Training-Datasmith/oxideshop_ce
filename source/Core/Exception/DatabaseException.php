@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Exception;
+namespace Oxid_Esales\Eshop_Community\Core\Exception;
 
 /**
  * Exception to be thrown on database errors
  */
-class DatabaseException extends \OxidEsales\Eshop\Core\Exception\StandardException
+class Database_Exception extends \Oxid_Esales\Eshop\Core\Exception\Standard_Exception
 {
     /**
      * DatabaseException constructor.

@@ -1,33 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core\Autoload;
 
-namespace OxidEsales\EshopCommunity\Core\Autoload;
-
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderBridgeInterface;
-
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Bridge_Interface;
 /**
  * Autoloader for module classes and extensions.
  *
  * @internal Do not make a module extension for this class.
  */
-class ModuleAutoload
+class Module_Autoload
 {
     /** @var array Classes, for which extension class chain was created. */
-    public $triedClasses = [];
-
+    public $tried_classes = [];
     /**
      * @var null|ModuleAutoload A singleton instance of this class or a sub class of this class
      */
     private static ?self $instance = null;
-
     /**
      * ModuleAutoload constructor.
      *
@@ -36,7 +31,6 @@ class ModuleAutoload
     protected function __construct()
     {
     }
-
     /**
      * Magic clone method.
      *
@@ -45,7 +39,6 @@ class ModuleAutoload
     private function __clone()
     {
     }
-
     /**
      * Tries to autoload given class. Searches for the class in module extensions.
      *
@@ -62,48 +55,41 @@ class ModuleAutoload
         if (str_contains($class, 'OxidEsales\Eshop\\')) {
             return false;
         }
-
-        $instance = static::getInstance();
+        $instance = static::get_instance();
         $class = strtolower(basename($class));
         $class = preg_replace('/_parent$/i', '', $class);
-
-        if (!in_array($class, $instance->triedClasses)) {
-            $instance->triedClasses[] = $class;
-            $instance->createExtensionClassChain($class);
+        if (!in_array($class, $instance->tried_classes)) {
+            $instance->tried_classes[] = $class;
+            $instance->create_extension_class_chain($class);
         }
     }
-
     /**
      * Returns the singleton instance of this class or of a sub class of this class.
      *
      * @return ModuleAutoload The singleton instance.
      */
-    public static function getInstance(): \OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload
+    public static function get_instance(): \Oxid_Esales\Eshop_Community\Core\Autoload\Module_Autoload
     {
         if (null === static::$instance) {
             static::$instance = new static();
         }
-
         return static::$instance;
     }
-
     /**
      * When module is extending other module's extension (module class, which is extending shop class),
      * this class comes to autoload and class chain has to be created.
      *
      * @param string $class
      */
-    protected function createExtensionClassChain($class)
+    protected function create_extension_class_chain($class)
     {
-        $extensions = ContainerFacade::get(ActiveModulesDataProviderBridgeInterface::class)->getClassExtensions();
-
+        $extensions = Container_Facade::get(Active_Modules_Data_Provider_Bridge_Interface::class)->get_class_extensions();
         if (is_array($extensions)) {
             $class = preg_quote($class, '/');
-
-            foreach ($extensions as $parentClass => $extensionPaths) {
-                foreach ($extensionPaths as $extensionPath) {
-                    if (preg_match('/\b' . $class . '($|\&)/i', (string) $extensionPath)) {
-                        Registry::getUtilsObject()->getClassName($parentClass);
+            foreach ($extensions as $parent_class => $extension_paths) {
+                foreach ($extension_paths as $extension_path) {
+                    if (preg_match('/\b' . $class . '($|\&)/i', (string) $extension_path)) {
+                        Registry::get_utils_object()->get_class_name($parent_class);
                         break;
                     }
                 }

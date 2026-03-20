@@ -1,40 +1,36 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Component\Widget;
+namespace Oxid_Esales\Eshop_Community\Application\Component\Widget;
 
 /**
  * Vendor list widget.
  * Forms vendor list.
  */
-class VendorList extends \OxidEsales\Eshop\Application\Component\Widget\WidgetController
+class Vendor_List extends \Oxid_Esales\Eshop\Application\Component\Widget\Widget_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'widget/footer/vendorlist';
-
+    protected $_s_this_template = 'widget/footer/vendorlist';
     /**
      * Template variable getter. Returns vendorlist for search
      *
      * @return array
      */
-    public function getVendorlist()
+    public function get_vendorlist()
     {
-        if ($this->_aVendorlist === null) {
-            $oVendorTree = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
-            $oVendorTree->buildVendorTree('vendorlist', null, \OxidEsales\Eshop\Core\Registry::getConfig()->getShopHomeUrl());
-            $this->_aVendorlist = $oVendorTree;
+        if ($this->_a_vendorlist === null) {
+            $o_vendor_tree = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor_List::class);
+            $o_vendor_tree->build_vendor_tree('vendorlist', null, \Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_home_url());
+            $this->_a_vendorlist = $o_vendor_tree;
         }
-
-        return $this->_aVendorlist;
+        return $this->_a_vendorlist;
     }
 }

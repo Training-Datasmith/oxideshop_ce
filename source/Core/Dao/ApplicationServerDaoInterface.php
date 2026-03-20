@@ -1,20 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Dao;
+namespace Oxid_Esales\Eshop_Community\Core\Dao;
 
 /**
  * Application server data access manager.
  *
  * @internal Do not make a module extension for this class.
  */
-interface ApplicationServerDaoInterface extends \OxidEsales\Eshop\Core\Dao\BaseDaoInterface
+interface Application_Server_Dao_Interface extends \Oxid_Esales\Eshop\Core\Dao\Base_Dao_Interface
 {
     /**
      * Finds an application server by given id, null if none is found.
@@ -23,5 +21,5 @@ interface ApplicationServerDaoInterface extends \OxidEsales\Eshop\Core\Dao\BaseD
      *
      * @return \OxidEsales\Eshop\Core\DataObject\ApplicationServer|null
      */
-    public function findAppServer($id);
+    public function find_app_server($id);
 }

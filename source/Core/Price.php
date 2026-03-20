@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Price calculation class. Responsible for simple price calculations. Basically contains Brutto, Netto prices and VAT values.
@@ -19,29 +17,25 @@ class Price
      *
      * @var double
      */
-    protected $_dBrutto = 0.0;
-
+    protected $_d_brutto = 0.0;
     /**
      * Netto price
      *
      * @var double
      */
-    protected $_dNetto = 0.0;
-
+    protected $_d_netto = 0.0;
     /**
      * VAT percent
      *
      * @var double
      */
-    protected $_dVat = 0.0;
-
+    protected $_d_vat = 0.0;
     /**
      * Assigned discount array
      *
      * @var array
      */
-    protected $_aDiscounts;
-
+    protected $_a_discounts;
     /**
      * Price entering mode
      * Reference to myConfig->blEnterNetPrice
@@ -50,8 +44,7 @@ class Price
      *
      * @var boolean
      */
-    protected $_blNetPriceMode;
-
+    protected $_bl_net_price_mode;
     /**
      * Class constructor. Gets price entering mode.
      *
@@ -59,61 +52,54 @@ class Price
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function __construct($dPrice = null)
+    public function __construct($d_price = null)
     {
-        $this->setNettoMode(\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blEnterNetPrice'));
-
-        if (!is_null($dPrice)) {
-            $this->setPrice($dPrice);
+        $this->set_netto_mode(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blEnterNetPrice'));
+        if (!is_null($d_price)) {
+            $this->set_price($d_price);
         }
     }
-
     /**
      * Netto price mode setter
      *
      * @param bool $blNetto State to set price to net mode (default true).
      */
-    public function setNettoMode($blNetto = true): void
+    public function set_netto_mode($bl_netto = true): void
     {
-        $this->_blNetPriceMode = $blNetto;
+        $this->_bl_net_price_mode = $bl_netto;
     }
-
     /**
      * return true if mode is netto
      *
      * @return bool
      */
-    public function isNettoMode()
+    public function is_netto_mode()
     {
-        return $this->_blNetPriceMode;
+        return $this->_bl_net_price_mode;
     }
-
     /**
      * Netto price mode setter
      */
-    public function setNettoPriceMode(): void
+    public function set_netto_price_mode(): void
     {
-        $this->setNettoMode();
+        $this->set_netto_mode();
     }
-
     /**
      * Brutto price mode setter
      */
-    public function setBruttoPriceMode(): void
+    public function set_brutto_price_mode(): void
     {
-        $this->setNettoMode(false);
+        $this->set_netto_mode(false);
     }
-
     /**
      * Sets new VAT percent, and recalculates price.
      *
      * @param float $dVat vat percent
      */
-    public function setVat($dVat): void
+    public function set_vat($d_vat): void
     {
-        $this->_dVat = (float) $dVat;
+        $this->_d_vat = (float) $d_vat;
     }
-
     /**
      * Sets new base VAT percent, recalculates brutto, and then netto price (in brutto mode).
      * if bruttoMode then BruttoPrice =(BruttoPrice - oldVAT% ) + newVat;
@@ -124,24 +110,22 @@ class Price
      *
      * @param float $newVat vat percent
      */
-    public function setUserVat($newVat): void
+    public function set_user_vat($new_vat): void
     {
-        if (!$this->isNettoMode() && $newVat != $this->_dVat) {
-            $this->_dBrutto = self::Netto2Brutto(self::Brutto2Netto($this->_dBrutto, $this->_dVat), (float) $newVat);
+        if (!$this->is_netto_mode() && $new_vat != $this->_d_vat) {
+            $this->_d_brutto = self::Netto2Brutto(self::Brutto2Netto($this->_d_brutto, $this->_d_vat), (float) $new_vat);
         }
-        $this->_dVat = (float) $newVat;
+        $this->_d_vat = (float) $new_vat;
     }
-
     /**
      * Returns VAT percent
      *
      * @return double
      */
-    public function getVat()
+    public function get_vat()
     {
-        return $this->_dVat;
+        return $this->_d_vat;
     }
-
     /**
      * Sets new price and VAT percent(optional). Recalculates price by
      * price entering mode
@@ -149,158 +133,144 @@ class Price
      * @param double $dPrice new price
      * @param double $dVat   VAT
      */
-    public function setPrice($dPrice, $dVat = null): void
+    public function set_price($d_price, $d_vat = null): void
     {
-        if (!is_null($dVat)) {
-            $this->setVat($dVat);
+        if (!is_null($d_vat)) {
+            $this->set_vat($d_vat);
         }
-
-        if ($this->isNettoMode()) {
-            $this->_dNetto = $dPrice;
+        if ($this->is_netto_mode()) {
+            $this->_d_netto = $d_price;
         } else {
-            $this->_dBrutto = $dPrice;
+            $this->_d_brutto = $d_price;
         }
     }
-
     /**
      * Returns price depending on mode brutto or netto
      *
      * @return double
      */
-    public function getPrice()
+    public function get_price()
     {
-        if ($this->isNettoMode()) {
-            return $this->getNettoPrice();
+        if ($this->is_netto_mode()) {
+            return $this->get_netto_price();
         }
-        return $this->getBruttoPrice();
+        return $this->get_brutto_price();
     }
-
     /**
      * Returns brutto price
      *
      * @return double
      */
-    public function getBruttoPrice()
+    public function get_brutto_price()
     {
-        if ($this->isNettoMode()) {
-            return $this->getNettoPrice() + $this->getVatValue();
+        if ($this->is_netto_mode()) {
+            return $this->get_netto_price() + $this->get_vat_value();
         }
-        return \OxidEsales\Eshop\Core\Registry::getUtils()->fRound($this->_dBrutto);
+        return \Oxid_Esales\Eshop\Core\Registry::get_utils()->f_round($this->_d_brutto);
     }
-
     /**
      * Returns netto price
      *
      * @return double
      */
-    public function getNettoPrice()
+    public function get_netto_price()
     {
-        if ($this->isNettoMode()) {
-            return \OxidEsales\Eshop\Core\Registry::getUtils()->fRound($this->_dNetto);
+        if ($this->is_netto_mode()) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_utils()->f_round($this->_d_netto);
         }
-        return $this->getBruttoPrice() - $this->getVatValue();
+        return $this->get_brutto_price() - $this->get_vat_value();
     }
-
     /**
      * Returns absolute VAT value
      *
      * @return double
      */
-    public function getVatValue()
+    public function get_vat_value()
     {
-        if ($this->isNettoMode()) {
-            $dVatValue = $this->getNettoPrice() * $this->getVat() / 100;
+        if ($this->is_netto_mode()) {
+            $d_vat_value = $this->get_netto_price() * $this->get_vat() / 100;
         } else {
-            $dVatValue = $this->getBruttoPrice() * $this->getVat() / (100 + $this->getVat());
+            $d_vat_value = $this->get_brutto_price() * $this->get_vat() / (100 + $this->get_vat());
         }
-
-        return \OxidEsales\Eshop\Core\Registry::getUtils()->fRound($dVatValue);
+        return \Oxid_Esales\Eshop\Core\Registry::get_utils()->f_round($d_vat_value);
     }
-
     /**
      * Subtracts given percent from price depending  on price entering mode,
      * and recalculates price
      *
      * @param double $dValue percent to subtract from price
      */
-    public function subtractPercent($dValue): void
+    public function subtract_percent($d_value): void
     {
-        $dPrice = $this->getPrice();
-        $this->setPrice($dPrice - self::percent($dPrice, $dValue));
+        $d_price = $this->get_price();
+        $this->set_price($d_price - self::percent($d_price, $d_value));
     }
-
     /**
      * Adds given percent to price depending  on price entering mode,
      * and recalculates price
      *
      * @param double $dValue percent to add to price
      */
-    public function addPercent($dValue): void
+    public function add_percent($d_value): void
     {
-        $this->subtractPercent(-$dValue);
+        $this->subtract_percent(-$d_value);
     }
-
     /**
      * Adds another oxPrice object and recalculates current method.
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice object
      */
-    public function addPrice(\OxidEsales\Eshop\Core\Price $oPrice): void
+    public function add_price(\Oxid_Esales\Eshop\Core\Price $o_price): void
     {
-        if ($this->isNettoMode()) {
-            $this->add($oPrice->getNettoPrice());
+        if ($this->is_netto_mode()) {
+            $this->add($o_price->get_netto_price());
         } else {
-            $this->add($oPrice->getBruttoPrice());
+            $this->add($o_price->get_brutto_price());
         }
     }
-
     /**
      * Adds given value to price depending  on price entering mode,
      * and recalculates price
      *
      * @param double $dValue value to add to price
      */
-    public function add($dValue): void
+    public function add($d_value): void
     {
-        $dPrice = $this->getPrice();
-        $this->setPrice($dPrice + $dValue);
+        $d_price = $this->get_price();
+        $this->set_price($d_price + $d_value);
     }
-
     /**
      * Subtracts given value from price depending  on price entering mode,
      * and recalculates price
      *
      * @param double $dValue value to subtracts from price
      */
-    public function subtract($dValue): void
+    public function subtract($d_value): void
     {
-        $this->add(-$dValue);
+        $this->add(-$d_value);
     }
-
     /**
      * Multiplies price by given value depending on price entering mode,
      * and recalculates price
      *
      * @param double $dValue value for multiplying price
      */
-    public function multiply($dValue): void
+    public function multiply($d_value): void
     {
-        $dPrice = $this->getPrice();
-        $this->setPrice($dPrice * $dValue);
+        $d_price = $this->get_price();
+        $this->set_price($d_price * $d_value);
     }
-
     /**
      * Divides price by given value depending on price entering mode,
      * and recalculates price
      *
      * @param double $dValue value for dividing price
      */
-    public function divide($dValue): void
+    public function divide($d_value): void
     {
-        $dPrice = $this->getPrice();
-        $this->setPrice($dPrice / $dValue);
+        $d_price = $this->get_price();
+        $this->set_price($d_price / $d_value);
     }
-
     /**
      * Compares this object to another oxPrice objects. Comparison is performed on brutto price.
      * Result is equal to:
@@ -310,33 +280,29 @@ class Price
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice price object
      */
-    public function compare(\OxidEsales\Eshop\Core\Price $oPrice): int
+    public function compare(\Oxid_Esales\Eshop\Core\Price $o_price): int
     {
-        $dBruttoPrice1 = $this->getBruttoPrice();
-        $dBruttoPrice2 = $oPrice->getBruttoPrice();
-
-        if ($dBruttoPrice1 == $dBruttoPrice2) {
-            $iRes = 0;
-        } elseif ($dBruttoPrice1 > $dBruttoPrice2) {
-            $iRes = 1;
+        $d_brutto_price1 = $this->get_brutto_price();
+        $d_brutto_price2 = $o_price->get_brutto_price();
+        if ($d_brutto_price1 == $d_brutto_price2) {
+            $i_res = 0;
+        } elseif ($d_brutto_price1 > $d_brutto_price2) {
+            $i_res = 1;
         } else {
-            $iRes = -1;
+            $i_res = -1;
         }
-
-        return $iRes;
+        return $i_res;
     }
-
     /**
      * Private function for percent value calculations
      *
      * @param double $dValue   value
      * @param double $dPercent percent
      */
-    public static function percent($dValue, $dPercent): float
+    public static function percent($d_value, $d_percent): float
     {
-        return ((float) $dValue * (float) $dPercent) / 100.0;
+        return (float) $d_value * (float) $d_percent / 100.0;
     }
-
     /**
      * Converts Brutto price to Netto using formula:
      * X + $dVat% = $dBrutto
@@ -349,17 +315,15 @@ class Price
      *
      * @return double
      */
-    public static function brutto2Netto($dBrutto, $dVat): int|float
+    public static function brutto2Netto($d_brutto, $d_vat): int|float
     {
         // if VAT = -100% Return 0 because we subtract all what we have.
         // made to avoid division by zero in formula.
-        if ($dVat == -100) {
+        if ($d_vat == -100) {
             return 0;
         }
-
-        return (float) $dBrutto * 100.0 / (100.0 + (float) $dVat);
+        return (float) $d_brutto * 100.0 / (100.0 + (float) $d_vat);
     }
-
     /**
      * Converts Netto price to Brutto using formula:
      * X = $dNetto + $dVat%
@@ -368,75 +332,67 @@ class Price
      * @param float $dNetto netto price
      * @param float $dVat   vat
      */
-    public static function netto2Brutto($dNetto, $dVat): float
+    public static function netto2Brutto($d_netto, $d_vat): float
     {
-        return (float) $dNetto + self::percent($dNetto, $dVat);
+        return (float) $d_netto + self::percent($d_netto, $d_vat);
     }
-
     /**
      * Returns price multiplied by current currency
      *
      * @param string $dPrice price value
      */
-    public static function getPriceInActCurrency($dPrice): float
+    public static function get_price_in_act_currency($d_price): float
     {
-        $oCur = \OxidEsales\Eshop\Core\Registry::getConfig()->getActShopCurrencyObject();
-
-        return ((float) $dPrice) * $oCur->rate;
+        $o_cur = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_act_shop_currency_object();
+        return (float) $d_price * $o_cur->rate;
     }
-
     /**
      * Sets discount to price
      *
      * @param double $dValue discount value
      * @param string $sType  discount type: abs or %
      */
-    public function setDiscount($dValue, $sType): void
+    public function set_discount($d_value, $s_type): void
     {
-        $this->_aDiscounts[] = ['value' => $dValue, 'type' => $sType];
+        $this->_a_discounts[] = ['value' => $d_value, 'type' => $s_type];
     }
-
     /**
      * Returns assigned discounts
      *
      * @return array
      */
-    public function getDiscounts()
+    public function get_discounts()
     {
-        return $this->_aDiscounts;
+        return $this->_a_discounts;
     }
-
     /**
      * Flush assigned discounts
      */
-    protected function flushDiscounts()
+    protected function flush_discounts()
     {
-        $this->_aDiscounts = null;
+        $this->_a_discounts = null;
     }
-
     /**
      * Calculates price: affects discounts
      */
-    public function calculateDiscount(): void
+    public function calculate_discount(): void
     {
-        $dPrice = $this->getPrice();
-        $aDiscounts = $this->getDiscounts();
-
-        if ($aDiscounts) {
-            foreach ($aDiscounts as $aDiscount) {
-                if ($aDiscount['type'] == 'abs') {
-                    $dPrice = $dPrice - $aDiscount['value'];
+        $d_price = $this->get_price();
+        $a_discounts = $this->get_discounts();
+        if ($a_discounts) {
+            foreach ($a_discounts as $a_discount) {
+                if ($a_discount['type'] == 'abs') {
+                    $d_price = $d_price - $a_discount['value'];
                 } else {
-                    $dPrice = $dPrice * (100 - $aDiscount['value']) / 100;
+                    $d_price = $d_price * (100 - $a_discount['value']) / 100;
                 }
             }
-            if ($dPrice < 0) {
-                $this->setPrice(0);
+            if ($d_price < 0) {
+                $this->set_price(0);
             } else {
-                $this->setPrice($dPrice);
+                $this->set_price($d_price);
             }
-
-            $this->flushDiscounts();
+            $this->flush_discounts();
         }
     }
 }

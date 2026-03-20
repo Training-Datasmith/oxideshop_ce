@@ -4,17 +4,14 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\RateLimiter;
-
-use Symfony\Component\HttpFoundation\Request;
-
-readonly class ClientIdentifierProvider implements ClientIdentifierProviderInterface
+use Symfony\Component\Http_Foundation\Request;
+readonly class Client_Identifier_Provider implements Client_Identifier_Provider_Interface
 {
-    public function getClientIdentifier(Request $request): string
+    public function get_client_identifier(Request $request): string
     {
-        return $request->getClientIp() ?? 'unknown';
+        return $request->get_client_ip() ?? 'unknown';
     }
 }

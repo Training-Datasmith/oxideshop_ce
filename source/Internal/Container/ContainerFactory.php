@@ -4,99 +4,85 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Container;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Container;
-
-use OxidEsales\Eshop\Core\ShopIdCalculator;
-use OxidEsales\Eshop\Core\UtilsServer;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\ContainerBuilder;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service\ContainerCacheInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service\FilesystemContainerCache;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
-use Psr\Container\ContainerInterface;
+use Oxid_Esales\Eshop\Core\Shop_Id_Calculator;
+use Oxid_Esales\Eshop\Core\Utils_Server;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Container_Builder;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Service\Container_Cache_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Service\Filesystem_Container_Cache;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context;
+use Psr\Container\Container_Interface;
 use Symfony\Component\Filesystem\Filesystem;
-
 /**
  * @deprecated use OxidEsales\EshopCommunity\Core\Di\ContainerFacade
  */
-class ContainerFactory implements ContainerProviderInterface
+class Container_Factory implements Container_Provider_Interface
 {
-    private static ?\OxidEsales\EshopCommunity\Internal\Container\ContainerFactory $instance = null;
-    private ContainerInterface $symfonyContainer;
-    private readonly ContainerCacheInterface $cache;
-    private static ?int $shopId;
-
+    private static ?\Oxid_Esales\Eshop_Community\Internal\Container\Container_Factory $instance = null;
+    private Container_Interface $symfony_container;
+    private readonly Container_Cache_Interface $cache;
+    private static ?int $shop_id;
     /**
      * The constructor's private to make class a singleton
      */
     private function __construct()
     {
-        $this->cache = new FilesystemContainerCache(new BasicContext(), new Filesystem());
+        $this->cache = new Filesystem_Container_Cache(new Basic_Context(), new Filesystem());
     }
-
-    public static function get(): ContainerInterface
+    public static function get(): Container_Interface
     {
-        return self::getInstance()->getContainer();
+        return self::get_instance()->get_container();
     }
-
-    public function getContainer(): ContainerInterface
+    public function get_container(): Container_Interface
     {
-        $customContainerProvider = getenv('OXID_CONTAINER_PROVIDER');
-        if ($customContainerProvider) {
-            return $customContainerProvider::get();
+        $custom_container_provider = getenv('OXID_CONTAINER_PROVIDER');
+        if ($custom_container_provider) {
+            return $custom_container_provider::get();
         }
-
-        if (!isset($this->symfonyContainer)) {
-            $this->initializeContainer();
+        if (!isset($this->symfony_container)) {
+            $this->initialize_container();
         }
-
-        return $this->symfonyContainer;
+        return $this->symfony_container;
     }
-
-    private function initializeContainer(): void
+    private function initialize_container(): void
     {
-        if ($this->cache->exists(self::getShopId())) {
-            $this->symfonyContainer = $this->cache->get(self::getShopId());
+        if ($this->cache->exists(self::get_shop_id())) {
+            $this->symfony_container = $this->cache->get(self::get_shop_id());
         } else {
-            $this->compileSymfonyContainer();
-            $this->cache->put($this->symfonyContainer, self::getShopId());
+            $this->compile_symfony_container();
+            $this->cache->put($this->symfony_container, self::get_shop_id());
         }
     }
-
-    private function compileSymfonyContainer(): void
+    private function compile_symfony_container(): void
     {
-        $containerBuilder = new ContainerBuilder(new BasicContext(), self::getShopId());
-        $this->symfonyContainer = $containerBuilder->getContainer();
-        $this->symfonyContainer->compile(true);
+        $container_builder = new Container_Builder(new Basic_Context(), self::get_shop_id());
+        $this->symfony_container = $container_builder->get_container();
+        $this->symfony_container->compile(true);
     }
-
-    public static function getInstance(): ContainerFactory
+    public static function get_instance(): Container_Factory
     {
         if (self::$instance === null) {
-            self::$instance = new ContainerFactory();
+            self::$instance = new Container_Factory();
         }
         return self::$instance;
     }
-
-    public static function resetContainer(): void
+    public static function reset_container(): void
     {
-        $customContainerProvider = getenv('OXID_CONTAINER_PROVIDER');
-        if ($customContainerProvider) {
-            $customContainerProvider::resetContainer();
+        $custom_container_provider = getenv('OXID_CONTAINER_PROVIDER');
+        if ($custom_container_provider) {
+            $custom_container_provider::reset_container();
         }
-
-        self::$shopId = null;
-        self::getInstance()->cache->invalidate(self::getShopId());
+        self::$shop_id = null;
+        self::get_instance()->cache->invalidate(self::get_shop_id());
         self::$instance = null;
     }
-
-    private static function getShopId(): int
+    private static function get_shop_id(): int
     {
-        if (!isset(self::$shopId)) {
-            self::$shopId = (new ShopIdCalculator(new UtilsServer()))->getShopId();
+        if (!isset(self::$shop_id)) {
+            self::$shop_id = (new Shop_Id_Calculator(new Utils_Server()))->get_shop_id();
         }
-        return self::$shopId;
+        return self::$shop_id;
     }
 }

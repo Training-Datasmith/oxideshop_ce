@@ -1,66 +1,57 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Content manager.
  * Base object for content pages
  */
-class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class Content extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model implements \Oxid_Esales\Eshop\Core\Contract\I_Url
 {
     /**
      * Current class name.
      *
      * @var string
      */
-    protected $_sClassName = 'oxcontent';
-
+    protected $_s_class_name = 'oxcontent';
     /**
      * Seo article urls for languages.
      *
      * @var array
      */
-    protected $_aSeoUrls = [];
-
+    protected $_a_seo_urls = [];
     /**
      * Content parent category id
      *
      * @var string
      */
-    protected $_sParentCatId;
-
+    protected $_s_parent_cat_id;
     /**
      * Expanded state of a content category.
      *
      * @var bool
      */
-    protected $_blExpanded;
-
+    protected $_bl_expanded;
     /**
      * Marks that current object is managed by SEO.
      *
      * @var bool
      */
-    protected $_blIsSeoObject = true;
-
+    protected $_bl_is_seo_object = true;
     /**
      * Category id.
      *
      * @var string
      */
-    protected $_sCategoryId;
-
+    protected $_s_category_id;
     /**
      * Extra getter to guarantee compatibility with templates.
      *
@@ -68,14 +59,13 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return mixed
      */
-    public function __get($sName)
+    public function __get($s_name)
     {
-        return match ($sName) {
-            'expanded' => $this->getExpanded(),
-            default => parent::__get($sName),
+        return match ($s_name) {
+            'expanded' => $this->get_expanded(),
+            default => parent::__get($s_name),
         };
     }
-
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
      */
@@ -84,41 +74,36 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
         parent::__construct();
         $this->init('oxcontents');
     }
-
     /**
      * Returns the expanded state of the content category.
      *
      * @return bool
      */
-    public function getExpanded()
+    public function get_expanded()
     {
-        if (!isset($this->_blExpanded)) {
-            $this->_blExpanded = ($this->getId() == Registry::getRequest()->getRequestEscapedParameter('oxcid'));
+        if (!isset($this->_bl_expanded)) {
+            $this->_bl_expanded = $this->get_id() == Registry::get_request()->get_request_escaped_parameter('oxcid');
         }
-
-        return $this->_blExpanded;
+        return $this->_bl_expanded;
     }
-
     /**
      * Sets category id.
      *
      * @param string $sCategoryId
      */
-    public function setCategoryId($sCategoryId): void
+    public function set_category_id($s_category_id): void
     {
-        $this->oxcontents__oxcatid = new Field($sCategoryId);
+        $this->oxcontents__oxcatid = new Field($s_category_id);
     }
-
     /**
      * Returns category id.
      *
      * @return string
      */
-    public function getCategoryId()
+    public function get_category_id()
     {
         return $this->oxcontents__oxcatid->value;
     }
-
     /**
      * Get data from db.
      *
@@ -126,37 +111,30 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return array
      */
-    protected function loadFromDb($sLoadId)
+    protected function load_from_db($s_load_id)
     {
-        $sTable = $this->getViewName();
-        $sShopId = $this->getShopId();
-        $aParams = [$sTable . '.oxloadid' => $sLoadId, $sTable . '.oxshopid' => $sShopId];
-
-        $sSelect = $this->buildSelectString($aParams);
-
+        $s_table = $this->get_view_name();
+        $s_shop_id = $this->get_shop_id();
+        $a_params = [$s_table . '.oxloadid' => $s_load_id, $s_table . '.oxshopid' => $s_shop_id];
+        $s_select = $this->build_select_string($a_params);
         //Loads "credits" content object and its text (first available)
-        if ($sLoadId == 'oxcredits') {
+        if ($s_load_id == 'oxcredits') {
             // fetching column names
-            $sColQ = "SHOW COLUMNS FROM oxcontents WHERE field LIKE  'oxcontent%'";
-            $aCols = DatabaseProvider::getDb()->getAll($sColQ);
-
+            $s_col_q = "SHOW COLUMNS FROM oxcontents WHERE field LIKE  'oxcontent%'";
+            $a_cols = Database_Provider::get_db()->get_all($s_col_q);
             // building subquery
-            $sPattern = "IF ( %s != '', %s, %s ) ";
-            $iCount = count($aCols) - 1;
-
-            $sContQ = "SELECT {$sPattern}";
-            foreach ($aCols as $iKey => $aCol) {
-                $sContQ = sprintf($sContQ, $aCol[0], $aCol[0], $iCount != $iKey ? $sPattern : "''");
+            $s_pattern = "IF ( %s != '', %s, %s ) ";
+            $i_count = count($a_cols) - 1;
+            $s_cont_q = "SELECT {$s_pattern}";
+            foreach ($a_cols as $i_key => $a_col) {
+                $s_cont_q = sprintf($s_cont_q, $a_col[0], $a_col[0], $i_count != $i_key ? $s_pattern : "''");
             }
-            $sContQ .= " FROM oxcontents WHERE oxloadid = '{$sLoadId}' AND oxshopid = '{$sShopId}'";
-
-            $sSelect = $this->buildSelectString($aParams);
-            $sSelect = str_replace("`{$sTable}`.`oxcontent`", "( $sContQ ) as oxcontent", $sSelect);
+            $s_cont_q .= " FROM oxcontents WHERE oxloadid = '{$s_load_id}' AND oxshopid = '{$s_shop_id}'";
+            $s_select = $this->build_select_string($a_params);
+            $s_select = str_replace("`{$s_table}`.`oxcontent`", "( {$s_cont_q} ) as oxcontent", $s_select);
         }
-
-        return DatabaseProvider::getDb()->getRow($sSelect);
+        return Database_Provider::get_db()->get_row($s_select);
     }
-
     /**
      * Loads Content by using field oxloadid instead of oxid.
      *
@@ -165,11 +143,10 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return bool
      */
-    public function loadByIdent($loadId, $onlyActive = false)
+    public function load_by_ident($load_id, $only_active = false)
     {
-        return $this->assignContentData($this->loadFromDb($loadId), $onlyActive);
+        return $this->assign_content_data($this->load_from_db($load_id), $only_active);
     }
-
     /**
      * Assign content data, filter inactive if needed.
      *
@@ -178,18 +155,15 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return bool
      */
-    protected function assignContentData($fetchedContent, $onlyActive = false)
+    protected function assign_content_data($fetched_content, $only_active = false)
     {
-        $filteredContent = $this->filterInactive($fetchedContent, $onlyActive);
-
-        if (!is_null($filteredContent)) {
-            $this->assign($filteredContent);
+        $filtered_content = $this->filter_inactive($fetched_content, $only_active);
+        if (!is_null($filtered_content)) {
+            $this->assign($filtered_content);
             return true;
         }
-
         return false;
     }
-
     /**
      * Decide if content item can be loaded by checking item activity if needed
      *
@@ -198,49 +172,41 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return array|null
      */
-    protected function filterInactive($data, $checkIfActive = false)
+    protected function filter_inactive($data, $check_if_active = false)
     {
-        return $data && (!$checkIfActive || ($checkIfActive && $data['OXACTIVE']) == '1') ? $data : null;
+        return $data && (!$check_if_active || ($check_if_active && $data['OXACTIVE']) == '1') ? $data : null;
     }
-
     /**
      * Returns unique object id.
      *
      * @return string
      */
-    public function getLoadId()
+    public function get_load_id()
     {
         return $this->oxcontents__oxloadid->value;
     }
-
     /**
      * Returns unique object id.
      *
      * @return string
      */
-    public function isActive()
+    public function is_active()
     {
         return $this->oxcontents__oxactive->value;
     }
-
     /**
      * Replace the "&amp;" into "&" and call base class.
      *
      * @param array $dbRecord database record
      */
-    public function assign($dbRecord): void
+    public function assign($db_record): void
     {
-        parent::assign($dbRecord);
+        parent::assign($db_record);
         // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
-
         if ($this->oxcontents__oxcontent) {
-            $this->oxcontents__oxcontent->setValue(
-                str_replace('&lang=', '&amp;lang=', $this->oxcontents__oxcontent->value),
-                Field::T_RAW
-            );
+            $this->oxcontents__oxcontent->set_value(str_replace('&lang=', '&amp;lang=', $this->oxcontents__oxcontent->value), Field::T_RAW);
         }
     }
-
     /**
      * Returns raw content seo url
      *
@@ -248,12 +214,10 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return string
      */
-    public function getBaseSeoLink($iLang)
+    public function get_base_seo_link($i_lang)
     {
-        return Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class)
-            ->getContentUrl($this, $iLang);
+        return Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Content::class)->get_content_url($this, $i_lang);
     }
-
     /**
      * getLink returns link for this content in the frontend.
      *
@@ -261,23 +225,19 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function get_link($i_lang = null)
     {
-        if (!Registry::getUtils()->seoIsActive()) {
-            return $this->getStdLink($iLang);
+        if (!Registry::get_utils()->seo_is_active()) {
+            return $this->get_std_link($i_lang);
         }
-
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        if (!isset($this->_aSeoUrls[$iLang])) {
-            $this->_aSeoUrls[$iLang] = $this->getBaseSeoLink($iLang);
+        if (!isset($this->_a_seo_urls[$i_lang])) {
+            $this->_a_seo_urls[$i_lang] = $this->get_base_seo_link($i_lang);
         }
-
-        return $this->_aSeoUrls[$iLang];
+        return $this->_a_seo_urls[$i_lang];
     }
-
     /**
      * Returns base dynamic url: shopurl/index.php?cl=details
      *
@@ -287,50 +247,39 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return string
      */
-    public function getBaseStdLink($iLang, $blAddId = true, $blFull = true)
+    public function get_base_std_link($i_lang, $bl_add_id = true, $bl_full = true)
     {
-        $sUrl = '';
-        if ($blFull) {
+        $s_url = '';
+        if ($bl_full) {
             //always returns shop url, not admin
-            $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
+            $s_url = Registry::get_config()->get_shop_url($i_lang, false);
         }
-
         if ($this->oxcontents__oxloadid->value === 'oxcredits') {
-            $sUrl .= 'index.php?cl=credits';
+            $s_url .= 'index.php?cl=credits';
         } else {
-            $sUrl .= 'index.php?cl=content';
+            $s_url .= 'index.php?cl=content';
         }
-        $sUrl .= '&amp;oxloadid=' . $this->getLoadId();
-
-        if ($blAddId) {
-            $sUrl .= '&amp;oxcid=' . $this->getId();
+        $s_url .= '&amp;oxloadid=' . $this->get_load_id();
+        if ($bl_add_id) {
+            $s_url .= '&amp;oxcid=' . $this->get_id();
             // adding parent category if if available
-            if (
-                $this->_sParentCatId !== false
-                && $this->oxcontents__oxcatid->value
-                && $this->oxcontents__oxcatid->value != 'oxrootid'
-            ) {
-                if ($this->_sParentCatId === null) {
-                    $this->_sParentCatId = false;
-                    $oDb = DatabaseProvider::getDb();
-                    $sParentId = $oDb->getOne('select oxparentid from oxcategories where oxid = :oxid', [
-                        'oxid' => $this->oxcontents__oxcatid->value,
-                    ]);
-                    if ($sParentId && 'oxrootid' != $sParentId) {
-                        $this->_sParentCatId = $sParentId;
+            if ($this->_s_parent_cat_id !== false && $this->oxcontents__oxcatid->value && $this->oxcontents__oxcatid->value != 'oxrootid') {
+                if ($this->_s_parent_cat_id === null) {
+                    $this->_s_parent_cat_id = false;
+                    $o_db = Database_Provider::get_db();
+                    $s_parent_id = $o_db->get_one('select oxparentid from oxcategories where oxid = :oxid', ['oxid' => $this->oxcontents__oxcatid->value]);
+                    if ($s_parent_id && 'oxrootid' != $s_parent_id) {
+                        $this->_s_parent_cat_id = $s_parent_id;
                     }
                 }
-
-                if ($this->_sParentCatId) {
-                    $sUrl .= '&amp;cnid=' . $this->_sParentCatId;
+                if ($this->_s_parent_cat_id) {
+                    $s_url .= '&amp;cnid=' . $this->_s_parent_cat_id;
                 }
             }
         }
-
         //always returns shop url, not admin
-        return $sUrl;
+        return $s_url;
     }
-
     /**
      * Returns standard URL to product.
      *
@@ -339,15 +288,13 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return string
      */
-    public function getStdLink($iLang = null, $aParams = [])
+    public function get_std_link($i_lang = null, $a_params = [])
     {
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        return Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
+        return Registry::get_utils_url()->process_url($this->get_base_std_link($i_lang), true, $a_params, $i_lang);
     }
-
     /**
      * Sets data field value.
      *
@@ -355,16 +302,14 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      */
-    protected function setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT)
+    protected function set_field_data($s_field_name, $s_value, $i_data_type = Field::T_TEXT)
     {
-        $sLoweredFieldName = strtolower($sFieldName);
-        if ('oxcontent' === $sLoweredFieldName || 'oxcontents__oxcontent' === $sLoweredFieldName) {
-            $iDataType = Field::T_RAW;
+        $s_lowered_field_name = strtolower($s_field_name);
+        if ('oxcontent' === $s_lowered_field_name || 'oxcontents__oxcontent' === $s_lowered_field_name) {
+            $i_data_type = Field::T_RAW;
         }
-
-        return parent::setFieldData($sFieldName, $sValue, $iDataType);
+        return parent::set_field_data($s_field_name, $s_value, $i_data_type);
     }
-
     /**
      * Delete this object from the database, returns true on success.
      *
@@ -372,21 +317,17 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      *
      * @return bool
      */
-    public function delete($sOXID = null)
+    public function delete($s_oxid = null)
     {
-        if (!$sOXID) {
-            $sOXID = $this->getId();
+        if (!$s_oxid) {
+            $s_oxid = $this->get_id();
         }
-
-        if (parent::delete($sOXID)) {
-            Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class)->onDeleteContent($sOXID);
-
+        if (parent::delete($s_oxid)) {
+            Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Content::class)->on_delete_content($s_oxid);
             return true;
         }
-
         return false;
     }
-
     /**
      * Save this Object to database, insert or update as needed.
      *
@@ -394,74 +335,61 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      */
     public function save()
     {
-        $blSaved = parent::save();
-        if ($blSaved && $this->getFieldData('oxloadid') === 'oxagb') {
-            $sShopId = Registry::getConfig()->getShopId();
-            $sVersion = $this->oxcontents__oxtermversion->value;
-
-            $oDb = DatabaseProvider::getDb();
+        $bl_saved = parent::save();
+        if ($bl_saved && $this->get_field_data('oxloadid') === 'oxagb') {
+            $s_shop_id = Registry::get_config()->get_shop_id();
+            $s_version = $this->oxcontents__oxtermversion->value;
+            $o_db = Database_Provider::get_db();
             // dropping expired..
-            $oDb->execute(
-                'delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion',
-                [
-                    'oxshopid' => $sShopId,
-                    'notoxtermversion' => $sVersion,
-                ]
-            );
+            $o_db->execute('delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion', ['oxshopid' => $s_shop_id, 'notoxtermversion' => $s_version]);
         }
-
-        return $blSaved;
+        return $bl_saved;
     }
-
     /**
      * Returns latest terms version id.
      *
      * @return string
      */
-    public function getTermsVersion()
+    public function get_terms_version()
     {
-        if ($this->loadByIdent('oxagb')) {
+        if ($this->load_by_ident('oxagb')) {
             return $this->oxcontents__oxtermversion->value;
         }
     }
-
     /**
      * Set type of content.
      *
      * @param string $sValue type value
      */
-    public function setType($sValue): void
+    public function set_type($s_value): void
     {
-        $this->setFieldData('oxcontents__oxtype', $sValue);
+        $this->set_field_data('oxcontents__oxtype', $s_value);
     }
-
     /**
      * Return type of content
      *
      * @return integer
      */
-    public function getType()
+    public function get_type()
     {
-        return (int) $this->getFieldData('oxcontents__oxtype');
+        return (int) $this->get_field_data('oxcontents__oxtype');
     }
-
     /**
      * Set title of content
      *
      * @param string $sValue title value
      */
-    public function setTitle($sValue): void
+    public function set_title($s_value): void
     {
-        $this->setFieldData('oxcontents__oxtitle', $sValue);
+        $this->set_field_data('oxcontents__oxtitle', $s_value);
     }
-
     /**
      * Return title of content
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        return (string) $this->getFieldData('oxcontents__oxtitle');
+        return (string) $this->get_field_data('oxcontents__oxtitle');
     }
 }

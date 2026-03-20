@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use SimpleXMLElement;
-
+use Simple_Xml_Element;
 /**
  * Parses objects to XML and XML to simple XML objects.
  *
@@ -32,7 +29,7 @@ use SimpleXMLElement;
  * <?xml version="1.0" encoding="utf-8"?>
  * <testXml><title>TestTitle</title><keys><key>testKey1</key><key>testKey2</key></keys></testXml>
  */
-class SimpleXml
+class Simple_Xml
 {
     /**
      * Parses object structure to XML string
@@ -42,14 +39,12 @@ class SimpleXml
      *
      * @return string
      */
-    public function objectToXml($oInput, $sDocument): string|false
+    public function object_to_xml($o_input, $s_document): string|false
     {
-        $oXml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"utf-8\"?><$sDocument/>");
-        $this->addSimpleXmlElement($oXml, $oInput);
-
-        return $oXml->asXml();
+        $o_xml = new Simple_Xml_Element("<?xml version=\"1.0\" encoding=\"utf-8\"?><{$s_document}/>");
+        $this->add_simple_xml_element($o_xml, $o_input);
+        return $o_xml->as_xml();
     }
-
     /**
      * Parses XML string into object structure
      *
@@ -57,11 +52,10 @@ class SimpleXml
      *
      * @return SimpleXMLElement
      */
-    public function xmlToObject($sXml): \SimpleXMLElement|false
+    public function xml_to_object($s_xml): \Simple_Xml_Element|false
     {
-        return simplexml_load_string($sXml);
+        return simplexml_load_string($s_xml);
     }
-
     /**
      * Recursively adds $oInput object data to SimpleXMLElement structure
      *
@@ -71,17 +65,14 @@ class SimpleXml
      *
      * @return SimpleXMLElement
      */
-    protected function addSimpleXmlElement($oXml, $oInput, $sPreferredKey = null)
+    protected function add_simple_xml_element($o_xml, $o_input, $s_preferred_key = null)
     {
-        $aElements = is_object($oInput) ? get_object_vars($oInput) : (array) $oInput;
-
-        foreach ($aElements as $sKey => $mElement) {
-            $oXml = $this->addChildNode($oXml, $sKey, $mElement, $sPreferredKey);
+        $a_elements = is_object($o_input) ? get_object_vars($o_input) : (array) $o_input;
+        foreach ($a_elements as $s_key => $m_element) {
+            $o_xml = $this->add_child_node($o_xml, $s_key, $m_element, $s_preferred_key);
         }
-
-        return $oXml;
+        return $o_xml;
     }
-
     /**
      * Adds child node to given simple xml object.
      *
@@ -92,31 +83,29 @@ class SimpleXml
      *
      * @return SimpleXMLElement
      */
-    protected function addChildNode($oXml, $sKey, $mElement, $sPreferredKey = null)
+    protected function add_child_node($o_xml, $s_key, $m_element, $s_preferred_key = null)
     {
-        $aAttributes = [];
-        if (is_array($mElement) && array_key_exists('attributes', $mElement) && is_array($mElement['attributes'])) {
-            $aAttributes = $mElement['attributes'];
-            $mElement = $mElement['value'];
+        $a_attributes = [];
+        if (is_array($m_element) && array_key_exists('attributes', $m_element) && is_array($m_element['attributes'])) {
+            $a_attributes = $m_element['attributes'];
+            $m_element = $m_element['value'];
         }
-
-        if (is_object($mElement) || is_array($mElement)) {
-            if (is_array($mElement) && is_int(key($mElement))) {
-                $this->addSimpleXmlElement($oXml, $mElement, $sKey);
+        if (is_object($m_element) || is_array($m_element)) {
+            if (is_array($m_element) && is_int(key($m_element))) {
+                $this->add_simple_xml_element($o_xml, $m_element, $s_key);
             } else {
-                $oChildNode = $oXml->addChild($sPreferredKey ?: $sKey);
-                $this->addNodeAttributes($oChildNode, $aAttributes);
-                $this->addSimpleXmlElement($oChildNode, $mElement);
+                $o_child_node = $o_xml->add_child($s_preferred_key ?: $s_key);
+                $this->add_node_attributes($o_child_node, $a_attributes);
+                $this->add_simple_xml_element($o_child_node, $m_element);
             }
         } else {
-            $oChildNode = $oXml->addChild($sPreferredKey ?: $sKey);
-            $oChildNode[0] = $mElement; // $oChildNode[0] is the inner text-node
-            $this->addNodeAttributes($oChildNode, $aAttributes);
+            $o_child_node = $o_xml->add_child($s_preferred_key ?: $s_key);
+            $o_child_node[0] = $m_element;
+            // $oChildNode[0] is the inner text-node
+            $this->add_node_attributes($o_child_node, $a_attributes);
         }
-
-        return $oXml;
+        return $o_xml;
     }
-
     /**
      * Adds attributes to given node.
      *
@@ -125,13 +114,12 @@ class SimpleXml
      *
      * @return SimpleXMLElement
      */
-    protected function addNodeAttributes($oNode, $aAttributes)
+    protected function add_node_attributes($o_node, $a_attributes)
     {
-        $aAttributes = (array) $aAttributes;
-        foreach ($aAttributes as $sKey => $sValue) {
-            $oNode->addAttribute($sKey, $sValue);
+        $a_attributes = (array) $a_attributes;
+        foreach ($a_attributes as $s_key => $s_value) {
+            $o_node->add_attribute($s_key, $s_value);
         }
-
-        return $oNode;
+        return $o_node;
     }
 }

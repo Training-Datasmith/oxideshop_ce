@@ -4,17 +4,14 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Converter\MetaDataConverterInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\InvalidMetaDataException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataValidatorInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-
-class MetaDataProvider implements MetaDataProviderInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Converter\Meta_Data_Converter_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Exception\Invalid_Meta_Data_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Validator\Meta_Data_Validator_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface;
+class Meta_Data_Provider implements Meta_Data_Provider_Interface
 {
     public const METADATA_ID = 'id';
     public const METADATA_METADATA_VERSION = 'metaDataVersion';
@@ -35,112 +32,84 @@ class MetaDataProvider implements MetaDataProviderInterface
      * @deprecated will be removed in v7.0
      */
     public const METADATA_FILEPATH = 'metaDataFilePath';
-
-    private string $filePath;
-
-    public function __construct(
-        private readonly MetaDataNormalizerInterface $metaDataNormalizer,
-        private readonly BasicContextInterface $context,
-        private readonly MetaDataValidatorInterface $metaDataValidatorService,
-        private readonly MetaDataConverterInterface $metaDataConverter
-    ) {
-    }
-
-    /**
-     * @throws InvalidMetaDataException
-     */
-    public function getData(string $filePath): array
+    private string $file_path;
+    public function __construct(private readonly Meta_Data_Normalizer_Interface $meta_data_normalizer, private readonly Basic_Context_Interface $context, private readonly Meta_Data_Validator_Interface $meta_data_validator_service, private readonly Meta_Data_Converter_Interface $meta_data_converter)
     {
-        if (!is_readable($filePath) || is_dir($filePath)) {
-            throw new \InvalidArgumentException('File ' . $filePath . ' is not readable or not even a file.');
-        }
-        $this->filePath = $filePath;
-        $normalizedMetaData = $this->getNormalizedMetaDataFileContent();
-
-        return $this->addFilePathToData($normalizedMetaData);
     }
-
     /**
      * @throws InvalidMetaDataException
      */
-    private function getNormalizedMetaDataFileContent(): array
+    public function get_data(string $file_path): array
+    {
+        if (!is_readable($file_path) || is_dir($file_path)) {
+            throw new \InvalidArgumentException('File ' . $file_path . ' is not readable or not even a file.');
+        }
+        $this->file_path = $file_path;
+        $normalized_meta_data = $this->get_normalized_meta_data_file_content();
+        return $this->add_file_path_to_data($normalized_meta_data);
+    }
+    /**
+     * @throws InvalidMetaDataException
+     */
+    private function get_normalized_meta_data_file_content(): array
     {
         /**
          * The following variables will be overwritten when the metadata file is included.
          */
-        $sMetadataVersion = null;
-        $aModule = null;
-        include $this->filePath;
-        $metadataVersion = $sMetadataVersion;
-        $moduleData = $aModule;
-
-        $this->validateMetaDataFileVariables($metadataVersion, $moduleData);
-        $this->metaDataValidatorService->validate($moduleData);
-        $moduleData = $this->metaDataConverter->convert($moduleData);
-        $normalizedMetaData = $this->metaDataNormalizer->normalizeData($moduleData);
-
-        if (isset($normalizedMetaData[static::METADATA_EXTEND])) {
-            $normalizedMetaData[static::METADATA_EXTEND] = $this->sanitizeExtendedClasses($normalizedMetaData);
+        $s_metadata_version = null;
+        $a_module = null;
+        include $this->file_path;
+        $metadata_version = $s_metadata_version;
+        $module_data = $a_module;
+        $this->validate_meta_data_file_variables($metadata_version, $module_data);
+        $this->meta_data_validator_service->validate($module_data);
+        $module_data = $this->meta_data_converter->convert($module_data);
+        $normalized_meta_data = $this->meta_data_normalizer->normalize_data($module_data);
+        if (isset($normalized_meta_data[static::METADATA_EXTEND])) {
+            $normalized_meta_data[static::METADATA_EXTEND] = $this->sanitize_extended_classes($normalized_meta_data);
         }
-
-        return [
-            static::METADATA_METADATA_VERSION => $metadataVersion,
-            static::METADATA_MODULE_DATA      => $normalizedMetaData,
-        ];
+        return [static::METADATA_METADATA_VERSION => $metadata_version, static::METADATA_MODULE_DATA => $normalized_meta_data];
     }
-
-    private function addFilePathToData(array $normalizedMetaData): array
+    private function add_file_path_to_data(array $normalized_meta_data): array
     {
-        $normalizedMetaData[static::METADATA_FILEPATH] = $this->filePath;
-
-        return $normalizedMetaData;
+        $normalized_meta_data[static::METADATA_FILEPATH] = $this->file_path;
+        return $normalized_meta_data;
     }
-
     /**
      * @param mixed $metaDataVersion
      * @param mixed $moduleData
      *
      * @throws InvalidMetaDataException
      */
-    private function validateMetaDataFileVariables($metaDataVersion, $moduleData): void
+    private function validate_meta_data_file_variables($meta_data_version, $module_data): void
     {
-        if ($metaDataVersion === null || !is_scalar($metaDataVersion)) {
-            throw new InvalidMetaDataException(
-                'The variable $sMetadataVersion must be present in '
-                . $this->filePath . ' and it must be a scalar.'
-            );
+        if ($meta_data_version === null || !is_scalar($meta_data_version)) {
+            throw new Invalid_Meta_Data_Exception('The variable $sMetadataVersion must be present in ' . $this->file_path . ' and it must be a scalar.');
         }
-        if ($moduleData === null || !\is_array($moduleData)) {
-            throw new InvalidMetaDataException(
-                'The variable $aModule must be present in '
-                . $this->filePath . ' and it must be an array'
-            );
+        if ($module_data === null || !\is_array($module_data)) {
+            throw new Invalid_Meta_Data_Exception('The variable $aModule must be present in ' . $this->file_path . ' and it must be an array');
         }
     }
-
-    private function sanitizeExtendedClasses(array $normalizedMetaData): array
+    private function sanitize_extended_classes(array $normalized_meta_data): array
     {
-        $sanitizedExtendedClasses = [];
-        $extendedClasses = $normalizedMetaData[static::METADATA_EXTEND] ?? [];
-        foreach ($extendedClasses as $shopClass => $moduleClass) {
-            if ($this->isBackwardsCompatibleClass($shopClass)) {
-                $sanitizedShopClass = $this->getBackwardsCompatibilityClassMap()[strtolower($shopClass)];
+        $sanitized_extended_classes = [];
+        $extended_classes = $normalized_meta_data[static::METADATA_EXTEND] ?? [];
+        foreach ($extended_classes as $shop_class => $module_class) {
+            if ($this->is_backwards_compatible_class($shop_class)) {
+                $sanitized_shop_class = $this->get_backwards_compatibility_class_map()[strtolower($shop_class)];
             } else {
-                $sanitizedShopClass = $shopClass;
+                $sanitized_shop_class = $shop_class;
             }
-            $sanitizedExtendedClasses[$sanitizedShopClass] = $moduleClass;
+            $sanitized_extended_classes[$sanitized_shop_class] = $module_class;
         }
-
-        return $sanitizedExtendedClasses;
+        return $sanitized_extended_classes;
     }
-
-    private function isBackwardsCompatibleClass(string $className): bool
+    private function is_backwards_compatible_class(string $class_name): bool
     {
-        return \array_key_exists(strtolower($className), $this->getBackwardsCompatibilityClassMap());
+        return \array_key_exists(strtolower($class_name), $this->get_backwards_compatibility_class_map());
     }
-
-    private function getBackwardsCompatibilityClassMap(): array
+    private function get_backwards_compatibility_class_map(): array
     {
-        return $this->context->getBackwardsCompatibilityClassMap();
+        return $this->context->get_backwards_compatibility_class_map();
     }
 }

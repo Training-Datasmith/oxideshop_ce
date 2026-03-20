@@ -4,27 +4,22 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating;
-
-class TemplateRendererBridge implements TemplateRendererBridgeInterface
+class Template_Renderer_Bridge implements Template_Renderer_Bridge_Interface
 {
-    public function __construct(private readonly TemplateRendererInterface $renderer)
+    public function __construct(private readonly Template_Renderer_Interface $renderer)
     {
     }
-
-    public function getTemplateRenderer(): TemplateRendererInterface
+    public function get_template_renderer(): Template_Renderer_Interface
     {
         return $this->renderer;
     }
-
-    public function setEngine($engine)
+    public function set_engine($engine)
     {
     }
-
-    public function getEngine()
+    public function get_engine()
     {
     }
 }

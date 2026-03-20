@@ -4,32 +4,26 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Form;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Form;
-
-interface FormInterface
+interface Form_Interface
 {
-    public function add(FormFieldInterface $field);
-
+    public function add(Form_Field_Interface $field);
     /**
      * @return array
      */
-    public function getFields();
-
+    public function get_fields();
     /**
      * @param array $request
      */
-    public function handleRequest($request);
-
+    public function handle_request($request);
     /**
      * @return bool
      */
-    public function isValid();
-
+    public function is_valid();
     /**
      * @return array
      */
-    public function getErrors();
+    public function get_errors();
 }

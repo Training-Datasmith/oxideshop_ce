@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Encrypt string with sha512 algorithm.
@@ -18,11 +16,10 @@ namespace OxidEsales\EshopCommunity\Core;
  *                                        password hashes. Therefor this class might not be
  *                                        compatible with the current passhword hash any more.
  */
-class Sha512Hasher extends \OxidEsales\Eshop\Core\Hasher
+class Sha512Hasher extends \Oxid_Esales\Eshop\Core\Hasher
 {
     /** Algorithm name. */
     public const HASHING_ALGORITHM_SHA512 = 'sha512';
-
     /**
      * Encrypt string.
      *

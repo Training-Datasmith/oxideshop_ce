@@ -1,24 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Collects System information.
  * Admin Menu: Service -> System Requirements.
  */
-class SystemRequirements extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class System_Requirements extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'sysreq';
+    protected $_s_this_template = 'sysreq';
 }

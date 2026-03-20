@@ -1,20 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Internal\Setup\Database;
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Database;
 
 use Doctrine\DBAL\Connection;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Configuration\DataObject\DatabaseConfiguration;
-
-interface SetupDbConnectionFactoryInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Configuration\Data_Object\Database_Configuration;
+interface Setup_Db_Connection_Factory_Interface
 {
-    public function getServerConnection(DatabaseConfiguration $databaseConfiguration): Connection;
-
-    public function getDatabaseConnection(DatabaseConfiguration $databaseConfiguration): Connection;
+    public function get_server_connection(Database_Configuration $database_configuration): Connection;
+    public function get_database_connection(Database_Configuration $database_configuration): Connection;
 }

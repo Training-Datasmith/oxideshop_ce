@@ -4,108 +4,87 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Database\Configuration\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Database\Configuration\DataObject;
-
-use Doctrine\DBAL\Tools\DsnParser;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Configuration\InvalidDatabaseConfigurationException;
-
-class DatabaseConfiguration
+use Doctrine\DBAL\Tools\Dsn_Parser;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Configuration\Invalid_Database_Configuration_Exception;
+class Database_Configuration
 {
-    private array $urlComponents;
-
+    private array $url_components;
     /**
      * List of URL schemes from a database URL and their mappings to driver.
      * @see \Doctrine\DBAL\DriverManager::$driverSchemeAliases
      */
-    private static array $driverSchemeAliases = [
+    private static array $driver_scheme_aliases = [
         'db2' => 'ibm_db2',
         'mssql' => 'pdo_sqlsrv',
         'mysql' => 'pdo_mysql',
-        'mysql2' => 'pdo_mysql', // Amazon RDS, for some weird reason
+        'mysql2' => 'pdo_mysql',
+        // Amazon RDS, for some weird reason
         'postgres' => 'pdo_pgsql',
         'postgresql' => 'pdo_pgsql',
         'pgsql' => 'pdo_pgsql',
         'sqlite' => 'pdo_sqlite',
         'sqlite3' => 'pdo_sqlite',
     ];
-
-    public function __construct(private readonly string $databaseUrl)
+    public function __construct(private readonly string $database_url)
     {
-        $this->urlComponents = (new DsnParser(self::$driverSchemeAliases))->parse($databaseUrl);
-        $this->validateRequiredUrlComponents();
+        $this->url_components = (new Dsn_Parser(self::$driver_scheme_aliases))->parse($database_url);
+        $this->validate_required_url_components();
     }
-
-    public function getDriver(): string
+    public function get_driver(): string
     {
-        return $this->urlComponents['driver'];
+        return $this->url_components['driver'];
     }
-
-    public function getDatabaseUrl(): string
+    public function get_database_url(): string
     {
-        return $this->databaseUrl;
+        return $this->database_url;
     }
-
-    public function getUser(): string
+    public function get_user(): string
     {
-        return $this->urlComponents['user'] ?? '';
+        return $this->url_components['user'] ?? '';
     }
-
-    public function getPass(): string
+    public function get_pass(): string
     {
-        return $this->urlComponents['password'] ?? '';
+        return $this->url_components['password'] ?? '';
     }
-
-    public function getHost(): string
+    public function get_host(): string
     {
-        return $this->urlComponents['host'];
+        return $this->url_components['host'];
     }
-
-    public function getPort(): int
+    public function get_port(): int
     {
-        return $this->urlComponents['port'] ?? 3306;
+        return $this->url_components['port'] ?? 3306;
     }
-
-    public function getName(): string
+    public function get_name(): string
     {
-        return $this->urlComponents['dbname'] ?? '';
+        return $this->url_components['dbname'] ?? '';
     }
-
-    public function getOptions(): array
+    public function get_options(): array
     {
-        return $this->urlComponents['driverOptions'] ?? [];
+        return $this->url_components['driverOptions'] ?? [];
     }
-
-    public function getCharset(): ?string
+    public function get_charset(): ?string
     {
-        return $this->urlComponents['charset'] ?? null;
+        return $this->url_components['charset'] ?? null;
     }
-
-    public function isSocketConnection(): bool
+    public function is_socket_connection(): bool
     {
-        return isset($this->urlComponents['socket']);
+        return isset($this->url_components['socket']);
     }
-
-    public function getSocket(): string
+    public function get_socket(): string
     {
-        return trim((string) $this->urlComponents['socket'], '()');
+        return trim((string) $this->url_components['socket'], '()');
     }
-
-    public function getConnectionParameters(): array
+    public function get_connection_parameters(): array
     {
-        return $this->urlComponents;
+        return $this->url_components;
     }
-
-    private function validateRequiredUrlComponents(): void
+    private function validate_required_url_components(): void
     {
-        if (
-            empty($this->urlComponents['host']) ||
-            !isset($this->urlComponents['driver']) ||
-            !in_array($this->urlComponents['driver'], self::$driverSchemeAliases, true)
-        ) {
-            throw new InvalidDatabaseConfigurationException('Provided database URL is not valid');
+        if (empty($this->url_components['host']) || !isset($this->url_components['driver']) || !in_array($this->url_components['driver'], self::$driver_scheme_aliases, true)) {
+            throw new Invalid_Database_Configuration_Exception('Provided database URL is not valid');
         }
     }
 }

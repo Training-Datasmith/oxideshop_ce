@@ -4,12 +4,10 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Exception;
-
-class EmptyProductMediaRoleException extends \InvalidArgumentException
+class Empty_Product_Media_Role_Exception extends \InvalidArgumentException
 {
     public function __construct()
     {

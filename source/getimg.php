@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
 /**
  * In case you need to extend current generator class:
  *   - create some alternative file;
@@ -24,9 +22,7 @@ declare(strict_types=1);
  *     include_once "oxdynimggenerator.php";
  *     class testImageGenerator extends oxdynimggenerator.php {...}
 */
-
 // including generator class
 require_once __DIR__ . '/bootstrap.php';
-
 // rendering requested image
-OxidEsales\EshopCommunity\Core\DynamicImageGenerator::getInstance()->outputImage();
+Oxid_Esales\Eshop_Community\Core\Dynamic_Image_Generator::get_instance()->output_image();

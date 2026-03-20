@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Online license check request class used as entity.
@@ -16,27 +14,25 @@ namespace OxidEsales\EshopCommunity\Core;
  *
  * @ignore   This class will not be included in documentation.
  */
-class OnlineLicenseCheckRequest extends \OxidEsales\Eshop\Core\OnlineRequest
+class Online_License_Check_Request extends \Oxid_Esales\Eshop\Core\Online_Request
 {
     /**
      * Web service protocol version.
      *
      * @var string
      */
-    public $pVersion = '1.1';
-
+    public $p_version = '1.1';
     /**
      * Serial keys.
      *
      * @var string
      */
     public $keys;
-
     /**
      * Product related specific information
      * like amount of sub shops and amount of admin users.
      *
      * @var object
      */
-    public $productSpecificInformation;
+    public $product_specific_information;
 }

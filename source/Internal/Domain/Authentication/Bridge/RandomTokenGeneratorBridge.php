@@ -4,29 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Generator\RandomTokenGeneratorInterface;
-
-class RandomTokenGeneratorBridge implements RandomTokenGeneratorBridgeInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Generator\Random_Token_Generator_Interface;
+class Random_Token_Generator_Bridge implements Random_Token_Generator_Bridge_Interface
 {
-    public function __construct(
-        private readonly RandomTokenGeneratorInterface $randomTokenGenerator
-    ) {
-    }
-
-    /** @inheritdoc */
-    public function getAlphanumericToken(int $length): string
+    public function __construct(private readonly Random_Token_Generator_Interface $random_token_generator)
     {
-        return $this->randomTokenGenerator->getAlphanumericToken($length);
     }
-
     /** @inheritdoc */
-    public function getHexToken(int $length): string
+    public function get_alphanumeric_token(int $length): string
     {
-        return $this->randomTokenGenerator->getHexToken($length);
+        return $this->random_token_generator->get_alphanumeric_token($length);
+    }
+    /** @inheritdoc */
+    public function get_hex_token(int $length): string
+    {
+        return $this->random_token_generator->get_hex_token($length);
     }
 }

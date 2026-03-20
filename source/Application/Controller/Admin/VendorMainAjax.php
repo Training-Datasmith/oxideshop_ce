@@ -1,34 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages vendor assignment to articles
  */
-class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Vendor_Main_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * If true extended column selection will be build
      *
      * @var bool
      */
-    protected $_blAllowExtColumns = true;
-
+    protected $_bl_allow_ext_columns = true;
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,       visible, multilanguage, ident
+    protected $_a_columns = ['container1' => [
+        // field , table,       visible, multilanguage, ident
         ['oxartnum', 'oxarticles', 1, 0, 0],
         ['oxtitle', 'oxarticles', 1, 1, 0],
         ['oxean', 'oxarticles', 1, 0, 0],
@@ -36,53 +33,38 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
         ['oxid', 'oxarticles', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxarticles', 0, 0, 1],
-                                 ],
-    ];
-
+    ], 'container2' => [['oxartnum', 'oxarticles', 1, 0, 0], ['oxtitle', 'oxarticles', 1, 1, 0], ['oxean', 'oxarticles', 1, 0, 0], ['oxmpn', 'oxarticles', 0, 0, 0], ['oxprice', 'oxarticles', 0, 0, 0], ['oxstock', 'oxarticles', 0, 0, 0], ['oxid', 'oxarticles', 0, 0, 1]]];
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
         // looking for table/view
-        $sArtTable = $this->getViewName('oxarticles');
-        $sO2CView = $this->getViewName('oxobject2category');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $sVendorId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchVendorId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $s_art_table = $this->get_view_name('oxarticles');
+        $s_o2c_view = $this->get_view_name('oxobject2category');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $o_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $s_vendor_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_synch_vendor_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // vendor selected or not ?
-        if (!$sVendorId) {
-            $sQAdd = ' from ' . $sArtTable . ' where ' . $sArtTable . '.oxshopid="' . $oConfig->getShopId() . '" and 1 ';
-            $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? '' : " and $sArtTable.oxparentid = '' and $sArtTable.oxvendorid != " . $oDb->quote($sSynchVendorId);
+        if (!$s_vendor_id) {
+            $s_q_add = ' from ' . $s_art_table . ' where ' . $s_art_table . '.oxshopid="' . $o_config->get_shop_id() . '" and 1 ';
+            $s_q_add .= $o_config->get_config_param('blVariantsSelection') ? '' : " and {$s_art_table}.oxparentid = '' and {$s_art_table}.oxvendorid != " . $o_db->quote($s_synch_vendor_id);
         } else {
             // selected category ?
-            if ($sSynchVendorId && $sSynchVendorId != $sVendorId) {
-                $sQAdd = " from $sO2CView left join $sArtTable on ";
-                $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? " ( $sArtTable.oxid = $sO2CView.oxobjectid or $sArtTable.oxparentid = oxobject2category.oxobjectid )" : " $sArtTable.oxid = $sO2CView.oxobjectid ";
-                $sQAdd .= 'where ' . $sArtTable . '.oxshopid="' . $oConfig->getShopId() . '" and ' . $sO2CView . '.oxcatnid = ' . $oDb->quote($sVendorId) . ' and ' . $sArtTable . '.oxvendorid != ' . $oDb->quote($sSynchVendorId);
+            if ($s_synch_vendor_id && $s_synch_vendor_id != $s_vendor_id) {
+                $s_q_add = " from {$s_o2c_view} left join {$s_art_table} on ";
+                $s_q_add .= $o_config->get_config_param('blVariantsSelection') ? " ( {$s_art_table}.oxid = {$s_o2c_view}.oxobjectid or {$s_art_table}.oxparentid = oxobject2category.oxobjectid )" : " {$s_art_table}.oxid = {$s_o2c_view}.oxobjectid ";
+                $s_q_add .= 'where ' . $s_art_table . '.oxshopid="' . $o_config->get_shop_id() . '" and ' . $s_o2c_view . '.oxcatnid = ' . $o_db->quote($s_vendor_id) . ' and ' . $s_art_table . '.oxvendorid != ' . $o_db->quote($s_synch_vendor_id);
             } else {
-                $sQAdd = " from $sArtTable where $sArtTable.oxvendorid = " . $oDb->quote($sVendorId);
+                $s_q_add = " from {$s_art_table} where {$s_art_table}.oxvendorid = " . $o_db->quote($s_vendor_id);
             }
-
-            $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? '' : " and $sArtTable.oxparentid = '' ";
+            $s_q_add .= $o_config->get_config_param('blVariantsSelection') ? '' : " and {$s_art_table}.oxparentid = '' ";
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Adds filter SQL to current query
      *
@@ -90,68 +72,52 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
      *
      * @return string
      */
-    protected function addFilter($sQ)
+    protected function add_filter($s_q)
     {
-        $sArtTable = $this->getViewName('oxarticles');
-        $sQ = parent::addFilter($sQ);
-
+        $s_art_table = $this->get_view_name('oxarticles');
+        $s_q = parent::add_filter($s_q);
         // display variants or not ?
-        $sQ .= \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVariantsSelection') ? ' group by ' . $sArtTable . '.oxid ' : '';
-
-        return $sQ;
+        $s_q .= \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blVariantsSelection') ? ' group by ' . $s_art_table . '.oxid ' : '';
+        return $s_q;
     }
-
     /**
      * Removes article from Vendor
      */
-    public function removeVendor(): void
+    public function remove_vendor(): void
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig();
-        $aRemoveArt = $this->getActionIds('oxarticles.oxid');
-
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sArtTable = $this->getViewName('oxarticles');
-            $aRemoveArt = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
+        \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $a_remove_art = $this->get_action_ids('oxarticles.oxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_art_table = $this->get_view_name('oxarticles');
+            $a_remove_art = $this->get_all($this->add_filter("select {$s_art_table}.oxid " . $this->get_query()));
         }
-
-        if (is_array($aRemoveArt)) {
-            $sSelect = 'update oxarticles set oxvendorid = null where '
-                . $this->onVendorActionArticleUpdateConditions($aRemoveArt);
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sSelect);
-
-            $this->resetCounter('vendorArticle', Registry::getRequest()->getRequestEscapedParameter('oxid'));
-
-            $this->onVendorAction(Registry::getRequest()->getRequestEscapedParameter('oxid'));
+        if (is_array($a_remove_art)) {
+            $s_select = 'update oxarticles set oxvendorid = null where ' . $this->on_vendor_action_article_update_conditions($a_remove_art);
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_select);
+            $this->reset_counter('vendorArticle', Registry::get_request()->get_request_escaped_parameter('oxid'));
+            $this->on_vendor_action(Registry::get_request()->get_request_escaped_parameter('oxid'));
         }
     }
-
     /**
      * Adds article to Vendor config
      */
-    public function addVendor(): void
+    public function add_vendor(): void
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $aAddArticle = $this->getActionIds('oxarticles.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sArtTable = $this->getViewName('oxarticles');
-            $aAddArticle = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
+        \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $a_add_article = $this->get_action_ids('oxarticles.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_art_table = $this->get_view_name('oxarticles');
+            $a_add_article = $this->get_all($this->add_filter("select {$s_art_table}.oxid " . $this->get_query()));
         }
-
-        if ($soxId && $soxId != '-1' && is_array($aAddArticle)) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sSelect = 'update oxarticles set oxvendorid = ' . $oDb->quote($soxId) . ' where '
-                . $this->onVendorActionArticleUpdateConditions($aAddArticle);
-
-            $oDb->Execute($sSelect);
-            $this->resetCounter('vendorArticle', $soxId);
-
-            $this->onVendorAction($soxId);
+        if ($sox_id && $sox_id != '-1' && is_array($a_add_article)) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $s_select = 'update oxarticles set oxvendorid = ' . $o_db->quote($sox_id) . ' where ' . $this->on_vendor_action_article_update_conditions($a_add_article);
+            $o_db->Execute($s_select);
+            $this->reset_counter('vendorArticle', $sox_id);
+            $this->on_vendor_action($sox_id);
         }
     }
-
     /**
      * Condition for updating oxarticles on add / remove vendor actions.
      *
@@ -159,17 +125,16 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
      *
      * @return string
      */
-    protected function onVendorActionArticleUpdateConditions($articleIds)
+    protected function on_vendor_action_article_update_conditions($article_ids)
     {
-        return 'oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articleIds)) . ')';
+        return 'oxid in (' . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($article_ids)) . ')';
     }
-
     /**
      * Additional actions on vendor add/remove.
      *
      * @param string $vendorOxid
      */
-    protected function onVendorAction($vendorOxid)
+    protected function on_vendor_action($vendor_oxid)
     {
     }
 }

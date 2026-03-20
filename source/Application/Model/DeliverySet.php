@@ -1,28 +1,24 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
 /**
  * Order delivery set manager.
  */
-class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Delivery_Set extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model
 {
     /**
      * Current object class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxdeliveryset';
-
+    protected $_s_class_name = 'oxdeliveryset';
     /**
      * Class constructor, initiates parent constructor (parent::oxBase()).
      */
@@ -31,7 +27,6 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         parent::__construct();
         $this->init('oxdeliveryset');
     }
-
     /**
      * Delete this object from the database, returns true on success.
      *
@@ -39,30 +34,20 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return bool
      */
-    public function delete($sOxId = null)
+    public function delete($s_ox_id = null)
     {
-        if (!$sOxId) {
-            $sOxId = $this->getId();
+        if (!$s_ox_id) {
+            $s_ox_id = $this->get_id();
         }
-        if (!$sOxId) {
+        if (!$s_ox_id) {
             return false;
         }
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        $oDb->execute('delete from oxobject2payment where oxobjectid = :oxid', [
-            'oxid' => $sOxId,
-        ]);
-        $oDb->execute('delete from oxobject2delivery where oxdeliveryid = :oxid', [
-            'oxid' => $sOxId,
-        ]);
-        $oDb->execute('delete from oxdel2delset where oxdelsetid = :oxid', [
-            'oxid' => $sOxId,
-        ]);
-
-        return parent::delete($sOxId);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $o_db->execute('delete from oxobject2payment where oxobjectid = :oxid', ['oxid' => $s_ox_id]);
+        $o_db->execute('delete from oxobject2delivery where oxdeliveryid = :oxid', ['oxid' => $s_ox_id]);
+        $o_db->execute('delete from oxdel2delset where oxdelsetid = :oxid', ['oxid' => $s_ox_id]);
+        return parent::delete($s_ox_id);
     }
-
     /**
      * returns delivery set id
      *
@@ -70,15 +55,12 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return string
      */
-    public function getIdByName($sTitle)
+    public function get_id_by_name($s_title)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sQ = 'SELECT `oxid` FROM `' . $tableViewNameGenerator->getViewName('oxdeliveryset') . '` 
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_q = 'SELECT `oxid` FROM `' . $table_view_name_generator->get_view_name('oxdeliveryset') . '` 
             WHERE  `oxtitle` = :oxtitle';
-
-        return $oDb->getOne($sQ, [
-            'oxtitle' => $sTitle,
-        ]);
+        return $o_db->get_one($s_q, ['oxtitle' => $s_title]);
     }
 }

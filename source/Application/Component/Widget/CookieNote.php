@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Component\Widget;
+namespace Oxid_Esales\Eshop_Community\Application\Component\Widget;
 
 /**
  * Cookie note widget
  */
-class CookieNote extends \OxidEsales\Eshop\Application\Component\Widget\WidgetController
+class Cookie_Note extends \Oxid_Esales\Eshop\Application\Component\Widget\Widget_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'widget/header/cookienote';
-
+    protected $_s_this_template = 'widget/header/cookienote';
     /**
      * Executes parent::render(). Check if need to hide cookie note.
      * Returns name of template file to render.
@@ -30,17 +27,15 @@ class CookieNote extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     public function render()
     {
         parent::render();
-
-        return $this->_sThisTemplate;
+        return $this->_s_this_template;
     }
-
     /**
      * Return if cookie notification is enabled by config.
      *
      * @return boolean
      */
-    public function isEnabled()
+    public function is_enabled()
     {
-        return (bool) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowCookiesNotification');
+        return (bool) \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blShowCookiesNotification');
     }
 }

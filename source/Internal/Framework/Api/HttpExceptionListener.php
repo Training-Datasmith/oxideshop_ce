@@ -4,47 +4,34 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Api;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Api;
-
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-
-class HttpExceptionListener implements EventSubscriberInterface
+use Symfony\Component\Event_Dispatcher\Event_Subscriber_Interface;
+use Symfony\Component\Http_Foundation\Json_Response;
+use Symfony\Component\Http_Foundation\Response;
+use Symfony\Component\Http_Kernel\Event\Exception_Event;
+use Symfony\Component\Http_Kernel\Exception\Http_Exception_Interface;
+use Symfony\Component\Http_Kernel\Kernel_Events;
+class Http_Exception_Listener implements Event_Subscriber_Interface
 {
-    public static function getSubscribedEvents(): array
+    public static function get_subscribed_events(): array
     {
-        return [
-            KernelEvents::EXCEPTION => ['onKernelException', -10],
-        ];
+        return [Kernel_Events::EXCEPTION => ['onKernelException', -10]];
     }
-
-    public function onKernelException(ExceptionEvent $event): void
+    public function on_kernel_exception(Exception_Event $event): void
     {
-        $exception = $event->getThrowable();
-
-        if ($exception instanceof HttpExceptionInterface) {
-            $response = new JsonResponse(
-                ['error' => $this->getErrorMessage($exception)],
-                $exception->getStatusCode(),
-                $exception->getHeaders()
-            );
-            $event->setResponse($response);
+        $exception = $event->get_throwable();
+        if ($exception instanceof Http_Exception_Interface) {
+            $response = new Json_Response(['error' => $this->get_error_message($exception)], $exception->get_status_code(), $exception->get_headers());
+            $event->set_response($response);
         }
     }
-
-    private function getErrorMessage(HttpExceptionInterface $exception): string
+    private function get_error_message(Http_Exception_Interface $exception): string
     {
         if (filter_var(getenv('OXID_DEBUG_MODE'), FILTER_VALIDATE_BOOLEAN)) {
-            return $exception->getMessage();
+            return $exception->get_message();
         }
-
-        return Response::$statusTexts[$exception->getStatusCode()] ?? 'An error occurred';
+        return Response::$status_texts[$exception->get_status_code()] ?? 'An error occurred';
     }
 }

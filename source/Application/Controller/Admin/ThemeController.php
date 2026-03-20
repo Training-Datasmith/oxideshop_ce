@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin theme manager.
@@ -15,7 +13,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * and "theme_main") to frame.
  * Admin Menu: Main Menu -> Theme.
  */
-class ThemeController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Theme_Controller extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Executes parent method parent::render() and returns name of template
@@ -26,7 +24,6 @@ class ThemeController extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     public function render()
     {
         parent::render();
-
         return 'theme';
     }
 }

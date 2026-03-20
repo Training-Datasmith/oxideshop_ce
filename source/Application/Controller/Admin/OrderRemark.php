@@ -1,89 +1,75 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Admin order remark manager.
  * Collects order remark information, updates it on user submit, etc.
  * Admin Menu: Orders -> Display Orders -> History.
  */
-class OrderRemark extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Order_Remark extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
         parent::render();
-
-        $soxId = $this->getEditObjectId();
-        $sRemoxId = Registry::getRequest()->getRequestEscapedParameter('rem_oxid');
-        if (isset($soxId) && $soxId != '-1') {
-            $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
-            $oOrder->load($soxId);
-
+        $sox_id = $this->get_edit_object_id();
+        $s_remox_id = Registry::get_request()->get_request_escaped_parameter('rem_oxid');
+        if (isset($sox_id) && $sox_id != '-1') {
+            $o_order = ox_new(\Oxid_Esales\Eshop\Application\Model\Order::class);
+            $o_order->load($sox_id);
             // all remark
-            $oRems = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $oRems->init('oxremark');
-            $sUserIdField = 'oxorder__oxuserid';
-            $sSelect = 'select * from oxremark where oxparentid = :oxparentid order by oxcreate desc';
-            $oRems->selectString($sSelect, [
-                'oxparentid' => $oOrder->$sUserIdField->value,
-            ]);
-            foreach ($oRems as $key => $val) {
-                if ($val->oxremark__oxid->value == $sRemoxId) {
+            $o_rems = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+            $o_rems->init('oxremark');
+            $s_user_id_field = 'oxorder__oxuserid';
+            $s_select = 'select * from oxremark where oxparentid = :oxparentid order by oxcreate desc';
+            $o_rems->select_string($s_select, ['oxparentid' => $o_order->{$s_user_id_field}->value]);
+            foreach ($o_rems as $key => $val) {
+                if ($val->oxremark__oxid->value == $s_remox_id) {
                     $val->selected = 1;
-                    $oRems[$key] = $val;
+                    $o_rems[$key] = $val;
                     break;
                 }
             }
-
-            $this->_aViewData['allremark'] = $oRems;
-
-            if (isset($sRemoxId)) {
-                $oRemark = oxNew(\OxidEsales\Eshop\Application\Model\Remark::class);
-                $oRemark->load($sRemoxId);
-                $this->_aViewData['remarktext'] = $oRemark->oxremark__oxtext->value;
-                $this->_aViewData['remarkheader'] = $oRemark->oxremark__oxheader->value;
+            $this->_a_view_data['allremark'] = $o_rems;
+            if (isset($s_remox_id)) {
+                $o_remark = ox_new(\Oxid_Esales\Eshop\Application\Model\Remark::class);
+                $o_remark->load($s_remox_id);
+                $this->_a_view_data['remarktext'] = $o_remark->oxremark__oxtext->value;
+                $this->_a_view_data['remarkheader'] = $o_remark->oxremark__oxheader->value;
             }
         }
-
         return 'order_remark';
     }
-
     /**
      * Saves order history item text changes.
      */
     public function save(): void
     {
         parent::save();
-
-        $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
-        if ($oOrder->load($this->getEditObjectId())) {
-            $oRemark = oxNew(\OxidEsales\Eshop\Application\Model\Remark::class);
-            $oRemark->load(Registry::getRequest()->getRequestEscapedParameter('rem_oxid'));
-
-            $oRemark->oxremark__oxtext = new \OxidEsales\Eshop\Core\Field(Registry::getRequest()->getRequestEscapedParameter('remarktext'));
-            $oRemark->oxremark__oxheader = new \OxidEsales\Eshop\Core\Field(Registry::getRequest()->getRequestEscapedParameter('remarkheader'));
-            $oRemark->oxremark__oxtype = new \OxidEsales\Eshop\Core\Field('r');
-            $oRemark->oxremark__oxparentid = new \OxidEsales\Eshop\Core\Field($oOrder->oxorder__oxuserid->value);
-            $oRemark->save();
+        $o_order = ox_new(\Oxid_Esales\Eshop\Application\Model\Order::class);
+        if ($o_order->load($this->get_edit_object_id())) {
+            $o_remark = ox_new(\Oxid_Esales\Eshop\Application\Model\Remark::class);
+            $o_remark->load(Registry::get_request()->get_request_escaped_parameter('rem_oxid'));
+            $o_remark->oxremark__oxtext = new \Oxid_Esales\Eshop\Core\Field(Registry::get_request()->get_request_escaped_parameter('remarktext'));
+            $o_remark->oxremark__oxheader = new \Oxid_Esales\Eshop\Core\Field(Registry::get_request()->get_request_escaped_parameter('remarkheader'));
+            $o_remark->oxremark__oxtype = new \Oxid_Esales\Eshop\Core\Field('r');
+            $o_remark->oxremark__oxparentid = new \Oxid_Esales\Eshop\Core\Field($o_order->oxorder__oxuserid->value);
+            $o_remark->save();
         }
     }
-
     /**
      * Deletes order history item.
      */
     public function delete(): void
     {
-        $oRemark = oxNew(\OxidEsales\Eshop\Application\Model\Remark::class);
-        $oRemark->delete(Registry::getRequest()->getRequestEscapedParameter('rem_oxid'));
+        $o_remark = ox_new(\Oxid_Esales\Eshop\Application\Model\Remark::class);
+        $o_remark->delete(Registry::get_request()->get_request_escaped_parameter('rem_oxid'));
     }
 }

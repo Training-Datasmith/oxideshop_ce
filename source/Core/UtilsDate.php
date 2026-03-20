@@ -1,21 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 use DateTime;
-use OxidEsales\Eshop\Core\Str;
-
+use Oxid_Esales\Eshop\Core\Str;
 /**
  * Date manipulation utility class
  */
-class UtilsDate extends \OxidEsales\Eshop\Core\Base
+class Utils_Date extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Format date to user defined format.
@@ -25,61 +22,52 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function formatDBDate($sDBDateIn, $blForceEnglishRet = false)
+    public function format_db_date($s_db_date_in, $bl_force_english_ret = false)
     {
         // convert english format to output format
-        if (!$sDBDateIn) {
+        if (!$s_db_date_in) {
             return null;
         }
-
-        $oStr = Str::getStr();
-        if ($blForceEnglishRet && $oStr->strstr($sDBDateIn, '-')) {
-            return $sDBDateIn;
+        $o_str = Str::get_str();
+        if ($bl_force_english_ret && $o_str->strstr($s_db_date_in, '-')) {
+            return $s_db_date_in;
         }
-        if ($this->isEmptyDate($sDBDateIn) && $sDBDateIn != '-') {
+        if ($this->is_empty_date($s_db_date_in) && $s_db_date_in != '-') {
             return '-';
         }
-
-        if ($sDBDateIn == '-') {
+        if ($s_db_date_in == '-') {
             return '0000-00-00 00:00:00';
         }
-
         // is it a timestamp ?
-        if (is_numeric($sDBDateIn)) {
+        if (is_numeric($s_db_date_in)) {
             // db timestamp : 20030322100409
-            $sNew = substr($sDBDateIn, 0, 4) . '-' . substr($sDBDateIn, 4, 2) . '-' . substr($sDBDateIn, 6, 2) . ' ';
+            $s_new = substr($s_db_date_in, 0, 4) . '-' . substr($s_db_date_in, 4, 2) . '-' . substr($s_db_date_in, 6, 2) . ' ';
             // check if it is a timestamp or wrong data: 20030322
-            if (strlen($sDBDateIn) > 8) {
-                $sNew .= substr($sDBDateIn, 8, 2) . ':' . substr($sDBDateIn, 10, 2) . ':' . substr($sDBDateIn, 12, 2);
+            if (strlen($s_db_date_in) > 8) {
+                $s_new .= substr($s_db_date_in, 8, 2) . ':' . substr($s_db_date_in, 10, 2) . ':' . substr($s_db_date_in, 12, 2);
             }
             // convert it to english format
-            $sDBDateIn = $sNew;
+            $s_db_date_in = $s_new;
         }
-
         // remove time as it is same in english as in german
-        $aData = explode(' ', trim($sDBDateIn));
-
+        $a_data = explode(' ', trim($s_db_date_in));
         // preparing time array
-        $sTime = (isset($aData[1]) && $oStr->strstr($aData[1], ':')) ? $aData[1] : '';
-        $aTime = $sTime ? explode(':', $sTime) : [0, 0, 0];
-
+        $s_time = isset($a_data[1]) && $o_str->strstr($a_data[1], ':') ? $a_data[1] : '';
+        $a_time = $s_time ? explode(':', $s_time) : [0, 0, 0];
         // preparing date array
-        $sDate = $aData[0] ?? '';
-        $aDate = preg_split('/[\/.-]/', $sDate);
-
+        $s_date = $a_data[0] ?? '';
+        $a_date = preg_split('/[\/.-]/', $s_date);
         // choosing format..
-        if ($sTime) {
-            $sFormat = $blForceEnglishRet ? 'Y-m-d H:i:s' : \OxidEsales\Eshop\Core\Registry::getLang()->translateString('fullDateFormat');
+        if ($s_time) {
+            $s_format = $bl_force_english_ret ? 'Y-m-d H:i:s' : \Oxid_Esales\Eshop\Core\Registry::get_lang()->translate_string('fullDateFormat');
         } else {
-            $sFormat = $blForceEnglishRet ? 'Y-m-d' : \OxidEsales\Eshop\Core\Registry::getLang()->translateString('simpleDateFormat');
+            $s_format = $bl_force_english_ret ? 'Y-m-d' : \Oxid_Esales\Eshop\Core\Registry::get_lang()->translate_string('simpleDateFormat');
         }
-
-        if (count($aDate) != 3) {
-            return date($sFormat);
+        if (count($a_date) != 3) {
+            return date($s_format);
         }
-        return $this->processDate($aTime, $aDate, $oStr->strstr($sDate, '.'), $sFormat);
+        return $this->process_date($a_time, $a_date, $o_str->strstr($s_date, '.'), $s_format);
     }
-
     /**
      * Bidirectional converter for date/datetime field
      *
@@ -89,122 +77,95 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function convertDBDateTime($oObject, $blToTimeStamp = false, $blOnlyDate = false)
+    public function convert_db_date_time($o_object, $bl_to_time_stamp = false, $bl_only_date = false)
     {
-        $sDate = $oObject->value;
-
+        $s_date = $o_object->value;
         // defining time format
-        $sLocalDateFormat = $this->defineAndCheckDefaultDateValues($blToTimeStamp);
-        $sLocalTimeFormat = $this->defineAndCheckDefaultTimeValues($blToTimeStamp);
-
+        $s_local_date_format = $this->define_and_check_default_date_values($bl_to_time_stamp);
+        $s_local_time_format = $this->define_and_check_default_time_values($bl_to_time_stamp);
         // default date/time patterns
-        $aDefDatePatterns = $this->defaultDatePattern();
-
+        $a_def_date_patterns = $this->default_date_pattern();
         // regexps to validate input
-        $aDatePatterns = $this->regexp2ValidateDateInput();
-        $aTimePatterns = $this->regexp2ValidateTimeInput();
-
+        $a_date_patterns = $this->regexp2validate_date_input();
+        $a_time_patterns = $this->regexp2validate_time_input();
         // date/time formatting rules
-        $aDFormats = $this->defineDateFormattingRules();
-        $aTFormats = $this->defineTimeFormattingRules();
-
+        $a_d_formats = $this->define_date_formatting_rules();
+        $a_t_formats = $this->define_time_formatting_rules();
         // empty date field value ? setting default value
-        if (!$sDate) {
-            $this->setDefaultDateTimeValue($oObject, $sLocalDateFormat, $sLocalTimeFormat, $blOnlyDate);
-
-            return $oObject->value;
+        if (!$s_date) {
+            $this->set_default_date_time_value($o_object, $s_local_date_format, $s_local_time_format, $bl_only_date);
+            return $o_object->value;
         }
-
-        $blDefDateFound = false;
-        $oStr = Str::getStr();
-
+        $bl_def_date_found = false;
+        $o_str = Str::get_str();
         // looking for default values that are formatted by MySQL
-        foreach (array_keys($aDefDatePatterns) as $sDefDatePattern) {
-            if ($oStr->preg_match($sDefDatePattern, $sDate)) {
-                $blDefDateFound = true;
+        foreach (array_keys($a_def_date_patterns) as $s_def_date_pattern) {
+            if ($o_str->preg_match($s_def_date_pattern, $s_date)) {
+                $bl_def_date_found = true;
                 break;
             }
         }
-
         // default value is set ?
-        if ($blDefDateFound) {
-            $this->setDefaultFormatedValue($oObject, $sDate, $sLocalDateFormat, $sLocalTimeFormat, $blOnlyDate);
-
-            return $oObject->value;
+        if ($bl_def_date_found) {
+            $this->set_default_formated_value($o_object, $s_date, $s_local_date_format, $s_local_time_format, $bl_only_date);
+            return $o_object->value;
         }
-
-        $blDateFound = false;
-        $blTimeFound = false;
-        $aDateMatches = [];
-        $aTimeMatches = [];
-
+        $bl_date_found = false;
+        $bl_time_found = false;
+        $a_date_matches = [];
+        $a_time_matches = [];
         // looking for date field
-        foreach ($aDatePatterns as $sPattern => $sType) {
-            if ($oStr->preg_match($sPattern, $sDate, $aDateMatches)) {
-                $blDateFound = true;
-
+        foreach ($a_date_patterns as $s_pattern => $s_type) {
+            if ($o_str->preg_match($s_pattern, $s_date, $a_date_matches)) {
+                $bl_date_found = true;
                 // now we know the type of passed date
-                $sDateFormat = $aDFormats[$sLocalDateFormat][0];
-                $aDFields = $aDFormats[$sType][1];
+                $s_date_format = $a_d_formats[$s_local_date_format][0];
+                $a_d_fields = $a_d_formats[$s_type][1];
                 break;
             }
         }
-
         // no such date field available ?
-        if (!$blDateFound) {
-            return $sDate;
+        if (!$bl_date_found) {
+            return $s_date;
         }
-
-        if ($blOnlyDate) {
-            $this->setDate($oObject, $sDateFormat, $aDFields, $aDateMatches);
-
-            return $oObject->value;
+        if ($bl_only_date) {
+            $this->set_date($o_object, $s_date_format, $a_d_fields, $a_date_matches);
+            return $o_object->value;
         }
-
         // looking for time field
-        foreach ($aTimePatterns as $sPattern => $sType) {
-            if ($oStr->preg_match($sPattern, $sDate, $aTimeMatches)) {
-                $blTimeFound = true;
-
+        foreach ($a_time_patterns as $s_pattern => $s_type) {
+            if ($o_str->preg_match($s_pattern, $s_date, $a_time_matches)) {
+                $bl_time_found = true;
                 // now we know the type of passed time
-                $sTimeFormat = $aTFormats[$sLocalTimeFormat][0];
-                $aTFields = $aTFormats[$sType][1];
-
-                if ($sType == 'USA' && isset($aTimeMatches[4])) {
-                    $iIntVal = (int) $aTimeMatches[1];
-                    if ($aTimeMatches[4] == 'PM') {
-                        if ($iIntVal < 13) {
-                            $iIntVal += 12;
+                $s_time_format = $a_t_formats[$s_local_time_format][0];
+                $a_t_fields = $a_t_formats[$s_type][1];
+                if ($s_type == 'USA' && isset($a_time_matches[4])) {
+                    $i_int_val = (int) $a_time_matches[1];
+                    if ($a_time_matches[4] == 'PM') {
+                        if ($i_int_val < 13) {
+                            $i_int_val += 12;
                         }
-                    } elseif ($aTimeMatches[4] == 'AM' && $aTimeMatches[1] == '12') {
-                        $iIntVal = 0;
+                    } elseif ($a_time_matches[4] == 'AM' && $a_time_matches[1] == '12') {
+                        $i_int_val = 0;
                     }
-
-                    $aTimeMatches[1] = sprintf('%02d', $iIntVal);
+                    $a_time_matches[1] = sprintf('%02d', $i_int_val);
                 }
-
                 break;
             }
         }
-
-        if (!$blTimeFound) {
+        if (!$bl_time_found) {
             //return $sDate;
             // #871A. trying to keep date as possible correct
-            $this->setDate($oObject, $sDateFormat, $aDFields, $aDateMatches);
-
-            return $oObject->value;
+            $this->set_date($o_object, $s_date_format, $a_d_fields, $a_date_matches);
+            return $o_object->value;
         }
-
-        $this->formatCorrectTimeValue($oObject, $sDateFormat, $sTimeFormat, $aDateMatches, $aTimeMatches, $aTFields, $aDFields);
-
+        $this->format_correct_time_value($o_object, $s_date_format, $s_time_format, $a_date_matches, $a_time_matches, $a_t_fields, $a_d_fields);
         // on some cases we get empty value
-        if (!$oObject->fldmax_length) {
-            return $this->convertDBDateTime($oObject, $blToTimeStamp, $blOnlyDate);
+        if (!$o_object->fldmax_length) {
+            return $this->convert_db_date_time($o_object, $bl_to_time_stamp, $bl_only_date);
         }
-
-        return $oObject->value;
+        return $o_object->value;
     }
-
     /**
      * Bidirectional converter for timestamp field
      *
@@ -213,52 +174,47 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function convertDBTimestamp($oObject, $blToTimeStamp = false)
+    public function convert_db_timestamp($o_object, $bl_to_time_stamp = false)
     {
         // on this case usually means that we gonna save value, and value is formatted, not plain
-        $sSQLTimeStampPattern = '/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/';
-        $sISOTimeStampPattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/';
-        $aMatches = [];
-        $oStr = Str::getStr();
-
+        $s_sql_time_stamp_pattern = '/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/';
+        $s_iso_time_stamp_pattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/';
+        $a_matches = [];
+        $o_str = Str::get_str();
         // preparing value to save
-        if ($blToTimeStamp) {
+        if ($bl_to_time_stamp) {
             // reformatting value to ISO
-            $this->convertDBDateTime($oObject, $blToTimeStamp);
-
-            if ($oStr->preg_match($sISOTimeStampPattern, $oObject->value, $aMatches)) {
+            $this->convert_db_date_time($o_object, $bl_to_time_stamp);
+            if ($o_str->preg_match($s_iso_time_stamp_pattern, $o_object->value, $a_matches)) {
                 // changing layout
-                $oObject->setValue($aMatches[1] . $aMatches[2] . $aMatches[3] . $aMatches[4] . $aMatches[5] . $aMatches[6]);
-                $oObject->fldmax_length = strlen((string) $oObject->value);
-
-                return $oObject->value;
+                $o_object->set_value($a_matches[1] . $a_matches[2] . $a_matches[3] . $a_matches[4] . $a_matches[5] . $a_matches[6]);
+                $o_object->fldmax_length = strlen((string) $o_object->value);
+                return $o_object->value;
             }
-        } else {
-            // loading and formatting value
-            // checking and parsing SQL timestamp value
-            //$sSQLTimeStampPattern = "/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/";
-            if ($oStr->preg_match($sSQLTimeStampPattern, $oObject->value, $aMatches)) {
-                $iTimestamp = mktime(
-                    $aMatches[4], //h
-                    $aMatches[5], //m
-                    $aMatches[6], //s
-                    $aMatches[2], //M
-                    $aMatches[3], //d
-                    $aMatches[1]
-                ); //y
-                if (!$iTimestamp) {
-                    $iTimestamp = '0';
-                }
-
-                $oObject->setValue(trim(date('Y-m-d H:i:s', $iTimestamp)));
-                $oObject->fldmax_length = strlen((string) $oObject->value);
-                $this->convertDBDateTime($oObject, $blToTimeStamp);
-
-                return $oObject->value;
+        } else if ($o_str->preg_match($s_sql_time_stamp_pattern, $o_object->value, $a_matches)) {
+            $i_timestamp = mktime(
+                $a_matches[4],
+                //h
+                $a_matches[5],
+                //m
+                $a_matches[6],
+                //s
+                $a_matches[2],
+                //M
+                $a_matches[3],
+                //d
+                $a_matches[1]
+            );
+            //y
+            if (!$i_timestamp) {
+                $i_timestamp = '0';
             }
+            $o_object->set_value(trim(date('Y-m-d H:i:s', $i_timestamp)));
+            $o_object->fldmax_length = strlen((string) $o_object->value);
+            $this->convert_db_date_time($o_object, $bl_to_time_stamp);
+            return $o_object->value;
         }
     }
-
     /**
      * Bidirectional converter for date field
      *
@@ -267,11 +223,10 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function convertDBDate($oObject, $blToTimeStamp = false)
+    public function convert_db_date($o_object, $bl_to_time_stamp = false)
     {
-        return $this->convertDBDateTime($oObject, $blToTimeStamp, true);
+        return $this->convert_db_date_time($o_object, $bl_to_time_stamp, true);
     }
-
     /**
      * sets default formatted value
      *
@@ -281,34 +236,32 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      * @param string $sLocalTimeFormat local format
      * @param bool   $blOnlyDate       marker to format only date field (no time)
      */
-    protected function setDefaultFormatedValue($oObject, $sDate, $sLocalDateFormat, $sLocalTimeFormat, $blOnlyDate)
+    protected function set_default_formated_value($o_object, $s_date, $s_local_date_format, $s_local_time_format, $bl_only_date)
     {
-        $aDefTimePatterns = $this->defaultTimePattern();
-        $aDFormats = $this->defineDateFormattingRules();
-        $aTFormats = $this->defineTimeFormattingRules();
-        $oStr = Str::getStr();
-
-        foreach (array_keys($aDefTimePatterns) as $sDefTimePattern) {
-            if ($oStr->preg_match($sDefTimePattern, $sDate)) {
-                $blDefTimeFound = true;
+        $a_def_time_patterns = $this->default_time_pattern();
+        $a_d_formats = $this->define_date_formatting_rules();
+        $a_t_formats = $this->define_time_formatting_rules();
+        $o_str = Str::get_str();
+        foreach (array_keys($a_def_time_patterns) as $s_def_time_pattern) {
+            if ($o_str->preg_match($s_def_time_pattern, $s_date)) {
+                $bl_def_time_found = true;
                 break;
             }
         }
         // setting and returning default formatted value
-        if ($blOnlyDate) {
-            $oObject->setValue(trim((string) $aDFormats[$sLocalDateFormat][2]));
+        if ($bl_only_date) {
+            $o_object->set_value(trim((string) $a_d_formats[$s_local_date_format][2]));
             // . " " . @$aTFormats[$sLocalTimeFormat][2]);
             // increasing(decreasing) field length
-            $oObject->fldmax_length = strlen((string) $oObject->value);
+            $o_object->fldmax_length = strlen((string) $o_object->value);
             return;
         }
         // setting and returning default formatted value
         // setting value
-        $oObject->setValue(trim($aDFormats[$sLocalDateFormat][2] . ' ' . $aTFormats[$sLocalTimeFormat][2]));
+        $o_object->set_value(trim($a_d_formats[$s_local_date_format][2] . ' ' . $a_t_formats[$s_local_time_format][2]));
         // increasing(decreasing) field length
-        $oObject->fldmax_length = strlen((string) $oObject->value);
+        $o_object->fldmax_length = strlen((string) $o_object->value);
     }
-
     /**
      * defines and checks default time values
      *
@@ -316,18 +269,16 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function defineAndCheckDefaultTimeValues($blToTimeStamp)
+    protected function define_and_check_default_time_values($bl_to_time_stamp)
     {
         // defining time format
         // checking for default values
-        $sLocalTimeFormat = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sLocalTimeFormat');
-        if (!$sLocalTimeFormat || $blToTimeStamp) {
+        $s_local_time_format = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sLocalTimeFormat');
+        if (!$s_local_time_format || $bl_to_time_stamp) {
             return 'ISO';
         }
-
-        return $sLocalTimeFormat;
+        return $s_local_time_format;
     }
-
     /**
      * defines and checks default date values
      *
@@ -335,96 +286,70 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function defineAndCheckDefaultDateValues($blToTimeStamp)
+    protected function define_and_check_default_date_values($bl_to_time_stamp)
     {
         // defining time format
         // checking for default values
-        $sLocalDateFormat = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sLocalDateFormat');
-        if (!$sLocalDateFormat || $blToTimeStamp) {
+        $s_local_date_format = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sLocalDateFormat');
+        if (!$s_local_date_format || $bl_to_time_stamp) {
             return 'ISO';
         }
-
-        return $sLocalDateFormat;
+        return $s_local_date_format;
     }
-
     /**
      * sets default date pattern
      *
      * @return array
      */
-    protected function defaultDatePattern()
+    protected function default_date_pattern()
     {
-        return ['/^0000-00-00/'   => 'ISO',
-                     "/^00\.00\.0000/" => 'EUR',
-                     "/^00\/00\/0000/" => 'USA',
-        ];
+        return ['/^0000-00-00/' => 'ISO', "/^00\\.00\\.0000/" => 'EUR', "/^00\\/00\\/0000/" => 'USA'];
     }
-
     /**
      * sets default time pattern
      *
      * @return array
      */
-    protected function defaultTimePattern()
+    protected function default_time_pattern()
     {
-        return ['/00:00:00$/'    => 'ISO',
-                     "/00\.00\.00$/"  => 'EUR',
-                     '/00:00:00 AM$/' => 'USA',
-        ];
+        return ['/00:00:00$/' => 'ISO', "/00\\.00\\.00\$/" => 'EUR', '/00:00:00 AM$/' => 'USA'];
     }
-
     /**
      * regular expressions to validate date input
      *
      * @return array
      */
-    protected function regexp2ValidateDateInput()
+    protected function regexp2validate_date_input()
     {
-        return ['/^([0-9]{4})-([0-9]{2})-([0-9]{2})/'   => 'ISO',
-                     "/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})/" => 'EUR',
-                     "/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})/" => 'USA',
-        ];
+        return ['/^([0-9]{4})-([0-9]{2})-([0-9]{2})/' => 'ISO', "/^([0-9]{2})\\.([0-9]{2})\\.([0-9]{4})/" => 'EUR', "/^([0-9]{2})\\/([0-9]{2})\\/([0-9]{4})/" => 'USA'];
     }
-
     /**
      * regular expressions to validate time input
      *
      * @return array
      */
-    protected function regexp2ValidateTimeInput()
+    protected function regexp2validate_time_input()
     {
-        return ['/([0-9]{2}):([0-9]{2}):([0-9]{2})$/'                 => 'ISO',
-                     "/([0-9]{2})\.([0-9]{2})\.([0-9]{2})$/"               => 'EUR',
-                     '/([0-9]{2}):([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/' => 'USA',
-        ];
+        return ['/([0-9]{2}):([0-9]{2}):([0-9]{2})$/' => 'ISO', "/([0-9]{2})\\.([0-9]{2})\\.([0-9]{2})\$/" => 'EUR', '/([0-9]{2}):([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/' => 'USA'];
     }
-
     /**
      * define date formatting rules
      *
      * @return array
      */
-    protected function defineDateFormattingRules()
+    protected function define_date_formatting_rules()
     {
-        return ['ISO' => ['Y-m-d', [2, 3, 1], '0000-00-00'],
-                     'EUR' => ['d.m.Y', [2, 1, 3], '00.00.0000'],
-                     'USA' => ['m/d/Y', [1, 2, 3], '00/00/0000'],
-        ];
+        return ['ISO' => ['Y-m-d', [2, 3, 1], '0000-00-00'], 'EUR' => ['d.m.Y', [2, 1, 3], '00.00.0000'], 'USA' => ['m/d/Y', [1, 2, 3], '00/00/0000']];
     }
-
     /**
      * defines time formatting rules
      *
      * @return array
      */
-    protected function defineTimeFormattingRules()
+    protected function define_time_formatting_rules()
     {
-        return ['ISO' => ['H:i:s', [1, 2, 3], '00:00:00'],
-                     'EUR' => ['H.i.s', [1, 2, 3], '00.00.00'],
-                     'USA' => ['h:i:s A', [1, 2, 3], '00:00:00 AM'],
-        ];
+        return ['ISO' => ['H:i:s', [1, 2, 3], '00:00:00'], 'EUR' => ['H.i.s', [1, 2, 3], '00.00.00'], 'USA' => ['h:i:s A', [1, 2, 3], '00:00:00 AM']];
     }
-
     /**
      * Sets default date time value
      *
@@ -433,25 +358,22 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      * @param string $sLocalTimeFormat local format
      * @param bool   $blOnlyDate       marker to format only date field (no time)
      */
-    protected function setDefaultDateTimeValue($oObject, $sLocalDateFormat, $sLocalTimeFormat, $blOnlyDate)
+    protected function set_default_date_time_value($o_object, $s_local_date_format, $s_local_time_format, $bl_only_date)
     {
-        $aDFormats = $this->defineDateFormattingRules();
-        $aTFormats = $this->defineTimeFormattingRules();
-
-        $sReturn = $aDFormats[$sLocalDateFormat][2];
-        if (!$blOnlyDate) {
-            $sReturn .= ' ' . $aTFormats[$sLocalTimeFormat][2];
+        $a_d_formats = $this->define_date_formatting_rules();
+        $a_t_formats = $this->define_time_formatting_rules();
+        $s_return = $a_d_formats[$s_local_date_format][2];
+        if (!$bl_only_date) {
+            $s_return .= ' ' . $a_t_formats[$s_local_time_format][2];
         }
-
-        if ($oObject instanceof \OxidEsales\Eshop\Core\Field) {
-            $oObject->setValue(trim((string) $sReturn));
+        if ($o_object instanceof \Oxid_Esales\Eshop\Core\Field) {
+            $o_object->set_value(trim((string) $s_return));
         } else {
-            $oObject->value = trim((string) $sReturn);
+            $o_object->value = trim((string) $s_return);
         }
         // increasing(decreasing) field lenght
-        $oObject->fldmax_length = strlen((string) $oObject->value);
+        $o_object->fldmax_length = strlen((string) $o_object->value);
     }
-
     /**
      * sets date
      *
@@ -460,27 +382,18 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      * @param array  $aDFields     days
      * @param array  $aDateMatches new date as array (month, year)
      */
-    protected function setDate($oObject, $sDateFormat, $aDFields, $aDateMatches)
+    protected function set_date($o_object, $s_date_format, $a_d_fields, $a_date_matches)
     {
         // formatting correct time value
-        $iTimestamp = mktime(
-            0,
-            0,
-            0,
-            $aDateMatches[$aDFields[0]],
-            $aDateMatches[$aDFields[1]],
-            $aDateMatches[$aDFields[2]]
-        );
-
-        if ($oObject instanceof \OxidEsales\Eshop\Core\Field) {
-            $oObject->setValue(@date($sDateFormat, $iTimestamp));
+        $i_timestamp = mktime(0, 0, 0, $a_date_matches[$a_d_fields[0]], $a_date_matches[$a_d_fields[1]], $a_date_matches[$a_d_fields[2]]);
+        if ($o_object instanceof \Oxid_Esales\Eshop\Core\Field) {
+            $o_object->set_value(@date($s_date_format, $i_timestamp));
         } else {
-            $oObject->value = @date($sDateFormat, $iTimestamp);
+            $o_object->value = @date($s_date_format, $i_timestamp);
         }
         // we should increase (decrease) field lenght
-        $oObject->fldmax_length = strlen((string) $oObject->value);
+        $o_object->fldmax_length = strlen((string) $o_object->value);
     }
-
     /**
      * Formatting correct time value
      *
@@ -492,50 +405,38 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      * @param array  $aTFields     defines the time fields
      * @param array  $aDFields     defines the date fields
      */
-    protected function formatCorrectTimeValue($oObject, $sDateFormat, $sTimeFormat, $aDateMatches, $aTimeMatches, $aTFields, $aDFields)
+    protected function format_correct_time_value($o_object, $s_date_format, $s_time_format, $a_date_matches, $a_time_matches, $a_t_fields, $a_d_fields)
     {
         // formatting correct time value
-        $iTimestamp = @mktime(
-            (int) $aTimeMatches[$aTFields[0]],
-            (int) $aTimeMatches[$aTFields[1]],
-            (int) $aTimeMatches[$aTFields[2]],
-            (int) $aDateMatches[$aDFields[0]],
-            (int) $aDateMatches[$aDFields[1]],
-            (int) $aDateMatches[$aDFields[2]]
-        );
-
-        if ($oObject instanceof \OxidEsales\Eshop\Core\Field) {
-            $oObject->setValue(trim(@date($sDateFormat . ' ' . $sTimeFormat, $iTimestamp)));
+        $i_timestamp = @mktime((int) $a_time_matches[$a_t_fields[0]], (int) $a_time_matches[$a_t_fields[1]], (int) $a_time_matches[$a_t_fields[2]], (int) $a_date_matches[$a_d_fields[0]], (int) $a_date_matches[$a_d_fields[1]], (int) $a_date_matches[$a_d_fields[2]]);
+        if ($o_object instanceof \Oxid_Esales\Eshop\Core\Field) {
+            $o_object->set_value(trim(@date($s_date_format . ' ' . $s_time_format, $i_timestamp)));
         } else {
-            $oObject->value = trim(@date($sDateFormat . ' ' . $sTimeFormat, $iTimestamp));
+            $o_object->value = trim(@date($s_date_format . ' ' . $s_time_format, $i_timestamp));
         }
-
         // we should increase (decrease) field lenght
-        $oObject->fldmax_length = strlen((string) $oObject->value);
+        $o_object->fldmax_length = strlen((string) $o_object->value);
     }
-
     /**
      * Returns time according shop timezone configuration. Configures in
      * Admin -> Main menu -> Core Settings -> General
      * @see getRequestTime
      * @return int current (modified according timezone) time
      */
-    public function getTime()
+    public function get_time()
     {
-        return $this->shiftServerTime(time());
+        return $this->shift_server_time(time());
     }
-
     /**
      * Returns time wen the request was started according shop timezone configuration. Configures in
      * Admin -> Main menu -> Core Settings -> General
      * REQUEST TIME is faster because it is not an syscall like time
      * @return int current (modified according timezone) time
      */
-    public function getRequestTime()
+    public function get_request_time()
     {
-        return $this->shiftServerTime($_SERVER['REQUEST_TIME']);
+        return $this->shift_server_time($_SERVER['REQUEST_TIME']);
     }
-
     /**
      * Returns the the timestamp formatted as date string for the database
      *
@@ -543,37 +444,33 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool|string timestamp formatted as date string for the database, false on error
      */
-    public function formatDBTimestamp($iTimestamp)
+    public function format_db_timestamp($i_timestamp)
     {
-        return date('Y-m-d H:i:s', $iTimestamp);
+        return date('Y-m-d H:i:s', $i_timestamp);
     }
-
     /**
      * Returns the the timestamp formatted as date string for the database
      * @param int $roundTo a amount of seconds to be rounded to e.g. 300 for rounding to 5 minutes
      *
      * @return bool|string  the data string formatted for the database (SQL), false on error
      */
-    public function getRoundedRequestDateDBFormatted($roundTo)
+    public function get_rounded_request_date_db_formatted($round_to)
     {
-        $timestamp = $this->getRequestTime();
+        $timestamp = $this->get_request_time();
         //round up x minutes so query cache can work
-        $timestamp = ceil($timestamp / $roundTo) * $roundTo;
-
+        $timestamp = ceil($timestamp / $round_to) * $round_to;
         //format date for sql query
-        return $this->formatDBTimestamp($timestamp);
+        return $this->format_db_timestamp($timestamp);
     }
-
     /**
      * Returns the the request time formatted as date string for the database
      *
      * @return bool|string
      */
-    public function getRequestTimeDBFormated()
+    public function get_request_time_db_formated()
     {
-        return $this->formatDBTimestamp($this->getRequestTime());
+        return $this->format_db_timestamp($this->get_request_time());
     }
-
     /**
      * Form time
      *
@@ -582,21 +479,18 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return int formed (modified according timezone) time
      */
-    public function formTime($sTime = 'now', $sTime2 = null)
+    public function form_time($s_time = 'now', $s_time2 = null)
     {
-        $oDate = new DateTime($sTime);
-
-        if ($sTime2) {
-            $aHourToCheck = explode(':', $sTime2);
-            $iHour = $aHourToCheck[0];
-            $iMinutes = $aHourToCheck[1];
-            $iSecond = $aHourToCheck[2];
-            $oDate->setTime($iHour, $iMinutes, $iSecond);
+        $o_date = new DateTime($s_time);
+        if ($s_time2) {
+            $a_hour_to_check = explode(':', $s_time2);
+            $i_hour = $a_hour_to_check[0];
+            $i_minutes = $a_hour_to_check[1];
+            $i_second = $a_hour_to_check[2];
+            $o_date->set_time($i_hour, $i_minutes, $i_second);
         }
-
-        return $this->shiftServerTime($oDate->getTimestamp());
+        return $this->shift_server_time($o_date->get_timestamp());
     }
-
     /**
      * Shift time if needed by configured timezone.
      *
@@ -604,15 +498,14 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function shiftServerTime($iTime)
+    public function shift_server_time($i_time)
     {
-        $iServerTimeShift = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iServerTimeShift');
-        if ($iServerTimeShift) {
-            return $iTime + ((int) $iServerTimeShift * 3600);
+        $i_server_time_shift = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iServerTimeShift');
+        if ($i_server_time_shift) {
+            return $i_time + (int) $i_server_time_shift * 3600;
         }
-        return $iTime;
+        return $i_time;
     }
-
     /**
      * Returns number of the week according to numeration standards (configurable in admin):
      * %U - week number, starting with the first Sunday as the first day of the first week;
@@ -624,21 +517,19 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function getWeekNumber($iFirstWeekDay, $sTimestamp = null, $sFormat = null)
+    public function get_week_number($i_first_week_day, $s_timestamp = null, $s_format = null)
     {
-        if ($sTimestamp == null) {
-            $sTimestamp = time();
+        if ($s_timestamp == null) {
+            $s_timestamp = time();
         }
-        if ($sFormat == null) {
-            $sFormat = '%W';
-            if ($iFirstWeekDay) {
-                $sFormat = '%U';
+        if ($s_format == null) {
+            $s_format = '%W';
+            if ($i_first_week_day) {
+                $s_format = '%U';
             }
         }
-
-        return (int) strftime($sFormat, $sTimestamp);
+        return (int) strftime($s_format, $s_timestamp);
     }
-
     /**
      * Reformats and returns German date string to English.
      *
@@ -646,21 +537,18 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function german2English($sDate)
+    public function german2English($s_date)
     {
-        $aDate = explode('.', $sDate);
-
-        if (count($aDate) > 1) {
-            if (count($aDate) == 2) {
-                $sDate = $aDate[1] . '-' . $aDate[0];
+        $a_date = explode('.', $s_date);
+        if (count($a_date) > 1) {
+            if (count($a_date) == 2) {
+                $s_date = $a_date[1] . '-' . $a_date[0];
             } else {
-                $sDate = $aDate[2] . '-' . $aDate[1] . '-' . $aDate[0];
+                $s_date = $a_date[2] . '-' . $a_date[1] . '-' . $a_date[0];
             }
         }
-
-        return $sDate;
+        return $s_date;
     }
-
     /**
      * Checks if date string is empty date field. Empty string or string with
      * all date values equal to 0 is treated as empty.
@@ -669,18 +557,16 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function isEmptyDate($sDate)
+    public function is_empty_date($s_date)
     {
-        if (!empty($sDate)) {
-            $sDate = preg_replace('/[^0-9a-z]/i', '', $sDate);
-            if (!is_numeric($sDate) || $sDate != 0) {
+        if (!empty($s_date)) {
+            $s_date = preg_replace('/[^0-9a-z]/i', '', $s_date);
+            if (!is_numeric($s_date) || $s_date != 0) {
                 return false;
             }
         }
-
         return true;
     }
-
     /**
      * Processes amd formats date / time.
      *
@@ -691,12 +577,11 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      *
      * @return string formatted string
      */
-    protected function processDate($aTime, $aDate, $blGerman, $sFormat)
+    protected function process_date($a_time, $a_date, $bl_german, $s_format)
     {
-        if ($blGerman) {
-            return date($sFormat, mktime($aTime[0], $aTime[1], $aTime[2], $aDate[1], $aDate[0], $aDate[2]));
+        if ($bl_german) {
+            return date($s_format, mktime($a_time[0], $a_time[1], $a_time[2], $a_date[1], $a_date[0], $a_date[2]));
         }
-
-        return date($sFormat, mktime($aTime[0], $aTime[1], $aTime[2], $aDate[1], $aDate[2], $aDate[0]));
+        return date($s_format, mktime($a_time[0], $a_time[1], $a_time[2], $a_date[1], $a_date[2], $a_date[0]));
     }
 }

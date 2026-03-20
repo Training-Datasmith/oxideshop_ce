@@ -4,85 +4,53 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service;
-
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Event\ProjectYamlChangedEvent;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception\NoServiceYamlException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ModuleConfigurationDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Event\BeforeModuleDeactivationEvent;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Event\FinalizingModuleActivationEvent;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Event\FinalizingModuleDeactivationEvent;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ModuleConfigurationValidatorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-class ModuleActivationService implements ModuleActivationServiceInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Event\Project_Yaml_Changed_Event;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Exception\No_Service_Yaml_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao\Module_Configuration_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Path\Module_Path_Resolver_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Event\Before_Module_Deactivation_Event;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Event\Finalizing_Module_Activation_Event;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Event\Finalizing_Module_Deactivation_Event;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Module_Configuration_Validator_Interface;
+use Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface;
+class Module_Activation_Service implements Module_Activation_Service_Interface
 {
-    public function __construct(
-        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly ModuleConfigurationValidatorInterface $moduleConfigurationValidator,
-        private readonly ModuleServicesImporterInterface $modulesYamlImportService,
-        private readonly ModulePathResolverInterface $modulePathResolver,
-        private readonly ModuleConfigurationValidatorInterface $deactivationDependencyValidator
-    ) {
-    }
-
-    public function activate(string $moduleId, int $shopId): void
+    public function __construct(private readonly Module_Configuration_Dao_Interface $module_configuration_dao, private readonly Event_Dispatcher_Interface $event_dispatcher, private readonly Module_Configuration_Validator_Interface $module_configuration_validator, private readonly Module_Services_Importer_Interface $modules_yaml_import_service, private readonly Module_Path_Resolver_Interface $module_path_resolver, private readonly Module_Configuration_Validator_Interface $deactivation_dependency_validator)
     {
-        $moduleConfiguration = $this->moduleConfigurationDao->get($moduleId, $shopId);
-
-        $this->moduleConfigurationValidator->validate($moduleConfiguration, $shopId);
-
-        $moduleConfiguration->setActivated(true);
-        $this->moduleConfigurationDao->save($moduleConfiguration, $shopId);
-
-        $this->addModuleServices($moduleId, $shopId);
-
-        $this->eventDispatcher->dispatch(
-            new FinalizingModuleActivationEvent($shopId, $moduleId)
-        );
     }
-
-    public function deactivate(string $moduleId, int $shopId): void
+    public function activate(string $module_id, int $shop_id): void
     {
-        $moduleConfiguration = $this->moduleConfigurationDao->get($moduleId, $shopId);
-
-        $this->deactivationDependencyValidator->validate($moduleConfiguration, $shopId);
-
-        $this->eventDispatcher->dispatch(new BeforeModuleDeactivationEvent($shopId, $moduleId));
-
-        $this->removeModuleServices($moduleId, $shopId);
-
-        $moduleConfiguration->setActivated(false);
-        $this->moduleConfigurationDao->save($moduleConfiguration, $shopId);
-
-        $this->eventDispatcher->dispatch(
-            new FinalizingModuleDeactivationEvent($shopId, $moduleId)
-        );
+        $module_configuration = $this->module_configuration_dao->get($module_id, $shop_id);
+        $this->module_configuration_validator->validate($module_configuration, $shop_id);
+        $module_configuration->set_activated(true);
+        $this->module_configuration_dao->save($module_configuration, $shop_id);
+        $this->add_module_services($module_id, $shop_id);
+        $this->event_dispatcher->dispatch(new Finalizing_Module_Activation_Event($shop_id, $module_id));
     }
-
-    private function addModuleServices(string $moduleId, int $shopId): void
+    public function deactivate(string $module_id, int $shop_id): void
+    {
+        $module_configuration = $this->module_configuration_dao->get($module_id, $shop_id);
+        $this->deactivation_dependency_validator->validate($module_configuration, $shop_id);
+        $this->event_dispatcher->dispatch(new Before_Module_Deactivation_Event($shop_id, $module_id));
+        $this->remove_module_services($module_id, $shop_id);
+        $module_configuration->set_activated(false);
+        $this->module_configuration_dao->save($module_configuration, $shop_id);
+        $this->event_dispatcher->dispatch(new Finalizing_Module_Deactivation_Event($shop_id, $module_id));
+    }
+    private function add_module_services(string $module_id, int $shop_id): void
     {
         try {
-            $this->modulesYamlImportService->addImport(
-                $this->modulePathResolver->getFullModulePathFromConfiguration($moduleId, $shopId),
-                $shopId
-            );
-            $this->eventDispatcher->dispatch(new ProjectYamlChangedEvent());
-        } catch (NoServiceYamlException) {
+            $this->modules_yaml_import_service->add_import($this->module_path_resolver->get_full_module_path_from_configuration($module_id, $shop_id), $shop_id);
+            $this->event_dispatcher->dispatch(new Project_Yaml_Changed_Event());
+        } catch (No_Service_Yaml_Exception) {
         }
     }
-
-    private function removeModuleServices(string $moduleId, int $shopId): void
+    private function remove_module_services(string $module_id, int $shop_id): void
     {
-        $this->modulesYamlImportService->removeImport(
-            $this->modulePathResolver->getFullModulePathFromConfiguration($moduleId, $shopId),
-            $shopId
-        );
-        $this->eventDispatcher->dispatch(new ProjectYamlChangedEvent());
+        $this->modules_yaml_import_service->remove_import($this->module_path_resolver->get_full_module_path_from_configuration($module_id, $shop_id), $shop_id);
+        $this->event_dispatcher->dispatch(new Project_Yaml_Changed_Event());
     }
 }

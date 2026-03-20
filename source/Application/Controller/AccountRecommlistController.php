@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Current user recommlist manager.
  * When user is logged in in this manager window he can modify his
@@ -20,57 +17,50 @@ use OxidEsales\Eshop\Core\Registry;
  *
  * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
  */
-class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class Account_Recommlist_Controller extends \Oxid_Esales\Eshop\Application\Controller\Account_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'page/account/recommendationlist';
-
+    protected $_s_this_template = 'page/account/recommendationlist';
     /**
      * Is recomendation list entry was saved this marker gets value TRUE. Default is FALSE
      *
      * @var bool
      */
-    protected $_blSavedEntry = false;
-
+    protected $_bl_saved_entry = false;
     /**
      * returns the recomm list articles
      *
      * @var object
      */
-    protected $_oActRecommListArticles;
-
+    protected $_o_act_recomm_list_articles;
     /**
      * returns the recomm list article. Whether the variable is empty, it list nothing
      *
      * @var array
      */
-    protected $_aUserRecommLists;
-
+    protected $_a_user_recomm_lists;
     /**
      * returns the recomm list articles
      *
      * @var object
      */
-    protected $_oActRecommList;
-
+    protected $_o_act_recomm_list;
     /**
      * List items count
      *
      * @var int
      */
-    protected $_iAllArtCnt = 0;
-
+    protected $_i_all_art_cnt = 0;
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation;
-
+    protected $_o_page_navigation;
     /**
      * If user is logged in loads his wishlist articles (articles may be accessed by
      * \OxidEsales\Eshop\Application\Model\User::GetBasket()), loads similar articles (is available) for the last
@@ -82,272 +72,224 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
     public function render()
     {
         parent::render();
-
         // is logged in ?
-        if (!($oUser = $this->getUser())) {
-            return $this->_sThisTemplate = $this->_sThisLoginTemplate;
+        if (!$o_user = $this->get_user()) {
+            return $this->_s_this_template = $this->_s_this_login_template;
         }
-
-        $oLists = $this->getRecommLists();
-        $oActList = $this->getActiveRecommList();
-
+        $o_lists = $this->get_recomm_lists();
+        $o_act_list = $this->get_active_recomm_list();
         // list of found oxrecommlists
-        if (!$oActList && $oLists->count()) {
-            $this->_iAllArtCnt = $oUser->getRecommListsCount();
-            $iNrofCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-            $iNrofCatArticles = $iNrofCatArticles ?: 10;
-            $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
+        if (!$o_act_list && $o_lists->count()) {
+            $this->_i_all_art_cnt = $o_user->get_recomm_lists_count();
+            $i_nrof_cat_articles = (int) \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iNrofCatArticles');
+            $i_nrof_cat_articles = $i_nrof_cat_articles ?: 10;
+            $this->_i_cnt_pages = ceil($this->_i_all_art_cnt / $i_nrof_cat_articles);
         }
-
-        return $this->_sThisTemplate;
+        return $this->_s_this_template;
     }
-
     /**
      * Returns array of params => values which are used in hidden forms and as additional url params
      *
      * @return array
      */
-    public function getNavigationParams()
+    public function get_navigation_params()
     {
-        $aParams = parent::getNavigationParams();
-
+        $a_params = parent::get_navigation_params();
         // adding recommendation list id to list product urls
-        if (($oList = $this->getActiveRecommList())) {
-            $aParams['recommid'] = $oList->getId();
+        if ($o_list = $this->get_active_recomm_list()) {
+            $a_params['recommid'] = $o_list->get_id();
         }
-
-        return $aParams;
+        return $a_params;
     }
-
     /**
      * return recomm list from the user
      *
      * @return array
      */
-    public function getRecommLists()
+    public function get_recomm_lists()
     {
-        if ($this->_aUserRecommLists === null) {
-            $this->_aUserRecommLists = false;
-            if (($oUser = $this->getUser())) {
+        if ($this->_a_user_recomm_lists === null) {
+            $this->_a_user_recomm_lists = false;
+            if ($o_user = $this->get_user()) {
                 // recommendation list
-                $this->_aUserRecommLists = $oUser->getUserRecommLists();
+                $this->_a_user_recomm_lists = $o_user->get_user_recomm_lists();
             }
         }
-
-        return $this->_aUserRecommLists;
+        return $this->_a_user_recomm_lists;
     }
-
     /**
      * return all articles in the recomm list
      */
-    public function getArticleList()
+    public function get_article_list()
     {
-        if ($this->_oActRecommListArticles === null) {
-            $this->_oActRecommListArticles = false;
-
-            if (($oRecommList = $this->getActiveRecommList())) {
-                $oItemList = $oRecommList->getArticles();
-
-                if ($oItemList->count()) {
-                    foreach ($oItemList as $key => $oItem) {
-                        if (!$oItem->isVisible()) {
-                            $oRecommList->removeArticle($oItem->getId());
-                            $oItemList->offsetUnset($key);
+        if ($this->_o_act_recomm_list_articles === null) {
+            $this->_o_act_recomm_list_articles = false;
+            if ($o_recomm_list = $this->get_active_recomm_list()) {
+                $o_item_list = $o_recomm_list->get_articles();
+                if ($o_item_list->count()) {
+                    foreach ($o_item_list as $key => $o_item) {
+                        if (!$o_item->is_visible()) {
+                            $o_recomm_list->remove_article($o_item->get_id());
+                            $o_item_list->offsetUnset($key);
                             continue;
                         }
-
-                        $oItem->text = $oRecommList->getArtDescription($oItem->getId());
+                        $o_item->text = $o_recomm_list->get_art_description($o_item->get_id());
                     }
-                    $this->_oActRecommListArticles = $oItemList;
+                    $this->_o_act_recomm_list_articles = $o_item_list;
                 }
             }
         }
-
-        return $this->_oActRecommListArticles;
+        return $this->_o_act_recomm_list_articles;
     }
-
     /**
      * return the active entrys
      */
-    public function getActiveRecommList()
+    public function get_active_recomm_list()
     {
-        if (!$this->getViewConfig()->getShowListmania()) {
+        if (!$this->get_view_config()->get_show_listmania()) {
             return false;
         }
-
-        if ($this->_oActRecommList === null) {
-            $this->_oActRecommList = false;
-
-            if (
-                ($oUser = $this->getUser()) &&
-                ($sRecommId = Registry::getRequest()->getRequestEscapedParameter('recommid'))
-            ) {
-                $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
-                $sUserIdField = 'oxrecommlists__oxuserid';
-                if (($oRecommList->load($sRecommId)) && $oUser->getId() === $oRecommList->$sUserIdField->value) {
-                    $this->_oActRecommList = $oRecommList;
+        if ($this->_o_act_recomm_list === null) {
+            $this->_o_act_recomm_list = false;
+            if (($o_user = $this->get_user()) && $s_recomm_id = Registry::get_request()->get_request_escaped_parameter('recommid')) {
+                $o_recomm_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Recommendation_List::class);
+                $s_user_id_field = 'oxrecommlists__oxuserid';
+                if ($o_recomm_list->load($s_recomm_id) && $o_user->get_id() === $o_recomm_list->{$s_user_id_field}->value) {
+                    $this->_o_act_recomm_list = $o_recomm_list;
                 }
             }
         }
-
-        return $this->_oActRecommList;
+        return $this->_o_act_recomm_list;
     }
-
     /**
      * Set active recommlist
      *
      * @param object $oRecommList Recommendation list
      */
-    public function setActiveRecommList($oRecommList): void
+    public function set_active_recomm_list($o_recomm_list): void
     {
-        $this->_oActRecommList = $oRecommList;
+        $this->_o_act_recomm_list = $o_recomm_list;
     }
-
     /**
      * add new recommlist
      */
-    public function saveRecommList(): void
+    public function save_recomm_list(): void
     {
-        if (!Registry::getSession()->checkSessionChallenge()) {
+        if (!Registry::get_session()->check_session_challenge()) {
             return;
         }
-
-        if (!$this->getViewConfig()->getShowListmania()) {
+        if (!$this->get_view_config()->get_show_listmania()) {
             return;
         }
-
-        if (($oUser = $this->getUser())) {
-            if (!($oRecommList = $this->getActiveRecommList())) {
-                $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
-                $oRecommList->oxrecommlists__oxuserid = new \OxidEsales\Eshop\Core\Field($oUser->getId());
-                $oRecommList->oxrecommlists__oxshopid = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopId());
+        if ($o_user = $this->get_user()) {
+            if (!$o_recomm_list = $this->get_active_recomm_list()) {
+                $o_recomm_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Recommendation_List::class);
+                $o_recomm_list->oxrecommlists__oxuserid = new \Oxid_Esales\Eshop\Core\Field($o_user->get_id());
+                $o_recomm_list->oxrecommlists__oxshopid = new \Oxid_Esales\Eshop\Core\Field(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_id());
             } else {
-                $this->_sThisTemplate = 'page/account/recommendationedit';
+                $this->_s_this_template = 'page/account/recommendationedit';
             }
-
-            $sTitle = trim((string) Registry::getRequest()->getRequestParameter('recomm_title'));
-            $sAuthor = trim((string) Registry::getRequest()->getRequestParameter('recomm_author'));
-            $sText = trim((string) Registry::getRequest()->getRequestParameter('recomm_desc'));
-
-            $oRecommList->oxrecommlists__oxtitle = new Field($sTitle);
-            $oRecommList->oxrecommlists__oxauthor = new Field($sAuthor);
-            $oRecommList->oxrecommlists__oxdesc = new Field($sText);
-
+            $s_title = trim((string) Registry::get_request()->get_request_parameter('recomm_title'));
+            $s_author = trim((string) Registry::get_request()->get_request_parameter('recomm_author'));
+            $s_text = trim((string) Registry::get_request()->get_request_parameter('recomm_desc'));
+            $o_recomm_list->oxrecommlists__oxtitle = new Field($s_title);
+            $o_recomm_list->oxrecommlists__oxauthor = new Field($s_author);
+            $o_recomm_list->oxrecommlists__oxdesc = new Field($s_text);
             try {
                 // marking entry as saved
-                $this->_blSavedEntry = (bool) $oRecommList->save();
-                $this->setActiveRecommList($this->_blSavedEntry ? $oRecommList : false);
-            } catch (\OxidEsales\Eshop\Core\Exception\ObjectException $oEx) {
+                $this->_bl_saved_entry = (bool) $o_recomm_list->save();
+                $this->set_active_recomm_list($this->_bl_saved_entry ? $o_recomm_list : false);
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Object_Exception $o_ex) {
                 //add to display at specific position
-                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'user');
+                Registry::get_utils_view()->add_error_to_display($o_ex, false, true, 'user');
             }
         }
     }
-
     /**
      * List entry saving status getter. Saving status is
      *
      * @return bool
      */
-    public function isSavedList()
+    public function is_saved_list()
     {
-        return $this->_blSavedEntry;
+        return $this->_bl_saved_entry;
     }
-
     /**
      * Delete recommlist
      */
-    public function editList(): void
+    public function edit_list(): void
     {
-        if (!Registry::getSession()->checkSessionChallenge()) {
+        if (!Registry::get_session()->check_session_challenge()) {
             return;
         }
-
-        if (!$this->getViewConfig()->getShowListmania()) {
+        if (!$this->get_view_config()->get_show_listmania()) {
             return;
         }
-
         // deleting on demand
-        if (
-            ($sAction = Registry::getRequest()->getRequestEscapedParameter('deleteList')) &&
-            ($oRecommList = $this->getActiveRecommList())
-        ) {
-            $oRecommList->delete();
-            $this->setActiveRecommList(false);
+        if (($s_action = Registry::get_request()->get_request_escaped_parameter('deleteList')) && $o_recomm_list = $this->get_active_recomm_list()) {
+            $o_recomm_list->delete();
+            $this->set_active_recomm_list(false);
         } else {
-            $this->_sThisTemplate = 'page/account/recommendationedit';
+            $this->_s_this_template = 'page/account/recommendationedit';
         }
     }
-
     /**
      * Delete recommlist
      */
-    public function removeArticle(): void
+    public function remove_article(): void
     {
-        if (!Registry::getSession()->checkSessionChallenge()) {
+        if (!Registry::get_session()->check_session_challenge()) {
             return;
         }
-
-        if (!$this->getViewConfig()->getShowListmania()) {
+        if (!$this->get_view_config()->get_show_listmania()) {
             return;
         }
-
-        if (
-            ($sArtId = Registry::getRequest()->getRequestEscapedParameter('aid')) &&
-            ($oRecommList = $this->getActiveRecommList())
-        ) {
-            $oRecommList->removeArticle($sArtId);
+        if (($s_art_id = Registry::get_request()->get_request_escaped_parameter('aid')) && $o_recomm_list = $this->get_active_recomm_list()) {
+            $o_recomm_list->remove_article($s_art_id);
         }
-        $this->_sThisTemplate = 'page/account/recommendationedit';
+        $this->_s_this_template = 'page/account/recommendationedit';
     }
-
     /**
      * Template variable getter. Returns page navigation
      *
      * @return object
      */
-    public function getPageNavigation()
+    public function get_page_navigation()
     {
-        if ($this->_oPageNavigation === null) {
-            $this->_oPageNavigation = false;
-            if (!$this->getActiveRecommlist()) {
-                $this->_oPageNavigation = $this->generatePageNavigation();
+        if ($this->_o_page_navigation === null) {
+            $this->_o_page_navigation = false;
+            if (!$this->get_active_recommlist()) {
+                $this->_o_page_navigation = $this->generate_page_navigation();
             }
         }
-
-        return $this->_oPageNavigation;
+        return $this->_o_page_navigation;
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        $aPaths = [];
-        $aPath = [];
-
-        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
-        $sSelfLink = $this->getViewConfig()->getSelfLink();
-        $aPath['title'] = Registry::getLang()->translateString('MY_ACCOUNT', $iBaseLanguage, false);
-        $aPath['link'] = Registry::getSeoEncoder()->getStaticUrl($sSelfLink . 'cl=account');
-        $aPaths[] = $aPath;
-
-        $aPath['title'] = Registry::getLang()->translateString('LISTMANIA', $iBaseLanguage, false);
-        $aPath['link'] = $this->getLink();
-        $aPaths[] = $aPath;
-
-        return $aPaths;
+        $a_paths = [];
+        $a_path = [];
+        $i_base_language = Registry::get_lang()->get_base_language();
+        $s_self_link = $this->get_view_config()->get_self_link();
+        $a_path['title'] = Registry::get_lang()->translate_string('MY_ACCOUNT', $i_base_language, false);
+        $a_path['link'] = Registry::get_seo_encoder()->get_static_url($s_self_link . 'cl=account');
+        $a_paths[] = $a_path;
+        $a_path['title'] = Registry::get_lang()->translate_string('LISTMANIA', $i_base_language, false);
+        $a_path['link'] = $this->get_link();
+        $a_paths[] = $a_path;
+        return $a_paths;
     }
-
     /**
      * Article count getter
      *
      * @return int
      */
-    public function getArticleCount()
+    public function get_article_count()
     {
-        return $this->_iAllArtCnt;
+        return $this->_i_all_art_cnt;
     }
 }

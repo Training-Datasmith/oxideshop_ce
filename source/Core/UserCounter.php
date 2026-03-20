@@ -1,40 +1,33 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Class used for counting users depending on given attributes.
  */
-class UserCounter
+class User_Counter
 {
     /**
      * Returns count of admins (mall and subshops). Only counts active admins.
      */
-    public function getAdminCount(): int
+    public function get_admin_count(): int
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        $sQuery = "SELECT COUNT(1) FROM oxuser WHERE oxrights != 'user'";
-
-        return (int) $oDb->getOne($sQuery);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_query = "SELECT COUNT(1) FROM oxuser WHERE oxrights != 'user'";
+        return (int) $o_db->get_one($s_query);
     }
-
     /**
      * Returns count of admins (mall and subshops). Only counts active admins.
      */
-    public function getActiveAdminCount(): int
+    public function get_active_admin_count(): int
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        $sQuery = "SELECT COUNT(1) FROM oxuser WHERE oxrights != 'user' AND oxactive = 1 ";
-
-        return (int) $oDb->getOne($sQuery);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_query = "SELECT COUNT(1) FROM oxuser WHERE oxrights != 'user' AND oxactive = 1 ";
+        return (int) $o_db->get_one($s_query);
     }
 }

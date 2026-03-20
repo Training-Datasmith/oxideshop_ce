@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Database;
 
-namespace OxidEsales\EshopCommunity\Internal\Setup\Database;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Configuration\DataObject\DatabaseConfiguration;
-
-interface SetupDbValidatorInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Configuration\Data_Object\Database_Configuration;
+interface Setup_Db_Validator_Interface
 {
     /** @throws DatabaseNotEmptyException */
-    public function validate(DatabaseConfiguration $databaseConfiguration): void;
+    public function validate(Database_Configuration $database_configuration): void;
 }

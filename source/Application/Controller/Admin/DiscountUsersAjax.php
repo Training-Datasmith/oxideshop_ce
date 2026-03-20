@@ -1,27 +1,25 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages discount users
  */
-class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Discount_Users_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
+    protected $_a_columns = ['container1' => [
+        // field , table,  visible, multilanguage, ident
         ['oxusername', 'oxuser', 1, 0, 0],
         ['oxlname', 'oxuser', 0, 0, 0],
         ['oxfname', 'oxuser', 0, 0, 0],
@@ -32,98 +30,74 @@ class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         ['oxfon', 'oxuser', 0, 0, 0],
         ['oxbirthdate', 'oxuser', 0, 0, 0],
         ['oxid', 'oxuser', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxusername', 'oxuser', 1, 0, 0],
-                                     ['oxlname', 'oxuser', 0, 0, 0],
-                                     ['oxfname', 'oxuser', 0, 0, 0],
-                                     ['oxstreet', 'oxuser', 0, 0, 0],
-                                     ['oxstreetnr', 'oxuser', 0, 0, 0],
-                                     ['oxcity', 'oxuser', 0, 0, 0],
-                                     ['oxzip', 'oxuser', 0, 0, 0],
-                                     ['oxfon', 'oxuser', 0, 0, 0],
-                                     ['oxbirthdate', 'oxuser', 0, 0, 0],
-                                     ['oxid', 'oxobject2discount', 0, 0, 1],
-                                 ],
-    ];
-
+    ], 'container2' => [['oxusername', 'oxuser', 1, 0, 0], ['oxlname', 'oxuser', 0, 0, 0], ['oxfname', 'oxuser', 0, 0, 0], ['oxstreet', 'oxuser', 0, 0, 0], ['oxstreetnr', 'oxuser', 0, 0, 0], ['oxcity', 'oxuser', 0, 0, 0], ['oxzip', 'oxuser', 0, 0, 0], ['oxfon', 'oxuser', 0, 0, 0], ['oxbirthdate', 'oxuser', 0, 0, 0], ['oxid', 'oxobject2discount', 0, 0, 1]]];
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $sUserTable = $this->getViewName('oxuser');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $o_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $s_user_table = $this->get_view_name('oxuser');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_synch_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // category selected or not ?
-        if (!$sId) {
-            $sQAdd = " from $sUserTable where 1 ";
-            if (!$oConfig->getConfigParam('blMallUsers')) {
-                $sQAdd .= " and oxshopid = '" . $oConfig->getShopId() . "' ";
+        if (!$s_id) {
+            $s_q_add = " from {$s_user_table} where 1 ";
+            if (!$o_config->get_config_param('blMallUsers')) {
+                $s_q_add .= " and oxshopid = '" . $o_config->get_shop_id() . "' ";
+            }
+        } else if ($s_synch_id && $s_synch_id != $s_id) {
+            $s_q_add = " from oxobject2group left join {$s_user_table} on {$s_user_table}.oxid = oxobject2group.oxobjectid where oxobject2group.oxgroupsid = " . $o_db->quote($s_id);
+            if (!$o_config->get_config_param('blMallUsers')) {
+                $s_q_add .= " and {$s_user_table}.oxshopid = '" . $o_config->get_shop_id() . "' ";
             }
         } else {
-            // selected group ?
-            if ($sSynchId && $sSynchId != $sId) {
-                $sQAdd = " from oxobject2group left join $sUserTable on $sUserTable.oxid = oxobject2group.oxobjectid where oxobject2group.oxgroupsid = " . $oDb->quote($sId);
-                if (!$oConfig->getConfigParam('blMallUsers')) {
-                    $sQAdd .= " and $sUserTable.oxshopid = '" . $oConfig->getShopId() . "' ";
-                }
-            } else {
-                $sQAdd = " from oxobject2discount, $sUserTable where $sUserTable.oxid=oxobject2discount.oxobjectid ";
-                $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) . " and oxobject2discount.oxtype = 'oxuser' ";
-            }
+            $s_q_add = " from oxobject2discount, {$s_user_table} where {$s_user_table}.oxid=oxobject2discount.oxobjectid ";
+            $s_q_add .= ' and oxobject2discount.oxdiscountid = ' . $o_db->quote($s_id) . " and oxobject2discount.oxtype = 'oxuser' ";
         }
-
-        if ($sSynchId && $sSynchId != $sId) {
-            $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from oxobject2discount, $sUserTable where $sUserTable.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) . " and oxobject2discount.oxtype = 'oxuser' ) ";
+        if ($s_synch_id && $s_synch_id != $s_id) {
+            $s_q_add .= " and {$s_user_table}.oxid not in ( select {$s_user_table}.oxid from oxobject2discount, {$s_user_table} where {$s_user_table}.oxid=oxobject2discount.oxobjectid ";
+            $s_q_add .= ' and oxobject2discount.oxdiscountid = ' . $o_db->quote($s_synch_id) . " and oxobject2discount.oxtype = 'oxuser' ) ";
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Removes user from discount config
      */
-    public function removeDiscUser(): void
+    public function remove_disc_user(): void
     {
-        $aRemoveGroups = $this->getActionIds('oxobject2discount.oxid');
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
-        } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        $a_remove_groups = $this->get_action_ids('oxobject2discount.oxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_q = $this->add_filter('delete oxobject2discount.* ' . $this->get_query());
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
+        } elseif ($a_remove_groups && is_array($a_remove_groups)) {
+            $s_q = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_remove_groups)) . ') ';
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
         }
     }
-
     /**
      * Adds user to discount config
      */
-    public function addDiscUser(): void
+    public function add_disc_user(): void
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig();
-        $aChosenUsr = $this->getActionIds('oxuser.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sUserTable = $this->getViewName('oxuser');
-            $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
+        \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $a_chosen_usr = $this->get_action_ids('oxuser.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_user_table = $this->get_view_name('oxuser');
+            $a_chosen_usr = $this->get_all($this->add_filter("select {$s_user_table}.oxid " . $this->get_query()));
         }
-        if ($soxId && $soxId != '-1' && is_array($aChosenUsr)) {
-            foreach ($aChosenUsr as $sChosenUsr) {
-                $oObject2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oObject2Discount->init('oxobject2discount');
-                $oObject2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenUsr);
-                $oObject2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field('oxuser');
-                $oObject2Discount->save();
+        if ($sox_id && $sox_id != '-1' && is_array($a_chosen_usr)) {
+            foreach ($a_chosen_usr as $s_chosen_usr) {
+                $o_object2discount = ox_new(\Oxid_Esales\Eshop\Core\Model\Base_Model::class);
+                $o_object2discount->init('oxobject2discount');
+                $o_object2discount->oxobject2discount__oxdiscountid = new \Oxid_Esales\Eshop\Core\Field($sox_id);
+                $o_object2discount->oxobject2discount__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($s_chosen_usr);
+                $o_object2discount->oxobject2discount__oxtype = new \Oxid_Esales\Eshop\Core\Field('oxuser');
+                $o_object2discount->save();
             }
         }
     }

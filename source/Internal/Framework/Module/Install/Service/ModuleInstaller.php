@@ -4,54 +4,38 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject\OxidEshopPackage;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleActivationServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface;
-
-class ModuleInstaller implements ModuleInstallerInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao\Shop_Configuration_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Data_Object\Oxid_Eshop_Package;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Module_Configuration_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Activation_Service_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\State\Module_State_Service_Interface;
+class Module_Installer implements Module_Installer_Interface
 {
-    public function __construct(
-        private readonly ModuleInstallerInterface $bootstrapModuleInstaller,
-        private readonly ModuleActivationServiceInterface $moduleActivationService,
-        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private readonly ShopConfigurationDaoInterface $shopConfigurationDao,
-        private readonly ModuleStateServiceInterface $moduleStateService
-    ) {
-    }
-
-    public function install(OxidEshopPackage $package): void
+    public function __construct(private readonly Module_Installer_Interface $bootstrap_module_installer, private readonly Module_Activation_Service_Interface $module_activation_service, private readonly Module_Configuration_Dao_Interface $module_configuration_dao, private readonly Shop_Configuration_Dao_Interface $shop_configuration_dao, private readonly Module_State_Service_Interface $module_state_service)
     {
-        $this->bootstrapModuleInstaller->install($package);
     }
-
-    public function uninstall(OxidEshopPackage $package): void
+    public function install(Oxid_Eshop_Package $package): void
     {
-        $moduleConfiguration = $this->moduleConfigurationDao->get($package->getPackagePath());
-        $this->deactivateModule($moduleConfiguration->getId());
-
-        $this->bootstrapModuleInstaller->uninstall($package);
+        $this->bootstrap_module_installer->install($package);
     }
-
-    public function isInstalled(OxidEshopPackage $package): bool
+    public function uninstall(Oxid_Eshop_Package $package): void
     {
-        return $this->bootstrapModuleInstaller->isInstalled($package);
+        $module_configuration = $this->module_configuration_dao->get($package->get_package_path());
+        $this->deactivate_module($module_configuration->get_id());
+        $this->bootstrap_module_installer->uninstall($package);
     }
-
-    private function deactivateModule(string $moduleId): void
+    public function is_installed(Oxid_Eshop_Package $package): bool
     {
-        foreach ($this->shopConfigurationDao->getAll() as $shopId => $shopConfiguration) {
-            if (
-                $shopConfiguration->hasModuleConfiguration($moduleId)
-                && $this->moduleStateService->isActive($moduleId, $shopId)
-            ) {
-                $this->moduleActivationService->deactivate($moduleId, $shopId);
+        return $this->bootstrap_module_installer->is_installed($package);
+    }
+    private function deactivate_module(string $module_id): void
+    {
+        foreach ($this->shop_configuration_dao->get_all() as $shop_id => $shop_configuration) {
+            if ($shop_configuration->has_module_configuration($module_id) && $this->module_state_service->is_active($module_id, $shop_id)) {
+                $this->module_activation_service->deactivate($module_id, $shop_id);
             }
         }
     }

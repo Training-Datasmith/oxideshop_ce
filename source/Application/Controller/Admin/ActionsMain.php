@@ -1,142 +1,108 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Application\Model\Actions;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use Oxid_Esales\Eshop\Application\Model\Actions;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Request;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 use stdClass;
-
 /**
  * Admin article main actions manager.
  * There is possibility to change actions description, assign articles to
  * this actions, etc.
  * Admin Menu: Manage Products -> actions -> Main.
  */
-class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Actions_Main extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
         parent::render();
-
-        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
-
-        if ($this->isNewEditObject() !== true) {
-            $oAction = oxNew(Actions::class);
-            $oAction->loadInLang($this->_iEditLang, $soxId);
-
-            $oOtherLang = $oAction->getAvailableInLangs();
-            if (!isset($oOtherLang[$this->_iEditLang])) {
-                $oAction->loadInLang(key($oOtherLang), $soxId);
+        $sox_id = $this->_a_view_data['oxid'] = $this->get_edit_object_id();
+        if ($this->is_new_edit_object() !== true) {
+            $o_action = ox_new(Actions::class);
+            $o_action->load_in_lang($this->_i_edit_lang, $sox_id);
+            $o_other_lang = $o_action->get_available_in_langs();
+            if (!isset($o_other_lang[$this->_i_edit_lang])) {
+                $o_action->load_in_lang(key($o_other_lang), $sox_id);
             }
-
-            $this->_aViewData['edit'] = $oAction;
-
+            $this->_a_view_data['edit'] = $o_action;
             // remove already created languages
-            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
-
-            if (count($aLang)) {
-                $this->_aViewData['posslang'] = $aLang;
+            $a_lang = array_diff(Registry::get_lang()->get_language_names(), $o_other_lang);
+            if (count($a_lang)) {
+                $this->_a_view_data['posslang'] = $a_lang;
             }
-
-            foreach ($oOtherLang as $id => $language) {
-                $oLang = new stdClass();
-                $oLang->sLangDesc = $language;
-                $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData['otherlang'][$id] = clone $oLang;
+            foreach ($o_other_lang as $id => $language) {
+                $o_lang = new stdClass();
+                $o_lang->s_lang_desc = $language;
+                $o_lang->selected = $id == $this->_i_edit_lang;
+                $this->_a_view_data['otherlang'][$id] = clone $o_lang;
             }
         }
-
-        if ($this->getViewConfig()->isAltImageServerConfigured()) {
-            $this->_aViewData['imageUrl'] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
+        if ($this->get_view_config()->is_alt_image_server_configured()) {
+            $this->_a_view_data['imageUrl'] = Container_Facade::get_parameter('oxid_esales.alternative_image_url');
         }
-
-        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
+        if (Registry::get_request()->get_request_escaped_parameter('aoc')) {
             // generating category tree for select list
-            $this->createCategoryTree('artcattree', $soxId);
-
-            $oActionsMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class);
-            $this->_aViewData['oxajax'] = $oActionsMainAjax->getColumns();
-
+            $this->create_category_tree('artcattree', $sox_id);
+            $o_actions_main_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Actions_Main_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_actions_main_ajax->get_columns();
             return 'popups/actions_main';
         }
-
-        if (($oPromotion = $this->getViewDataElement('edit'))) {
-            if (($oPromotion->oxactions__oxtype->value == 2) || ($oPromotion->oxactions__oxtype->value == 3)) {
-                if ($iAoc = Registry::getRequest()->getRequestEscapedParameter('oxpromotionaoc')) {
-                    $sPopup = false;
-                    switch ($iAoc) {
+        if ($o_promotion = $this->get_view_data_element('edit')) {
+            if ($o_promotion->oxactions__oxtype->value == 2 || $o_promotion->oxactions__oxtype->value == 3) {
+                if ($i_aoc = Registry::get_request()->get_request_escaped_parameter('oxpromotionaoc')) {
+                    $s_popup = false;
+                    switch ($i_aoc) {
                         case 'article':
                             // generating category tree for select list
-                            $this->createCategoryTree('artcattree', $soxId);
-
-                            if ($oArticle = $oPromotion->getBannerArticle()) {
-                                $this->_aViewData['actionarticle_artnum'] = $oArticle->oxarticles__oxartnum->value;
-                                $this->_aViewData['actionarticle_title'] = $oArticle->oxarticles__oxtitle->value;
+                            $this->create_category_tree('artcattree', $sox_id);
+                            if ($o_article = $o_promotion->get_banner_article()) {
+                                $this->_a_view_data['actionarticle_artnum'] = $o_article->oxarticles__oxartnum->value;
+                                $this->_a_view_data['actionarticle_title'] = $o_article->oxarticles__oxtitle->value;
                             }
-
-                            $sPopup = 'actions_article';
+                            $s_popup = 'actions_article';
                             break;
                         case 'groups':
-                            $sPopup = 'actions_groups';
+                            $s_popup = 'actions_groups';
                             break;
                     }
-
-                    if ($sPopup) {
-                        $oActionsArticleAjax = oxNew($sPopup . '_ajax');
-                        $this->_aViewData['oxajax'] = $oActionsArticleAjax->getColumns();
-
-                        return "popups/{$sPopup}";
+                    if ($s_popup) {
+                        $o_actions_article_ajax = ox_new($s_popup . '_ajax');
+                        $this->_a_view_data['oxajax'] = $o_actions_article_ajax->get_columns();
+                        return "popups/{$s_popup}";
                     }
-                } else {
-                    if ($oPromotion->oxactions__oxtype->value == 2) {
-                        $this->_aViewData['editor'] = $this->generateTextEditor(
-                            '100%',
-                            300,
-                            $oPromotion,
-                            'oxactions__oxlongdesc',
-                            'details.css'
-                        );
-                    }
+                } else if ($o_promotion->oxactions__oxtype->value == 2) {
+                    $this->_a_view_data['editor'] = $this->generate_text_editor('100%', 300, $o_promotion, 'oxactions__oxlongdesc', 'details.css');
                 }
             }
         }
-
         return 'actions_main';
     }
-
     /**
      * Saves Promotions
      */
     public function save(): void
     {
         parent::save();
-
-        $action = oxNew(Actions::class);
-
-        if ($this->isNewEditObject() !== true) {
-            $action->load($this->getEditObjectId());
+        $action = ox_new(Actions::class);
+        if ($this->is_new_edit_object() !== true) {
+            $action->load($this->get_edit_object_id());
         }
-
-        if ($this->checkAccessToEditAction($action) === true) {
-            $action->assign($this->getActionFormData());
-            $action->setLanguage($this->_iEditLang);
-            $action = Registry::getUtilsFile()->processFiles($action);
+        if ($this->check_access_to_edit_action($action) === true) {
+            $action->assign($this->get_action_form_data());
+            $action->set_language($this->_i_edit_lang);
+            $action = Registry::get_utils_file()->process_files($action);
             $action->save();
-
-            $this->setEditObjectId($action->getId());
+            $this->set_edit_object_id($action->get_id());
         }
     }
-
     /**
      * Saves changed selected action parameters in different language.
      */
@@ -144,44 +110,38 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         $this->save();
     }
-
     /**
      * Checks access to edit Action.
      *
      *
      * @return bool
      */
-    protected function checkAccessToEditAction(Actions $action)
+    protected function check_access_to_edit_action(Actions $action)
     {
         return true;
     }
-
     /**
      * Returns form data for Action.
      */
-    private function getActionFormData(): array
+    private function get_action_form_data(): array
     {
-        $request    = oxNew(Request::class);
-        $formData   = $request->getRequestEscapedParameter('editval');
-
-        return $this->normalizeActionFormData($formData);
+        $request = ox_new(Request::class);
+        $form_data = $request->get_request_escaped_parameter('editval');
+        return $this->normalize_action_form_data($form_data);
     }
-
     /**
      * Normalizes form data for Action.
      *
      *
      */
-    private function normalizeActionFormData(array $formData): array
+    private function normalize_action_form_data(array $form_data): array
     {
-        if ($this->isNewEditObject() === true) {
-            $formData['oxactions__oxid'] = null;
+        if ($this->is_new_edit_object() === true) {
+            $form_data['oxactions__oxid'] = null;
         }
-
-        if (!isset($formData['oxactions__oxactive']) || !$formData['oxactions__oxactive']) {
-            $formData['oxactions__oxactive'] = 0;
+        if (!isset($form_data['oxactions__oxactive']) || !$form_data['oxactions__oxactive']) {
+            $form_data['oxactions__oxactive'] = 0;
         }
-
-        return $formData;
+        return $form_data;
     }
 }

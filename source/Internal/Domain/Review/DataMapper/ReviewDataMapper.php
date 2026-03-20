@@ -4,46 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Review;
-
-class ReviewDataMapper implements ReviewDataMapperInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Object\Review;
+class Review_Data_Mapper implements Review_Data_Mapper_Interface
 {
     public function map(Review $review, array $data): Review
     {
-        $review
-            ->setId($data['OXID'])
-            ->setRating($data['OXRATING'])
-            ->setText($data['OXTEXT'])
-            ->setObjectId($data['OXOBJECTID'])
-            ->setUserId($data['OXUSERID'])
-            ->setType($data['OXTYPE'])
-            ->setCreatedAt($data['OXTIMESTAMP']);
-
+        $review->set_id($data['OXID'])->set_rating($data['OXRATING'])->set_text($data['OXTEXT'])->set_object_id($data['OXOBJECTID'])->set_user_id($data['OXUSERID'])->set_type($data['OXTYPE'])->set_created_at($data['OXTIMESTAMP']);
         return $review;
     }
-
-    public function getData(Review $review): array
+    public function get_data(Review $review): array
     {
-        return [
-            'OXID'        => $review->getId(),
-            'OXRATING'    => $review->getRating(),
-            'OXTEXT'      => $review->getText(),
-            'OXOBJECTID'  => $review->getObjectId(),
-            'OXUSERID'    => $review->getUserId(),
-            'OXTYPE'      => $review->getType(),
-            'OXTIMESTAMP' => $review->getCreatedAt(),
-        ];
+        return ['OXID' => $review->get_id(), 'OXRATING' => $review->get_rating(), 'OXTEXT' => $review->get_text(), 'OXOBJECTID' => $review->get_object_id(), 'OXUSERID' => $review->get_user_id(), 'OXTYPE' => $review->get_type(), 'OXTIMESTAMP' => $review->get_created_at()];
     }
-
-    public function getPrimaryKey(Review $review): array
+    public function get_primary_key(Review $review): array
     {
-        return [
-            'OXID' => $review->getId(),
-        ];
+        return ['OXID' => $review->get_id()];
     }
 }

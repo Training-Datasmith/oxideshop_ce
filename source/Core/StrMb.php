@@ -1,50 +1,44 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Class dealing with multibyte strings
  */
-class StrMb
+class Str_Mb
 {
     /**
      * The character encoding.
      *
      * @var string
      */
-    protected $_sEncoding = 'UTF-8';
-
+    protected $_s_encoding = 'UTF-8';
     /**
      * Language specific characters (currently german; storen in octal form)
      *
      * @var array
      */
-    protected $_aUmls = ["\xc3\xa4", "\xc3\xb6", "\xc3\xbc", "\xC3\x84", "\xC3\x96", "\xC3\x9C", "\xC3\x9F"];
-
+    protected $_a_umls = ["ä", "ö", "ü", "Ä", "Ö", "Ü", "ß"];
     /**
      * oxUtilsString::$_aUmls equivalent in entities form
      *
      * @var array
      */
-    protected $_aUmlEntities = ['&auml;', '&ouml;', '&uuml;', '&Auml;', '&Ouml;', '&Uuml;', '&szlig;'];
-
+    protected $_a_uml_entities = ['&auml;', '&ouml;', '&uuml;', '&Auml;', '&Ouml;', '&Uuml;', '&szlig;'];
     /**
      * PHP  multi byte compliant strlen() function wrapper
      *
      * @param string $sStr string to measure its length
      */
-    public function strlen($sStr): int
+    public function strlen($s_str): int
     {
-        return mb_strlen($sStr ?? '', $this->_sEncoding);
+        return mb_strlen($s_str ?? '', $this->_s_encoding);
     }
-
     /**
      * PHP multi byte compliant substr() function wrapper
      *
@@ -52,13 +46,11 @@ class StrMb
      * @param int    $iStart  start position
      * @param int    $iLength length
      */
-    public function substr($sStr, $iStart, $iLength = null): string
+    public function substr($s_str, $i_start, $i_length = null): string
     {
-        $iLength = is_null($iLength) ? $this->strlen($sStr) : $iLength;
-
-        return mb_substr($sStr, $iStart, $iLength, $this->_sEncoding);
+        $i_length = is_null($i_length) ? $this->strlen($s_str) : $i_length;
+        return mb_substr($s_str, $i_start, $i_length, $this->_s_encoding);
     }
-
     /**
      * PHP multi byte compliant strpos() function wrapper
      *
@@ -66,17 +58,15 @@ class StrMb
      * @param string $sNeedle   value to search for
      * @param int    $iOffset   initial search position
      */
-    public function strpos($sHaystack, $sNeedle, $iOffset = null): int|false
+    public function strpos($s_haystack, $s_needle, $i_offset = null): int|false
     {
-        $iPos = false;
-        if ($sHaystack && $sNeedle) {
-            $iOffset = is_null($iOffset) ? 0 : $iOffset;
-            $iPos = mb_strpos($sHaystack, $sNeedle, $iOffset, $this->_sEncoding);
+        $i_pos = false;
+        if ($s_haystack && $s_needle) {
+            $i_offset = is_null($i_offset) ? 0 : $i_offset;
+            $i_pos = mb_strpos($s_haystack, $s_needle, $i_offset, $this->_s_encoding);
         }
-
-        return $iPos;
+        return $i_pos;
     }
-
     /**
      * PHP multi byte compliant strstr() function wrapper
      *
@@ -85,58 +75,52 @@ class StrMb
      *
      * @return string
      */
-    public function strstr($sHaystack, $sNeedle): false|string
+    public function strstr($s_haystack, $s_needle): false|string
     {
         // additional check according to bug in PHP 5.2.0 version
-        if (!$sHaystack) {
+        if (!$s_haystack) {
             return false;
         }
-
-        return mb_strstr($sHaystack, $sNeedle, false, $this->_sEncoding);
+        return mb_strstr($s_haystack, $s_needle, false, $this->_s_encoding);
     }
-
     /**
      * PHP multi byte compliant strtolower() function wrapper
      *
      * @param string $sString string being lower cased
      */
-    public function strtolower($sString): string
+    public function strtolower($s_string): string
     {
-        return mb_strtolower($sString, $this->_sEncoding);
+        return mb_strtolower($s_string, $this->_s_encoding);
     }
-
     /**
      * PHP multi byte compliant strtoupper() function wrapper
      *
      * @param string $sString string being lower cased
      */
-    public function strtoupper($sString): string
+    public function strtoupper($s_string): string
     {
-        return mb_strtoupper($sString, $this->_sEncoding);
+        return mb_strtoupper($s_string, $this->_s_encoding);
     }
-
     /**
      * PHP htmlspecialchars() function wrapper
      *
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
      */
-    public function htmlspecialchars($sString, $iQuotStyle = ENT_QUOTES): string
+    public function htmlspecialchars($s_string, $i_quot_style = ENT_QUOTES): string
     {
-        return htmlspecialchars($sString, $iQuotStyle, $this->_sEncoding);
+        return htmlspecialchars($s_string, $i_quot_style, $this->_s_encoding);
     }
-
     /**
      * PHP htmlentities() function wrapper
      *
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
      */
-    public function htmlentities($sString, $iQuotStyle = ENT_QUOTES): string
+    public function htmlentities($s_string, $i_quot_style = ENT_QUOTES): string
     {
-        return htmlentities($sString, $iQuotStyle, $this->_sEncoding);
+        return htmlentities($s_string, $i_quot_style, $this->_s_encoding);
     }
-
     // @codingStandardsIgnoreStart
     /**
      * PHP html_entity_decode() function wrapper
@@ -144,11 +128,10 @@ class StrMb
      * @param string $sString    string being converted
      * @param int    $iQuotStyle quoting rule
      */
-    public function html_entity_decode($sString, $iQuotStyle = ENT_QUOTES): string
+    public function html_entity_decode($s_string, $i_quot_style = ENT_QUOTES): string
     {
-        return html_entity_decode($sString, $iQuotStyle, $this->_sEncoding);
+        return html_entity_decode($s_string, $i_quot_style, $this->_s_encoding);
     }
-
     /**
      * PHP preg_split() function wrapper
      *
@@ -159,11 +142,10 @@ class StrMb
      *
      * @return string
      */
-    public function preg_split(string $sPattern, $sString, $iLimit = -1, $iFlag = 0)
+    public function preg_split(string $s_pattern, $s_string, $i_limit = -1, $i_flag = 0)
     {
-        return preg_split($sPattern . 'u', $sString, $iLimit, $iFlag);
+        return preg_split($s_pattern . 'u', $s_string, $i_limit, $i_flag);
     }
-
     /**
      * PHP preg_replace() function wrapper
      *
@@ -175,19 +157,17 @@ class StrMb
      *
      * @return string
      */
-    public function preg_replace($aPattern, $sString, $sSubject, $iLimit = -1, $iCount = null): ?string
+    public function preg_replace($a_pattern, $s_string, $s_subject, $i_limit = -1, $i_count = null): ?string
     {
-        if (is_array($aPattern)) {
-            foreach ($aPattern as &$sPattern) {
-                $sPattern = $sPattern . 'u';
+        if (is_array($a_pattern)) {
+            foreach ($a_pattern as &$s_pattern) {
+                $s_pattern = $s_pattern . 'u';
             }
         } else {
-            $aPattern = $aPattern . 'u';
+            $a_pattern = $a_pattern . 'u';
         }
-
-        return preg_replace($aPattern, (string) $sString, $sSubject, $iLimit, $iCount);
+        return preg_replace($a_pattern, (string) $s_string, $s_subject, $i_limit, $i_count);
     }
-
     /**
      * PHP preg_replace() function wrapper
      *
@@ -208,10 +188,8 @@ class StrMb
         } else {
             $pattern = $pattern . 'u';
         }
-
         return preg_replace_callback($pattern, $callback, $subject, $limit, $count);
     }
-
     /**
      * PHP preg_match() function wrapper
      *
@@ -221,11 +199,10 @@ class StrMb
      * @param int    $iFlags   flags
      * @param int    $iOffset  place from which to start the search
      */
-    public function preg_match(string $sPattern, $sSubject, &$aMatches = null, $iFlags = 0, $iOffset = 0): int|false
+    public function preg_match(string $s_pattern, $s_subject, &$a_matches = null, $i_flags = 0, $i_offset = 0): int|false
     {
-        return preg_match($sPattern . 'u', $sSubject, $aMatches, $iFlags, $iOffset);
+        return preg_match($s_pattern . 'u', $s_subject, $a_matches, $i_flags, $i_offset);
     }
-
     /**
      * PHP preg_match_all() function wrapper
      *
@@ -235,9 +212,9 @@ class StrMb
      * @param int    $iFlags   flags
      * @param int    $iOffset  place from which to start the search
      */
-    public function preg_match_all(string $sPattern, $sSubject, &$aMatches = null, $iFlags = null, $iOffset = null): int|false
+    public function preg_match_all(string $s_pattern, $s_subject, &$a_matches = null, $i_flags = null, $i_offset = null): int|false
     {
-        return preg_match_all($sPattern . 'u', $sSubject, $aMatches, $iFlags, $iOffset);
+        return preg_match_all($s_pattern . 'u', $s_subject, $a_matches, $i_flags, $i_offset);
     }
     // @codingStandardsIgnoreEnd
     /**
@@ -245,13 +222,11 @@ class StrMb
      *
      * @param string $sSubject input string
      */
-    public function ucfirst($sSubject): string
+    public function ucfirst($s_subject): string
     {
-        $sString = $this->strtoupper($this->substr($sSubject, 0, 1));
-
-        return $sString . $this->substr($sSubject, 1);
+        $s_string = $this->strtoupper($this->substr($s_subject, 0, 1));
+        return $s_string . $this->substr($s_subject, 1);
     }
-
     /**
      * PHP wordwrap() function wrapper
      *
@@ -262,41 +237,36 @@ class StrMb
      *
      * @return string
      */
-    public function wordwrap($sString, $iLength = 75, string $sBreak = "\n", $blCut = null)
+    public function wordwrap($s_string, $i_length = 75, string $s_break = "\n", $bl_cut = null)
     {
-        if (!$blCut) {
-            $sRegexp = "/^(.{1,{$iLength}}\r?(\s|$|\n)|.{1,{$iLength}}[^\r\s\n]*\r?(\n|\s|$))/u";
+        if (!$bl_cut) {
+            $s_regexp = "/^(.{1,{$i_length}}\r?(\\s|\$|\n)|.{1,{$i_length}}[^\r\\s\n]*\r?(\n|\\s|\$))/u";
         } else {
-            $sRegexp = "/^([^\s]{{$iLength}}|.{1,{$iLength}}\s)/u";
+            $s_regexp = "/^([^\\s]{{$i_length}}|.{1,{$i_length}}\\s)/u";
         }
-
-        $iStrLen = mb_strlen($sString, $this->_sEncoding);
-        $iWraps = floor($iStrLen / $iLength);
-
-        $i = $iWraps;
-        $sReturn = '';
-        $aMatches = [];
+        $i_str_len = mb_strlen($s_string, $this->_s_encoding);
+        $i_wraps = floor($i_str_len / $i_length);
+        $i = $i_wraps;
+        $s_return = '';
+        $a_matches = [];
         while ($i > 0) {
-            $iWraps = floor(mb_strlen($sString, $this->_sEncoding) / $iLength);
-
-            $i = $iWraps;
-            if (preg_match($sRegexp, $sString, $aMatches)) {
-                $sStr = $aMatches[0];
-                $sReturn .= preg_replace('/\s$/s', '', $sStr) . $sBreak;
-                $sString = $this->substr($sString, mb_strlen($sStr, $this->_sEncoding));
+            $i_wraps = floor(mb_strlen($s_string, $this->_s_encoding) / $i_length);
+            $i = $i_wraps;
+            if (preg_match($s_regexp, $s_string, $a_matches)) {
+                $s_str = $a_matches[0];
+                $s_return .= preg_replace('/\s$/s', '', $s_str) . $s_break;
+                $s_string = $this->substr($s_string, mb_strlen($s_str, $this->_s_encoding));
             } else {
                 break;
             }
             $i--;
         }
-        $sReturn = preg_replace("/$sBreak$/", '', $sReturn);
-        if ($sString) {
-            $sReturn .= $sBreak . $sString;
+        $s_return = preg_replace("/{$s_break}\$/", '', $s_return);
+        if ($s_string) {
+            $s_return .= $s_break . $s_string;
         }
-
-        return $sReturn;
+        return $s_return;
     }
-
     /**
      * Recodes and returns passed input:
      * if $blToHtmlEntities == true  ä -> &auml;
@@ -309,24 +279,21 @@ class StrMb
      *
      * @return string
      */
-    public function recodeEntities($sInput, $blToHtmlEntities = false, $aUmls = [], $aUmlEntities = []): string|array
+    public function recode_entities($s_input, $bl_to_html_entities = false, $a_umls = [], $a_uml_entities = []): string|array
     {
-        $aUmls = (count($aUmls) > 0) ? array_merge($this->_aUmls, $aUmls) : $this->_aUmls;
-        $aUmlEntities = (count($aUmlEntities) > 0) ? array_merge($this->_aUmlEntities, $aUmlEntities) : $this->_aUmlEntities;
-
-        return $blToHtmlEntities ? str_replace($aUmls, $aUmlEntities, $sInput) : str_replace($aUmlEntities, $aUmls, $sInput);
+        $a_umls = count($a_umls) > 0 ? array_merge($this->_a_umls, $a_umls) : $this->_a_umls;
+        $a_uml_entities = count($a_uml_entities) > 0 ? array_merge($this->_a_uml_entities, $a_uml_entities) : $this->_a_uml_entities;
+        return $bl_to_html_entities ? str_replace($a_umls, $a_uml_entities, $s_input) : str_replace($a_uml_entities, $a_umls, $s_input);
     }
-
     /**
      * Checks if string has special chars
      *
      * @param string $sStr string to search in
      */
-    public function hasSpecialChars($sStr): int|false
+    public function has_special_chars($s_str): int|false
     {
-        return $this->preg_match('/(' . implode('|', $this->_aUmls) . '|(&amp;))/', $sStr);
+        return $this->preg_match('/(' . implode('|', $this->_a_umls) . '|(&amp;))/', $s_str);
     }
-
     /**
      * Replaces special characters with passed char.
      * Special chars are: \n \r \t \xc2\x95 \xc2\xa0 ;
@@ -336,11 +303,10 @@ class StrMb
      *
      * @return string
      */
-    public function cleanStr($sStr, $sCleanChr = ' '): ?string
+    public function clean_str($s_str, $s_clean_chr = ' '): ?string
     {
-        return $this->preg_replace("/\n|\r|\t|\xc2\x95|\xc2\xa0|;/", $sCleanChr, $sStr);
+        return $this->preg_replace("/\n|\r|\t|| |;/", $s_clean_chr, $s_str);
     }
-
     /**
      * wrapper for json encode, which does not work with non utf8 characters
      *
@@ -348,11 +314,10 @@ class StrMb
      *
      * @return string
      */
-    public function jsonEncode($data)
+    public function json_encode($data)
     {
         return json_encode($data);
     }
-
     // @codingStandardsIgnoreStart
     /**
      * PHP strip_tags() function wrapper.
@@ -360,17 +325,15 @@ class StrMb
      * @param string $sString        the input string
      * @param string $sAllowableTags an optional parameter to specify tags which should not be stripped
      */
-    public function strip_tags($sString, $sAllowableTags = ''): string
+    public function strip_tags($s_string, $s_allowable_tags = ''): string
     {
-        if (stripos($sAllowableTags, '<style>') === false) {
+        if (stripos($s_allowable_tags, '<style>') === false) {
             // strip style tags with definitions within
-            $sString = $this->preg_replace("'<style[^>]*>.*</style>'siU", '', $sString);
+            $s_string = $this->preg_replace("'<style[^>]*>.*</style>'siU", '', $s_string);
         }
-
-        return strip_tags((string) $sString, $sAllowableTags);
+        return strip_tags((string) $s_string, $s_allowable_tags);
     }
     // @codingStandardsIgnoreEnd
-
     /**
      * Compares two strings. Case sensitive.
      * For use in sorting with reverse order
@@ -380,8 +343,8 @@ class StrMb
      *
      * @return int > 0 if str1 is less than str2; < 0 if str1 is greater than str2, and 0 if they are equal.
      */
-    public function strrcmp($sStr1, $sStr2): int
+    public function strrcmp($s_str1, $s_str2): int
     {
-        return -strcmp($sStr1, $sStr2);
+        return -strcmp($s_str1, $s_str2);
     }
 }

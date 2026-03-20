@@ -1,19 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Mapper;
 
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\DataMapper;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\Media;
-
-interface DataMapperInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object\Media;
+interface Data_Mapper_Interface
 {
-    public function toData(Media $media): array;
-
-    public function fromData(array $data): Media;
+    public function to_data(Media $media): array;
+    public function from_data(array $data): Media;
 }

@@ -1,91 +1,65 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages manufacturer assignment to articles
  */
-class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Manufacturer_Main_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * If true extended column selection will be build
      *
      * @var bool
      */
-    protected $_blAllowExtColumns = true;
-
+    protected $_bl_allow_ext_columns = true;
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = [
+    protected $_a_columns = [
         // field , table, visible, multilanguage, id
-        'container1' => [
-            ['oxartnum', 'oxarticles', 1, 0, 0],
-            ['oxtitle', 'oxarticles', 1, 1, 0],
-            ['oxean', 'oxarticles', 1, 0, 0],
-            ['oxmpn', 'oxarticles', 0, 0, 0],
-            ['oxprice', 'oxarticles', 0, 0, 0],
-            ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1],
-        ],
-        'container2' => [
-            ['oxartnum', 'oxarticles', 1, 0, 0],
-            ['oxtitle', 'oxarticles', 1, 1, 0],
-            ['oxean', 'oxarticles', 1, 0, 0],
-            ['oxmpn', 'oxarticles', 0, 0, 0],
-            ['oxprice', 'oxarticles', 0, 0, 0],
-            ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1],
-        ],
+        'container1' => [['oxartnum', 'oxarticles', 1, 0, 0], ['oxtitle', 'oxarticles', 1, 1, 0], ['oxean', 'oxarticles', 1, 0, 0], ['oxmpn', 'oxarticles', 0, 0, 0], ['oxprice', 'oxarticles', 0, 0, 0], ['oxstock', 'oxarticles', 0, 0, 0], ['oxid', 'oxarticles', 0, 0, 1]],
+        'container2' => [['oxartnum', 'oxarticles', 1, 0, 0], ['oxtitle', 'oxarticles', 1, 1, 0], ['oxean', 'oxarticles', 1, 0, 0], ['oxmpn', 'oxarticles', 0, 0, 0], ['oxprice', 'oxarticles', 0, 0, 0], ['oxstock', 'oxarticles', 0, 0, 0], ['oxid', 'oxarticles', 0, 0, 1]],
     ];
-
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         // looking for table/view
-        $articlesViewName = $this->getViewName('oxarticles');
-        $objectToCategoryViewName = $this->getViewName('oxobject2category');
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $syncedManufacturerId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $articles_view_name = $this->get_view_name('oxarticles');
+        $object_to_category_view_name = $this->get_view_name('oxobject2category');
+        $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $manufacturer_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $synced_manufacturer_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // Manufacturer selected or not ?
-        if (!$manufacturerId) {
+        if (!$manufacturer_id) {
             // performance
-            $query = ' from ' . $articlesViewName . ' where ' . $articlesViewName . '.oxshopid="' . $config->getShopId() . '" and 1 ';
-            $query .= $config->getConfigParam('blVariantsSelection') ? '' : " and $articlesViewName.oxparentid = '' and $articlesViewName.oxmanufacturerid != " . $database->quote($syncedManufacturerId);
-        } elseif ($syncedManufacturerId && $syncedManufacturerId != $manufacturerId) {
+            $query = ' from ' . $articles_view_name . ' where ' . $articles_view_name . '.oxshopid="' . $config->get_shop_id() . '" and 1 ';
+            $query .= $config->get_config_param('blVariantsSelection') ? '' : " and {$articles_view_name}.oxparentid = '' and {$articles_view_name}.oxmanufacturerid != " . $database->quote($synced_manufacturer_id);
+        } elseif ($synced_manufacturer_id && $synced_manufacturer_id != $manufacturer_id) {
             // selected category ?
-            $query = " from $objectToCategoryViewName left join $articlesViewName on ";
-            $query .= $config->getConfigParam('blVariantsSelection') ? " ( $articlesViewName.oxid = $objectToCategoryViewName.oxobjectid or $articlesViewName.oxparentid = $objectToCategoryViewName.oxobjectid )" : " $articlesViewName.oxid = $objectToCategoryViewName.oxobjectid ";
-            $query .= 'where ' . $articlesViewName . '.oxshopid="' . $config->getShopId() . '" and ' . $objectToCategoryViewName . '.oxcatnid = ' . $database->quote($manufacturerId) . ' and ' . $articlesViewName . '.oxmanufacturerid != ' . $database->quote($syncedManufacturerId);
-            $query .= $config->getConfigParam('blVariantsSelection') ? '' : " and $articlesViewName.oxparentid = '' ";
+            $query = " from {$object_to_category_view_name} left join {$articles_view_name} on ";
+            $query .= $config->get_config_param('blVariantsSelection') ? " ( {$articles_view_name}.oxid = {$object_to_category_view_name}.oxobjectid or {$articles_view_name}.oxparentid = {$object_to_category_view_name}.oxobjectid )" : " {$articles_view_name}.oxid = {$object_to_category_view_name}.oxobjectid ";
+            $query .= 'where ' . $articles_view_name . '.oxshopid="' . $config->get_shop_id() . '" and ' . $object_to_category_view_name . '.oxcatnid = ' . $database->quote($manufacturer_id) . ' and ' . $articles_view_name . '.oxmanufacturerid != ' . $database->quote($synced_manufacturer_id);
+            $query .= $config->get_config_param('blVariantsSelection') ? '' : " and {$articles_view_name}.oxparentid = '' ";
         } else {
-            $query = " from $articlesViewName where $articlesViewName.oxmanufacturerid = " . $database->quote($manufacturerId);
-            $query .= $config->getConfigParam('blVariantsSelection') ? '' : " and $articlesViewName.oxparentid = '' ";
+            $query = " from {$articles_view_name} where {$articles_view_name}.oxmanufacturerid = " . $database->quote($manufacturer_id);
+            $query .= $config->get_config_param('blVariantsSelection') ? '' : " and {$articles_view_name}.oxparentid = '' ";
         }
-
         return $query;
     }
-
     /**
      * Adds filter SQL to current query
      *
@@ -93,40 +67,33 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @return string
      */
-    protected function addFilter($query)
+    protected function add_filter($query)
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $articleViewName = $this->getViewName('oxarticles');
-        $query = parent::addFilter($query);
-
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $article_view_name = $this->get_view_name('oxarticles');
+        $query = parent::add_filter($query);
         // display variants or not ?
-        $query .= $config->getConfigParam('blVariantsSelection') ? ' group by ' . $articleViewName . '.oxid ' : '';
-
+        $query .= $config->get_config_param('blVariantsSelection') ? ' group by ' . $article_view_name . '.oxid ' : '';
         return $query;
     }
-
     /**
      * Removes article from Manufacturer config
      */
-    public function removeManufacturer(): void
+    public function remove_manufacturer(): void
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig();
-        $articleIds = $this->getActionIds('oxarticles.oxid');
-        $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $articleViewTable = $this->getViewName('oxarticles');
-            $articleIds = $this->getAll($this->addFilter("select $articleViewTable.oxid " . $this->getQuery()));
+        \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $article_ids = $this->get_action_ids('oxarticles.oxid');
+        $manufacturer_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $article_view_table = $this->get_view_name('oxarticles');
+            $article_ids = $this->get_all($this->add_filter("select {$article_view_table}.oxid " . $this->get_query()));
         }
-
-        if (is_array($articleIds) && !empty($articleIds)) {
-            $query = $this->formManufacturerRemovalQuery($articleIds);
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query);
-
-            $this->resetCounter('manufacturerArticle', $manufacturerId);
+        if (is_array($article_ids) && !empty($article_ids)) {
+            $query = $this->form_manufacturer_removal_query($article_ids);
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->execute($query);
+            $this->reset_counter('manufacturerArticle', $manufacturer_id);
         }
     }
-
     /**
      * Forms and returns query for manufacturers removal.
      *
@@ -134,38 +101,32 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @return string
      */
-    protected function formManufacturerRemovalQuery($articlesToRemove)
+    protected function form_manufacturer_removal_query($articles_to_remove)
     {
         return '
           UPDATE oxarticles
           SET oxmanufacturerid = null
-          WHERE oxid IN ( ' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ') ';
+          WHERE oxid IN ( ' . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($articles_to_remove)) . ') ';
     }
-
     /**
      * Adds article to Manufacturer config
      */
-    public function addManufacturer(): void
+    public function add_manufacturer(): void
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        $articleIds = $this->getActionIds('oxarticles.oxid');
-        $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $articleViewName = $this->getViewName('oxarticles');
-            $articleIds = $this->getAll($this->addFilter("select $articleViewName.oxid " . $this->getQuery()));
+        \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $article_ids = $this->get_action_ids('oxarticles.oxid');
+        $manufacturer_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $article_view_name = $this->get_view_name('oxarticles');
+            $article_ids = $this->get_all($this->add_filter("select {$article_view_name}.oxid " . $this->get_query()));
         }
-
-        if ($manufacturerId && $manufacturerId != '-1' && is_array($articleIds)) {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-            $query = $this->formArticleToManufacturerAdditionQuery($manufacturerId, $articleIds);
+        if ($manufacturer_id && $manufacturer_id != '-1' && is_array($article_ids)) {
+            $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $query = $this->form_article_to_manufacturer_addition_query($manufacturer_id, $article_ids);
             $database->execute($query);
-            $this->resetCounter('manufacturerArticle', $manufacturerId);
+            $this->reset_counter('manufacturerArticle', $manufacturer_id);
         }
     }
-
     /**
      * Forms and returns query for articles addition to manufacturer.
      *
@@ -174,13 +135,12 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @return string
      */
-    protected function formArticleToManufacturerAdditionQuery($manufacturerId, $articlesToAdd)
+    protected function form_article_to_manufacturer_addition_query($manufacturer_id, $articles_to_add)
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         return '
             UPDATE oxarticles
-            SET oxmanufacturerid = ' . $database->quote($manufacturerId) . '
-            WHERE oxid IN ( ' . implode(', ', $database->quoteArray($articlesToAdd)) . ' )';
+            SET oxmanufacturerid = ' . $database->quote($manufacturer_id) . '
+            WHERE oxid IN ( ' . implode(', ', $database->quote_array($articles_to_add)) . ' )';
     }
 }

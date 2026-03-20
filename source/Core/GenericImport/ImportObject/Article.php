@@ -1,25 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\GenericImport\ImportObject;
+namespace Oxid_Esales\Eshop_Community\Core\Generic_Import\Import_Object;
 
 /**
  * Import object for Articles.
  */
-class Article extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject
+class Article extends \Oxid_Esales\Eshop\Core\Generic_Import\Import_Object\Import_Object
 {
     /** @var string Database table name. */
-    protected $tableName = 'oxarticles';
-
+    protected $table_name = 'oxarticles';
     /** @var string Shop object name. */
-    protected $shopObjectName = 'oxArticle';
-
+    protected $shop_object_name = 'oxArticle';
     /**
      * Imports article. Returns import status.
      *
@@ -30,12 +26,10 @@ class Article extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportOb
     public function import($data)
     {
         if (isset($data['OXID'])) {
-            $this->checkIdField($data['OXID']);
+            $this->check_id_field($data['OXID']);
         }
-
         return parent::import($data);
     }
-
     /**
      * Issued before saving an object.
      * Can modify $data array before saving.
@@ -47,17 +41,15 @@ class Article extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportOb
      *
      * @return array
      */
-    protected function preAssignObject($shopObject, $data, $allowCustomShopId)
+    protected function pre_assign_object($shop_object, $data, $allow_custom_shop_id)
     {
         if (!isset($data['OXSTOCKFLAG'])) {
-            if (!$data['OXID'] || !$shopObject->exists($data['OXID'])) {
+            if (!$data['OXID'] || !$shop_object->exists($data['OXID'])) {
                 $data['OXSTOCKFLAG'] = 1;
             }
         }
-
-        return parent::preAssignObject($shopObject, $data, $allowCustomShopId);
+        return parent::pre_assign_object($shop_object, $data, $allow_custom_shop_id);
     }
-
     /**
      * Post saving hook. can finish transactions if needed or ajust related data.
      *
@@ -66,25 +58,22 @@ class Article extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportOb
      *
      * @return mixed data to return
      */
-    protected function postSaveObject($shopObject, $data)
+    protected function post_save_object($shop_object, $data)
     {
-        $articleId = $shopObject->getId();
-        $shopObject->onChange(null, $articleId, $articleId);
-
-        return $articleId;
+        $article_id = $shop_object->get_id();
+        $shop_object->on_change(null, $article_id, $article_id);
+        return $article_id;
     }
-
     /**
      * Creates shop object.
      *
      * @return \OxidEsales\Eshop\Core\Model\BaseModel
      */
-    protected function createShopObject()
+    protected function create_shop_object()
     {
         /** @var \OxidEsales\Eshop\Application\Model\Article $shopObject */
-        $shopObject = parent::createShopObject();
-        $shopObject->setNoVariantLoading(true);
-
-        return $shopObject;
+        $shop_object = parent::create_shop_object();
+        $shop_object->set_no_variant_loading(true);
+        return $shop_object;
     }
 }

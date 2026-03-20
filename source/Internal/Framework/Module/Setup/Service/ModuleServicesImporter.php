@@ -4,75 +4,55 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service;
-
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\DataObject\DIConfigWrapper;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception\NoServiceYamlException;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Data_Object\Di_Config_Wrapper;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Exception\No_Service_Yaml_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Yaml\Yaml;
-
 /**
  * @internal
  */
-class ModuleServicesImporter implements ModuleServicesImporterInterface
+class Module_Services_Importer implements Module_Services_Importer_Interface
 {
-    public function __construct(
-        private readonly BasicContextInterface $context
-    ) {
-    }
-
-    public function addImport(string $serviceDir, int $shopId): void
+    public function __construct(private readonly Basic_Context_Interface $context)
     {
-        if (!file_exists($this->getServiceFilePath($serviceDir))) {
-            throw new NoServiceYamlException();
+    }
+    public function add_import(string $service_dir, int $shop_id): void
+    {
+        if (!file_exists($this->get_service_file_path($service_dir))) {
+            throw new No_Service_Yaml_Exception();
         }
-        $services = $this->loadDIConfigFile($this->context->getActiveModuleServicesFilePath($shopId));
-        $services->addImport($this->getServiceRelativeFilePath($serviceDir, $shopId));
-
-        $this->saveServicesFile($services, $shopId);
+        $services = $this->load_di_config_file($this->context->get_active_module_services_file_path($shop_id));
+        $services->add_import($this->get_service_relative_file_path($service_dir, $shop_id));
+        $this->save_services_file($services, $shop_id);
     }
-
-    public function removeImport(string $serviceDir, int $shopId): void
+    public function remove_import(string $service_dir, int $shop_id): void
     {
-        $services = $this->loadDIConfigFile($this->context->getActiveModuleServicesFilePath($shopId));
-        $services->removeImport($this->getServiceRelativeFilePath($serviceDir, $shopId));
-
-        $this->saveServicesFile($services, $shopId);
+        $services = $this->load_di_config_file($this->context->get_active_module_services_file_path($shop_id));
+        $services->remove_import($this->get_service_relative_file_path($service_dir, $shop_id));
+        $this->save_services_file($services, $shop_id);
     }
-
-    private function getServiceRelativeFilePath(string $serviceDir, int $shopId): string
+    private function get_service_relative_file_path(string $service_dir, int $shop_id): string
     {
-        return Path::makeRelative(
-            $this->getServiceFilePath($serviceDir),
-            Path::getDirectory($this->context->getActiveModuleServicesFilePath($shopId))
-        );
+        return Path::make_relative($this->get_service_file_path($service_dir), Path::get_directory($this->context->get_active_module_services_file_path($shop_id)));
     }
-
-    private function loadDIConfigFile(string $path): DIConfigWrapper
+    private function load_di_config_file(string $path): Di_Config_Wrapper
     {
-        $yamlArray = [];
-
+        $yaml_array = [];
         if (file_exists($path)) {
-            $yamlArray = Yaml::parse(file_get_contents($path), Yaml::PARSE_CUSTOM_TAGS) ?? [];
+            $yaml_array = Yaml::parse(file_get_contents($path), Yaml::PARSE_CUSTOM_TAGS) ?? [];
         }
-
-        return new DIConfigWrapper($yamlArray);
+        return new Di_Config_Wrapper($yaml_array);
     }
-
-    private function saveServicesFile(DIConfigWrapper $config, int $shopId): void
+    private function save_services_file(Di_Config_Wrapper $config, int $shop_id): void
     {
-        file_put_contents(
-            $this->context->getActiveModuleServicesFilePath($shopId),
-            Yaml::dump($config->getConfigAsArray(), 3, 2)
-        );
+        file_put_contents($this->context->get_active_module_services_file_path($shop_id), Yaml::dump($config->get_config_as_array(), 3, 2));
     }
-
-    private function getServiceFilePath(string $serviceDir): string
+    private function get_service_file_path(string $service_dir): string
     {
-        return Path::join($serviceDir, 'services.yaml');
+        return Path::join($service_dir, 'services.yaml');
     }
 }

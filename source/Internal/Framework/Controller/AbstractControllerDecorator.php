@@ -4,85 +4,68 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Controller;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Controller;
-
-abstract class AbstractControllerDecorator implements ViewControllerInterface
+abstract class Abstract_Controller_Decorator implements View_Controller_Interface
 {
-    public function __construct(
-        protected readonly ViewControllerInterface $controller,
-    ) {
+    public function __construct(protected readonly View_Controller_Interface $controller)
+    {
     }
-
     public function init(): void
     {
         $this->controller->init();
     }
-
     public function render()
     {
         return $this->controller->render();
     }
-
-    public function getFncName()
+    public function get_fnc_name()
     {
-        return $this->controller->getFncName();
+        return $this->controller->get_fnc_name();
     }
-
-    public function executeFunction($function): void
+    public function execute_function($function): void
     {
-        $this->controller->executeFunction($function);
+        $this->controller->execute_function($function);
     }
-
-    public function getIsCallForCache()
+    public function get_is_call_for_cache()
     {
-        return $this->controller->getIsCallForCache();
+        return $this->controller->get_is_call_for_cache();
     }
-
-    public function getClassKey()
+    public function get_class_key()
     {
-        return $this->controller->getClassKey();
+        return $this->controller->get_class_key();
     }
-
-    public function getViewData()
+    public function get_view_data()
     {
-        return $this->controller->getViewData();
+        return $this->controller->get_view_data();
     }
-
-    public function setViewData($viewData = null): void
+    public function set_view_data($view_data = null): void
     {
-        $this->controller->setViewData($viewData);
+        $this->controller->set_view_data($view_data);
     }
-
-    public function getViewId()
+    public function get_view_id()
     {
-        return $this->controller->getViewId();
+        return $this->controller->get_view_id();
     }
-
-    public function getCharSet()
+    public function get_char_set()
     {
-        return $this->controller->getCharSet();
+        return $this->controller->get_char_set();
     }
-
-    public function setClassKey($classKey): void
+    public function set_class_key($class_key): void
     {
-        $this->controller->setClassKey($classKey);
+        $this->controller->set_class_key($class_key);
     }
-
-    public function setFncName($fncName): void
+    public function set_fnc_name($fnc_name): void
     {
-        $this->controller->setFncName($fncName);
+        $this->controller->set_fnc_name($fnc_name);
     }
-
-    public function setViewParameters($params = null): void
+    public function set_view_parameters($params = null): void
     {
-        $this->controller->setViewParameters($params);
+        $this->controller->set_view_parameters($params);
     }
-
-    public function getViewParameter($key)
+    public function get_view_parameter($key)
     {
-        return $this->controller->getViewParameter($key);
+        return $this->controller->get_view_parameter($key);
     }
 }

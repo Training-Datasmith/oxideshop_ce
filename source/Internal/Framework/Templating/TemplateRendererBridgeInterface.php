@@ -4,22 +4,18 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating;
-
-interface TemplateRendererBridgeInterface
+interface Template_Renderer_Bridge_Interface
 {
-    public function getTemplateRenderer(): TemplateRendererInterface;
-
+    public function get_template_renderer(): Template_Renderer_Interface;
     /**
      * @deprecated since 7.0.0 will be removed in next major
      */
-    public function setEngine($engine);
-
+    public function set_engine($engine);
     /**
      * @deprecated since 7.0.0 will be removed in next major
      */
-    public function getEngine();
+    public function get_engine();
 }

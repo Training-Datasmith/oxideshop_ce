@@ -1,23 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * SEPA (Single Euro Payments Area) validation class
  */
-class SepaValidator
+class Sepa_Validator
 {
     /**
      * @var array IBAN Code Length array
      */
-    protected $_aIBANCodeLengths = [
+    protected $_a_iban_code_lengths = [
         'AL' => 28,
         'AD' => 24,
         'AT' => 20,
@@ -31,9 +29,12 @@ class SepaValidator
         'HR' => 21,
         'CY' => 28,
         'CZ' => 24,
-        'DK' => 18, // Same DENMARK
-        'FO' => 18, // Same DENMARK
-        'GL' => 18, // Same DENMARK
+        'DK' => 18,
+        // Same DENMARK
+        'FO' => 18,
+        // Same DENMARK
+        'GL' => 18,
+        // Same DENMARK
         'DO' => 28,
         'EE' => 20,
         'FI' => 18,
@@ -83,7 +84,6 @@ class SepaValidator
         'GB' => 22,
         'VG' => 24,
     ];
-
     /**
      * Business identifier code validation
      *
@@ -91,13 +91,11 @@ class SepaValidator
      *
      * @return bool
      */
-    public function isValidBIC($sBIC)
+    public function is_valid_bic($s_bic)
     {
-        $oBICValidator = oxNew(\OxidEsales\Eshop\Core\SepaBICValidator::class);
-
-        return $oBICValidator->isValid($sBIC);
+        $o_bic_validator = ox_new(\Oxid_Esales\Eshop\Core\Sepa_Bic_Validator::class);
+        return $o_bic_validator->is_valid($s_bic);
     }
-
     /**
      * International bank account number validation
      *
@@ -105,21 +103,19 @@ class SepaValidator
      *
      * @return bool
      */
-    public function isValidIBAN($sIBAN)
+    public function is_valid_iban($s_iban)
     {
-        $oIBANValidator = oxNew(\OxidEsales\Eshop\Core\SepaIBANValidator::class);
-        $oIBANValidator->setCodeLengths($this->getIBANCodeLengths());
-
-        return $oIBANValidator->isValid($sIBAN);
+        $o_iban_validator = ox_new(\Oxid_Esales\Eshop\Core\Sepa_Iban_Validator::class);
+        $o_iban_validator->set_code_lengths($this->get_iban_code_lengths());
+        return $o_iban_validator->is_valid($s_iban);
     }
-
     /**
      * Get IBAN length by country data
      *
      * @return array
      */
-    public function getIBANCodeLengths()
+    public function get_iban_code_lengths()
     {
-        return $this->_aIBANCodeLengths;
+        return $this->_a_iban_code_lengths;
     }
 }

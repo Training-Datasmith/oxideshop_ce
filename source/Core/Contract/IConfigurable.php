@@ -1,19 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Contract;
+namespace Oxid_Esales\Eshop_Community\Core\Contract;
 
 /**
  * The interface methods should be implemented by classes which need a configuration object
  * (usually OxConfig) manually set.
  */
-interface IConfigurable
+interface I_Configurable
 {
     /**
      * Sets configuration object
@@ -24,8 +22,7 @@ interface IConfigurable
      *
      * @return mixed
      */
-    public function setConfig(\OxidEsales\Eshop\Core\Config $oConfig);
-
+    public function set_config(\Oxid_Esales\Eshop\Core\Config $o_config);
     /**
      * Returns active configuration object
      *
@@ -33,5 +30,5 @@ interface IConfigurable
      *
      * @return \OxidEsales\Eshop\Core\Config
      */
-    public function getConfig();
+    public function get_config();
 }

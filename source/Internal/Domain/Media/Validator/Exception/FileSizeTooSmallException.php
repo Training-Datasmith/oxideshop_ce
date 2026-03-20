@@ -4,37 +4,30 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception;
-
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FileSizeLogic;
-
-class FileSizeTooSmallException extends MediaValidationException
+use Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\File_Size_Logic;
+class File_Size_Too_Small_Exception extends Media_Validation_Exception
 {
-    public function __construct(private readonly int $actualBytes, private readonly int $minKb)
+    public function __construct(private readonly int $actual_bytes, private readonly int $min_kb)
     {
-        parent::__construct('File too small: ' . $actualBytes . ' bytes, min ' . $minKb . ' KB');
+        parent::__construct('File too small: ' . $actual_bytes . ' bytes, min ' . $min_kb . ' KB');
     }
-
-    public function getActualBytes(): int
+    public function get_actual_bytes(): int
     {
-        return $this->actualBytes;
+        return $this->actual_bytes;
     }
-
-    public function getMinKb(): int
+    public function get_min_kb(): int
     {
-        return $this->minKb;
+        return $this->min_kb;
     }
-
-    public function getActualFormatted(): string
+    public function get_actual_formatted(): string
     {
-        return (new FileSizeLogic())->getFileSize($this->actualBytes);
+        return (new File_Size_Logic())->get_file_size($this->actual_bytes);
     }
-
-    public function getMinFormatted(): string
+    public function get_min_formatted(): string
     {
-        return (new FileSizeLogic())->getFileSize($this->minKb * 1024);
+        return (new File_Size_Logic())->get_file_size($this->min_kb * 1024);
     }
 }

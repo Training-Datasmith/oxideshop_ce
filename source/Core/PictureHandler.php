@@ -1,24 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\Eshop\Application\Model\Article;
-use OxidEsales\Eshop\Core\Base;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use Oxid_Esales\Eshop\Application\Model\Article;
+use Oxid_Esales\Eshop\Core\Base;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 use Symfony\Component\Filesystem\Path;
-
 /**
  * class for pictures processing
  */
-class PictureHandler extends Base
+class Picture_Handler extends Base
 {
     /**
      * Deletes master picture and all images generated from it.
@@ -29,130 +26,100 @@ class PictureHandler extends Base
      * @param int     $iIndex                master picture index
      * @param bool    $blDeleteMasterPicture delete master picture, default is true
      */
-    public function deleteArticleMasterPicture($oObject, $iIndex, $blDeleteMasterPicture = true): void
+    public function delete_article_master_picture($o_object, $i_index, $bl_delete_master_picture = true): void
     {
-        $myConfig = Registry::getConfig();
-        $myUtilsPic = Registry::getUtilsPic();
-        $oUtilsFile = Registry::getUtilsFile();
-        $blGeneratedImagesOnly = !$blDeleteMasterPicture;
-        $imageFieldName = "oxpic$iIndex";
-        $imageFieldValue = $oObject->getFieldData($imageFieldName);
-
-        $masterImageFilename = $imageFieldValue ? basename((string) $imageFieldValue) : null;
-        if (!$masterImageFilename || $masterImageFilename === $this->getNopicFilename()) {
+        $my_config = Registry::get_config();
+        $my_utils_pic = Registry::get_utils_pic();
+        $o_utils_file = Registry::get_utils_file();
+        $bl_generated_images_only = !$bl_delete_master_picture;
+        $image_field_name = "oxpic{$i_index}";
+        $image_field_value = $o_object->get_field_data($image_field_name);
+        $master_image_filename = $image_field_value ? basename((string) $image_field_value) : null;
+        if (!$master_image_filename || $master_image_filename === $this->get_nopic_filename()) {
             return;
         }
-
-        $aPic = [
-            'sField' => $imageFieldName,
-            'sDir' => $oUtilsFile->getImageDirByType('M' . $iIndex, $blGeneratedImagesOnly),
-            'sFileName' => $masterImageFilename,
-        ];
-
-        $sAbsDynImageDir = $myConfig->getPictureDir(false);
-        $blDeleted = $myUtilsPic->safePictureDelete(
-            $aPic['sFileName'],
-            $sAbsDynImageDir . $aPic['sDir'],
-            'oxarticles',
-            $aPic['sField']
-        );
-        if ($blDeleted) {
-            $this->deleteZoomPicture($oObject, $iIndex);
-
-            $aDelPics = [];
-            if ($iIndex == 1) {
+        $a_pic = ['sField' => $image_field_name, 'sDir' => $o_utils_file->get_image_dir_by_type('M' . $i_index, $bl_generated_images_only), 'sFileName' => $master_image_filename];
+        $s_abs_dyn_image_dir = $my_config->get_picture_dir(false);
+        $bl_deleted = $my_utils_pic->safe_picture_delete($a_pic['sFileName'], $s_abs_dyn_image_dir . $a_pic['sDir'], 'oxarticles', $a_pic['sField']);
+        if ($bl_deleted) {
+            $this->delete_zoom_picture($o_object, $i_index);
+            $a_del_pics = [];
+            if ($i_index == 1) {
                 // deleting generated main icon picture if custom main icon
                 // file name not equal with generated from master picture
-                if ($this->getMainIconName($masterImageFilename) != basename((string) $oObject->oxarticles__oxicon->value)) {
-                    $aDelPics[] = [
-                        'sField'    => 'oxpic1',
-                        'sDir'      => $oUtilsFile->getImageDirByType('ICO', $blGeneratedImagesOnly),
-                        'sFileName' => $this->getMainIconName($masterImageFilename),
-                    ];
+                if ($this->get_main_icon_name($master_image_filename) != basename((string) $o_object->oxarticles__oxicon->value)) {
+                    $a_del_pics[] = ['sField' => 'oxpic1', 'sDir' => $o_utils_file->get_image_dir_by_type('ICO', $bl_generated_images_only), 'sFileName' => $this->get_main_icon_name($master_image_filename)];
                 }
-
                 // deleting generated thumbnail picture if custom thumbnail
                 // file name not equal with generated from master picture
-                if ($this->getThumbName($masterImageFilename) != basename((string) $oObject->oxarticles__oxthumb->value)) {
-                    $aDelPics[] = [
-                        'sField'    => 'oxpic1',
-                        'sDir'      => $oUtilsFile->getImageDirByType('TH', $blGeneratedImagesOnly),
-                        'sFileName' => $this->getThumbName($masterImageFilename),
-                    ];
+                if ($this->get_thumb_name($master_image_filename) != basename((string) $o_object->oxarticles__oxthumb->value)) {
+                    $a_del_pics[] = ['sField' => 'oxpic1', 'sDir' => $o_utils_file->get_image_dir_by_type('TH', $bl_generated_images_only), 'sFileName' => $this->get_thumb_name($master_image_filename)];
                 }
             }
-
-            foreach ($aDelPics as $aPic) {
-                $myUtilsPic->safePictureDelete($aPic['sFileName'], $sAbsDynImageDir . $aPic['sDir'], 'oxarticles', $aPic['sField']);
+            foreach ($a_del_pics as $a_pic) {
+                $my_utils_pic->safe_picture_delete($a_pic['sFileName'], $s_abs_dyn_image_dir . $a_pic['sDir'], 'oxarticles', $a_pic['sField']);
             }
         }
-
         //deleting custom zoom pic (compatibility mode)
-        if ($oObject->{'oxarticles__oxzoom' . $iIndex}->value) {
-            if (basename((string) $oObject->{'oxarticles__oxzoom' . $iIndex}->value) !== $this->getNopicFilename()) {
+        if ($o_object->{'oxarticles__oxzoom' . $i_index}->value) {
+            if (basename((string) $o_object->{'oxarticles__oxzoom' . $i_index}->value) !== $this->get_nopic_filename()) {
                 // deleting old zoom picture
-                $this->deleteZoomPicture($oObject, $iIndex);
+                $this->delete_zoom_picture($o_object, $i_index);
             }
         }
     }
-
     /**
      * Deletes custom main icon, which name is specified in oxicon field.
      *
      * @param Article $oObject article object
      */
-    public function deleteMainIcon($oObject): void
+    public function delete_main_icon($o_object): void
     {
-        if (($sMainIcon = $oObject->oxarticles__oxicon->value)) {
-            $sPath = Registry::getConfig()->getPictureDir(false) . Registry::getUtilsFile()->getImageDirByType('ICO');
-            Registry::getUtilsPic()->safePictureDelete($sMainIcon, $sPath, 'oxarticles', 'oxicon');
+        if ($s_main_icon = $o_object->oxarticles__oxicon->value) {
+            $s_path = Registry::get_config()->get_picture_dir(false) . Registry::get_utils_file()->get_image_dir_by_type('ICO');
+            Registry::get_utils_pic()->safe_picture_delete($s_main_icon, $s_path, 'oxarticles', 'oxicon');
         }
     }
-
     /**
      * Deletes custom thumbnail, which name is specified in oxthumb field.
      *
      * @param Article $oObject article object
      */
-    public function deleteThumbnail($oObject): void
+    public function delete_thumbnail($o_object): void
     {
-        if (($sThumb = $oObject->oxarticles__oxthumb->value)) {
+        if ($s_thumb = $o_object->oxarticles__oxthumb->value) {
             // deleting article main icon and thumb picture
-            $sPath = Registry::getConfig()->getPictureDir(false) . Registry::getUtilsFile()->getImageDirByType('TH');
-            Registry::getUtilsPic()->safePictureDelete($sThumb, $sPath, 'oxarticles', 'oxthumb');
+            $s_path = Registry::get_config()->get_picture_dir(false) . Registry::get_utils_file()->get_image_dir_by_type('TH');
+            Registry::get_utils_pic()->safe_picture_delete($s_thumb, $s_path, 'oxarticles', 'oxthumb');
         }
     }
-
     /**
      * Deletes custom zoom picture, which name is specified in oxzoom field.
      *
      * @param Article $oObject article object
      * @param int     $iIndex  zoom picture index
      */
-    public function deleteZoomPicture($oObject, $iIndex): void
+    public function delete_zoom_picture($o_object, $i_index): void
     {
         // checking if oxzoom field exists
-        $oDbHandler = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
-        $iZoomPicCount = (int) Registry::getConfig()->getConfigParam('iZoomPicCount');
-
-        if ($iIndex > $iZoomPicCount || !$oDbHandler->fieldExists('oxzoom' . $iIndex, 'oxarticles')) {
-            if ($sZoomPicName = $this->getZoomName($oObject->{'oxarticles__oxpic' . $iIndex}->value, $iIndex)) {
-                $sFieldToCheck = 'oxpic' . $iIndex;
+        $o_db_handler = ox_new(\Oxid_Esales\Eshop\Core\Db_Meta_Data_Handler::class);
+        $i_zoom_pic_count = (int) Registry::get_config()->get_config_param('iZoomPicCount');
+        if ($i_index > $i_zoom_pic_count || !$o_db_handler->field_exists('oxzoom' . $i_index, 'oxarticles')) {
+            if ($s_zoom_pic_name = $this->get_zoom_name($o_object->{'oxarticles__oxpic' . $i_index}->value, $i_index)) {
+                $s_field_to_check = 'oxpic' . $i_index;
             } else {
                 return;
             }
         } else {
-            $sZoomPicName = basename((string) $oObject->{'oxarticles__oxzoom' . $iIndex}->value);
-            $sFieldToCheck = 'oxzoom' . $iIndex;
+            $s_zoom_pic_name = basename((string) $o_object->{'oxarticles__oxzoom' . $i_index}->value);
+            $s_field_to_check = 'oxzoom' . $i_index;
         }
-
-        if ($sZoomPicName && $sZoomPicName != $this->getNopicFilename()) {
+        if ($s_zoom_pic_name && $s_zoom_pic_name != $this->get_nopic_filename()) {
             // deleting zoom picture
-            $sPath = Registry::getConfig()->getPictureDir(false) . Registry::getUtilsFile()->getImageDirByType('Z' . $iIndex);
-            Registry::getUtilsPic()->safePictureDelete($sZoomPicName, $sPath, 'oxarticles', $sFieldToCheck);
+            $s_path = Registry::get_config()->get_picture_dir(false) . Registry::get_utils_file()->get_image_dir_by_type('Z' . $i_index);
+            Registry::get_utils_pic()->safe_picture_delete($s_zoom_pic_name, $s_path, 'oxarticles', $s_field_to_check);
         }
     }
-
     /**
      * Returns article picture icon name for selected article picture
      *
@@ -160,11 +127,10 @@ class PictureHandler extends Base
      *
      * @return string
      */
-    public function getIconName($sFilename)
+    public function get_icon_name($s_filename)
     {
-        return $sFilename;
+        return $s_filename;
     }
-
     /**
      * Returns article main icon name generated from master picture
      *
@@ -172,11 +138,10 @@ class PictureHandler extends Base
      *
      * @return string
      */
-    public function getMainIconName($sMasterImageFile)
+    public function get_main_icon_name($s_master_image_file)
     {
-        return $this->getBaseMasterImageFileName($sMasterImageFile);
+        return $this->get_base_master_image_file_name($s_master_image_file);
     }
-
     /**
      * Returns thumb image name generated from master picture
      *
@@ -184,11 +149,10 @@ class PictureHandler extends Base
      *
      * @return string
      */
-    public function getThumbName($sMasterImageFile)
+    public function get_thumb_name($s_master_image_file)
     {
-        return basename($sMasterImageFile);
+        return basename($s_master_image_file);
     }
-
     /**
      * Returns zoom image name generated from master picture
      *
@@ -197,21 +161,19 @@ class PictureHandler extends Base
      *
      * @return string
      */
-    public function getZoomName($sMasterImageFile, $iIndex)
+    public function get_zoom_name($s_master_image_file, $i_index)
     {
-        return basename($sMasterImageFile);
+        return basename($s_master_image_file);
     }
-
     /**
      * Gets master image file name and removes suffics (e.g. _p1) from file end.
      *
      * @param string $sMasterImageFile master image file name
      */
-    protected function getBaseMasterImageFileName($sMasterImageFile)
+    protected function get_base_master_image_file_name($s_master_image_file)
     {
-        return basename($sMasterImageFile);
+        return basename($s_master_image_file);
     }
-
     /**
      * Returns image sizes from provided config array
      *
@@ -220,25 +182,23 @@ class PictureHandler extends Base
      *
      * @return array
      */
-    public function getImageSize($aImgSizes, $sIndex = null)
+    public function get_image_size($a_img_sizes, $s_index = null)
     {
-        $aSize = [];
-        if (isset($sIndex) && is_array($aImgSizes) && isset($aImgSizes[$sIndex])) {
-            $aSize = explode('*', (string) $aImgSizes[$sIndex]);
-        } elseif (is_string($aImgSizes)) {
-            $aSize = explode('*', $aImgSizes);
+        $a_size = [];
+        if (isset($s_index) && is_array($a_img_sizes) && isset($a_img_sizes[$s_index])) {
+            $a_size = explode('*', (string) $a_img_sizes[$s_index]);
+        } elseif (is_string($a_img_sizes)) {
+            $a_size = explode('*', $a_img_sizes);
         }
-        if (2 == count($aSize)) {
-            $x = (int) $aSize[0];
-            $y = (int) $aSize[1];
+        if (2 == count($a_size)) {
+            $x = (int) $a_size[0];
+            $y = (int) $a_size[1];
             if ($x && $y) {
-                return $aSize;
+                return $a_size;
             }
         }
-
         return null;
     }
-
     /**
      * Returns dir/url info for given image file
      *
@@ -251,36 +211,29 @@ class PictureHandler extends Base
      *
      * @return array
      */
-    protected function getPictureInfo($sFilePath, $sFile, $blAdmin = false, $blSSL = null, $iLang = null, $iShopId = null)
+    protected function get_picture_info($s_file_path, $s_file, $bl_admin = false, $bl_ssl = null, $i_lang = null, $i_shop_id = null)
     {
         // custom server as image storage?
-        if ($sAltUrl = $this->getAltImageUrl($sFilePath, $sFile)) {
-            return ['path' => false, 'url' => $sAltUrl];
+        if ($s_alt_url = $this->get_alt_image_url($s_file_path, $s_file)) {
+            return ['path' => false, 'url' => $s_alt_url];
         }
-
-        $oConfig = Registry::getConfig();
-        $sPath = $oConfig->getPicturePath($sFilePath . $sFile, $blAdmin, $iLang, $iShopId);
-        if (!$sPath) {
+        $o_config = Registry::get_config();
+        $s_path = $o_config->get_picture_path($s_file_path . $s_file, $bl_admin, $i_lang, $i_shop_id);
+        if (!$s_path) {
             return ['path' => false, 'url' => false];
         }
-
-        $sDirPrefix = $oConfig->getOutDir();
-        $sUrlPrefix = $oConfig->getOutUrl($blSSL, $blAdmin, $oConfig->getConfigParam('blNativeImages'));
-
-        return ['path' => $sPath, 'url' => str_replace($sDirPrefix, $sUrlPrefix, $sPath)];
+        $s_dir_prefix = $o_config->get_out_dir();
+        $s_url_prefix = $o_config->get_out_url($bl_ssl, $bl_admin, $o_config->get_config_param('blNativeImages'));
+        return ['path' => $s_path, 'url' => str_replace($s_dir_prefix, $s_url_prefix, $s_path)];
     }
-
-    public function getAltImageUrl($filePath, $file)
+    public function get_alt_image_url($file_path, $file)
     {
-        $altUrl = ContainerFacade::getParameter('oxid_esales.alternative_image_url') ?: null;
-
-        if ($altUrl && !is_null($file)) {
-            return Path::join($altUrl, $filePath, $file);
+        $alt_url = Container_Facade::get_parameter('oxid_esales.alternative_image_url') ?: null;
+        if ($alt_url && !is_null($file)) {
+            return Path::join($alt_url, $file_path, $file);
         }
-
-        return $altUrl;
+        return $alt_url;
     }
-
     /**
      * Returns requested picture url. If image is not available - returns false
      *
@@ -293,29 +246,22 @@ class PictureHandler extends Base
      *
      * @return string|bool
      */
-    public function getPicUrl($sPath, $sFile, $sSize, $sIndex = null, $sAltPath = false, $bSsl = null)
+    public function get_pic_url($s_path, $s_file, $s_size, $s_index = null, $s_alt_path = false, $b_ssl = null)
     {
-        $sUrl = null;
-        if ($sPath && $sFile && ($aSize = $this->getImageSize($sSize, $sIndex))) {
-            $aPicInfo = $this->getPictureInfo('master/' . ($sAltPath ?: $sPath), $sFile, $this->isAdmin(), $bSsl);
-            if ($aPicInfo['url'] && $aSize[0] && $aSize[1]) {
-                $sDirName = "{$aSize[0]}_{$aSize[1]}_" . Registry::getConfig()->getConfigParam('sDefaultImageQuality');
-                $sUrl = str_replace('/master/' . ($sAltPath ?: $sPath), "/generated/{$sPath}{$sDirName}/", $aPicInfo['url']);
+        $s_url = null;
+        if ($s_path && $s_file && $a_size = $this->get_image_size($s_size, $s_index)) {
+            $a_pic_info = $this->get_picture_info('master/' . ($s_alt_path ?: $s_path), $s_file, $this->is_admin(), $b_ssl);
+            if ($a_pic_info['url'] && $a_size[0] && $a_size[1]) {
+                $s_dir_name = "{$a_size[0]}_{$a_size[1]}_" . Registry::get_config()->get_config_param('sDefaultImageQuality');
+                $s_url = str_replace('/master/' . ($s_alt_path ?: $s_path), "/generated/{$s_path}{$s_dir_name}/", $a_pic_info['url']);
             }
         }
-
         // Add webp extension if automatic conversion is enabled
-        if (
-            $sUrl !== null &&
-            Registry::getConfig()->getConfigParam('blConvertImagesToWebP', false) &&
-            pathinfo($sUrl, PATHINFO_EXTENSION) != 'webp'
-        ) {
-            $sUrl .= '.webp';
+        if ($s_url !== null && Registry::get_config()->get_config_param('blConvertImagesToWebP', false) && pathinfo($s_url, PATHINFO_EXTENSION) != 'webp') {
+            $s_url .= '.webp';
         }
-
-        return $sUrl;
+        return $s_url;
     }
-
     /**
      * Returns requested product picture url. If image is not available - returns url to nopic.jpg
      *
@@ -327,22 +273,19 @@ class PictureHandler extends Base
      *
      * @return string|bool
      */
-    public function getProductPicUrl($sPath, $sFile, $sSize, $sIndex = null, $bSsl = null)
+    public function get_product_pic_url($s_path, $s_file, $s_size, $s_index = null, $b_ssl = null)
     {
-        $sUrl = null;
-        if (!$sFile || !($sUrl = $this->getPicUrl($sPath, $sFile, $sSize, $sIndex, false, $bSsl))) {
-            return $this->getPicUrl($sPath, $this->getNopicFilename(), $sSize, $sIndex, '/', $bSsl);
+        $s_url = null;
+        if (!$s_file || !$s_url = $this->get_pic_url($s_path, $s_file, $s_size, $s_index, false, $b_ssl)) {
+            return $this->get_pic_url($s_path, $this->get_nopic_filename(), $s_size, $s_index, '/', $b_ssl);
         }
-
-        return $sUrl;
+        return $s_url;
     }
-
-    private function getNopicFilename(): string
+    private function get_nopic_filename(): string
     {
-        if (Registry::getConfig()->getConfigParam('blConvertImagesToWebP')) {
+        if (Registry::get_config()->get_config_param('blConvertImagesToWebP')) {
             return 'nopic.webp';
         }
-
         return 'nopic.jpg';
     }
 }

@@ -1,59 +1,49 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Admin article crosselling/accesories manager.
  * Creates list of available articles, there is ability to assign or remove
  * assigning of article to crosselling/accesories with other products.
  * Admin Menu: Manage Products -> Articles -> Crosssell.
  */
-class ArticleCrossselling extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Article_Crossselling extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
         parent::render();
-
-        $this->_aViewData['edit'] = $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-
+        $this->_a_view_data['edit'] = $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
         // crossselling
-        $this->createCategoryTree('artcattree');
-
+        $this->create_category_tree('artcattree');
         // accessoires
-        $this->createCategoryTree('artcattree2');
-
-        $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != '-1') {
+        $this->create_category_tree('artcattree2');
+        $sox_id = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
             // load object
-            $oArticle->load($soxId);
-
-            if ($oArticle->isDerived()) {
-                $this->_aViewData['readonly'] = true;
+            $o_article->load($sox_id);
+            if ($o_article->is_derived()) {
+                $this->_a_view_data['readonly'] = true;
             }
         }
-
-        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
-        if ($iAoc == 1) {
-            $oArticleCrossellingAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleCrosssellingAjax::class);
-            $this->_aViewData['oxajax'] = $oArticleCrossellingAjax->getColumns();
+        $i_aoc = Registry::get_request()->get_request_escaped_parameter('aoc');
+        if ($i_aoc == 1) {
+            $o_article_crosselling_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Article_Crossselling_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_article_crosselling_ajax->get_columns();
             return 'popups/article_crossselling';
         }
-        if ($iAoc == 2) {
-            $oArticleAccessoriesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class);
-            $this->_aViewData['oxajax'] = $oArticleAccessoriesAjax->getColumns();
+        if ($i_aoc == 2) {
+            $o_article_accessories_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Article_Accessories_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_article_accessories_ajax->get_columns();
             return 'popups/article_accessories';
         }
-
         return 'article_crossselling';
     }
 }

@@ -4,42 +4,34 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Core\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Core\Exception;
-
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\ShopIdCalculator;
-use OxidEsales\EshopCommunity\Internal\Framework\Logger\LoggerServiceFactory;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\Context;
-
-use function oxTriggerOfflinePageDisplay;
-
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Shop_Id_Calculator;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Logger\Logger_Service_Factory;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context;
+use function Ox_Trigger_Offline_Page_Display;
 use Throwable;
-
-class ExceptionHandler
+class Exception_Handler
 {
-    public function __construct(private readonly bool $isDebugMode = false)
+    public function __construct(private readonly bool $is_debug_mode = false)
     {
     }
-
     /**
      * @throws Throwable
      */
-    public function handleUncaughtException(Throwable $exception): void
+    public function handle_uncaught_exception(Throwable $exception): void
     {
         try {
-            Registry::getLogger()->error($exception->getMessage(), [$exception]);
+            Registry::get_logger()->error($exception->get_message(), [$exception]);
         } catch (Throwable) {
-            (new LoggerServiceFactory(new Context(ShopIdCalculator::BASE_SHOP_ID)))
-                ->getLogger()
-                ->error($exception);
+            (new Logger_Service_Factory(new Context(Shop_Id_Calculator::BASE_SHOP_ID)))->get_logger()->error($exception);
         }
-        if ($this->isDebugMode || PHP_SAPI === 'cli') {
+        if ($this->is_debug_mode || PHP_SAPI === 'cli') {
             throw $exception;
         }
-        oxTriggerOfflinePageDisplay();
+        ox_trigger_offline_page_display();
         exit(1);
     }
 }

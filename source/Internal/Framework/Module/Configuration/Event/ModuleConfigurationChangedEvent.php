@@ -4,32 +4,26 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Event;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Event;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-use Symfony\Contracts\EventDispatcher\Event;
-
-class ModuleConfigurationChangedEvent extends Event
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration;
+use Symfony\Contracts\Event_Dispatcher\Event;
+class Module_Configuration_Changed_Event extends Event
 {
-    public function __construct(private readonly ModuleConfiguration $moduleConfiguration, private readonly int $shopId)
+    public function __construct(private readonly Module_Configuration $module_configuration, private readonly int $shop_id)
     {
     }
-
-    public function getModuleConfiguration(): ModuleConfiguration
+    public function get_module_configuration(): Module_Configuration
     {
-        return $this->moduleConfiguration;
+        return $this->module_configuration;
     }
-
-    public function getModuleId(): string
+    public function get_module_id(): string
     {
-        return $this->moduleConfiguration->getId();
+        return $this->module_configuration->get_id();
     }
-
-    public function getShopId(): int
+    public function get_shop_id(): int
     {
-        return $this->shopId;
+        return $this->shop_id;
     }
 }

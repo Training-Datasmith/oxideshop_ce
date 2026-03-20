@@ -1,57 +1,49 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Admin article main discount manager.
  * There is possibility to change discount name, article, user
  * and etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
-class DiscountArticles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Discount_Articles extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
         parent::render();
-
-        $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != '-1') {
+        $sox_id = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
             // load object
-            $oDiscount = oxNew(\OxidEsales\Eshop\Application\Model\Discount::class);
-            $oDiscount->load($soxId);
-            $this->_aViewData['edit'] = $oDiscount;
-
+            $o_discount = ox_new(\Oxid_Esales\Eshop\Application\Model\Discount::class);
+            $o_discount->load($sox_id);
+            $this->_a_view_data['edit'] = $o_discount;
             //disabling derived items
-            if ($oDiscount->isDerived()) {
-                $this->_aViewData['readonly'] = true;
+            if ($o_discount->is_derived()) {
+                $this->_a_view_data['readonly'] = true;
             }
-
             // generating category tree for artikel choose select list
-            $this->createCategoryTree('artcattree');
+            $this->create_category_tree('artcattree');
         }
-
-        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
-        if ($iAoc == 1) {
-            $oDiscountArticlesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountArticlesAjax::class);
-            $this->_aViewData['oxajax'] = $oDiscountArticlesAjax->getColumns();
+        $i_aoc = Registry::get_request()->get_request_escaped_parameter('aoc');
+        if ($i_aoc == 1) {
+            $o_discount_articles_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Discount_Articles_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_discount_articles_ajax->get_columns();
             return 'popups/discount_articles';
         }
-        if ($iAoc == 2) {
-            $oDiscountCategoriesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountCategoriesAjax::class);
-            $this->_aViewData['oxajax'] = $oDiscountCategoriesAjax->getColumns();
+        if ($i_aoc == 2) {
+            $o_discount_categories_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Discount_Categories_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_discount_categories_ajax->get_columns();
             return 'popups/discount_categories';
         }
-
         return 'discount_articles';
     }
 }

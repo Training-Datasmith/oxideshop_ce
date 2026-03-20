@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Htaccess;
 
-namespace OxidEsales\EshopCommunity\Internal\Setup\Htaccess;
-
-interface HtaccessDaoFactoryInterface
+interface Htaccess_Dao_Factory_Interface
 {
-    public function createRootHtaccessDao(): HtaccessDaoInterface;
+    public function create_root_htaccess_dao(): Htaccess_Dao_Interface;
 }

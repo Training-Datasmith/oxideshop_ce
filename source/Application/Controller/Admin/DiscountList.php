@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin discount list manager.
@@ -15,33 +13,30 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * filter them by description, title or delete them.
  * Admin Menu: Shop Settings -> Discounts.
  */
-class DiscountList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class Discount_List extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_List_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'discount_list';
-
+    protected $_s_this_template = 'discount_list';
     /**
      * Name of chosen object class (default null).
      *
      * @var string
      */
-    protected $_sListClass = 'oxdiscount';
-
+    protected $_s_list_class = 'oxdiscount';
     /**
      * Type of list.
      *
      * @var string
      */
-    protected $_sListType = 'oxdiscountlist';
-
+    protected $_s_list_type = 'oxdiscountlist';
     /**
      * Default SQL sorting parameter (default null).
      *
      * @var string
      */
-    protected $_sDefSortField = 'oxsort';
+    protected $_s_def_sort_field = 'oxsort';
 }

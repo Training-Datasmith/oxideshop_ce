@@ -4,31 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Factory;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Factory;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\Media;
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\MediaPath;
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\MediaType;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMedia;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRoleSet;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
-
-readonly class ProductMediaFactory implements ProductMediaFactoryInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object\Media;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object\Media_Path;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object\Media_Type;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_Role_Set;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Id;
+readonly class Product_Media_Factory implements Product_Media_Factory_Interface
 {
-    public function create(Id $productId, MediaPath $path, MediaType $mimeType): ProductMedia
+    public function create(Id $product_id, Media_Path $path, Media_Type $mime_type): Product_Media
     {
-        return new ProductMedia(
-            Id::generate(),
-            $productId,
-            new Media(
-                Id::generate(),
-                $path,
-                $mimeType
-            ),
-            new ProductMediaRoleSet(),
-        );
+        return new Product_Media(Id::generate(), $product_id, new Media(Id::generate(), $path, $mime_type), new Product_Media_Role_Set());
     }
 }

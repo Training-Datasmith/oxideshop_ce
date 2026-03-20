@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin admin_pricealarm manager.
@@ -15,19 +13,18 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * and "pricealarm_main") to frame.
  * Admin Menu: Customer Info -> admin_pricealarm.
  */
-class AdminPriceAlarm extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Admin_Price_Alarm extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Default active tab number
      *
      * @var int
      */
-    protected $_iDefEdit = 1;
-
+    protected $_i_def_edit = 1;
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'admin_pricealarm';
+    protected $_s_this_template = 'admin_pricealarm';
 }

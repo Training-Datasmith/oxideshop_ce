@@ -4,13 +4,10 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Setup\Htaccess;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Htaccess;
 
 use Exception;
-
-class HtaccessAccessException extends Exception
+class Htaccess_Access_Exception extends Exception
 {
 }

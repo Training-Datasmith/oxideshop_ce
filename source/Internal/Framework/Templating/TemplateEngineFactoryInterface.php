@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating;
 
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating;
-
-interface TemplateEngineFactoryInterface
+interface Template_Engine_Factory_Interface
 {
-    public function getTemplateEngine(): TemplateEngineInterface;
+    public function get_template_engine(): Template_Engine_Interface;
 }

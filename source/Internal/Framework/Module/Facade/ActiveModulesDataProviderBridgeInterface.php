@@ -4,32 +4,26 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Facade;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Controller;
-
-interface ActiveModulesDataProviderBridgeInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration\Controller;
+interface Active_Modules_Data_Provider_Bridge_Interface
 {
     /**
      * @return string[]
      */
-    public function getModuleIds(): array;
-
+    public function get_module_ids(): array;
     /**
      * @return string[]
      */
-    public function getModulePaths(): array;
-
+    public function get_module_paths(): array;
     /**
      * @return Controller[]
      */
-    public function getControllers(): array;
-
+    public function get_controllers(): array;
     /**
      * @return string[]
      */
-    public function getClassExtensions(): array;
+    public function get_class_extensions(): array;
 }

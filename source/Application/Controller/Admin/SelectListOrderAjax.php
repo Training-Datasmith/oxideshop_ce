@@ -1,109 +1,83 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages article select lists sorting
  */
-class SelectListOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Select_List_Order_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [
-        ['oxtitle', 'oxselectlist', 1, 1, 0],
-        ['oxsort', 'oxobject2selectlist', 1, 0, 0],
-        ['oxident', 'oxselectlist', 0, 0, 0],
-        ['oxvaldesc', 'oxselectlist', 0, 0, 0],
-        ['oxid', 'oxobject2selectlist', 0, 0, 1],
-    ],
-    ];
-
+    protected $_a_columns = ['container1' => [['oxtitle', 'oxselectlist', 1, 1, 0], ['oxsort', 'oxobject2selectlist', 1, 0, 0], ['oxident', 'oxselectlist', 0, 0, 0], ['oxvaldesc', 'oxselectlist', 0, 0, 0], ['oxid', 'oxobject2selectlist', 0, 0, 1]]];
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
-        $sSelTable = $this->getViewName('oxselectlist');
-        $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-
-        return " from $sSelTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sSelTable.oxid " .
-                 'where oxobjectid = ' . DatabaseProvider::getDb()->quote($sArtId) . ' ';
+        $s_sel_table = $this->get_view_name('oxselectlist');
+        $s_art_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        return " from {$s_sel_table} left join oxobject2selectlist on oxobject2selectlist.oxselnid = {$s_sel_table}.oxid " . 'where oxobjectid = ' . Database_Provider::get_db()->quote($s_art_id) . ' ';
     }
-
     /**
      * Returns SQL query addon for sorting
      *
      * @return string
      */
-    protected function getSorting()
+    protected function get_sorting()
     {
         return 'order by oxobject2selectlist.oxsort ';
     }
-
     /**
      * Applies sorting for selection lists
      */
-    public function setSorting(): void
+    public function set_sorting(): void
     {
-        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSelect = 'select * from oxobject2selectlist where oxobjectid = :oxobjectid order by oxsort';
-
-        $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $oList->init('oxbase', 'oxobject2selectlist');
-        $oList->selectString($sSelect, [
-            'oxobjectid' => $sSelId,
-        ]);
-
+        $s_sel_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_select = 'select * from oxobject2selectlist where oxobjectid = :oxobjectid order by oxsort';
+        $o_list = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+        $o_list->init('oxbase', 'oxobject2selectlist');
+        $o_list->select_string($s_select, ['oxobjectid' => $s_sel_id]);
         // fixing indexes
-        $iSelCnt = 0;
-        $aIdx2Id = [];
-        foreach ($oList as $sKey => $oSel) {
-            if ($oSel->oxobject2selectlist__oxsort->value != $iSelCnt) {
-                $oSel->oxobject2selectlist__oxsort->setValue($iSelCnt);
-
+        $i_sel_cnt = 0;
+        $a_idx2id = [];
+        foreach ($o_list as $s_key => $o_sel) {
+            if ($o_sel->oxobject2selectlist__oxsort->value != $i_sel_cnt) {
+                $o_sel->oxobject2selectlist__oxsort->set_value($i_sel_cnt);
                 // saving new index
-                $oSel->save();
+                $o_sel->save();
             }
-            $aIdx2Id[$iSelCnt] = $sKey;
-            $iSelCnt++;
+            $a_idx2id[$i_sel_cnt] = $s_key;
+            $i_sel_cnt++;
         }
-
-        if (($iKey = array_search(Registry::getRequest()->getRequestEscapedParameter('sortoxid'), $aIdx2Id)) !== false) {
-            $iDir = (Registry::getRequest()->getRequestEscapedParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
-            if (isset($aIdx2Id[$iDir])) {
+        if (($i_key = array_search(Registry::get_request()->get_request_escaped_parameter('sortoxid'), $a_idx2id)) !== false) {
+            $i_dir = Registry::get_request()->get_request_escaped_parameter('direction') == 'up' ? $i_key - 1 : $i_key + 1;
+            if (isset($a_idx2id[$i_dir])) {
                 // exchanging indexes
-                $oDir1 = $oList->offsetGet($aIdx2Id[$iDir]);
-                $oDir2 = $oList->offsetGet($aIdx2Id[$iKey]);
-
-                $iCopy = $oDir1->oxobject2selectlist__oxsort->value;
-                $oDir1->oxobject2selectlist__oxsort->setValue($oDir2->oxobject2selectlist__oxsort->value);
-                $oDir2->oxobject2selectlist__oxsort->setValue($iCopy);
-
-                $oDir1->save();
-                $oDir2->save();
+                $o_dir1 = $o_list->offsetGet($a_idx2id[$i_dir]);
+                $o_dir2 = $o_list->offsetGet($a_idx2id[$i_key]);
+                $i_copy = $o_dir1->oxobject2selectlist__oxsort->value;
+                $o_dir1->oxobject2selectlist__oxsort->set_value($o_dir2->oxobject2selectlist__oxsort->value);
+                $o_dir2->oxobject2selectlist__oxsort->set_value($i_copy);
+                $o_dir1->save();
+                $o_dir2->save();
             }
         }
-
-        $sQAdd = $this->getQuery();
-
-        $sQ = 'select ' . $this->getQueryCols() . $sQAdd;
-        $sCountQ = 'select count( * ) ' . $sQAdd;
-
-        $this->outputResponse($this->getData($sCountQ, $sQ));
+        $s_q_add = $this->get_query();
+        $s_q = 'select ' . $this->get_query_cols() . $s_q_add;
+        $s_count_q = 'select count( * ) ' . $s_q_add;
+        $this->output_response($this->get_data($s_count_q, $s_q));
     }
 }

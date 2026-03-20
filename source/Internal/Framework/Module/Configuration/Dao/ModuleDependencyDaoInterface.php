@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao;
 
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleDependencies;
-
-interface ModuleDependencyDaoInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Dependencies;
+interface Module_Dependency_Dao_Interface
 {
-    public function get(string $moduleId): ModuleDependencies;
+    public function get(string $module_id): Module_Dependencies;
 }

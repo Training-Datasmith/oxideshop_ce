@@ -4,51 +4,35 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleDependencies;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Storage\ArrayStorageInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Dependencies;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Path\Module_Path_Resolver_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Storage\Array_Storage_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Storage\File_Storage_Factory_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
 use Symfony\Component\Filesystem\Path;
-
-class ModuleDependencyDao implements ModuleDependencyDaoInterface
+class Module_Dependency_Dao implements Module_Dependency_Dao_Interface
 {
-    public function __construct(
-        private readonly FileStorageFactoryInterface $fileStorageFactory,
-        private readonly ModulePathResolverInterface $modulePathResolver,
-        private readonly ContextInterface $context
-    ) {
-    }
-
-    public function get(string $moduleId): ModuleDependencies
+    public function __construct(private readonly File_Storage_Factory_Interface $file_storage_factory, private readonly Module_Path_Resolver_Interface $module_path_resolver, private readonly Context_Interface $context)
     {
-        return new ModuleDependencies(
-            $this->storageExists($moduleId) ? $this->getStorage($moduleId)->get() : []
-        );
     }
-
-    private function storageExists(string $moduleId): bool
+    public function get(string $module_id): Module_Dependencies
     {
-        return file_exists($this->getStorageFilePath($moduleId));
+        return new Module_Dependencies($this->storage_exists($module_id) ? $this->get_storage($module_id)->get() : []);
     }
-
-    private function getStorage(string $moduleId): ArrayStorageInterface
+    private function storage_exists(string $module_id): bool
     {
-        return $this->fileStorageFactory->create($this->getStorageFilePath($moduleId));
+        return file_exists($this->get_storage_file_path($module_id));
     }
-
-    private function getStorageFilePath(string $moduleId): string
+    private function get_storage(string $module_id): Array_Storage_Interface
     {
-        $modulePath = $this->modulePathResolver->getFullModulePathFromConfiguration(
-            $moduleId,
-            $this->context->getCurrentShopId()
-        );
-
-        return Path::join($modulePath, 'dependencies.yaml');
+        return $this->file_storage_factory->create($this->get_storage_file_path($module_id));
+    }
+    private function get_storage_file_path(string $module_id): string
+    {
+        $module_path = $this->module_path_resolver->get_full_module_path_from_configuration($module_id, $this->context->get_current_shop_id());
+        return Path::join($module_path, 'dependencies.yaml');
     }
 }

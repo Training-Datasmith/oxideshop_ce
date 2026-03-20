@@ -1,129 +1,114 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 use Exception;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-
+use Oxid_Esales\Eshop\Core\Database_Provider;
 /**
  * Category list manager.
  * Collects available categories, performs some SQL queries to create category
  * list structure.
  */
-class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
+class Category_List extends \Oxid_Esales\Eshop\Core\Model\List_Model
 {
     /**
      * List Object class name
      *
      * @var string
      */
-    protected $_sObjectsInListName = 'oxcategory';
-
+    protected $_s_objects_in_list_name = 'oxcategory';
     /**
      * Performance option mapped to config option blDontShowEmptyCategories
      *
      * @var boolean
      */
-    protected $_blHideEmpty = false;
-
+    protected $_bl_hide_empty = false;
     /**
      * Performance option used to force full tree loading
      *
      * @var boolean
      */
-    protected $_blForceFull = false;
-
+    protected $_bl_force_full = false;
     /**
      * Levels count should be loaded available options 1 - only root and 2 - root and second level
      *
      * @var boolean
      */
-    protected $_iForceLevel = 2;
-
+    protected $_i_force_level = 2;
     /**
      * Active category id, used in path building, and performance optimization
      *
      * @var string
      */
-    protected $_sActCat;
-
+    protected $_s_act_cat;
     /**
      * Active category path array
      *
      * @var array
      */
-    protected $_aPath = [];
-
+    protected $_a_path = [];
     /**
      * Category update info array
      *
      * @var array
      */
-    protected $_aUpdateInfo = [];
-
+    protected $_a_update_info = [];
     /**
      * Class constructor, initiates parent constructor (parent::oxList()).
      *
      * @param string $sObjectsInListName optional parameter, the objects contained in the list, always oxCategory
      */
-    public function __construct($sObjectsInListName = 'oxcategory')
+    public function __construct($s_objects_in_list_name = 'oxcategory')
     {
-        $this->_blHideEmpty = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blDontShowEmptyCategories');
-        parent::__construct($sObjectsInListName);
+        $this->_bl_hide_empty = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blDontShowEmptyCategories');
+        parent::__construct($s_objects_in_list_name);
     }
-
     /**
      * Set how to load tree true - for full tree
      *
      * @param boolean $blForceFull - true to load full
      */
-    public function setLoadFull($blForceFull): void
+    public function set_load_full($bl_force_full): void
     {
-        $this->_blForceFull = $blForceFull;
+        $this->_bl_force_full = $bl_force_full;
     }
-
     /**
      * Return true if load full tree
      *
      * @return boolean
      */
-    public function getLoadFull()
+    public function get_load_full()
     {
-        return $this->_blForceFull;
+        return $this->_bl_force_full;
     }
-
     /**
      * Set tree level 1- load root or 2 - root and second level
      *
      * @param int $iForceLevel - level number
      */
-    public function setLoadLevel($iForceLevel): void
+    public function set_load_level($i_force_level): void
     {
-        if ($iForceLevel > 2) {
-            $iForceLevel = 2;
-        } elseif ($iForceLevel < 1) {
-            $iForceLevel = 0;
+        if ($i_force_level > 2) {
+            $i_force_level = 2;
+        } elseif ($i_force_level < 1) {
+            $i_force_level = 0;
         }
-        $this->_iForceLevel = $iForceLevel;
+        $this->_i_force_level = $i_force_level;
     }
-
     /**
      * Returns tree load level
      *
      * @return integer
      */
-    public function getLoadLevel()
+    public function get_load_level()
     {
-        return $this->_iForceLevel;
+        return $this->_i_force_level;
     }
-
     /**
      * return fields to select while loading category tree
      *
@@ -132,29 +117,17 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string return
      */
-    protected function getSqlSelectFieldsForTree($sTable, $aColumns = null)
+    protected function get_sql_select_fields_for_tree($s_table, $a_columns = null)
     {
-        if ($aColumns && count($aColumns)) {
-            foreach ($aColumns as $key => $val) {
-                $aColumns[$key] .= ' as ' . $val;
+        if ($a_columns && count($a_columns)) {
+            foreach ($a_columns as $key => $val) {
+                $a_columns[$key] .= ' as ' . $val;
             }
-
-            return "$sTable." . implode(", $sTable.", $aColumns);
+            return "{$s_table}." . implode(", {$s_table}.", $a_columns);
         }
-
-        $sFieldList = "$sTable.oxid as oxid, $sTable.oxactive as oxactive,"
-                      . " $sTable.oxhidden as oxhidden, $sTable.oxparentid as oxparentid,"
-                      . " $sTable.oxdefsort as oxdefsort, $sTable.oxdefsortmode as oxdefsortmode,"
-                      . " $sTable.oxleft as oxleft, $sTable.oxright as oxright,"
-                      . " $sTable.oxrootid as oxrootid, $sTable.oxsort as oxsort,"
-                      . " $sTable.oxtitle as oxtitle, $sTable.oxdesc as oxdesc,"
-                      . " $sTable.oxpricefrom as oxpricefrom, $sTable.oxpriceto as oxpriceto,"
-                      . " $sTable.oxicon as oxicon, $sTable.oxextlink as oxextlink,"
-                      . " $sTable.oxthumb as oxthumb, $sTable.oxpromoicon as oxpromoicon";
-
-        return $sFieldList . $this->getActivityFieldsSql($sTable);
+        $s_field_list = "{$s_table}.oxid as oxid, {$s_table}.oxactive as oxactive," . " {$s_table}.oxhidden as oxhidden, {$s_table}.oxparentid as oxparentid," . " {$s_table}.oxdefsort as oxdefsort, {$s_table}.oxdefsortmode as oxdefsortmode," . " {$s_table}.oxleft as oxleft, {$s_table}.oxright as oxright," . " {$s_table}.oxrootid as oxrootid, {$s_table}.oxsort as oxsort," . " {$s_table}.oxtitle as oxtitle, {$s_table}.oxdesc as oxdesc," . " {$s_table}.oxpricefrom as oxpricefrom, {$s_table}.oxpriceto as oxpriceto," . " {$s_table}.oxicon as oxicon, {$s_table}.oxextlink as oxextlink," . " {$s_table}.oxthumb as oxthumb, {$s_table}.oxpromoicon as oxpromoicon";
+        return $s_field_list . $this->get_activity_fields_sql($s_table);
     }
-
     /**
      * Get activity related fields
      *
@@ -162,11 +135,10 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string SQL snippet
      */
-    protected function getActivityFieldsSql($tableName)
+    protected function get_activity_fields_sql($table_name)
     {
-        return ",not $tableName.oxactive as oxppremove";
+        return ",not {$table_name}.oxactive as oxppremove";
     }
-
     /**
      * constructs the sql string to get the category list
      *
@@ -176,34 +148,29 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string
      */
-    protected function getSelectString($blReverse = false, $aColumns = null, $sOrder = null)
+    protected function get_select_string($bl_reverse = false, $a_columns = null, $s_order = null)
     {
-        $sViewName = $this->getBaseObject()->getViewName();
-        $sFieldList = $this->getSqlSelectFieldsForTree($sViewName, $aColumns);
-
+        $s_view_name = $this->get_base_object()->get_view_name();
+        $s_field_list = $this->get_sql_select_fields_for_tree($s_view_name, $a_columns);
         //excluding long desc
-        if (!$this->isAdmin() && !$this->_blHideEmpty && !$this->getLoadFull()) {
-            $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-            if (!($this->_sActCat && $oCat->load($this->_sActCat) && $oCat->oxcategories__oxrootid->value)) {
-                $oCat = null;
-                $this->_sActCat = null;
+        if (!$this->is_admin() && !$this->_bl_hide_empty && !$this->get_load_full()) {
+            $o_cat = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+            if (!($this->_s_act_cat && $o_cat->load($this->_s_act_cat) && $o_cat->oxcategories__oxrootid->value)) {
+                $o_cat = null;
+                $this->_s_act_cat = null;
             }
-
-            $sUnion = $this->getDepthSqlUnion($oCat, $aColumns);
-            $sWhere = $this->getDepthSqlSnippet($oCat);
+            $s_union = $this->get_depth_sql_union($o_cat, $a_columns);
+            $s_where = $this->get_depth_sql_snippet($o_cat);
         } else {
-            $sUnion = '';
-            $sWhere = '1';
+            $s_union = '';
+            $s_where = '1';
         }
-
-        if (!$sOrder) {
-            $sOrdDir = $blReverse ? 'desc' : 'asc';
-            $sOrder = "oxrootid $sOrdDir, oxleft $sOrdDir";
+        if (!$s_order) {
+            $s_ord_dir = $bl_reverse ? 'desc' : 'asc';
+            $s_order = "oxrootid {$s_ord_dir}, oxleft {$s_ord_dir}";
         }
-
-        return "select $sFieldList from $sViewName where $sWhere $sUnion order by $sOrder";
+        return "select {$s_field_list} from {$s_view_name} where {$s_where} {$s_union} order by {$s_order}";
     }
-
     /**
      * constructs the sql snippet responsible for depth optimizations,
      * loads only selected category's siblings
@@ -212,31 +179,25 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string
      */
-    protected function getDepthSqlSnippet($oCat)
+    protected function get_depth_sql_snippet($o_cat)
     {
-        $sViewName = $this->getBaseObject()->getViewName();
-        $depthSnippet = ' ( 0';
-
+        $s_view_name = $this->get_base_object()->get_view_name();
+        $depth_snippet = ' ( 0';
         // load complete tree of active category, if it exists
-        if ($oCat) {
+        if ($o_cat) {
             // select children here, siblings will be selected from union
-            $depthSnippet .= " or ($sViewName.oxparentid = "
-                . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxid->value) . ')';
+            $depth_snippet .= " or ({$s_view_name}.oxparentid = " . Database_Provider::get_db()->quote($o_cat->oxcategories__oxid->value) . ')';
         }
-
         // load 1'st category level (roots)
-        if ($this->getLoadLevel() >= 1) {
-            $depthSnippet .= " or $sViewName.oxparentid = 'oxrootid'";
+        if ($this->get_load_level() >= 1) {
+            $depth_snippet .= " or {$s_view_name}.oxparentid = 'oxrootid'";
         }
-
         // load 2'nd category level ()
-        if ($this->getLoadLevel() >= 2) {
-            $depthSnippet .= " or $sViewName.oxrootid = $sViewName.oxparentid or $sViewName.oxid = $sViewName.oxrootid";
+        if ($this->get_load_level() >= 2) {
+            $depth_snippet .= " or {$s_view_name}.oxrootid = {$s_view_name}.oxparentid or {$s_view_name}.oxid = {$s_view_name}.oxrootid";
         }
-
-        return $depthSnippet . ' ) ';
+        return $depth_snippet . ' ) ';
     }
-
     /**
      * returns sql snippet for union of select category's and its upper level
      * siblings of the same root (siblings of the category, and parents and
@@ -247,43 +208,32 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string
      */
-    protected function getDepthSqlUnion($oCat, $aColumns = null)
+    protected function get_depth_sql_union($o_cat, $a_columns = null)
     {
-        if (!$oCat) {
+        if (!$o_cat) {
             return '';
         }
-
-        $sViewName = $this->getBaseObject()->getViewName();
-
-        return 'UNION SELECT ' . $this->getSqlSelectFieldsForTree('maincats', $aColumns)
-               . ' FROM oxcategories AS subcats'
-               . " LEFT JOIN $sViewName AS maincats on maincats.oxparentid = subcats.oxparentid"
-               . ' WHERE subcats.oxrootid = ' . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxrootid->value)
-               . ' AND subcats.oxleft <= ' . (int) $oCat->oxcategories__oxleft->value
-               . ' AND subcats.oxright >= ' . (int) $oCat->oxcategories__oxright->value;
+        $s_view_name = $this->get_base_object()->get_view_name();
+        return 'UNION SELECT ' . $this->get_sql_select_fields_for_tree('maincats', $a_columns) . ' FROM oxcategories AS subcats' . " LEFT JOIN {$s_view_name} AS maincats on maincats.oxparentid = subcats.oxparentid" . ' WHERE subcats.oxrootid = ' . Database_Provider::get_db()->quote($o_cat->oxcategories__oxrootid->value) . ' AND subcats.oxleft <= ' . (int) $o_cat->oxcategories__oxleft->value . ' AND subcats.oxright >= ' . (int) $o_cat->oxcategories__oxright->value;
     }
-
     /**
      * Get data from db
      *
      * @return array
      */
-    protected function loadFromDb()
+    protected function load_from_db()
     {
-        $sSql = $this->getSelectString(false, null, 'oxparentid, oxsort, oxtitle');
-
-        return DatabaseProvider::getDb()->getAll($sSql);
+        $s_sql = $this->get_select_string(false, null, 'oxparentid, oxsort, oxtitle');
+        return Database_Provider::get_db()->get_all($s_sql);
     }
-
     /**
      * Load category list data
      */
     public function load(): void
     {
-        $aData = $this->loadFromDb();
-        $this->assignArray($aData);
+        $a_data = $this->load_from_db();
+        $this->assign_array($a_data);
     }
-
     /**
      * Fetches reversed raw categories and does all necessary postprocessing for
      * removing invisible or forbidden categories, building oc navigation path,
@@ -291,232 +241,197 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sActCat Active category (default null)
      */
-    public function buildTree($sActCat): void
+    public function build_tree($s_act_cat): void
     {
-        startProfile('buildTree');
-
-        $this->_sActCat = $sActCat;
+        start_profile('buildTree');
+        $this->_s_act_cat = $s_act_cat;
         $this->load();
-
         // PostProcessing
-        if (!$this->isAdmin()) {
+        if (!$this->is_admin()) {
             // remove inactive categories
-            $this->ppRemoveInactiveCategories();
-
+            $this->pp_remove_inactive_categories();
             // add active cat as full object
-            $this->ppLoadFullCategory($sActCat);
-
+            $this->pp_load_full_category($s_act_cat);
             // builds navigation path
-            $this->ppAddPathInfo();
-
+            $this->pp_add_path_info();
             // add content categories
-            $this->ppAddContentCategories();
-
+            $this->pp_add_content_categories();
             // build tree structure
-            $this->ppBuildTree();
+            $this->pp_build_tree();
         }
-
-        stopProfile('buildTree');
+        stop_profile('buildTree');
     }
-
     /**
      * set full category object in tree
      *
      * @param string $sId category id
      */
-    protected function ppLoadFullCategory($sId)
+    protected function pp_load_full_category($s_id)
     {
-        if ($sId !== null && isset($this->_aArray[$sId])) {
-            $oNewCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-            if ($oNewCat->load($sId)) {
+        if ($s_id !== null && isset($this->_a_array[$s_id])) {
+            $o_new_cat = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+            if ($o_new_cat->load($s_id)) {
                 // replace aArray object with fully loaded category
-                $this->_aArray[$sId] = $oNewCat;
+                $this->_a_array[$s_id] = $o_new_cat;
             }
         } else {
-            $this->_sActCat = null;
+            $this->_s_act_cat = null;
         }
     }
-
     /**
      * Fetches raw categories and does postprocessing for adding depth information
      */
-    public function loadList(): void
+    public function load_list(): void
     {
-        startProfile('buildCategoryList');
-
-        $this->setLoadFull(true);
-        $this->selectString($this->getSelectString(false, null, 'oxparentid, oxsort, oxtitle'));
-
+        start_profile('buildCategoryList');
+        $this->set_load_full(true);
+        $this->select_string($this->get_select_string(false, null, 'oxparentid, oxsort, oxtitle'));
         // build tree structure
-        $this->ppBuildTree();
-
+        $this->pp_build_tree();
         // PostProcessing
         // add tree depth info
-        $this->ppAddDepthInformation();
-        stopProfile('buildCategoryList');
+        $this->pp_add_depth_information();
+        stop_profile('buildCategoryList');
     }
-
     /**
      * setter for shopId
      *
      * @param int $sShopId ShopID
      */
-    public function setShopID($sShopId): void
+    public function set_shop_id($s_shop_id): void
     {
-        $this->_sShopID = $sShopId;
+        $this->_s_shop_id = $s_shop_id;
     }
-
     /**
      * Getter for active category path
      *
      * @return array
      */
-    public function getPath()
+    public function get_path()
     {
-        return $this->_aPath;
+        return $this->_a_path;
     }
-
     /**
      * Getter for active category
      *
      * @return \OxidEsales\Eshop\Application\Model\Category
      */
-    public function getClickCat()
+    public function get_click_cat()
     {
-        if (count($this->_aPath)) {
-            return end($this->_aPath);
+        if (count($this->_a_path)) {
+            return end($this->_a_path);
         }
     }
-
     /**
      * Getter for active root category
      *
      * @return array of oxCategory
      */
-    public function getClickRoot()
+    public function get_click_root()
     {
-        if (count($this->_aPath)) {
-            return [reset($this->_aPath)];
+        if (count($this->_a_path)) {
+            return [reset($this->_a_path)];
         }
     }
-
     /**
      * Postprocess to remove inactive/forbidden categories and subcategories
      */
-    protected function ppRemoveInactiveCategories()
+    protected function pp_remove_inactive_categories()
     {
         // Collect all items which must be remove
-        $aRemoveList = [];
-        foreach ($this->_aArray as $sId => $oCat) {
-            if ($oCat->oxcategories__oxppremove->value) {
-                if (!isset($aRemoveList[$oCat->oxcategories__oxrootid->value])) {
-                    $aRemoveList[$oCat->oxcategories__oxrootid->value] = [];
+        $a_remove_list = [];
+        foreach ($this->_a_array as $s_id => $o_cat) {
+            if ($o_cat->oxcategories__oxppremove->value) {
+                if (!isset($a_remove_list[$o_cat->oxcategories__oxrootid->value])) {
+                    $a_remove_list[$o_cat->oxcategories__oxrootid->value] = [];
                 }
-                $aRemoveList[$oCat->oxcategories__oxrootid->value][$oCat->oxcategories__oxleft->value]
-                    = $oCat->oxcategories__oxright->value;
-                unset($this->_aArray[$sId]);
+                $a_remove_list[$o_cat->oxcategories__oxrootid->value][$o_cat->oxcategories__oxleft->value] = $o_cat->oxcategories__oxright->value;
+                unset($this->_a_array[$s_id]);
             } else {
-                unset($oCat->oxcategories__oxppremove);
+                unset($o_cat->oxcategories__oxppremove);
             }
         }
-
         // Remove collected item's children from the list too (in the ranges).
-        foreach ($this->_aArray as $sId => $oCat) {
-            if (
-                isset($aRemoveList[$oCat->oxcategories__oxrootid->value]) &&
-                is_array($aRemoveList[$oCat->oxcategories__oxrootid->value])
-            ) {
-                foreach ($aRemoveList[$oCat->oxcategories__oxrootid->value] as $iLeft => $iRight) {
-                    if (
-                        ($iLeft <= $oCat->oxcategories__oxleft->value)
-                        && ($iRight >= $oCat->oxcategories__oxleft->value)
-                    ) {
+        foreach ($this->_a_array as $s_id => $o_cat) {
+            if (isset($a_remove_list[$o_cat->oxcategories__oxrootid->value]) && is_array($a_remove_list[$o_cat->oxcategories__oxrootid->value])) {
+                foreach ($a_remove_list[$o_cat->oxcategories__oxrootid->value] as $i_left => $i_right) {
+                    if ($i_left <= $o_cat->oxcategories__oxleft->value && $i_right >= $o_cat->oxcategories__oxleft->value) {
                         // this is a child in an inactive range (parent already gone)
-                        unset($this->_aArray[$sId]);
+                        unset($this->_a_array[$s_id]);
                         break 1;
                     }
                 }
             }
         }
     }
-
     /**
      * Category list postprocessing routine, responsible for generation of active category path
      */
-    protected function ppAddPathInfo()
+    protected function pp_add_path_info()
     {
-        if (is_null($this->_sActCat)) {
+        if (is_null($this->_s_act_cat)) {
             return;
         }
-
-        $aPath = [];
-        $sCurrentCat = $this->_sActCat;
-
-        while ($sCurrentCat != 'oxrootid' && isset($this[$sCurrentCat])) {
-            $oCat = $this[$sCurrentCat];
-            $oCat->setExpanded(true);
-            $aPath[$sCurrentCat] = $oCat;
-            $sCurrentCat = $oCat->oxcategories__oxparentid->value;
+        $a_path = [];
+        $s_current_cat = $this->_s_act_cat;
+        while ($s_current_cat != 'oxrootid' && isset($this[$s_current_cat])) {
+            $o_cat = $this[$s_current_cat];
+            $o_cat->set_expanded(true);
+            $a_path[$s_current_cat] = $o_cat;
+            $s_current_cat = $o_cat->oxcategories__oxparentid->value;
         }
-
-        $this->_aPath = array_reverse($aPath);
+        $this->_a_path = array_reverse($a_path);
     }
-
     /**
      * Category list postprocessing routine, responsible adding of content categories
      */
-    protected function ppAddContentCategories()
+    protected function pp_add_content_categories()
     {
         // load content pages for adding them into menu tree
-        $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
-        $oContentList->loadCatMenues();
-
-        foreach ($oContentList as $sCatId => $aContent) {
-            if (array_key_exists($sCatId, $this->_aArray)) {
-                $this[$sCatId]->setContentCats($aContent);
+        $o_content_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Content_List::class);
+        $o_content_list->load_cat_menues();
+        foreach ($o_content_list as $s_cat_id => $a_content) {
+            if (array_key_exists($s_cat_id, $this->_a_array)) {
+                $this[$s_cat_id]->set_content_cats($a_content);
             }
         }
     }
-
     /**
      * Category list postprocessing routine, responsible building an sorting of hierarchical category tree
      */
-    protected function ppBuildTree()
+    protected function pp_build_tree()
     {
-        $aTree = [];
-        foreach ($this->_aArray as $oCat) {
-            $sParentId = $oCat->oxcategories__oxparentid->value;
-            if ($sParentId != 'oxrootid') {
-                if (isset($this->_aArray[$sParentId])) {
-                    $this->_aArray[$sParentId]->setSubCat($oCat, $oCat->getId());
+        $a_tree = [];
+        foreach ($this->_a_array as $o_cat) {
+            $s_parent_id = $o_cat->oxcategories__oxparentid->value;
+            if ($s_parent_id != 'oxrootid') {
+                if (isset($this->_a_array[$s_parent_id])) {
+                    $this->_a_array[$s_parent_id]->set_sub_cat($o_cat, $o_cat->get_id());
                 }
             } else {
-                $aTree[$oCat->getId()] = $oCat;
+                $a_tree[$o_cat->get_id()] = $o_cat;
             }
         }
-
-        $this->assign($aTree);
+        $this->assign($a_tree);
     }
-
     /**
      * Category list postprocessing routine, responsible for making flat category tree and adding depth information.
      * Requires reversed category list!
      */
-    protected function ppAddDepthInformation()
+    protected function pp_add_depth_information()
     {
-        $aTree = [];
-        foreach ($this->_aArray as $oCat) {
-            $aTree[$oCat->getId()] = $oCat;
-            $aSubCats = $oCat->getSubCats();
-            if (count($aSubCats) > 0) {
-                foreach ($aSubCats as $oSubCat) {
-                    $aTree = $this->addDepthInfo($aTree, $oSubCat);
+        $a_tree = [];
+        foreach ($this->_a_array as $o_cat) {
+            $a_tree[$o_cat->get_id()] = $o_cat;
+            $a_sub_cats = $o_cat->get_sub_cats();
+            if (count($a_sub_cats) > 0) {
+                foreach ($a_sub_cats as $o_sub_cat) {
+                    $a_tree = $this->add_depth_info($a_tree, $o_sub_cat);
                 }
             }
         }
-        $this->assign($aTree);
+        $this->assign($a_tree);
     }
-
     /**
      * Recursive function to add depth information
      *
@@ -526,75 +441,60 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return array $aTree
      */
-    protected function addDepthInfo($aTree, $oCat, $sDepth = '')
+    protected function add_depth_info($a_tree, $o_cat, $s_depth = '')
     {
-        $sDepth .= '-';
-        $oCat->oxcategories__oxtitle->setValue($sDepth . ' ' . $oCat->oxcategories__oxtitle->value);
-        $aTree[$oCat->getId()] = $oCat;
-        $aSubCats = $oCat->getSubCats();
-        if (count($aSubCats) > 0) {
-            foreach ($aSubCats as $oSubCat) {
-                $aTree = $this->addDepthInfo($aTree, $oSubCat, $sDepth);
+        $s_depth .= '-';
+        $o_cat->oxcategories__oxtitle->set_value($s_depth . ' ' . $o_cat->oxcategories__oxtitle->value);
+        $a_tree[$o_cat->get_id()] = $o_cat;
+        $a_sub_cats = $o_cat->get_sub_cats();
+        if (count($a_sub_cats) > 0) {
+            foreach ($a_sub_cats as $o_sub_cat) {
+                $a_tree = $this->add_depth_info($a_tree, $o_sub_cat, $s_depth);
             }
         }
-
-        return $aTree;
+        return $a_tree;
     }
-
     /**
      * Rebuilds nested sets information by updating oxLeft and oxRight category attributes, from oxParentId
      *
      * @param bool   $blVerbose Set to true for output the update status for user,
      * @param string $sShopID   the shop id
      */
-    public function updateCategoryTree($blVerbose = true, $sShopID = null): void
+    public function update_category_tree($bl_verbose = true, $s_shop_id = null): void
     {
         // Only called from admin and admin mode reads from master (see ESDEV-3804 and ESDEV-3822).
-        $database = DatabaseProvider::getDb();
-        $database->startTransaction();
-
+        $database = Database_Provider::get_db();
+        $database->start_transaction();
         try {
-            $sWhere = $this->getInitialUpdateCategoryTreeCondition($blVerbose);
-
-            $database->execute("update oxcategories set oxleft = 0, oxright = 0 where $sWhere");
-            $database->execute(
-                "update oxcategories set oxleft = 1, oxright = 2 where oxparentid = 'oxrootid' and $sWhere"
-            );
-
+            $s_where = $this->get_initial_update_category_tree_condition($bl_verbose);
+            $database->execute("update oxcategories set oxleft = 0, oxright = 0 where {$s_where}");
+            $database->execute("update oxcategories set oxleft = 1, oxright = 2 where oxparentid = 'oxrootid' and {$s_where}");
             // Get all root categories
-            $categories = $database->select(
-                "select oxid, oxtitle from oxcategories where oxparentid = 'oxrootid'"
-                . " and $sWhere order by oxsort"
-            );
+            $categories = $database->select("select oxid, oxtitle from oxcategories where oxparentid = 'oxrootid'" . " and {$s_where} order by oxsort");
             if ($categories != false && $categories->count() > 0) {
                 while (!$categories->EOF) {
-                    $this->_aUpdateInfo[] = '<b>Processing : ' . $categories->fields['oxtitle']
-                        . '</b>(' . $categories->fields['oxid'] . ')<br>';
-                    if ($blVerbose) {
-                        echo next($this->_aUpdateInfo);
+                    $this->_a_update_info[] = '<b>Processing : ' . $categories->fields['oxtitle'] . '</b>(' . $categories->fields['oxid'] . ')<br>';
+                    if ($bl_verbose) {
+                        echo next($this->_a_update_info);
                     }
-                    $oxRootId = $categories->fields['oxid'];
-
-                    $this->updateNodes($oxRootId, true, $oxRootId);
-                    $categories->fetchRow();
+                    $ox_root_id = $categories->fields['oxid'];
+                    $this->update_nodes($ox_root_id, true, $ox_root_id);
+                    $categories->fetch_row();
                 }
             }
-            $database->commitTransaction();
+            $database->commit_transaction();
         } catch (Exception $exception) {
-            $database->rollbackTransaction();
+            $database->rollback_transaction();
             throw $exception;
         }
-
-        $this->onUpdateCategoryTree();
+        $this->on_update_category_tree();
     }
-
     /**
      * Triggering in the end of updateCategoryTree method
      */
-    protected function onUpdateCategoryTree()
+    protected function on_update_category_tree()
     {
     }
-
     /**
      * Get Initial updateCategoryTree sql condition
      *
@@ -602,21 +502,19 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string
      */
-    protected function getInitialUpdateCategoryTreeCondition($blVerbose = false)
+    protected function get_initial_update_category_tree_condition($bl_verbose = false)
     {
         return '1';
     }
-
     /**
      * Returns update log data array
      *
      * @return array
      */
-    public function getUpdateInfo()
+    public function get_update_info()
     {
-        return $this->_aUpdateInfo;
+        return $this->_a_update_info;
     }
-
     /**
      * Recursively updates root nodes, this method is used (only) in updateCategoryTree()
      *
@@ -624,72 +522,38 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @param bool   $isRoot   is the current node root?
      * @param string $thisRoot the id of the root
      */
-    protected function updateNodes($oxRootId, $isRoot, $thisRoot)
+    protected function update_nodes($ox_root_id, $is_root, $this_root)
     {
         // Called from inside a transaction so master is picked automatically (see ESDEV-3804 and ESDEV-3822).
-        $database = DatabaseProvider::getDb();
-
-        if ($isRoot) {
-            $thisRoot = $oxRootId;
+        $database = Database_Provider::get_db();
+        if ($is_root) {
+            $this_root = $ox_root_id;
         }
-
-        $database->execute('update oxcategories set oxrootid = :oxrootid where oxparentid = :oxparentid', [
-            'oxrootid' => $thisRoot,
-            'oxparentid' => $oxRootId,
-        ]);
-        $childCategories = $database->select(
-            'select oxid, oxparentid from oxcategories where oxparentid = :oxparentid order by oxsort',
-            [
-                'oxparentid' => $oxRootId,
-            ]
-        );
-        if ($childCategories != false && $childCategories->count() > 0) {
-            while (!$childCategories->EOF) {
-                $parentId = $childCategories->fields['oxparentid'];
-                $actOxid = $childCategories->fields['oxid'];
-
-                $parentCategory = $database->select(
-                    'select oxrootid, oxright from oxcategories where oxid = :oxid',
-                    [
-                        'oxid' => $parentId,
-                    ]
-                );
-                if ($parentCategory != false && $parentCategory->count() > 0) {
-                    while (!$parentCategory->EOF) {
-                        $parentOxRootId = $parentCategory->fields['oxrootid'];
-                        $parentRight = (int)$parentCategory->fields['oxright'];
-                        $parentCategory->fetchRow();
+        $database->execute('update oxcategories set oxrootid = :oxrootid where oxparentid = :oxparentid', ['oxrootid' => $this_root, 'oxparentid' => $ox_root_id]);
+        $child_categories = $database->select('select oxid, oxparentid from oxcategories where oxparentid = :oxparentid order by oxsort', ['oxparentid' => $ox_root_id]);
+        if ($child_categories != false && $child_categories->count() > 0) {
+            while (!$child_categories->EOF) {
+                $parent_id = $child_categories->fields['oxparentid'];
+                $act_oxid = $child_categories->fields['oxid'];
+                $parent_category = $database->select('select oxrootid, oxright from oxcategories where oxid = :oxid', ['oxid' => $parent_id]);
+                if ($parent_category != false && $parent_category->count() > 0) {
+                    while (!$parent_category->EOF) {
+                        $parent_ox_root_id = $parent_category->fields['oxrootid'];
+                        $parent_right = (int) $parent_category->fields['oxright'];
+                        $parent_category->fetch_row();
                     }
                 }
-
-                $query = 'update oxcategories set oxleft = oxleft + 2 where oxrootid = :oxrootid and'
-                    . ' oxleft > :parentRight and oxright >= :parentRight and oxid != :oxid';
-                $database->execute($query, [
-                    'oxrootid' => $parentOxRootId,
-                    'parentRight' => $parentRight,
-                    'oxid' => $actOxid,
-                ]);
-
-                $query = 'update oxcategories set oxright = oxright + 2 where oxrootid = :oxrootid and'
-                    . ' oxright >= :oxright and oxid != :oxid';
-                $database->execute($query, [
-                    'oxrootid' => $parentOxRootId,
-                    'oxright' => $parentRight,
-                    'oxid' => $actOxid,
-                ]);
-
-                $query = 'update oxcategories set oxleft = :parentRight, oxright = (:parentRight + 1)'
-                    . ' where oxid = :oxid';
-                $database->execute($query, [
-                    'parentRight' => $parentRight,
-                    'oxid' => $actOxid,
-                ]);
-                $this->updateNodes($actOxid, false, $thisRoot);
-                $childCategories->fetchRow();
+                $query = 'update oxcategories set oxleft = oxleft + 2 where oxrootid = :oxrootid and' . ' oxleft > :parentRight and oxright >= :parentRight and oxid != :oxid';
+                $database->execute($query, ['oxrootid' => $parent_ox_root_id, 'parentRight' => $parent_right, 'oxid' => $act_oxid]);
+                $query = 'update oxcategories set oxright = oxright + 2 where oxrootid = :oxrootid and' . ' oxright >= :oxright and oxid != :oxid';
+                $database->execute($query, ['oxrootid' => $parent_ox_root_id, 'oxright' => $parent_right, 'oxid' => $act_oxid]);
+                $query = 'update oxcategories set oxleft = :parentRight, oxright = (:parentRight + 1)' . ' where oxid = :oxid';
+                $database->execute($query, ['parentRight' => $parent_right, 'oxid' => $act_oxid]);
+                $this->update_nodes($act_oxid, false, $this_root);
+                $child_categories->fetch_row();
             }
         }
     }
-
     /**
      * Extra getter to guarantee compatibility with templates
      *
@@ -697,11 +561,11 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @return string
      */
-    public function __get($sName)
+    public function __get($s_name)
     {
-        return match ($sName) {
-            'aPath', 'aFullPath' => $this->getPath(),
-            default => parent::__get($sName),
+        return match ($s_name) {
+            'aPath', 'aFullPath' => $this->get_path(),
+            default => parent::__get($s_name),
         };
     }
 }

@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core\Module;
 
-namespace OxidEsales\EshopCommunity\Core\Module;
-
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderBridgeInterface;
-
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Bridge_Interface;
 /**
  * Generates class chains for extended classes by modules.
  * IMPORTANT: Due to the way the shop is prepared for testing, you must not use Registry::getConfig() in this class.
@@ -19,7 +16,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesData
  *
  * @internal Do not make a module extension for this class.
  */
-class ModuleChainsGenerator
+class Module_Chains_Generator
 {
     /**
      * Creates given class chains.
@@ -29,19 +26,17 @@ class ModuleChainsGenerator
      *
      * @return string
      */
-    public function createClassChain($className, $classAlias = null)
+    public function create_class_chain($class_name, $class_alias = null)
     {
-        if (!$classAlias) {
-            $classAlias = $className;
+        if (!$class_alias) {
+            $class_alias = $class_name;
         }
-        $activeChain = $this->getActiveChain($className, $classAlias);
-        if (!empty($activeChain)) {
-            return $this->createClassExtensions($activeChain, $classAlias);
+        $active_chain = $this->get_active_chain($class_name, $class_alias);
+        if (!empty($active_chain)) {
+            return $this->create_class_extensions($active_chain, $class_alias);
         }
-
-        return $className;
+        return $class_name;
     }
-
     /**
      * Assembles class chains.
      *
@@ -50,11 +45,10 @@ class ModuleChainsGenerator
      *
      * @return array
      */
-    public function getActiveChain($className, $classAlias = null)
+    public function get_active_chain($class_name, $class_alias = null)
     {
-        return $this->getFullChain($className, $classAlias);
+        return $this->get_full_chain($class_name, $class_alias);
     }
-
     /**
      * Build full class chain.
      *
@@ -63,16 +57,12 @@ class ModuleChainsGenerator
      *
      * @return array
      */
-    public function getFullChain($className, $classAlias)
+    public function get_full_chain($class_name, $class_alias)
     {
-        $chain = ContainerFacade::get(ActiveModulesDataProviderBridgeInterface::class)->getClassExtensions();
-        $classChain = $chain[$className] ?? [];
-
-        return $classAlias && $classAlias !== $className
-            ? array_merge($classChain, $this->getChainForBackwardsCompatibilityClassAlias($chain, $classAlias))
-            : $classChain;
+        $chain = Container_Facade::get(Active_Modules_Data_Provider_Bridge_Interface::class)->get_class_extensions();
+        $class_chain = $chain[$class_name] ?? [];
+        return $class_alias && $class_alias !== $class_name ? array_merge($class_chain, $this->get_chain_for_backwards_compatibility_class_alias($chain, $class_alias)) : $class_chain;
     }
-
     /**
      * Creates middle classes if needed.
      *
@@ -83,30 +73,26 @@ class ModuleChainsGenerator
      *
      * @return string
      */
-    protected function createClassExtensions($classChain, $baseClass): string|array
+    protected function create_class_extensions($class_chain, $base_class): string|array
     {
         //security: just preventing string termination
-        $lastClass = str_replace(chr(0), '', $baseClass);
-        $parentClass = $lastClass;
-
-        foreach ($classChain as $extensionPath) {
-            $extensionPath = str_replace(chr(0), '', $extensionPath);
-
-            if ($this->createClassExtension($parentClass, $extensionPath)) {
-                if (\OxidEsales\Eshop\Core\NamespaceInformationProvider::isNamespacedClass($extensionPath)) {
-                    $parentClass = $extensionPath;
-                    $lastClass = $extensionPath;
+        $last_class = str_replace(chr(0), '', $base_class);
+        $parent_class = $last_class;
+        foreach ($class_chain as $extension_path) {
+            $extension_path = str_replace(chr(0), '', $extension_path);
+            if ($this->create_class_extension($parent_class, $extension_path)) {
+                if (\Oxid_Esales\Eshop\Core\Namespace_Information_Provider::is_namespaced_class($extension_path)) {
+                    $parent_class = $extension_path;
+                    $last_class = $extension_path;
                 } else {
-                    $parentClass = basename($extensionPath);
-                    $lastClass = basename($extensionPath);
+                    $parent_class = basename($extension_path);
+                    $last_class = basename($extension_path);
                 }
             }
         }
-
         //returning the last module from the chain
-        return $lastClass;
+        return $last_class;
     }
-
     /**
      * Checks, if a given class can be loaded and create an alias for _parent.
      * If the class cannot be loaded, some error handling is done.
@@ -122,82 +108,69 @@ class ModuleChainsGenerator
      * @throws \OxidEsales\Eshop\Core\Exception\SystemComponentException
      * @return bool Return on error
      */
-    protected function createClassExtension($parentClass, string $moduleClass): bool
+    protected function create_class_extension($parent_class, string $module_class): bool
     {
         /**
          * Test if the class file could be loaded
          */
         /** @var \Composer\Autoload\ClassLoader $composerClassLoader */
-        $composerClassLoader = include VENDOR_PATH . 'autoload.php';
-        if (
-            !strpos($moduleClass, '_parent') &&
-            !$composerClassLoader->findFile($moduleClass)
-        ) {
-            $this->handleSpecialCases($parentClass);
-            $this->onModuleExtensionCreationError($moduleClass);
-
+        $composer_class_loader = include VENDOR_PATH . 'autoload.php';
+        if (!strpos($module_class, '_parent') && !$composer_class_loader->find_file($module_class)) {
+            $this->handle_special_cases($parent_class);
+            $this->on_module_extension_creation_error($module_class);
             return false;
         }
-
-        $moduleClassParentAlias = $moduleClass . '_parent';
-        if (!class_exists($moduleClassParentAlias, false)) {
-            class_alias($parentClass, $moduleClassParentAlias);
+        $module_class_parent_alias = $module_class . '_parent';
+        if (!class_exists($module_class_parent_alias, false)) {
+            class_alias($parent_class, $module_class_parent_alias);
         }
-
         return true;
     }
-
     /**
      * Special case is when oxconfig class is extended: we cant call "_disableModule" as it requires valid config object
      * but we can't create it as module class extending it does not exist. So we will use original oxConfig object instead.
      *
      * @param string $requestedClass Class, for which extension chain was generated.
      */
-    protected function handleSpecialCases($requestedClass)
+    protected function handle_special_cases($requested_class)
     {
         // We do actually have to check the whole inheritance chain in case two OXID modules each have an extension
         // on oxconfig. Checking for $requestedClass only would cover only one inheritance step.
-
-        $isConfigClass = false;
-        $currentClass = $requestedClass;
-        $safetyCount = 0;
+        $is_config_class = false;
+        $current_class = $requested_class;
+        $safety_count = 0;
         do {
-            if (($currentClass == 'oxconfig') || ($currentClass == \OxidEsales\Eshop\Core\Config::class)) {
-                $isConfigClass = true;
+            if ($current_class == 'oxconfig' || $current_class == \Oxid_Esales\Eshop\Core\Config::class) {
+                $is_config_class = true;
                 break;
             }
-
-            if ($safetyCount++ === 200) {
-                throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException('Recursion limit reached while traversing class inheritance chain.');
+            if ($safety_count++ === 200) {
+                throw new \Oxid_Esales\Eshop\Core\Exception\System_Component_Exception('Recursion limit reached while traversing class inheritance chain.');
             }
-
             // We can be sure that the parent class of the current class is actually defined due to the way
             // the extension chain is traversed.
-        } while ($currentClass = get_parent_class($currentClass));
-
-        if ($isConfigClass) {
-            $config = new \OxidEsales\Eshop\Core\Config();
-            \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $config);
+        } while ($current_class = get_parent_class($current_class));
+        if ($is_config_class) {
+            $config = new \Oxid_Esales\Eshop\Core\Config();
+            \Oxid_Esales\Eshop\Core\Registry::set(\Oxid_Esales\Eshop\Core\Config::class, $config);
         }
     }
-
     /**
      * Writes/logs an error on module extension creation problem
      */
-    protected function onModuleExtensionCreationError(string $moduleClass)
+    protected function on_module_extension_creation_error(string $module_class)
     {
-        $moduleId = '(module id not availible)';
-        if (class_exists("\OxidEsales\Eshop\Core\Module\Module", false)) {
-            $module = new \OxidEsales\Eshop\Core\Module\Module();
-            $moduleId = $module->getIdByPath($moduleClass);
+        $module_id = '(module id not availible)';
+        if (class_exists("\\OxidEsales\\Eshop\\Core\\Module\\Module", false)) {
+            $module = new \Oxid_Esales\Eshop\Core\Module\Module();
+            $module_id = $module->get_id_by_path($module_class);
         }
-        $message = sprintf('Module class %s not found. Module ID %s', $moduleClass, $moduleId);
-        $exception = new \OxidEsales\Eshop\Core\Exception\SystemComponentException($message);
-        \OxidEsales\Eshop\Core\Registry::getLogger()->error($exception->getMessage(), [$exception]);
+        $message = sprintf('Module class %s not found. Module ID %s', $module_class, $module_id);
+        $exception = new \Oxid_Esales\Eshop\Core\Exception\System_Component_Exception($message);
+        \Oxid_Esales\Eshop\Core\Registry::get_logger()->error($exception->get_message(), [$exception]);
     }
-
-    private function getChainForBackwardsCompatibilityClassAlias(array $chain, string $classAlias): array
+    private function get_chain_for_backwards_compatibility_class_alias(array $chain, string $class_alias): array
     {
-        return array_change_key_case($chain)[strtolower($classAlias)] ?? [];
+        return array_change_key_case($chain)[strtolower($class_alias)] ?? [];
     }
 }

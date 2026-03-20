@@ -4,47 +4,38 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ModuleConfigurationDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Event\SettingChangedEvent;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao\Module_Configuration_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setting\Event\Setting_Changed_Event;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
+use Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface;
 /**
  * @deprecated use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface
  */
-class ModuleSettingBridge implements ModuleSettingBridgeInterface
+class Module_Setting_Bridge implements Module_Setting_Bridge_Interface
 {
-    public function __construct(
-        private readonly ContextInterface $context,
-        private readonly ModuleConfigurationDaoInterface $moduleConfigurationDao,
-        private readonly EventDispatcherInterface $eventDispatcher
-    ) {
+    public function __construct(private readonly Context_Interface $context, private readonly Module_Configuration_Dao_Interface $module_configuration_dao, private readonly Event_Dispatcher_Interface $event_dispatcher)
+    {
     }
-
     /**
      * @param mixed $value
      */
-    public function save(string $name, $value, string $moduleId): void
+    public function save(string $name, $value, string $module_id): void
     {
-        $moduleConfiguration = $this->moduleConfigurationDao->get($moduleId, $this->context->getCurrentShopId());
-        $setting = $moduleConfiguration->getModuleSetting($name);
-        $setting->setValue($value);
-        $this->moduleConfigurationDao->save($moduleConfiguration, $this->context->getCurrentShopId());
-
-        $this->eventDispatcher->dispatch(new SettingChangedEvent($name, $this->context->getCurrentShopId(), $moduleId));
+        $module_configuration = $this->module_configuration_dao->get($module_id, $this->context->get_current_shop_id());
+        $setting = $module_configuration->get_module_setting($name);
+        $setting->set_value($value);
+        $this->module_configuration_dao->save($module_configuration, $this->context->get_current_shop_id());
+        $this->event_dispatcher->dispatch(new Setting_Changed_Event($name, $this->context->get_current_shop_id(), $module_id));
     }
-
     /**
      * @return mixed
      */
-    public function get(string $name, string $moduleId)
+    public function get(string $name, string $module_id)
     {
-        $configuration = $this->moduleConfigurationDao->get($moduleId, $this->context->getCurrentShopId());
-        return $configuration->getModuleSetting($name)->getValue();
+        $configuration = $this->module_configuration_dao->get($module_id, $this->context->get_current_shop_id());
+        return $configuration->get_module_setting($name)->get_value();
     }
 }

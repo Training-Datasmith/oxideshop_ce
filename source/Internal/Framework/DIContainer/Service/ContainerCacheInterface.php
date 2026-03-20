@@ -4,21 +4,15 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service;
-
-use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-interface ContainerCacheInterface
+use Psr\Container\Container_Interface;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+interface Container_Cache_Interface
 {
-    public function put(ContainerBuilder $container, int $shopId): void;
-
-    public function get(int $shopId): ContainerInterface;
-
-    public function exists(int $shopId): bool;
-
-    public function invalidate(int $shopId): void;
+    public function put(Container_Builder $container, int $shop_id): void;
+    public function get(int $shop_id): Container_Interface;
+    public function exists(int $shop_id): bool;
+    public function invalidate(int $shop_id): void;
 }

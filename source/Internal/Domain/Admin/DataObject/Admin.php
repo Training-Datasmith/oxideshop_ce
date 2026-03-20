@@ -4,51 +4,44 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Admin\DataObject;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Data_Object;
 
 class Admin
 {
     public const MALL_ADMIN = 'malladmin';
-
     public function __construct(
         /** @var string */
         private $id,
         /** @var string */
         private $email,
         /** @var string */
-        private $passwordHash,
+        private $password_hash,
         /** @var string */
         private $rights,
         /** @var int */
-        private $shopId
-    ) {
+        private $shop_id
+    )
+    {
     }
-
-    public function getId(): string
+    public function get_id(): string
     {
         return $this->id;
     }
-
-    public function getEmail(): string
+    public function get_email(): string
     {
         return $this->email;
     }
-
-    public function getPasswordHash(): string
+    public function get_password_hash(): string
     {
-        return $this->passwordHash;
+        return $this->password_hash;
     }
-
-    public function getRights(): string
+    public function get_rights(): string
     {
         return $this->rights;
     }
-
-    public function getShopId(): int
+    public function get_shop_id(): int
     {
-        return $this->shopId;
+        return $this->shop_id;
     }
 }

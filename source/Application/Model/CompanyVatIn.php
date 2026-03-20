@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Company VAT identification number (VATIN)
  */
-class CompanyVatIn implements \Stringable
+class Company_Vat_In implements \Stringable
 {
     /**
      * Constructor
@@ -23,41 +21,38 @@ class CompanyVatIn implements \Stringable
         /**
          * VAT identification number
          */
-        private $_sCompanyVatNumber
-    ) {
+        private $_s_company_vat_number
+    )
+    {
     }
-
     /**
      * Returns country code from number.
      */
-    public function getCountryCode(): string
+    public function get_country_code(): string
     {
-        return (string) \OxidEsales\Eshop\Core\Str::getStr()->strtoupper(\OxidEsales\Eshop\Core\Str::getStr()->substr($this->cleanUp($this->_sCompanyVatNumber), 0, 2));
+        return (string) \Oxid_Esales\Eshop\Core\Str::get_str()->strtoupper(\Oxid_Esales\Eshop\Core\Str::get_str()->substr($this->clean_up($this->_s_company_vat_number), 0, 2));
     }
-
     /**
      * Returns country code from number.
      */
-    public function getNumbers(): string
+    public function get_numbers(): string
     {
-        return (string) \OxidEsales\Eshop\Core\Str::getStr()->substr($this->cleanUp($this->_sCompanyVatNumber), 2);
+        return (string) \Oxid_Esales\Eshop\Core\Str::get_str()->substr($this->clean_up($this->_s_company_vat_number), 2);
     }
-
     /**
      * Removes spaces and symbols: '-',',','.' from string
      *
      * @param string $sValue Value.
      */
-    protected function cleanUp($sValue): string
+    protected function clean_up($s_value): string
     {
-        return (string) \OxidEsales\Eshop\Core\Str::getStr()->preg_replace("/\s|-/", '', $sValue);
+        return (string) \Oxid_Esales\Eshop\Core\Str::get_str()->preg_replace("/\\s|-/", '', $s_value);
     }
-
     /**
      * Cast to string
      */
     public function __toString(): string
     {
-        return $this->_sCompanyVatNumber;
+        return $this->_s_company_vat_number;
     }
 }

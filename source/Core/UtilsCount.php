@@ -1,28 +1,24 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
 /**
  * Counting utility class
  */
-class UtilsCount extends \OxidEsales\Eshop\Core\Base
+class Utils_Count extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Users view id, used to identify current state cache
      *
      * @var string
      */
-    protected $_sUserViewId;
-
+    protected $_s_user_view_id;
     /**
      * Returns category article count
      *
@@ -30,21 +26,17 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function getCatArticleCount($sCatId)
+    public function get_cat_article_count($s_cat_id)
     {
         // current status unique ident
-        $sActIdent = $this->getUserViewId();
-
+        $s_act_ident = $this->get_user_view_id();
         // loading from cache
-        $aCatData = $this->getCatCache();
-
-        if (!$aCatData || !isset($aCatData[$sCatId][$sActIdent])) {
-            return $this->setCatArticleCount($aCatData, $sCatId, $sActIdent);
+        $a_cat_data = $this->get_cat_cache();
+        if (!$a_cat_data || !isset($a_cat_data[$s_cat_id][$s_act_ident])) {
+            return $this->set_cat_article_count($a_cat_data, $s_cat_id, $s_act_ident);
         }
-
-        return $aCatData[$sCatId][$sActIdent];
+        return $a_cat_data[$s_cat_id][$s_act_ident];
     }
-
     /**
      * Returns category article count price
      *
@@ -54,21 +46,17 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function getPriceCatArticleCount($sCatId, $dPriceFrom, $dPriceTo)
+    public function get_price_cat_article_count($s_cat_id, $d_price_from, $d_price_to)
     {
         // current status unique ident
-        $sActIdent = $this->getUserViewId();
-
+        $s_act_ident = $this->get_user_view_id();
         // loading from cache
-        $aCatData = $this->getCatCache();
-
-        if (!$aCatData || !isset($aCatData[$sCatId][$sActIdent])) {
-            return $this->setPriceCatArticleCount($aCatData, $sCatId, $sActIdent, $dPriceFrom, $dPriceTo);
+        $a_cat_data = $this->get_cat_cache();
+        if (!$a_cat_data || !isset($a_cat_data[$s_cat_id][$s_act_ident])) {
+            return $this->set_price_cat_article_count($a_cat_data, $s_cat_id, $s_act_ident, $d_price_from, $d_price_to);
         }
-
-        return $aCatData[$sCatId][$sActIdent];
+        return $a_cat_data[$s_cat_id][$s_act_ident];
     }
-
     /**
      * Returns vendor article count
      *
@@ -76,21 +64,17 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function getVendorArticleCount($sVendorId)
+    public function get_vendor_article_count($s_vendor_id)
     {
         // current category unique ident
-        $sActIdent = $this->getUserViewId();
-
+        $s_act_ident = $this->get_user_view_id();
         // loading from cache
-        $aVendorData = $this->getVendorCache();
-
-        if (!$aVendorData || !isset($aVendorData[$sVendorId][$sActIdent])) {
-            return $this->setVendorArticleCount($aVendorData, $sVendorId, $sActIdent);
+        $a_vendor_data = $this->get_vendor_cache();
+        if (!$a_vendor_data || !isset($a_vendor_data[$s_vendor_id][$s_act_ident])) {
+            return $this->set_vendor_article_count($a_vendor_data, $s_vendor_id, $s_act_ident);
         }
-
-        return $aVendorData[$sVendorId][$sActIdent];
+        return $a_vendor_data[$s_vendor_id][$s_act_ident];
     }
-
     /**
      * Returns Manufacturer article count
      *
@@ -98,20 +82,17 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function getManufacturerArticleCount($sManufacturerId)
+    public function get_manufacturer_article_count($s_manufacturer_id)
     {
         // current category unique ident
-        $sActIdent = $this->getUserViewId();
-
+        $s_act_ident = $this->get_user_view_id();
         // loading from cache
-        $aManufacturerData = $this->getManufacturerCache();
-        if (!$aManufacturerData || !isset($aManufacturerData[$sManufacturerId][$sActIdent])) {
-            return $this->setManufacturerArticleCount($aManufacturerData, $sManufacturerId, $sActIdent);
+        $a_manufacturer_data = $this->get_manufacturer_cache();
+        if (!$a_manufacturer_data || !isset($a_manufacturer_data[$s_manufacturer_id][$s_act_ident])) {
+            return $this->set_manufacturer_article_count($a_manufacturer_data, $s_manufacturer_id, $s_act_ident);
         }
-
-        return $aManufacturerData[$sManufacturerId][$sActIdent];
+        return $a_manufacturer_data[$s_manufacturer_id][$s_act_ident];
     }
-
     /**
      * Saves and returns category article count into cache
      *
@@ -121,29 +102,19 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function setCatArticleCount($aCache, $sCatId, $sActIdent)
+    public function set_cat_article_count($a_cache, $s_cat_id, $s_act_ident)
     {
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $sTable = $oArticle->getViewName();
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sO2CView = $tableViewNameGenerator->getViewName('oxobject2category');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+        $s_table = $o_article->get_view_name();
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_o2c_view = $table_view_name_generator->get_view_name('oxobject2category');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         // we use distinct if article is assigned to category twice
-        $sQ = "SELECT COUNT( DISTINCT $sTable.`oxid` )
-               FROM $sO2CView
-                   INNER JOIN $sTable ON $sO2CView.`oxobjectid` = $sTable.`oxid` AND $sTable.`oxparentid` = ''
-               WHERE $sO2CView.`oxcatnid` = :oxcatnid AND " . $oArticle->getSqlActiveSnippet();
-
-        $aCache[$sCatId][$sActIdent] = $oDb->getOne($sQ, [
-            'oxcatnid' => $sCatId,
-        ]);
-
-        $this->setCatCache($aCache);
-
-        return $aCache[$sCatId][$sActIdent];
+        $s_q = "SELECT COUNT( DISTINCT {$s_table}.`oxid` )\n               FROM {$s_o2c_view}\n                   INNER JOIN {$s_table} ON {$s_o2c_view}.`oxobjectid` = {$s_table}.`oxid` AND {$s_table}.`oxparentid` = ''\n               WHERE {$s_o2c_view}.`oxcatnid` = :oxcatnid AND " . $o_article->get_sql_active_snippet();
+        $a_cache[$s_cat_id][$s_act_ident] = $o_db->get_one($s_q, ['oxcatnid' => $s_cat_id]);
+        $this->set_cat_cache($a_cache);
+        return $a_cache[$s_cat_id][$s_act_ident];
     }
-
     /**
      * Saves (if needed) and returns price category article count into cache
      *
@@ -153,32 +124,25 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      * @param int    $dPriceFrom Price from
      * @param int    $dPriceTo   Price to
      */
-    public function setPriceCatArticleCount($aCache, $sCatId, $sActIdent, $dPriceFrom, $dPriceTo)
+    public function set_price_cat_article_count($a_cache, $s_cat_id, $s_act_ident, $d_price_from, $d_price_to)
     {
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $sTable = $oArticle->getViewName();
-
+        $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+        $s_table = $o_article->get_view_name();
         $params = [];
-        $sSelect = "SELECT count({$sTable}.oxid) FROM {$sTable} WHERE oxvarminprice >= 0";
-        if ($dPriceTo) {
-            $sSelect .= ' AND oxvarminprice <= :oxvarpriceto';
-            $params['oxvarpriceto'] = (float) $dPriceTo;
+        $s_select = "SELECT count({$s_table}.oxid) FROM {$s_table} WHERE oxvarminprice >= 0";
+        if ($d_price_to) {
+            $s_select .= ' AND oxvarminprice <= :oxvarpriceto';
+            $params['oxvarpriceto'] = (float) $d_price_to;
         }
-
-        if ($dPriceFrom) {
-            $sSelect .= ' AND oxvarminprice  >= :oxvarpricefrom';
-            $params['oxvarpricefrom'] = (float) $dPriceFrom;
+        if ($d_price_from) {
+            $s_select .= ' AND oxvarminprice  >= :oxvarpricefrom';
+            $params['oxvarpricefrom'] = (float) $d_price_from;
         }
-
-        $sSelect .=  " AND {$sTable}.oxissearch = 1 AND " . $oArticle->getSqlActiveSnippet();
-
-        $aCache[$sCatId][$sActIdent] = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSelect, $params);
-
-        $this->setCatCache($aCache);
-
-        return $aCache[$sCatId][$sActIdent];
+        $s_select .= " AND {$s_table}.oxissearch = 1 AND " . $o_article->get_sql_active_snippet();
+        $a_cache[$s_cat_id][$s_act_ident] = \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_one($s_select, $params);
+        $this->set_cat_cache($a_cache);
+        return $a_cache[$s_cat_id][$s_act_ident];
     }
-
     /**
      * Saves and returns vendors category article count into cache
      *
@@ -188,30 +152,24 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function setVendorArticleCount($aCache, $sCatId, $sActIdent)
+    public function set_vendor_article_count($a_cache, $s_cat_id, $s_act_ident)
     {
         // if vendor/category name is 'root', skip counting
-        if ($sCatId == 'root') {
+        if ($s_cat_id == 'root') {
             return 0;
         }
-
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $sTable = $oArticle->getViewName();
-
+        $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+        $s_table = $o_article->get_view_name();
         // select each vendor articles count
-        $sQ = "select $sTable.oxvendorid AS vendorId, count(*) from $sTable where ";
-        $sQ .= "$sTable.oxvendorid <> '' and $sTable.oxparentid = '' and " . $oArticle->getSqlActiveSnippet() . " group by $sTable.oxvendorid ";
-        $aDbResult = $this->getAssoc($sQ);
-
-        foreach ($aDbResult as $sKey => $sValue) {
-            $aCache[$sKey][$sActIdent] = $sValue;
+        $s_q = "select {$s_table}.oxvendorid AS vendorId, count(*) from {$s_table} where ";
+        $s_q .= "{$s_table}.oxvendorid <> '' and {$s_table}.oxparentid = '' and " . $o_article->get_sql_active_snippet() . " group by {$s_table}.oxvendorid ";
+        $a_db_result = $this->get_assoc($s_q);
+        foreach ($a_db_result as $s_key => $s_value) {
+            $a_cache[$s_key][$s_act_ident] = $s_value;
         }
-
-        $this->setVendorCache($aCache);
-
-        return $aCache[$sCatId][$sActIdent] ?? 0;
+        $this->set_vendor_cache($a_cache);
+        return $a_cache[$s_cat_id][$s_act_ident] ?? 0;
     }
-
     /**
      * Returns the query result as a two dimensional associative array.
      * The keys of the first level are the firsts value of each row.
@@ -223,34 +181,25 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    protected function getAssoc($query, $parameters = [])
+    protected function get_assoc($query, $parameters = [])
     {
-        $database = DatabaseProvider::getDb();
-
-        $resultSet = $database->select($query, $parameters);
-
-        $rows = $resultSet->fetchAll();
-
+        $database = Database_Provider::get_db();
+        $result_set = $database->select($query, $parameters);
+        $rows = $result_set->fetch_all();
         if (!$rows) {
             return [];
         }
-
         $result = [];
-
         foreach ($rows as $row) {
-            $firstColumn = array_keys($row)[0];
-            $key = $row[$firstColumn];
-
+            $first_column = array_keys($row)[0];
+            $key = $row[$first_column];
             $values = array_values($row);
-
             if (2 <= count($values)) {
                 $result[$key] = $values[1];
             }
         }
-
         return $result;
     }
-
     /**
      * Saves and returns Manufacturers category article count into cache
      *
@@ -260,233 +209,197 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return int
      */
-    public function setManufacturerArticleCount($aCache, $sMnfId, $sActIdent)
+    public function set_manufacturer_article_count($a_cache, $s_mnf_id, $s_act_ident)
     {
         // if Manufacturer/category name is 'root', skip counting
-        if ($sMnfId == 'root') {
+        if ($s_mnf_id == 'root') {
             return 0;
         }
-
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $sArtTable = $oArticle->getViewName();
-
+        $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+        $s_art_table = $o_article->get_view_name();
         // select each Manufacturer articles count
         //#3485
-        $sQ = "SELECT count($sArtTable.oxid) FROM $sArtTable WHERE $sArtTable.oxparentid = '' AND oxmanufacturerid = :manufacturerId AND " . $oArticle->getSqlActiveSnippet();
-        $iValue = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQ, [
-            'manufacturerId' => $sMnfId,
-        ]);
-
-        $aCache[$sMnfId][$sActIdent] = (int) $iValue;
-
-        $this->setManufacturerCache($aCache);
-
-        return $aCache[$sMnfId][$sActIdent];
+        $s_q = "SELECT count({$s_art_table}.oxid) FROM {$s_art_table} WHERE {$s_art_table}.oxparentid = '' AND oxmanufacturerid = :manufacturerId AND " . $o_article->get_sql_active_snippet();
+        $i_value = \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_one($s_q, ['manufacturerId' => $s_mnf_id]);
+        $a_cache[$s_mnf_id][$s_act_ident] = (int) $i_value;
+        $this->set_manufacturer_cache($a_cache);
+        return $a_cache[$s_mnf_id][$s_act_ident];
     }
-
     /**
      * Resets category (all categories) article count
      *
      * @param string $sCatId Category/vendor/manufacturer ID
      */
-    public function resetCatArticleCount($sCatId = null): void
+    public function reset_cat_article_count($s_cat_id = null): void
     {
-        if (!$sCatId) {
-            \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalCatCache', null);
-            \OxidEsales\Eshop\Core\Registry::getUtils()->toFileCache('aLocalCatCache', '');
+        if (!$s_cat_id) {
+            \Oxid_Esales\Eshop\Core\Registry::get_config()->set_global_parameter('aLocalCatCache', null);
+            \Oxid_Esales\Eshop\Core\Registry::get_utils()->to_file_cache('aLocalCatCache', '');
         } else {
             // loading from cache
-            $aCatData = $this->getCatCache();
-            if (isset($aCatData[$sCatId])) {
-                unset($aCatData[$sCatId]);
-                $this->setCatCache($aCatData);
+            $a_cat_data = $this->get_cat_cache();
+            if (isset($a_cat_data[$s_cat_id])) {
+                unset($a_cat_data[$s_cat_id]);
+                $this->set_cat_cache($a_cat_data);
             }
         }
     }
-
     /**
      * Resets price categories article count
      *
      * @param int $iPrice article price
      */
-    public function resetPriceCatArticleCount($iPrice): void
+    public function reset_price_cat_article_count($i_price): void
     {
         // loading from cache
-        if ($aCatData = $this->getCatCache()) {
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-
+        if ($a_cat_data = $this->get_cat_cache()) {
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-            $categoriesIds = DatabaseProvider::getMaster()->getCol(
-                sprintf(
-                    'SELECT oxid FROM %s WHERE :oxpricefrom >= oxpricefrom AND :oxpriceto <= oxpriceto',
-                    $tableViewNameGenerator->getViewName('oxcategories')
-                ),
-                [
-                    'oxpricefrom' => (float) $iPrice,
-                    'oxpriceto' => (float) $iPrice,
-                ]
-            );
-            foreach ($categoriesIds as $categoryId) {
-                if (isset($aCatData[$categoryId])) {
-                    unset($aCatData[$categoryId]);
+            $categories_ids = Database_Provider::get_master()->get_col(sprintf('SELECT oxid FROM %s WHERE :oxpricefrom >= oxpricefrom AND :oxpriceto <= oxpriceto', $table_view_name_generator->get_view_name('oxcategories')), ['oxpricefrom' => (float) $i_price, 'oxpriceto' => (float) $i_price]);
+            foreach ($categories_ids as $category_id) {
+                if (isset($a_cat_data[$category_id])) {
+                    unset($a_cat_data[$category_id]);
                 }
             }
-
-            if (!empty($categoriesIds)) {
-                $this->setCatCache($aCatData);
+            if (!empty($categories_ids)) {
+                $this->set_cat_cache($a_cat_data);
             }
         }
     }
-
     /**
      * Resets vendor (all vendors) article count
      *
      * @param string $sVendorId Category/vendor ID
      */
-    public function resetVendorArticleCount($sVendorId = null): void
+    public function reset_vendor_article_count($s_vendor_id = null): void
     {
-        if (!$sVendorId) {
-            \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalVendorCache', null);
-            \OxidEsales\Eshop\Core\Registry::getUtils()->toFileCache('aLocalVendorCache', '');
+        if (!$s_vendor_id) {
+            \Oxid_Esales\Eshop\Core\Registry::get_config()->set_global_parameter('aLocalVendorCache', null);
+            \Oxid_Esales\Eshop\Core\Registry::get_utils()->to_file_cache('aLocalVendorCache', '');
         } else {
             // loading from cache
-            $aVendorData = $this->getVendorCache();
-            if (isset($aVendorData[$sVendorId])) {
-                unset($aVendorData[$sVendorId]);
-                $this->setVendorCache($aVendorData);
+            $a_vendor_data = $this->get_vendor_cache();
+            if (isset($a_vendor_data[$s_vendor_id])) {
+                unset($a_vendor_data[$s_vendor_id]);
+                $this->set_vendor_cache($a_vendor_data);
             }
         }
     }
-
     /**
      * Resets Manufacturer (all Manufacturers) article count
      *
      * @param string $sManufacturerId Category/Manufacturer ID
      */
-    public function resetManufacturerArticleCount($sManufacturerId = null): void
+    public function reset_manufacturer_article_count($s_manufacturer_id = null): void
     {
-        if (!$sManufacturerId) {
-            \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalManufacturerCache', null);
-            \OxidEsales\Eshop\Core\Registry::getUtils()->toFileCache('aLocalManufacturerCache', '');
+        if (!$s_manufacturer_id) {
+            \Oxid_Esales\Eshop\Core\Registry::get_config()->set_global_parameter('aLocalManufacturerCache', null);
+            \Oxid_Esales\Eshop\Core\Registry::get_utils()->to_file_cache('aLocalManufacturerCache', '');
         } else {
             // loading from cache
-            $aManufacturerData = $this->getManufacturerCache();
-            if (isset($aManufacturerData[$sManufacturerId])) {
-                unset($aManufacturerData[$sManufacturerId]);
-                $this->setManufacturerCache($aManufacturerData);
+            $a_manufacturer_data = $this->get_manufacturer_cache();
+            if (isset($a_manufacturer_data[$s_manufacturer_id])) {
+                unset($a_manufacturer_data[$s_manufacturer_id]);
+                $this->set_manufacturer_cache($a_manufacturer_data);
             }
         }
     }
-
     /**
      * Loads and returns category cache data array
      *
      * @return array
      */
-    protected function getCatCache()
+    protected function get_cat_cache()
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         // first look at the local cache
-        $aLocalCatCache = $myConfig->getGlobalParameter('aLocalCatCache');
-
+        $a_local_cat_cache = $my_config->get_global_parameter('aLocalCatCache');
         // if local cache is not set - loading from file cache
-        if (!$aLocalCatCache) {
-            $sLocalCatCache = \OxidEsales\Eshop\Core\Registry::getUtils()->fromFileCache('aLocalCatCache');
-            if ($sLocalCatCache) {
-                $aLocalCatCache = $sLocalCatCache;
+        if (!$a_local_cat_cache) {
+            $s_local_cat_cache = \Oxid_Esales\Eshop\Core\Registry::get_utils()->from_file_cache('aLocalCatCache');
+            if ($s_local_cat_cache) {
+                $a_local_cat_cache = $s_local_cat_cache;
             } else {
-                $aLocalCatCache = null;
+                $a_local_cat_cache = null;
             }
-            $myConfig->setGlobalParameter('aLocalCatCache', $aLocalCatCache);
+            $my_config->set_global_parameter('aLocalCatCache', $a_local_cat_cache);
         }
-
-        return $aLocalCatCache;
+        return $a_local_cat_cache;
     }
-
     /**
      * Writes category data into cache
      *
      * @param array $aCache A cacheable data
      */
-    protected function setCatCache($aCache)
+    protected function set_cat_cache($a_cache)
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalCatCache', $aCache);
-        \OxidEsales\Eshop\Core\Registry::getUtils()->toFileCache('aLocalCatCache', $aCache);
+        \Oxid_Esales\Eshop\Core\Registry::get_config()->set_global_parameter('aLocalCatCache', $a_cache);
+        \Oxid_Esales\Eshop\Core\Registry::get_utils()->to_file_cache('aLocalCatCache', $a_cache);
     }
-
     /**
      * Writes vendor data into cache
      *
      * @param array $aCache A cacheable data
      */
-    protected function setVendorCache($aCache)
+    protected function set_vendor_cache($a_cache)
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalVendorCache', $aCache);
-        \OxidEsales\Eshop\Core\Registry::getUtils()->toFileCache('aLocalVendorCache', $aCache);
+        \Oxid_Esales\Eshop\Core\Registry::get_config()->set_global_parameter('aLocalVendorCache', $a_cache);
+        \Oxid_Esales\Eshop\Core\Registry::get_utils()->to_file_cache('aLocalVendorCache', $a_cache);
     }
-
     /**
      * Writes Manufacturer data into cache
      *
      * @param array $aCache A cacheable data
      */
-    protected function setManufacturerCache($aCache)
+    protected function set_manufacturer_cache($a_cache)
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig()->setGlobalParameter('aLocalManufacturerCache', $aCache);
-        \OxidEsales\Eshop\Core\Registry::getUtils()->toFileCache('aLocalManufacturerCache', $aCache);
+        \Oxid_Esales\Eshop\Core\Registry::get_config()->set_global_parameter('aLocalManufacturerCache', $a_cache);
+        \Oxid_Esales\Eshop\Core\Registry::get_utils()->to_file_cache('aLocalManufacturerCache', $a_cache);
     }
-
     /**
      * Loads and returns category/vendor cache data array
      *
      * @return array
      */
-    protected function getVendorCache()
+    protected function get_vendor_cache()
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         // first look at the local cache
-        $aLocalVendorCache = $myConfig->getGlobalParameter('aLocalVendorCache');
+        $a_local_vendor_cache = $my_config->get_global_parameter('aLocalVendorCache');
         // if local cache is not set - loading from file cache
-        if (!$aLocalVendorCache) {
-            $sLocalVendorCache = \OxidEsales\Eshop\Core\Registry::getUtils()->fromFileCache('aLocalVendorCache');
-            if ($sLocalVendorCache) {
-                $aLocalVendorCache = $sLocalVendorCache;
+        if (!$a_local_vendor_cache) {
+            $s_local_vendor_cache = \Oxid_Esales\Eshop\Core\Registry::get_utils()->from_file_cache('aLocalVendorCache');
+            if ($s_local_vendor_cache) {
+                $a_local_vendor_cache = $s_local_vendor_cache;
             } else {
-                $aLocalVendorCache = null;
+                $a_local_vendor_cache = null;
             }
-            $myConfig->setGlobalParameter('aLocalVendorCache', $aLocalVendorCache);
+            $my_config->set_global_parameter('aLocalVendorCache', $a_local_vendor_cache);
         }
-
-        return $aLocalVendorCache;
+        return $a_local_vendor_cache;
     }
-
     /**
      * Loads and returns category/Manufacturer cache data array
      *
      * @return array
      */
-    protected function getManufacturerCache()
+    protected function get_manufacturer_cache()
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         // first look at the local cache
-        $aLocalManufacturerCache = $myConfig->getGlobalParameter('aLocalManufacturerCache');
+        $a_local_manufacturer_cache = $my_config->get_global_parameter('aLocalManufacturerCache');
         // if local cache is not set - loading from file cache
-        if (!$aLocalManufacturerCache) {
-            $sLocalManufacturerCache = \OxidEsales\Eshop\Core\Registry::getUtils()->fromFileCache('aLocalManufacturerCache');
-            if ($sLocalManufacturerCache) {
-                $aLocalManufacturerCache = $sLocalManufacturerCache;
+        if (!$a_local_manufacturer_cache) {
+            $s_local_manufacturer_cache = \Oxid_Esales\Eshop\Core\Registry::get_utils()->from_file_cache('aLocalManufacturerCache');
+            if ($s_local_manufacturer_cache) {
+                $a_local_manufacturer_cache = $s_local_manufacturer_cache;
             } else {
-                $aLocalManufacturerCache = null;
+                $a_local_manufacturer_cache = null;
             }
-            $myConfig->setGlobalParameter('aLocalManufacturerCache', $aLocalManufacturerCache);
+            $my_config->set_global_parameter('aLocalManufacturerCache', $a_local_manufacturer_cache);
         }
-
-        return $aLocalManufacturerCache;
+        return $a_local_manufacturer_cache;
     }
-
     /**
      * Returns user view id (Shop, language, RR group index...)
      *
@@ -494,25 +407,22 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getUserViewId($blReset = false)
+    protected function get_user_view_id($bl_reset = false)
     {
-        if ($this->_sUserViewId != null && !$blReset) {
-            return $this->_sUserViewId;
+        if ($this->_s_user_view_id != null && !$bl_reset) {
+            return $this->_s_user_view_id;
         }
-
         // loading R&R data from session
-        $userSessionGroups = $this->getCurrentUserSessionGroups();
-        $this->_sUserViewId = md5(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopID() . \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageTag() . serialize($userSessionGroups) . (int) $this->isAdmin());
-
-        return $this->_sUserViewId;
+        $user_session_groups = $this->get_current_user_session_groups();
+        $this->_s_user_view_id = md5(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_id() . \Oxid_Esales\Eshop\Core\Registry::get_lang()->get_language_tag() . serialize($user_session_groups) . (int) $this->is_admin());
+        return $this->_s_user_view_id;
     }
-
     /**
      * Get current user groups
      *
      * @return array|null
      */
-    protected function getCurrentUserSessionGroups()
+    protected function get_current_user_session_groups()
     {
         return null;
     }

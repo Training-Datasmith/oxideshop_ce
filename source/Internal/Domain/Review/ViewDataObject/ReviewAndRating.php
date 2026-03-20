@@ -4,210 +4,177 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\View_Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject;
-
-class ReviewAndRating
+class Review_And_Rating
 {
     /**
      * @var string
      */
-    private $reviewId;
-
+    private $review_id;
     /**
      * @var string
      */
-    private $ratingId;
-
+    private $rating_id;
     /**
      * @var int
      */
     private $rating;
-
     /**
      * @var string
      */
-    private $reviewText;
-
+    private $review_text;
     /**
      * @var string
      */
-    private $objectId;
-
+    private $object_id;
     /**
      * @var string
      */
-    private $objectType;
-
+    private $object_type;
     /**
      * @var string
      */
-    private $objectTitle;
-
+    private $object_title;
     /**
      * @var string
      */
-    private $createdAt;
-
+    private $created_at;
     /**
      * @param string $id
      *
      * @return $this
      */
-    public function setReviewId($id): static
+    public function set_review_id($id): static
     {
-        $this->reviewId = $id;
-
+        $this->review_id = $id;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getReviewId()
+    public function get_review_id()
     {
-        return $this->reviewId;
+        return $this->review_id;
     }
-
     /**
      * @param int $id
      *
      * @return $this
      */
-    public function setRatingId($id): static
+    public function set_rating_id($id): static
     {
-        $this->ratingId = $id;
-
+        $this->rating_id = $id;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getRatingId()
+    public function get_rating_id()
     {
-        return $this->ratingId;
+        return $this->rating_id;
     }
-
     /**
      * @param string $rating
      *
      * @return $this
      */
-    public function setRating($rating): static
+    public function set_rating($rating): static
     {
         $this->rating = $rating;
-
         return $this;
     }
-
     /**
      * @return int
      */
-    public function getRating()
+    public function get_rating()
     {
         return $this->rating;
     }
-
     /**
      * @param string $reviewText
      *
      * @return $this
      */
-    public function setReviewText($reviewText): static
+    public function set_review_text($review_text): static
     {
-        $this->reviewText = $reviewText;
-
+        $this->review_text = $review_text;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getReviewText()
+    public function get_review_text()
     {
-        return $this->reviewText;
+        return $this->review_text;
     }
-
     /**
      * @param string $objectId
      *
      * @return $this
      */
-    public function setObjectId($objectId): static
+    public function set_object_id($object_id): static
     {
-        $this->objectId = $objectId;
-
+        $this->object_id = $object_id;
         return $this;
     }
-
     /**
      * @return int
      */
-    public function getObjectId()
+    public function get_object_id()
     {
-        return $this->objectId;
+        return $this->object_id;
     }
-
     /**
      * @param string $objectType
      *
      * @return $this
      */
-    public function setObjectType($objectType): static
+    public function set_object_type($object_type): static
     {
-        $this->objectType = $objectType;
-
+        $this->object_type = $object_type;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getObjectType()
+    public function get_object_type()
     {
-        return $this->objectType;
+        return $this->object_type;
     }
-
     /**
      * @param string $objectTitle
      *
      * @return $this
      */
-    public function setObjectTitle($objectTitle): static
+    public function set_object_title($object_title): static
     {
-        $this->objectTitle = $objectTitle;
-
+        $this->object_title = $object_title;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getObjectTitle()
+    public function get_object_title()
     {
-        return $this->objectTitle;
+        return $this->object_title;
     }
-
     /**
      * @param string $date
      *
      * @return $this
      */
-    public function setCreatedAt($date): static
+    public function set_created_at($date): static
     {
-        $this->createdAt = $date;
-
+        $this->created_at = $date;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getCreatedAt()
+    public function get_created_at()
     {
-        return $this->createdAt;
+        return $this->created_at;
     }
 }

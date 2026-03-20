@@ -4,98 +4,85 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Form;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Form;
-
-class FormField implements FormFieldInterface
+class Form_Field implements Form_Field_Interface
 {
     /**
      * @var string
      */
     private $name;
-
     /**
      * @var string
      */
     private $value;
-
     /**
      * @var string
      */
     private $label;
-
     /**
      * @var bool
      */
-    private $isRequired;
-
+    private $is_required;
     /**
      * @return string
      */
-    public function getName()
+    public function get_name()
     {
         return $this->name;
     }
-
     /**
      * @param string $name
      */
-    public function setName($name): static
+    public function set_name($name): static
     {
         $this->name = $name;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getValue()
+    public function get_value()
     {
         return $this->value;
     }
-
     /**
      * @param string $value
      */
-    public function setValue($value): static
+    public function set_value($value): static
     {
         $this->value = $value;
         return $this;
     }
-
     /**
      * @return string
      */
-    public function getLabel()
+    public function get_label()
     {
         return $this->label;
     }
-
     /**
      * @param string $label
      */
-    public function setLabel($label): static
+    public function set_label($label): static
     {
         $this->label = $label;
         return $this;
     }
-
     /**
      * @return bool
      */
-    public function isRequired()
+    public function is_required()
     {
-        return $this->isRequired;
+        return $this->is_required;
     }
-
     /**
      * @param bool $isRequired
      */
-    public function setIsRequired($isRequired): static
+    public function set_is_required($is_required): static
     {
-        $this->isRequired = $isRequired;
+        $this->is_required = $is_required;
         return $this;
     }
 }

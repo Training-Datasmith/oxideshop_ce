@@ -1,75 +1,66 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Shopping basket item manager.
  * Manager class for shopping basket item (class may be overriden).
  */
-class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
+class User_Basket_Item extends \Oxid_Esales\Eshop\Core\Model\Base_Model
 {
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxuserbasketitem';
-
+    protected $_s_class_name = 'oxuserbasketitem';
     /**
      * Article object assigned to userbasketitem
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oArticle;
-
+    protected $_o_article;
     /**
      * Variant parent "buyable" status
      *
      * @var bool
      */
-    protected $_blParentBuyable = false;
-
+    protected $_bl_parent_buyable = false;
     /**
      * Basket item selection list
      *
      * @var array
      */
-    protected $_aSelList;
-
+    protected $_a_sel_list;
     /**
      * Basket item persistent parameters
      *
      * @var array
      */
-    protected $_aPersParam;
-
+    protected $_a_pers_param;
     /**
      * Class constructor, initiates parent constructor (parent::oxBase()).
      */
     public function __construct()
     {
-        $this->setVariantParentBuyable(\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVariantParentBuyable'));
+        $this->set_variant_parent_buyable(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blVariantParentBuyable'));
         parent::__construct();
         $this->init('oxuserbasketitems');
     }
-
     /**
      * Variant parent "buyable" status setter
      *
      * @param bool $blBuyable parent "buyable" status
      */
-    public function setVariantParentBuyable($blBuyable = false): void
+    public function set_variant_parent_buyable($bl_buyable = false): void
     {
-        $this->_blParentBuyable = $blBuyable;
+        $this->_bl_parent_buyable = $bl_buyable;
     }
-
     /**
      * Loads and returns the article for that basket item
      *
@@ -79,48 +70,41 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    public function getArticle($sItemKey)
+    public function get_article($s_item_key)
     {
         if (!$this->oxuserbasketitems__oxartid->value) {
             //this exception may not be caught, anyhow this is a critical exception
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ArticleException::class);
-            $oEx->setMessage('EXCEPTION_ARTICLE_NOPRODUCTID');
-            throw $oEx;
+            $o_ex = ox_new(\Oxid_Esales\Eshop\Core\Exception\Article_Exception::class);
+            $o_ex->set_message('EXCEPTION_ARTICLE_NOPRODUCTID');
+            throw $o_ex;
         }
-
-        if ($this->_oArticle === null) {
-            $this->_oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-
+        if ($this->_o_article === null) {
+            $this->_o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
             // performance
             /* removed due to #4178
-             if ( $this->_blParentBuyable ) {
-                $this->_oArticle->setNoVariantLoading( true );
-            }
-            */
-
-            if (!$this->_oArticle->load($this->oxuserbasketitems__oxartid->value)) {
+                if ( $this->_blParentBuyable ) {
+                   $this->_oArticle->setNoVariantLoading( true );
+               }
+               */
+            if (!$this->_o_article->load($this->oxuserbasketitems__oxartid->value)) {
                 return false;
             }
-
-            $aSelList = $this->getSelList();
-            if (($aSelectlist = $this->_oArticle->getSelectLists()) && is_array($aSelList)) {
-                foreach ($aSelList as $iKey => $iSel) {
-                    if (isset($aSelectlist[$iKey][$iSel])) {
+            $a_sel_list = $this->get_sel_list();
+            if (($a_selectlist = $this->_o_article->get_select_lists()) && is_array($a_sel_list)) {
+                foreach ($a_sel_list as $i_key => $i_sel) {
+                    if (isset($a_selectlist[$i_key][$i_sel])) {
                         // cloning select list information
-                        $aSelectlist[$iKey][$iSel] = clone $aSelectlist[$iKey][$iSel];
-                        $aSelectlist[$iKey][$iSel]->selected = 1;
+                        $a_selectlist[$i_key][$i_sel] = clone $a_selectlist[$i_key][$i_sel];
+                        $a_selectlist[$i_key][$i_sel]->selected = 1;
                     }
                 }
-                $this->_oArticle->setSelectlist($aSelectlist);
+                $this->_o_article->set_selectlist($a_selectlist);
             }
-
             // generating item key
-            $this->_oArticle->setItemKey($sItemKey);
+            $this->_o_article->set_item_key($s_item_key);
         }
-
-        return $this->_oArticle;
+        return $this->_o_article;
     }
-
     /**
      * Does not return _oArticle var on serialisation
      *
@@ -128,64 +112,56 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function __sleep()
     {
-        $aRet = [];
-        foreach (get_object_vars($this) as $sKey => $sVar) {
-            if ($sKey != '_oArticle') {
-                $aRet[] = $sKey;
+        $a_ret = [];
+        foreach (get_object_vars($this) as $s_key => $s_var) {
+            if ($s_key != '_oArticle') {
+                $a_ret[] = $s_key;
             }
         }
-
-        return $aRet;
+        return $a_ret;
     }
-
     /**
      * Basket item selection list getter
      *
      * @return array
      */
-    public function getSelList()
+    public function get_sel_list()
     {
-        if ($this->_aSelList == null && $this->oxuserbasketitems__oxsellist->value) {
-            $this->_aSelList = unserialize($this->oxuserbasketitems__oxsellist->value);
+        if ($this->_a_sel_list == null && $this->oxuserbasketitems__oxsellist->value) {
+            $this->_a_sel_list = unserialize($this->oxuserbasketitems__oxsellist->value);
         }
-
-        return $this->_aSelList;
+        return $this->_a_sel_list;
     }
-
     /**
      * Basket item selection list setter
      *
      * @param array $aSelList selection list
      */
-    public function setSelList($aSelList): void
+    public function set_sel_list($a_sel_list): void
     {
-        $this->oxuserbasketitems__oxsellist = new \OxidEsales\Eshop\Core\Field(serialize($aSelList), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxuserbasketitems__oxsellist = new \Oxid_Esales\Eshop\Core\Field(serialize($a_sel_list), \Oxid_Esales\Eshop\Core\Field::T_RAW);
     }
-
     /**
      * Basket item persistent parameters getter
      *
      * @return array
      */
-    public function getPersParams()
+    public function get_pers_params()
     {
-        if ($this->_aPersParam == null && $this->oxuserbasketitems__oxpersparam->value) {
-            $this->_aPersParam = unserialize($this->oxuserbasketitems__oxpersparam->value);
+        if ($this->_a_pers_param == null && $this->oxuserbasketitems__oxpersparam->value) {
+            $this->_a_pers_param = unserialize($this->oxuserbasketitems__oxpersparam->value);
         }
-
-        return $this->_aPersParam;
+        return $this->_a_pers_param;
     }
-
     /**
      * Basket item persistent parameters setter
      *
      * @param string $sPersParams persistent parameters
      */
-    public function setPersParams($sPersParams): void
+    public function set_pers_params($s_pers_params): void
     {
-        $this->oxuserbasketitems__oxpersparam = new \OxidEsales\Eshop\Core\Field(serialize($sPersParams), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxuserbasketitems__oxpersparam = new \Oxid_Esales\Eshop\Core\Field(serialize($s_pers_params), \Oxid_Esales\Eshop\Core\Field::T_RAW);
     }
-
     /**
      * Sets data field value
      *
@@ -193,15 +169,11 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      */
-    protected function setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT)
+    protected function set_field_data($s_field_name, $s_value, $i_data_type = \Oxid_Esales\Eshop\Core\Field::T_TEXT)
     {
-        if (
-            'oxsellist' === strtolower($sFieldName) || 'oxuserbasketitems__oxsellist' === strtolower($sFieldName)
-            || 'oxpersparam' === strtolower($sFieldName) || 'oxuserbasketitems__oxpersparam' === strtolower($sFieldName)
-        ) {
-            $iDataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+        if ('oxsellist' === strtolower($s_field_name) || 'oxuserbasketitems__oxsellist' === strtolower($s_field_name) || 'oxpersparam' === strtolower($s_field_name) || 'oxuserbasketitems__oxpersparam' === strtolower($s_field_name)) {
+            $i_data_type = \Oxid_Esales\Eshop\Core\Field::T_RAW;
         }
-
-        return parent::setFieldData($sFieldName, $sValue, $iDataType);
+        return parent::set_field_data($s_field_name, $s_value, $i_data_type);
     }
 }

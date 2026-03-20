@@ -1,245 +1,188 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Application\Model\Review;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserRatingBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
-
+use Oxid_Esales\Eshop\Application\Model\Review;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Request;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Rating_Bridge_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Review_Bridge_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Dao\Entry_Does_Not_Exist_Dao_Exception;
 /**
  * Class AccountReviewController
  *
  * @package OxidEsales\EshopCommunity\Application\Controller
  */
-class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class Account_Review_Controller extends \Oxid_Esales\Eshop\Application\Controller\Account_Controller
 {
-    protected $itemsPerPage = 10;
-
-    protected $_sThisTemplate = 'page/account/reviews';
-
+    protected $items_per_page = 10;
+    protected $_s_this_template = 'page/account/reviews';
     /**
      * Redirect to My Account, if validation does not pass.
      */
     public function init(): void
     {
-        if (!$this->isUserAllowedToManageOwnReviews() || !$this->getUser()) {
-            $this->redirectToAccountDashboard();
+        if (!$this->is_user_allowed_to_manage_own_reviews() || !$this->get_user()) {
+            $this->redirect_to_account_dashboard();
         }
-
         parent::init();
     }
-
     /**
      * Returns Review List
      *
      * @return array
      */
-    public function getReviewList()
+    public function get_review_list()
     {
-        $currentPage = $this->getActPage();
-        $itemsPerPage = $this->getItemsPerPage();
-        $offset = $currentPage * $itemsPerPage;
-
-        $userId = $this->getUser()->getId();
-
-        $reviewModel = oxNew(Review::class);
-        $reviewAndRatingList = $reviewModel->getReviewAndRatingListByUserId($userId);
-
-        return $this->getPaginatedReviewAndRatingList(
-            $reviewAndRatingList,
-            $itemsPerPage,
-            $offset
-        );
+        $current_page = $this->get_act_page();
+        $items_per_page = $this->get_items_per_page();
+        $offset = $current_page * $items_per_page;
+        $user_id = $this->get_user()->get_id();
+        $review_model = ox_new(Review::class);
+        $review_and_rating_list = $review_model->get_review_and_rating_list_by_user_id($user_id);
+        return $this->get_paginated_review_and_rating_list($review_and_rating_list, $items_per_page, $offset);
     }
-
     /**
      * Delete review and rating, which belongs to the active user.
      */
-    public function deleteReviewAndRating(): void
+    public function delete_review_and_rating(): void
     {
-        $session = \OxidEsales\Eshop\Core\Registry::getSession();
-
-        if ($session->checkSessionChallenge()) {
+        $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
+        if ($session->check_session_challenge()) {
             try {
-                $this->deleteReview();
-                $this->deleteRating();
-            } catch (EntryDoesNotExistDaoException) {
+                $this->delete_review();
+                $this->delete_rating();
+            } catch (Entry_Does_Not_Exist_Dao_Exception) {
                 //if user reloads the page after deletion
             }
         }
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        return [
-            [
-                'title' => $this->getTranslatedString('MY_ACCOUNT'),
-                'link'  => $this->getMyAccountPageUrl(),
-            ],
-            [
-                'title' => $this->getTranslatedString('MY_REVIEWS'),
-                'link'  => $this->getLink(),
-            ],
-        ];
+        return [['title' => $this->get_translated_string('MY_ACCOUNT'), 'link' => $this->get_my_account_page_url()], ['title' => $this->get_translated_string('MY_REVIEWS'), 'link' => $this->get_link()]];
     }
-
     /**
      * Generates the pagination.
      *
      * @return \stdClass
      */
-    public function getPageNavigation()
+    public function get_page_navigation()
     {
-        $this->_iCntPages = $this->getPagesCount();
-        $this->_oPageNavigation = $this->generatePageNavigation();
-
-        return $this->_oPageNavigation;
+        $this->_i_cnt_pages = $this->get_pages_count();
+        $this->_o_page_navigation = $this->generate_page_navigation();
+        return $this->_o_page_navigation;
     }
-
     /**
      * Return how many items will be displayed per page.
      *
      * @return int
      */
-    public function getItemsPerPage()
+    public function get_items_per_page()
     {
-        return $this->itemsPerPage;
+        return $this->items_per_page;
     }
-
     /**
      * Get actual page number.
      *
      * @return int
      */
-    public function getActPage()
+    public function get_act_page()
     {
-        $lastPage = $this->getPagesCount();
-        $currentPage = parent::getActPage();
-
-        if ($currentPage >= $lastPage) {
-            return $lastPage - 1;
+        $last_page = $this->get_pages_count();
+        $current_page = parent::get_act_page();
+        if ($current_page >= $last_page) {
+            return $last_page - 1;
         }
-
-        return $currentPage;
+        return $current_page;
     }
-
     /**
      * Deletes Review.
      */
-    private function deleteReview(): void
+    private function delete_review(): void
     {
-        $userId = $this->getUser()->getId();
-        $reviewId = $this->getReviewIdFromRequest();
-
-        if ($reviewId) {
-            ContainerFacade::get(UserReviewBridgeInterface::class)
-                ->deleteReview($userId, $reviewId);
+        $user_id = $this->get_user()->get_id();
+        $review_id = $this->get_review_id_from_request();
+        if ($review_id) {
+            Container_Facade::get(User_Review_Bridge_Interface::class)->delete_review($user_id, $review_id);
         }
     }
-
     /**
      * Deletes Rating.
      */
-    private function deleteRating(): void
+    private function delete_rating(): void
     {
-        $userId = $this->getUser()->getId();
-        $ratingId = $this->getRatingIdFromRequest();
-
-        if ($ratingId) {
-            ContainerFacade::get(UserRatingBridgeInterface::class)
-                ->deleteRating($userId, $ratingId);
+        $user_id = $this->get_user()->get_id();
+        $rating_id = $this->get_rating_id_from_request();
+        if ($rating_id) {
+            Container_Facade::get(User_Rating_Bridge_Interface::class)->delete_rating($user_id, $rating_id);
         }
     }
-
     /**
      * Retrieve the Review id from the request
      *
      * @return string
      */
-    private function getReviewIdFromRequest()
+    private function get_review_id_from_request()
     {
-        $request = oxNew(Request::class);
-
-        return $request->getRequestEscapedParameter('reviewId');
+        $request = ox_new(Request::class);
+        return $request->get_request_escaped_parameter('reviewId');
     }
-
     /**
      * Retrieve the Rating id from the request
      *
      * @return string
      */
-    private function getRatingIdFromRequest()
+    private function get_rating_id_from_request()
     {
-        $request = oxNew(Request::class);
-
-        return $request->getRequestEscapedParameter('ratingId');
+        $request = ox_new(Request::class);
+        return $request->get_request_escaped_parameter('ratingId');
     }
-
     /**
      * Redirect to My Account dashboard
      */
-    private function redirectToAccountDashboard(): void
+    private function redirect_to_account_dashboard(): void
     {
-        Registry::getUtils()->redirect(
-            $this->getMyAccountPageUrl(),
-            true,
-            302
-        );
+        Registry::get_utils()->redirect($this->get_my_account_page_url(), true, 302);
     }
-
     /**
      * Returns pages count.
      */
-    private function getPagesCount(): float
+    private function get_pages_count(): float
     {
-        return ceil($this->getReviewAndRatingItemsCount() / $this->getItemsPerPage());
+        return ceil($this->get_review_and_rating_items_count() / $this->get_items_per_page());
     }
-
     /**
      * Returns My Account page url.
      *
      * @return string
      */
-    private function getMyAccountPageUrl()
+    private function get_my_account_page_url()
     {
-        $selfLink = $this->getViewConfig()->getSelfLink();
-
-        return Registry::getSeoEncoder()->getStaticUrl($selfLink . 'cl=account');
+        $self_link = $this->get_view_config()->get_self_link();
+        return Registry::get_seo_encoder()->get_static_url($self_link . 'cl=account');
     }
-
     /**
      * Returns translated string.
      *
      *
      * @return string
      */
-    private function getTranslatedString(string $string)
+    private function get_translated_string(string $string)
     {
-        $languageId = Registry::getLang()->getBaseLanguage();
-
-        return Registry::getLang()->translateString(
-            $string,
-            $languageId,
-            false
-        );
+        $language_id = Registry::get_lang()->get_base_language();
+        return Registry::get_lang()->translate_string($string, $language_id, false);
     }
-
     /**
      * Paginate ReviewAndRating list.
      *
@@ -247,16 +190,8 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
      * @param int   $itemsCount
      * @param int   $offset
      */
-    private function getPaginatedReviewAndRatingList(
-        $reviewAndRatingList,
-        $itemsCount,
-        int|float $offset
-    ): array {
-        return array_slice(
-            $reviewAndRatingList,
-            $offset,
-            $itemsCount,
-            true
-        );
+    private function get_paginated_review_and_rating_list($review_and_rating_list, $items_count, int|float $offset): array
+    {
+        return array_slice($review_and_rating_list, $offset, $items_count, true);
     }
 }

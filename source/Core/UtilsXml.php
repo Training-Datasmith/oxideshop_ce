@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use DOMDocument;
-
+use Dom_Document;
 /**
  * XML document handler
  */
-class UtilsXml extends \OxidEsales\Eshop\Core\Base
+class Utils_Xml extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Takes XML string and makes DOMDocument
@@ -25,22 +22,19 @@ class UtilsXml extends \OxidEsales\Eshop\Core\Base
      *
      * @return DOMDocument|bool
      */
-    public function loadXml($sXml, $oDomDocument = null)
+    public function load_xml($s_xml, $o_dom_document = null)
     {
-        if (!$oDomDocument) {
-            $oDomDocument = new DOMDocument('1.0', 'utf-8');
+        if (!$o_dom_document) {
+            $o_dom_document = new Dom_Document('1.0', 'utf-8');
         }
-
         libxml_use_internal_errors(true);
-        $oDomDocument->loadXML($sXml);
+        $o_dom_document->load_xml($s_xml);
         $errors = libxml_get_errors();
-        $blLoaded = empty($errors);
+        $bl_loaded = empty($errors);
         libxml_clear_errors();
-
-        if ($blLoaded) {
-            return $oDomDocument;
+        if ($bl_loaded) {
+            return $o_dom_document;
         }
-
         return false;
     }
 }

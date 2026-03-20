@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Class makes call to given URL address and sends request parameter.
@@ -20,40 +18,36 @@ namespace OxidEsales\EshopCommunity\Core;
  *
  * @ignore   This class will not be included in documentation.
  */
-class OnlineModuleVersionNotifierCaller extends \OxidEsales\Eshop\Core\OnlineCaller
+class Online_Module_Version_Notifier_Caller extends \Oxid_Esales\Eshop\Core\Online_Caller
 {
     /** Online Module Version Notifier web service url. */
     public const WEB_SERVICE_URL = 'https://omvn.oxid-esales.com/check.php';
-
     /** XML document tag name. */
     public const XML_DOCUMENT_NAME = 'omvnRequest';
-
     /**
      * Performs Web service request
      *
      * @param \OxidEsales\Eshop\Core\OnlineModulesNotifierRequest $oRequest Object with request parameters
      */
-    public function doRequest(\OxidEsales\Eshop\Core\OnlineModulesNotifierRequest $oRequest): void
+    public function do_request(\Oxid_Esales\Eshop\Core\Online_Modules_Notifier_Request $o_request): void
     {
-        $this->call($oRequest);
+        $this->call($o_request);
     }
-
     /**
      * Gets XML document name.
      *
      * @return string XML document tag name.
      */
-    protected function getXMLDocumentName()
+    protected function get_xml_document_name()
     {
         return self::XML_DOCUMENT_NAME;
     }
-
     /**
      * Gets service url.
      *
      * @return string Web service url.
      */
-    protected function getServiceUrl()
+    protected function get_service_url()
     {
         return self::WEB_SERVICE_URL;
     }

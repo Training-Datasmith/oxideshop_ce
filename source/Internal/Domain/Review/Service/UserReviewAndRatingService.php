@@ -4,23 +4,16 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Service;
-
-use Doctrine\Common\Collections\ArrayCollection;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRating;
-
-class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
+use Doctrine\Common\Collections\Array_Collection;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\View_Data_Object\Review_And_Rating;
+class User_Review_And_Rating_Service implements User_Review_And_Rating_Service_Interface
 {
-    public function __construct(
-        private readonly UserReviewServiceInterface $userReviewService,
-        private readonly UserRatingServiceInterface $userRatingService,
-        private readonly ReviewAndRatingMergingServiceInterface $reviewAndRatingMergingService
-    ) {
+    public function __construct(private readonly User_Review_Service_Interface $user_review_service, private readonly User_Rating_Service_Interface $user_rating_service, private readonly Review_And_Rating_Merging_Service_Interface $review_and_rating_merging_service)
+    {
     }
-
     /**
      * Get number of reviews by given user.
      *
@@ -28,13 +21,10 @@ class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
      *
      * @return int
      */
-    public function getReviewAndRatingListCount($userId)
+    public function get_review_and_rating_list_count($user_id)
     {
-        return $this
-            ->getMergedReviewAndRatingList($userId)
-            ->count();
+        return $this->get_merged_review_and_rating_list($user_id)->count();
     }
-
     /**
      * Returns Collection of User Ratings and Reviews.
      *
@@ -42,13 +32,11 @@ class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
      *
      * @return ArrayCollection
      */
-    public function getReviewAndRatingList($userId)
+    public function get_review_and_rating_list($user_id)
     {
-        $reviewAndRatingList = $this->getMergedReviewAndRatingList($userId);
-
-        return $this->sortReviewAndRatingList($reviewAndRatingList);
+        $review_and_rating_list = $this->get_merged_review_and_rating_list($user_id);
+        return $this->sort_review_and_rating_list($review_and_rating_list);
     }
-
     /**
      * Returns merged Rating and Review.
      *
@@ -56,28 +44,22 @@ class UserReviewAndRatingService implements UserReviewAndRatingServiceInterface
      *
      * @return ArrayCollection
      */
-    private function getMergedReviewAndRatingList($userId)
+    private function get_merged_review_and_rating_list($user_id)
     {
-        $reviews = $this->userReviewService->getReviews($userId);
-        $ratings = $this->userRatingService->getRatings($userId);
-
-        return $this
-            ->reviewAndRatingMergingService
-            ->mergeReviewAndRating($reviews, $ratings);
+        $reviews = $this->user_review_service->get_reviews($user_id);
+        $ratings = $this->user_rating_service->get_ratings($user_id);
+        return $this->review_and_rating_merging_service->merge_review_and_rating($reviews, $ratings);
     }
-
     /**
      * Sorts ReviewAndRating list.
      *
      *
      * @return ArrayCollection
      */
-    private function sortReviewAndRatingList(ArrayCollection $reviewAndRatingList)
+    private function sort_review_and_rating_list(Array_Collection $review_and_rating_list)
     {
-        $reviewAndRatingListArray = $reviewAndRatingList->toArray();
-
-        usort($reviewAndRatingListArray, fn (ReviewAndRating $first, ReviewAndRating $second): int => $first->getCreatedAt() < $second->getCreatedAt() ? 1 : -1);
-
-        return new ArrayCollection($reviewAndRatingListArray);
+        $review_and_rating_list_array = $review_and_rating_list->to_array();
+        usort($review_and_rating_list_array, fn(Review_And_Rating $first, Review_And_Rating $second): int => $first->get_created_at() < $second->get_created_at() ? 1 : -1);
+        return new Array_Collection($review_and_rating_list_array);
     }
 }

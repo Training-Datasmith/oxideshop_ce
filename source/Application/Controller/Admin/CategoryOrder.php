@@ -1,22 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Admin article categories order manager.
  * There is possibility to change category sorting.
  * Admin Menu: Manage Products -> Categories -> Order.
  */
-class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Category_Order extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /**
      * Loads article category ordering info, passes it to template engine
@@ -27,30 +24,23 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     public function render()
     {
         parent::render();
-
-        $this->_aViewData['edit'] = $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-
+        $this->_a_view_data['edit'] = $o_category = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
         // resetting
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', null);
-
-        $soxId = $this->getEditObjectId();
-
-        if (isset($soxId) && $soxId != '-1') {
+        \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('neworder_sess', null);
+        $sox_id = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
             // load object
-            $oCategory->load($soxId);
-
+            $o_category->load($sox_id);
             //Disable editing for derived items
-            if ($oCategory->isDerived()) {
-                $this->_aViewData['readonly'] = true;
+            if ($o_category->is_derived()) {
+                $this->_a_view_data['readonly'] = true;
             }
         }
-        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
-            $oCategoryOrderAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax::class);
-            $this->_aViewData['oxajax'] = $oCategoryOrderAjax->getColumns();
-
+        if (Registry::get_request()->get_request_escaped_parameter('aoc')) {
+            $o_category_order_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Category_Order_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_category_order_ajax->get_columns();
             return 'popups/category_order';
         }
-
         return 'category_order';
     }
 }

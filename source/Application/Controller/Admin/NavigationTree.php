@@ -1,43 +1,37 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use DOMDocument;
-use DOMElement;
-use DOMXPath;
-use OxidEsales\Eshop\Core\Base;
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use Dom_Document;
+use Dom_Element;
+use Domx_Path;
+use Oxid_Esales\Eshop\Core\Base;
+use Oxid_Esales\Eshop\Core\Str;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 use stdClass;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
-
-class NavigationTree extends Base
+use Symfony\Contracts\Cache\Item_Interface;
+use Symfony\Contracts\Cache\Tag_Aware_Cache_Interface;
+class Navigation_Tree extends Base
 {
     /**
      * stores DOM object for all navigation tree
      */
-    protected $_oDom;
-
+    protected $_o_dom;
     /**
      * keeps unmodified dom
      */
-    protected $_oInitialDom;
-
+    protected $_o_initial_dom;
     /**
      * Default EXPATH supported encodings
      *
      * @var array
      */
-    protected $_aSupportedExpathXmlEncodings = ['utf-8', 'utf-16', 'iso-8859-1', 'us-ascii'];
-
+    protected $_a_supported_expath_xml_encodings = ['utf-8', 'utf-16', 'iso-8859-1', 'us-ascii'];
     /**
      * clean empty nodes from tree
      *
@@ -45,215 +39,198 @@ class NavigationTree extends Base
      * @param string $parentXPath parent xpath
      * @param string $childXPath  child xpath from parent
      */
-    protected function cleanEmptyParents($dom, $parentXPath, $childXPath)
+    protected function clean_empty_parents($dom, $parent_x_path, $child_x_path)
     {
-        $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query($parentXPath);
-
-        foreach ($nodeList as $node) {
-            $id = $node->getAttribute('id');
-            $childList = $xPath->query("{$parentXPath}[@id='$id']/$childXPath");
-            if (!$childList->length) {
-                $node->parentNode->removeChild($node);
+        $x_path = new Dom_X_Path($dom);
+        $node_list = $x_path->query($parent_x_path);
+        foreach ($node_list as $node) {
+            $id = $node->get_attribute('id');
+            $child_list = $x_path->query("{$parent_x_path}[@id='{$id}']/{$child_x_path}");
+            if (!$child_list->length) {
+                $node->parent_node->remove_child($node);
             }
         }
     }
-
     /**
      * Adds links to xml nodes to resolve paths
      *
      * @param DomDocument $dom where to add links
      */
-    protected function addLinks($dom)
+    protected function add_links($dom)
     {
-        $url = 'index.php?'; // session parameters will be included later (after cache processor)
-        $xPath = new DomXPath($dom);
-
+        $url = 'index.php?';
+        // session parameters will be included later (after cache processor)
+        $x_path = new Dom_X_Path($dom);
         // building
-        $nodeList = $xPath->query('//SUBMENU[@cl]');
-        foreach ($nodeList as $node) {
+        $node_list = $x_path->query('//SUBMENU[@cl]');
+        foreach ($node_list as $node) {
             // fetching class
-            $cl = $node->getAttribute('cl');
-            $cl = $cl ? "cl=$cl" : '';
-
+            $cl = $node->get_attribute('cl');
+            $cl = $cl ? "cl={$cl}" : '';
             // fetching params
-            $param = $node->getAttribute('clparam');
-            $param = $param ? "&$param" : '';
-
+            $param = $node->get_attribute('clparam');
+            $param = $param ? "&{$param}" : '';
             // setting link
-            $node->setAttribute('link', "{$url}{$cl}{$param}");
+            $node->set_attribute('link', "{$url}{$cl}{$param}");
         }
     }
-
     /**
      * Loads data form XML file, and merges it with main oDomXML.
      *
      * @param string      $menuFile which file to load
      * @param DomDocument $dom      where to load
      */
-    protected function loadFromFile($menuFile, $dom)
+    protected function load_from_file($menu_file, $dom)
     {
         $merge = false;
-        $domFile = new DomDocument();
-        $domFile->preserveWhiteSpace = false;
-        if (!@$domFile->load($menuFile)) {
+        $dom_file = new Dom_Document();
+        $dom_file->preserve_white_space = false;
+        if (!@$dom_file->load($menu_file)) {
             $merge = true;
-        } elseif (is_readable($menuFile) && ($xml = @file_get_contents($menuFile))) {
+        } elseif (is_readable($menu_file) && $xml = @file_get_contents($menu_file)) {
             // looking for non supported character encoding
-            if (Str::getStr()->preg_match("/encoding\=(.*)\?\>/", $xml, $matches) !== 0) {
+            if (Str::get_str()->preg_match("/encoding\\=(.*)\\?\\>/", $xml, $matches) !== 0) {
                 if (isset($matches[1])) {
-                    $currEncoding = trim((string) $matches[1], '"');
-                    if (!in_array(strtolower($currEncoding), $this->_aSupportedExpathXmlEncodings)) {
+                    $curr_encoding = trim((string) $matches[1], '"');
+                    if (!in_array(strtolower($curr_encoding), $this->_a_supported_expath_xml_encodings)) {
                         $xml = str_replace($matches[1], '"UTF-8"', $xml);
-                        $xml = iconv($currEncoding, 'UTF-8', $xml);
+                        $xml = iconv($curr_encoding, 'UTF-8', $xml);
                     }
                 }
             }
-
             // load XML as string
-            if (@$domFile->loadXml($xml)) {
+            if (@$dom_file->load_xml($xml)) {
                 $merge = true;
             }
         }
-
         if ($merge) {
-            $this->merge($domFile, $dom);
+            $this->merge($dom_file, $dom);
         }
     }
-
     /**
      * add session parameters to local urls
      *
      * @param object $dom dom element to add links
      */
-    protected function sessionizeLocalUrls($dom)
+    protected function sessionize_local_urls($dom)
     {
-        $url = $this->getAdminUrl();
-        $xPath = new DomXPath($dom);
-        $str = Str::getStr();
-        foreach (['url', 'link'] as $attrType) {
-            foreach ($xPath->query("//OXMENU//*[@$attrType]") as $node) {
-                $localUrl = $node->getAttribute($attrType);
-                if (str_starts_with((string) $localUrl, 'index.php?')) {
-                    $localUrl = $str->preg_replace('#^index.php\?#', $url, $localUrl);
-                    $node->setAttribute($attrType, $localUrl);
+        $url = $this->get_admin_url();
+        $x_path = new Dom_X_Path($dom);
+        $str = Str::get_str();
+        foreach (['url', 'link'] as $attr_type) {
+            foreach ($x_path->query("//OXMENU//*[@{$attr_type}]") as $node) {
+                $local_url = $node->get_attribute($attr_type);
+                if (str_starts_with((string) $local_url, 'index.php?')) {
+                    $local_url = $str->preg_replace('#^index.php\?#', $url, $local_url);
+                    $node->set_attribute($attr_type, $local_url);
                 }
             }
         }
     }
-
     /**
      * Removes form tree elements which does not have required user rights
      *
      * @param object $dom DOMDocument
      */
-    protected function checkRights($dom)
+    protected function check_rights($dom)
     {
-        $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query('//*[@rights or @norights]');
-
-        foreach ($nodeList as $node) {
+        $x_path = new Dom_X_Path($dom);
+        $node_list = $x_path->query('//*[@rights or @norights]');
+        foreach ($node_list as $node) {
             // only allowed modules/user rights or so
-            if (($req = $node->getAttribute('rights'))) {
+            if ($req = $node->get_attribute('rights')) {
                 $perms = explode(',', (string) $req);
                 foreach ($perms as $perm) {
-                    if ($perm && !$this->hasRights($perm)) {
-                        $node->parentNode->removeChild($node);
+                    if ($perm && !$this->has_rights($perm)) {
+                        $node->parent_node->remove_child($node);
                     }
                 }
                 // not allowed modules/user rights or so
-            } elseif (($noReq = $node->getAttribute('norights'))) {
-                $perms = explode(',', (string) $noReq);
+            } elseif ($no_req = $node->get_attribute('norights')) {
+                $perms = explode(',', (string) $no_req);
                 foreach ($perms as $perm) {
-                    if ($perm && $this->hasRights($perm)) {
-                        $node->parentNode->removeChild($node);
+                    if ($perm && $this->has_rights($perm)) {
+                        $node->parent_node->remove_child($node);
                     }
                 }
             }
         }
     }
-
     /**
      * Removes from tree elements which don't have required groups
      *
      * @param DOMDocument $dom document to check group
      */
-    protected function checkGroups($dom)
+    protected function check_groups($dom)
     {
-        $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query('//*[@nogroup or @group]');
-
-        foreach ($nodeList as $node) {
+        $x_path = new Dom_X_Path($dom);
+        $node_list = $x_path->query('//*[@nogroup or @group]');
+        foreach ($node_list as $node) {
             // allowed only for groups
-            if (($req = $node->getAttribute('group'))) {
+            if ($req = $node->get_attribute('group')) {
                 $perms = explode(',', (string) $req);
                 foreach ($perms as $perm) {
-                    if ($perm && !$this->hasGroup($perm)) {
-                        $node->parentNode->removeChild($node);
+                    if ($perm && !$this->has_group($perm)) {
+                        $node->parent_node->remove_child($node);
                     }
                 }
                 // not allowed for groups
-            } elseif (($noReq = $node->getAttribute('nogroup'))) {
-                $perms = explode(',', (string) $noReq);
+            } elseif ($no_req = $node->get_attribute('nogroup')) {
+                $perms = explode(',', (string) $no_req);
                 foreach ($perms as $perm) {
-                    if ($perm && $this->hasGroup($perm)) {
-                        $node->parentNode->removeChild($node);
+                    if ($perm && $this->has_group($perm)) {
+                        $node->parent_node->remove_child($node);
                     }
                 }
             }
         }
     }
-
     /**
      * Removes form tree elements if this is demo shop and elements have disableForDemoShop="1"
      *
      * @param DOMDocument $dom document to check group
      */
-    protected function checkDemoShopDenials($dom)
+    protected function check_demo_shop_denials($dom)
     {
-        if (!\OxidEsales\Eshop\Core\Registry::getConfig()->isDemoShop()) {
+        if (!\Oxid_Esales\Eshop\Core\Registry::get_config()->is_demo_shop()) {
             // nothing to check for non demo shop
             return;
         }
-
-        $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query('//*[@disableForDemoShop]');
-        foreach ($nodeList as $node) {
-            if ($node->getAttribute('disableForDemoShop')) {
-                $node->parentNode->removeChild($node);
+        $x_path = new Dom_X_Path($dom);
+        $node_list = $x_path->query('//*[@disableForDemoShop]');
+        foreach ($node_list as $node) {
+            if ($node->get_attribute('disableForDemoShop')) {
+                $node->parent_node->remove_child($node);
             }
         }
     }
-
     /**
      * Removes node from tree elements if it is marked as not visible (visible="0")
      *
      * @param DOMDocument $dom document to check group
      */
-    protected function removeInvisibleMenuNodes($dom)
+    protected function remove_invisible_menu_nodes($dom)
     {
-        $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query('//*[@visible]');
-        foreach ($nodeList as $node) {
-            if (!$node->getAttribute('visible')) {
-                $node->parentNode->removeChild($node);
+        $x_path = new Dom_X_Path($dom);
+        $node_list = $x_path->query('//*[@visible]');
+        foreach ($node_list as $node) {
+            if (!$node->get_attribute('visible')) {
+                $node->parent_node->remove_child($node);
             }
         }
     }
-
     /**
      * Copys attributes form one element to another
      *
      * @param object $domElemTo   DOMElement
      * @param object $domElemFrom DOMElement
      */
-    protected function copyAttributes($domElemTo, $domElemFrom)
+    protected function copy_attributes($dom_elem_to, $dom_elem_from)
     {
-        foreach ($domElemFrom->attributes as $attr) {
-            $domElemTo->setAttribute($attr->nodeName, $attr->nodeValue);
+        foreach ($dom_elem_from->attributes as $attr) {
+            $dom_elem_to->set_attribute($attr->node_name, $attr->node_value);
         }
     }
-
     /**
      * Merges nodes of newly added menu xml file
      *
@@ -263,46 +240,40 @@ class NavigationTree extends Base
      * @param object $domDocTo    node to append child
      * @param string $queryStart  node query
      */
-    protected function mergeNodes($domElemTo, $domElemFrom, $xPathTo, $domDocTo, $queryStart)
+    protected function merge_nodes($dom_elem_to, $dom_elem_from, $x_path_to, $dom_doc_to, $query_start)
     {
-        foreach ($domElemFrom->childNodes as $fromNode) {
-            if ($fromNode->nodeType === XML_ELEMENT_NODE) {
-                $fromAttrName = $fromNode->getAttribute('id');
-                $fromNodeName = $fromNode->tagName;
-
+        foreach ($dom_elem_from->child_nodes as $from_node) {
+            if ($from_node->node_type === XML_ELEMENT_NODE) {
+                $from_attr_name = $from_node->get_attribute('id');
+                $from_node_name = $from_node->tag_name;
                 // find current item
-                $query = "{$queryStart}/{$fromNodeName}[@id='{$fromAttrName}']";
-                $curNode = $xPathTo->query($query);
-
+                $query = "{$query_start}/{$from_node_name}[@id='{$from_attr_name}']";
+                $cur_node = $x_path_to->query($query);
                 // if not found - append
-                if ($curNode->length == 0) {
-                    $domElemTo->appendChild($domDocTo->importNode($fromNode, true));
+                if ($cur_node->length == 0) {
+                    $dom_elem_to->append_child($dom_doc_to->import_node($from_node, true));
                 } else {
-                    $curNode = $curNode->item(0);
-
+                    $cur_node = $cur_node->item(0);
                     // if found copy all attributes and check childnodes
-                    $this->copyAttributes($curNode, $fromNode);
-
-                    if ($fromNode->childNodes->length) {
-                        $this->mergeNodes($curNode, $fromNode, $xPathTo, $domDocTo, $query);
+                    $this->copy_attributes($cur_node, $from_node);
+                    if ($from_node->child_nodes->length) {
+                        $this->merge_nodes($cur_node, $from_node, $x_path_to, $dom_doc_to, $query);
                     }
                 }
             }
         }
     }
-
     /**
      * If oDomXML exist meges nodes
      *
      * @param DomDocument $domNew what to merge
      * @param DomDocument $dom    where to merge
      */
-    protected function merge($domNew, $dom)
+    protected function merge($dom_new, $dom)
     {
-        $xPath = new DOMXPath($dom);
-        $this->mergeNodes($dom->documentElement, $domNew->documentElement, $xPath, $dom, '/OX');
+        $x_path = new Domx_Path($dom);
+        $this->merge_nodes($dom->document_element, $dom_new->document_element, $x_path, $dom, '/OX');
     }
-
     /**
      * Returns from oDomXML tree tabs DOMNodeList, which belongs to $id
      *
@@ -312,26 +283,22 @@ class NavigationTree extends Base
      *
      * @return \DOMNodeList
      */
-    public function getTabs($id, $act, $setActive = true)
+    public function get_tabs($id, $act, $set_active = true)
     {
-        $xPath = new DOMXPath($this->getDomXml());
+        $x_path = new Domx_Path($this->get_dom_xml());
         //$nodeList = $xPath->query( "//SUBMENU[@cl='$id' or @list='$id']/TAB | //SUBMENU/../TAB[@cl='$id']" );
-        $nodeList = $xPath->query("//SUBMENU[@cl='$id']/TAB | //SUBMENU[@list='$id']/TAB | //SUBMENU/../TAB[@cl='$id']");
-
-        $act = ($act > $nodeList->length) ? ($nodeList->length - 1) : $act;
-
-        if ($setActive) {
-            foreach ($nodeList as $pos => $node) {
+        $node_list = $x_path->query("//SUBMENU[@cl='{$id}']/TAB | //SUBMENU[@list='{$id}']/TAB | //SUBMENU/../TAB[@cl='{$id}']");
+        $act = $act > $node_list->length ? $node_list->length - 1 : $act;
+        if ($set_active) {
+            foreach ($node_list as $pos => $node) {
                 if ($pos == $act) {
                     // marking active node
-                    $node->setAttribute('active', 1);
+                    $node->set_attribute('active', 1);
                 }
             }
         }
-
-        return $nodeList;
+        return $node_list;
     }
-
     /**
      * Returns active TAB class name
      *
@@ -340,15 +307,14 @@ class NavigationTree extends Base
      *
      * @return string
      */
-    public function getActiveTab($id, $act)
+    public function get_active_tab($id, $act)
     {
-        $nodeList = $this->getTabs($id, $act, false);
-        $act = ($act > $nodeList->length) ? ($nodeList->length - 1) : $act;
-        if ($nodeList->length && ($node = $nodeList->item($act))) {
-            return $node->getAttribute('cl');
+        $node_list = $this->get_tabs($id, $act, false);
+        $act = $act > $node_list->length ? $node_list->length - 1 : $act;
+        if ($node_list->length && $node = $node_list->item($act)) {
+            return $node->get_attribute('cl');
         }
     }
-
     /**
      * returns from oDomXML tree buttons stdClass, which belongs to $class
      *
@@ -356,33 +322,29 @@ class NavigationTree extends Base
      *
      * @return mixed
      */
-    public function getBtn($class)
+    public function get_btn($class)
     {
         $buttons = null;
-        $xPath = new DOMXPath($this->getDomXml());
-        $nodeList = $xPath->query("//TAB[@cl='$class']/../BTN");
-        if ($nodeList->length) {
+        $x_path = new Domx_Path($this->get_dom_xml());
+        $node_list = $x_path->query("//TAB[@cl='{$class}']/../BTN");
+        if ($node_list->length) {
             $buttons = new stdClass();
-            foreach ($nodeList as $node) {
-                $btnId = $node->getAttribute('id');
-                $buttons->$btnId = 1;
+            foreach ($node_list as $node) {
+                $btn_id = $node->get_attribute('id');
+                $buttons->{$btn_id} = 1;
             }
         }
-
         return $buttons;
     }
-
     /**
      * Returns array with paths + names ox menu xml files. Paths are checked
      *
      * @return array
      */
-    protected function getMenuFiles()
+    protected function get_menu_files()
     {
-        return ContainerFacade::get('oxid_esales.templating.admin.navigation.file.locator')
-            ->locate();
+        return Container_Facade::get('oxid_esales.templating.admin.navigation.file.locator')->locate();
     }
-
     /**
      * Method is used for overriding.
      *
@@ -390,76 +352,58 @@ class NavigationTree extends Base
      *
      * @return string
      */
-    protected function processCachedFile($cacheContents)
+    protected function process_cached_file($cache_contents)
     {
-        return $cacheContents;
+        return $cache_contents;
     }
-
-    protected function getInitialDom()
+    protected function get_initial_dom()
     {
-        if ($this->_oInitialDom !== null) {
-            return $this->_oInitialDom;
+        if ($this->_o_initial_dom !== null) {
+            return $this->_o_initial_dom;
         }
-
-        $filesToLoad = $this->getMenuFiles();
-        if (!is_array($filesToLoad)) {
+        $files_to_load = $this->get_menu_files();
+        if (!is_array($files_to_load)) {
             return null;
         }
-
-        $templateLanguageCode = $this->getTemplateLanguageCode();
-        $cacheName = 'shop_menu_cache_' . $templateLanguageCode;
-        $cache = ContainerFacade::get(TagAwareCacheInterface::class);
-
-        if ($this->isMenuCacheOutdated($cache, $cacheName, $filesToLoad)) {
-            $cache->delete($cacheName);
+        $template_language_code = $this->get_template_language_code();
+        $cache_name = 'shop_menu_cache_' . $template_language_code;
+        $cache = Container_Facade::get(Tag_Aware_Cache_Interface::class);
+        if ($this->is_menu_cache_outdated($cache, $cache_name, $files_to_load)) {
+            $cache->delete($cache_name);
         }
-
-        $cacheContents = $cache->get($cacheName, function (ItemInterface $item) use ($filesToLoad): array {
+        $cache_contents = $cache->get($cache_name, function (Item_Interface $item) use ($files_to_load): array {
             $item->tag('oxid_esales.cache.menu');
-            return [
-                'creation_time' => time(),
-                'menu_dom' => $this->generateInitialMenuDomXml($filesToLoad),
-            ];
+            return ['creation_time' => time(), 'menu_dom' => $this->generate_initial_menu_dom_xml($files_to_load)];
         });
-
-        $this->_oInitialDom = new DOMDocument();
-        $this->_oInitialDom->preserveWhiteSpace = false;
-        $this->_oInitialDom->loadXML($cacheContents['menu_dom']);
-
-        $this->sessionizeLocalUrls($this->_oInitialDom);
-
-        return $this->_oInitialDom;
+        $this->_o_initial_dom = new Dom_Document();
+        $this->_o_initial_dom->preserve_white_space = false;
+        $this->_o_initial_dom->load_xml($cache_contents['menu_dom']);
+        $this->sessionize_local_urls($this->_o_initial_dom);
+        return $this->_o_initial_dom;
     }
-
     /**
      * Returns DomXML
      *
      * @return DOMDocument
      */
-    public function getDomXml()
+    public function get_dom_xml()
     {
-        if ($this->_oDom === null) {
-            $this->_oDom = clone $this->getInitialDom();
-
+        if ($this->_o_dom === null) {
+            $this->_o_dom = clone $this->get_initial_dom();
             // removes items denied by user group
-            $this->checkGroups($this->_oDom);
-
+            $this->check_groups($this->_o_dom);
             // removes items denied by user rights
-            $this->checkRights($this->_oDom);
-
+            $this->check_rights($this->_o_dom);
             // removes items marked as not visible
-            $this->removeInvisibleMenuNodes($this->_oDom);
-
+            $this->remove_invisible_menu_nodes($this->_o_dom);
             // check config params
-            $this->checkDemoShopDenials($this->_oDom);
-            $this->onGettingDomXml();
-            $this->cleanEmptyParents($this->_oDom, '//SUBMENU[@id][@list]', 'TAB');
-            $this->cleanEmptyParents($this->_oDom, '//MAINMENU[@id]', 'SUBMENU');
+            $this->check_demo_shop_denials($this->_o_dom);
+            $this->on_getting_dom_xml();
+            $this->clean_empty_parents($this->_o_dom, '//SUBMENU[@id][@list]', 'TAB');
+            $this->clean_empty_parents($this->_o_dom, '//MAINMENU[@id]', 'SUBMENU');
         }
-
-        return $this->_oDom;
+        return $this->_o_dom;
     }
-
     /**
      * Returns DOMNodeList of given navigation classes
      *
@@ -467,33 +411,29 @@ class NavigationTree extends Base
      *
      * @return \DOMNodeList
      */
-    public function getListNodes($nodes)
+    public function get_list_nodes($nodes)
     {
-        $xPath = new DOMXPath($this->getDomXml());
-        $nodeList = $xPath->query("//SUBMENU[@cl='" . implode("' or @cl='", $nodes) . "']");
-
-        return ($nodeList->length) ? $nodeList : null;
+        $x_path = new Domx_Path($this->get_dom_xml());
+        $node_list = $x_path->query("//SUBMENU[@cl='" . implode("' or @cl='", $nodes) . "']");
+        return $node_list->length ? $node_list : null;
     }
-
     /**
      * Marks passed node as active
      *
      * @param string $nodeId node id
      */
-    public function markNodeActive($nodeId): void
+    public function mark_node_active($node_id): void
     {
-        $xPath = new DOMXPath($this->getDomXml());
-        $nodeList = $xPath->query("//*[@cl='{$nodeId}' or @list='{$nodeId}']");
-
-        if ($nodeList->length) {
-            foreach ($nodeList as $node) {
+        $x_path = new Domx_Path($this->get_dom_xml());
+        $node_list = $x_path->query("//*[@cl='{$node_id}' or @list='{$node_id}']");
+        if ($node_list->length) {
+            foreach ($node_list as $node) {
                 // special case for external resources
-                $node->setAttribute('active', 1);
-                $node->parentNode->setAttribute('active', 1);
+                $node->set_attribute('active', 1);
+                $node->parent_node->set_attribute('active', 1);
             }
         }
     }
-
     /**
      * Formats and returns url for list area
      *
@@ -501,21 +441,18 @@ class NavigationTree extends Base
      *
      * @return string
      */
-    public function getListUrl($id)
+    public function get_list_url($id)
     {
-        $xPath = new DOMXPath($this->getDomXml());
-        $nodeList = $xPath->query("//SUBMENU[@cl='{$id}']");
-        if ($nodeList->length && ($node = $nodeList->item(0))) {
-            $cl = $node->getAttribute('list');
-            $cl = $cl ? "cl=$cl" : '';
-
-            $params = $node->getAttribute('listparam');
-            $params = $params ? "&$params" : '';
-
+        $x_path = new Domx_Path($this->get_dom_xml());
+        $node_list = $x_path->query("//SUBMENU[@cl='{$id}']");
+        if ($node_list->length && $node = $node_list->item(0)) {
+            $cl = $node->get_attribute('list');
+            $cl = $cl ? "cl={$cl}" : '';
+            $params = $node->get_attribute('listparam');
+            $params = $params ? "&{$params}" : '';
             return "{$cl}{$params}";
         }
     }
-
     /**
      * Formats and returns url for edit area
      *
@@ -524,45 +461,38 @@ class NavigationTree extends Base
      *
      * @return string
      */
-    public function getEditUrl($id, $actTab)
+    public function get_edit_url($id, $act_tab)
     {
-        $xPath = new DOMXPath($this->getDomXml());
-        $nodeList = $xPath->query("//SUBMENU[@cl='{$id}']/TAB");
-
-        $actTab = ($actTab > $nodeList->length) ? ($nodeList->length - 1) : $actTab;
-        if ($nodeList->length && ($actTab = $nodeList->item($actTab))) {
+        $x_path = new Domx_Path($this->get_dom_xml());
+        $node_list = $x_path->query("//SUBMENU[@cl='{$id}']/TAB");
+        $act_tab = $act_tab > $node_list->length ? $node_list->length - 1 : $act_tab;
+        if ($node_list->length && $act_tab = $node_list->item($act_tab)) {
             // special case for external resources
-            if ($actTab->getAttribute('external')) {
-                return $actTab->getAttribute('location');
+            if ($act_tab->get_attribute('external')) {
+                return $act_tab->get_attribute('location');
             }
-            $cl = $actTab->getAttribute('cl');
+            $cl = $act_tab->get_attribute('cl');
             $cl = $cl ? "cl={$cl}" : '';
-
-            $params = $actTab->getAttribute('clparam');
+            $params = $act_tab->get_attribute('clparam');
             $params = $params ? "&{$params}" : '';
-
             return "{$cl}{$params}";
         }
     }
-
     /**
      * Admin url getter
      *
      * @return string
      */
-    protected function getAdminUrl()
+    protected function get_admin_url()
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        if (($adminUrl = ContainerFacade::getParameter('oxid_esales.shop_admin_url'))) {
-            $url = trim((string) $adminUrl, '/');
+        \Oxid_Esales\Eshop\Core\Registry::get_config();
+        if ($admin_url = Container_Facade::get_parameter('oxid_esales.shop_admin_url')) {
+            $url = trim((string) $admin_url, '/');
         } else {
-            $url = trim((string) ContainerFacade::getParameter('oxid_esales.shop_url'), '/') . '/admin';
+            $url = trim((string) Container_Facade::get_parameter('oxid_esales.shop_url'), '/') . '/admin';
         }
-
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl("{$url}/index.php", false);
+        return \Oxid_Esales\Eshop\Core\Registry::get_utils_url()->process_url("{$url}/index.php", false);
     }
-
     /**
      * Checks if user has required rights
      *
@@ -570,11 +500,10 @@ class NavigationTree extends Base
      *
      * @return bool
      */
-    protected function hasRights($rights)
+    protected function has_rights($rights)
     {
-        return $this->getUser()->oxuser__oxrights->value == $rights;
+        return $this->get_user()->oxuser__oxrights->value == $rights;
     }
-
     /**
      * Checks if user in required group
      *
@@ -582,11 +511,10 @@ class NavigationTree extends Base
      *
      * @return bool
      */
-    protected function hasGroup($groupId)
+    protected function has_group($group_id)
     {
-        return $this->getUser()->inGroup($groupId);
+        return $this->get_user()->in_group($group_id);
     }
-
     /**
      * Returns id of class assigned to current node
      *
@@ -594,63 +522,52 @@ class NavigationTree extends Base
      *
      * @return string
      */
-    public function getClassId($className)
+    public function get_class_id($class_name)
     {
-        $xPath = new DOMXPath($this->getInitialDom());
-        $nodeList = $xPath->query("//*[@cl='{$className}' or @list='{$className}']");
-        if ($nodeList->length && ($firstItem = $nodeList->item(0))) {
-            return $firstItem->getAttribute('id');
+        $x_path = new Domx_Path($this->get_initial_dom());
+        $node_list = $x_path->query("//*[@cl='{$class_name}' or @list='{$class_name}']");
+        if ($node_list->length && $first_item = $node_list->item(0)) {
+            return $first_item->get_attribute('id');
         }
     }
-
     /**
      * Get template language code
      *
      * @return string
      */
-    protected function getTemplateLanguageCode()
+    protected function get_template_language_code()
     {
-        $language = \OxidEsales\Eshop\Core\Registry::getLang();
-
-        return $language->getLanguageArray()[$language->getTplLanguage()]->abbr;
+        $language = \Oxid_Esales\Eshop\Core\Registry::get_lang();
+        return $language->get_language_array()[$language->get_tpl_language()]->abbr;
     }
-
     /**
      * Method is used for overriding.
      */
-    protected function onGettingDomXml()
+    protected function on_getting_dom_xml()
     {
     }
-
-    private function isMenuCacheOutdated(object $cache, string $cacheName, array $filesToLoad): bool
+    private function is_menu_cache_outdated(object $cache, string $cache_name, array $files_to_load): bool
     {
-        $cacheItem = $cache->getItem($cacheName);
-
-        if (!$cacheItem->isHit()) {
+        $cache_item = $cache->get_item($cache_name);
+        if (!$cache_item->is_hit()) {
             return true;
         }
-
-        $cacheCreationTime = $cacheItem->get()['creation_time'];
-        foreach ($filesToLoad as $filePath) {
-            if ($cacheCreationTime < filemtime($filePath)) {
+        $cache_creation_time = $cache_item->get()['creation_time'];
+        foreach ($files_to_load as $file_path) {
+            if ($cache_creation_time < filemtime($file_path)) {
                 return true;
             }
         }
-
         return false;
     }
-
-    private function generateInitialMenuDomXml(array $filesToLoad): string
+    private function generate_initial_menu_dom_xml(array $files_to_load): string
     {
-        $initialDom = new DOMDocument();
-        $initialDom->appendChild(new DOMElement('OX'));
-
-        foreach ($filesToLoad as $filePath) {
-            $this->loadFromFile($filePath, $initialDom);
+        $initial_dom = new Dom_Document();
+        $initial_dom->append_child(new Dom_Element('OX'));
+        foreach ($files_to_load as $file_path) {
+            $this->load_from_file($file_path, $initial_dom);
         }
-
-        $this->addLinks($initialDom);
-
-        return $initialDom->saveXML();
+        $this->add_links($initial_dom);
+        return $initial_dom->save_xml();
     }
 }

@@ -4,23 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Locator;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator;
-
-use OxidEsales\Eshop\Core\Config;
-
+use Oxid_Esales\Eshop\Core\Config;
 /**
  * Class TemplateFileLocator
  * @package OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator
  */
-class TemplateFileLocator implements FileLocatorInterface
+class Template_File_Locator implements File_Locator_Interface
 {
     public function __construct(private readonly Config $context)
     {
     }
-
     /**
      * Returns a full path for a given file name.
      *
@@ -30,6 +26,6 @@ class TemplateFileLocator implements FileLocatorInterface
      */
     public function locate(string $name): string
     {
-        return $this->context->getTemplatePath($name, false);
+        return $this->context->get_template_path($name, false);
     }
 }

@@ -4,27 +4,20 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Cache\Adapter;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Cache\Adapter;
-
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
-use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
+use Symfony\Component\Cache\Adapter\Filesystem_Tag_Aware_Adapter;
+use Symfony\Component\Cache\Adapter\Tag_Aware_Adapter_Interface;
 use Symfony\Component\Filesystem\Path;
-
-class FilesystemTagAwareAdapterFactory implements TagAwareAdapterFactoryInterface
+class Filesystem_Tag_Aware_Adapter_Factory implements Tag_Aware_Adapter_Factory_Interface
 {
-    public function __construct(private readonly ContextInterface $context)
+    public function __construct(private readonly Context_Interface $context)
     {
     }
-
-    public function create(int $shopId): TagAwareAdapterInterface
+    public function create(int $shop_id): Tag_Aware_Adapter_Interface
     {
-        return new FilesystemTagAwareAdapter(
-            namespace: "cache_items_shop_$shopId",
-            directory: Path::join($this->context->getCacheDirectory(), 'pool')
-        );
+        return new Filesystem_Tag_Aware_Adapter(namespace: "cache_items_shop_{$shop_id}", directory: Path::join($this->context->get_cache_directory(), 'pool'));
     }
 }

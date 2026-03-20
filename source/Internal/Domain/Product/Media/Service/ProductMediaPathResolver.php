@@ -4,36 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject\MediaPath;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object\Media_Path;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
 use Symfony\Component\Filesystem\Path;
-
-readonly class ProductMediaPathResolver implements ProductMediaPathResolverInterface
+readonly class Product_Media_Path_Resolver implements Product_Media_Path_Resolver_Interface
 {
-    public function __construct(
-        private ContextInterface $context
-    ) {
-    }
-
-    public function resolve(string $productId, string $filename): MediaPath
+    public function __construct(private Context_Interface $context)
     {
-        return new MediaPath(
-            Path::join(
-                Path::makeRelative(
-                    $this->context->getOutPath(),
-                    $this->context->getSourcePath()
-                ),
-                'pictures',
-                'media',
-                'products',
-                $productId,
-                $filename
-            )
-        );
+    }
+    public function resolve(string $product_id, string $filename): Media_Path
+    {
+        return new Media_Path(Path::join(Path::make_relative($this->context->get_out_path(), $this->context->get_source_path()), 'pictures', 'media', 'products', $product_id, $filename));
     }
 }

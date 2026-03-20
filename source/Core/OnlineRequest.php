@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Online check base request class.
@@ -16,73 +14,65 @@ namespace OxidEsales\EshopCommunity\Core;
  *
  * @ignore   This class will not be included in documentation.
  */
-class OnlineRequest
+class Online_Request
 {
     /**
      * OXID eShop servers cluster id.
      *
      * @var string
      */
-    public $clusterId;
-
+    public $cluster_id;
     /**
      * OXID eShop edition.
      *
      * @var string
      */
     public $edition;
-
     /**
      * Shops version number.
      *
      * @var string
      */
     public $version;
-
     /**
      * @var string
      */
-    public $shopUrl;
-
+    public $shop_url;
     /**
      * Web service protocol version.
      *
      * @var string
      */
-    public $pVersion;
-
+    public $p_version;
     /**
      * Product ID. Intended for possible partner modules in future.
      *
      * @var string
      */
-    public $productId = 'eShop';
-
+    public $product_id = 'eShop';
     public function __construct()
     {
-        $this->clusterId = $this->getClusterId();
-        $this->edition = \OxidEsales\Eshop\Core\Registry::getConfig()->getEdition()->value;
-        $this->version = ShopVersion::getVersion();
-        $this->shopUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopUrl();
+        $this->cluster_id = $this->get_cluster_id();
+        $this->edition = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_edition()->value;
+        $this->version = Shop_Version::get_version();
+        $this->shop_url = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_url();
     }
-
     /**
      * Returns cluster id.
      * Takes cluster id from configuration if set, otherwise generates it.
      *
      * @return string
      */
-    private function getClusterId()
+    private function get_cluster_id()
     {
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $sBaseShop = $oConfig->getBaseShopId();
-        $sClusterId = $oConfig->getShopConfVar('sClusterId', $sBaseShop);
-        if (!$sClusterId) {
-            $oUUIDGenerator = oxNew(\OxidEsales\Eshop\Core\UniversallyUniqueIdGenerator::class);
-            $sClusterId = $oUUIDGenerator->generate();
-            $oConfig->saveShopConfVar('str', 'sClusterId', $sClusterId, $sBaseShop);
+        $o_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $s_base_shop = $o_config->get_base_shop_id();
+        $s_cluster_id = $o_config->get_shop_conf_var('sClusterId', $s_base_shop);
+        if (!$s_cluster_id) {
+            $o_uuid_generator = ox_new(\Oxid_Esales\Eshop\Core\Universally_Unique_Id_Generator::class);
+            $s_cluster_id = $o_uuid_generator->generate();
+            $o_config->save_shop_conf_var('str', 'sClusterId', $s_cluster_id, $s_base_shop);
         }
-
-        return $sClusterId;
+        return $s_cluster_id;
     }
 }

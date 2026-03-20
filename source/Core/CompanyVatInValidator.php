@@ -1,122 +1,107 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Company VAT identification number validator. Executes added validators on given VATIN.
  */
-class CompanyVatInValidator
+class Company_Vat_In_Validator
 {
     /**
      * @var \OxidEsales\Eshop\Application\Model\Country
      */
-    private $_oCountry;
-
+    private $_o_country;
     /**
      * Array of validators (checkers)
      */
-    private array $_aCheckers = [];
-
+    private array $_a_checkers = [];
     /**
      * Error message
      *
      * @var string
      */
-    private $_sError = '';
-
+    private $_s_error = '';
     /**
      * Country setter
      */
-    public function setCountry(\OxidEsales\Eshop\Application\Model\Country $country): void
+    public function set_country(\Oxid_Esales\Eshop\Application\Model\Country $country): void
     {
-        $this->_oCountry = $country;
+        $this->_o_country = $country;
     }
-
     /**
      * Country getter
      *
      * @return \OxidEsales\Eshop\Application\Model\Country
      */
-    public function getCountry()
+    public function get_country()
     {
-        return $this->_oCountry;
+        return $this->_o_country;
     }
-
     /**
      * Error setter
      *
      * @param string $error
      */
-    public function setError($error): void
+    public function set_error($error): void
     {
-        $this->_sError = $error;
+        $this->_s_error = $error;
     }
-
     /**
      * Error getter
      *
      * @return string
      */
-    public function getError()
+    public function get_error()
     {
-        return $this->_sError;
+        return $this->_s_error;
     }
-
     /**
      * Constructor
      */
-    public function __construct(\OxidEsales\Eshop\Application\Model\Country $country)
+    public function __construct(\Oxid_Esales\Eshop\Application\Model\Country $country)
     {
-        $this->setCountry($country);
+        $this->set_country($country);
     }
-
     /**
      * Adds validator
      */
-    public function addChecker(\OxidEsales\Eshop\Core\CompanyVatInChecker $validator): void
+    public function add_checker(\Oxid_Esales\Eshop\Core\Company_Vat_In_Checker $validator): void
     {
-        $this->_aCheckers[] = $validator;
+        $this->_a_checkers[] = $validator;
     }
-
     /**
      * Returns added validators
      */
-    public function getCheckers(): array
+    public function get_checkers(): array
     {
-        return $this->_aCheckers;
+        return $this->_a_checkers;
     }
-
     /**
      * Validate company VAT identification number.
      *
      *
      * @return bool
      */
-    public function validate(\OxidEsales\Eshop\Application\Model\CompanyVatIn $companyVatNumber)
+    public function validate(\Oxid_Esales\Eshop\Application\Model\Company_Vat_In $company_vat_number)
     {
         $result = false;
-        $validators = $this->getCheckers();
-
+        $validators = $this->get_checkers();
         foreach ($validators as $validator) {
             $result = true;
-            if ($validator instanceof \OxidEsales\Eshop\Core\Contract\ICountryAware) {
-                $validator->setCountry($this->getCountry());
+            if ($validator instanceof \Oxid_Esales\Eshop\Core\Contract\I_Country_Aware) {
+                $validator->set_country($this->get_country());
             }
-
-            if (!$validator->validate($companyVatNumber)) {
+            if (!$validator->validate($company_vat_number)) {
                 $result = false;
-                $this->setError($validator->getError());
+                $this->set_error($validator->get_error());
                 break;
             }
         }
-
         return $result;
     }
 }

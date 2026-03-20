@@ -4,17 +4,14 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Event;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Event;
-
-use Symfony\Contracts\EventDispatcher\Event;
-
+use Symfony\Contracts\Event_Dispatcher\Event;
 /**
  * @stable
  * @see OxidEsales/EshopCommunity/Internal/README.md
  */
-class ProjectYamlChangedEvent extends Event
+class Project_Yaml_Changed_Event extends Event
 {
 }

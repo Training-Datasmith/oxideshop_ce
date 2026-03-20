@@ -4,28 +4,22 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Core\Di;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Core\Di;
-
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\EventDispatcher\Event;
-
+use Oxid_Esales\Eshop_Community\Internal\Container\Container_Factory;
+use Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface;
+use Symfony\Contracts\Event_Dispatcher\Event;
 /**
  * A Service Locator fallback to use in the application areas, not managed by the Dependency Injection Component (e.g. Application, Core).
  * Never use this class (or Container directly) in other namespaces (e.g. Internal)!
  */
-final class ContainerFacade
+final class Container_Facade
 {
     public static function has(string $id): bool
     {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->has($id);
+        return Container_Factory::get_instance()->get_container()->has($id);
     }
-
     /**
      * @template T
      * @param class-string<T> $id
@@ -33,25 +27,16 @@ final class ContainerFacade
      */
     public static function get(string $id): object
     {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->get($id);
+        return Container_Factory::get_instance()->get_container()->get($id);
     }
-
-    public static function hasParameter(string $name): bool
+    public static function has_parameter(string $name): bool
     {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->hasParameter($name);
+        return Container_Factory::get_instance()->get_container()->has_parameter($name);
     }
-
-    public static function getParameter(string $name): mixed
+    public static function get_parameter(string $name): mixed
     {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->getParameter($name);
+        return Container_Factory::get_instance()->get_container()->get_parameter($name);
     }
-
     /**
      * @template T of Event
      * @param T $event
@@ -59,9 +44,6 @@ final class ContainerFacade
      */
     public static function dispatch(Event $event): Event
     {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(EventDispatcherInterface::class)
-            ->dispatch($event);
+        return Container_Factory::get_instance()->get_container()->get(Event_Dispatcher_Interface::class)->dispatch($event);
     }
 }

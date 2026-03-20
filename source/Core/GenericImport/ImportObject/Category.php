@@ -1,25 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\GenericImport\ImportObject;
+namespace Oxid_Esales\Eshop_Community\Core\Generic_Import\Import_Object;
 
 /**
  * Import object for Categories.
  */
-class Category extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject
+class Category extends \Oxid_Esales\Eshop\Core\Generic_Import\Import_Object\Import_Object
 {
     /** @var string Database table name. */
-    protected $tableName = 'oxcategories';
-
+    protected $table_name = 'oxcategories';
     /** @var string Shop object name. */
-    protected $shopObjectName = 'oxcategory';
-
+    protected $shop_object_name = 'oxcategory';
     /**
      * Issued before saving an object. can modify aData for saving.
      *
@@ -29,14 +25,12 @@ class Category extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportO
      *
      * @return array
      */
-    protected function preAssignObject($shopObject, $data, $allowCustomShopId)
+    protected function pre_assign_object($shop_object, $data, $allow_custom_shop_id)
     {
-        $data = parent::preAssignObject($shopObject, $data, $allowCustomShopId);
-
+        $data = parent::pre_assign_object($shop_object, $data, $allow_custom_shop_id);
         if (!$data['OXPARENTID']) {
             $data['OXPARENTID'] = 'oxrootid';
         }
-
         return $data;
     }
 }

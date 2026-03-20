@@ -1,27 +1,25 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages delivery articles
  */
-class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Delivery_Articles_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_a_columns = ['container1' => [
+        // field , table,         visible, multilanguage, ident
         ['oxartnum', 'oxarticles', 1, 0, 0],
         ['oxtitle', 'oxarticles', 1, 1, 0],
         ['oxean', 'oxarticles', 1, 0, 0],
@@ -29,107 +27,83 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         ['oxprice', 'oxarticles', 0, 0, 0],
         ['oxstock', 'oxarticles', 0, 0, 0],
         ['oxid', 'oxarticles', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                 ],
-    ];
-
+    ], 'container2' => [['oxartnum', 'oxarticles', 1, 0, 0], ['oxtitle', 'oxarticles', 1, 1, 0], ['oxean', 'oxarticles', 1, 0, 0], ['oxmpn', 'oxarticles', 0, 0, 0], ['oxprice', 'oxarticles', 0, 0, 0], ['oxstock', 'oxarticles', 0, 0, 0], ['oxid', 'oxobject2delivery', 0, 0, 1]]];
     /**
      * If true extended column selection will be build
      *
      * @var bool
      */
-    protected $_blAllowExtColumns = true;
-
+    protected $_bl_allow_ext_columns = true;
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $request = \OxidEsales\Eshop\Core\Registry::getRequest();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $request = \Oxid_Esales\Eshop\Core\Registry::get_request();
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         // looking for table/view
-        $sArtTable = $this->getViewName('oxarticles');
-        $sO2CView = $this->getViewName('oxobject2category');
-
-        $sDelId = $request->getRequestParameter('oxid');
-        $sSynchDelId = $request->getRequestParameter('synchoxid');
-
+        $s_art_table = $this->get_view_name('oxarticles');
+        $s_o2c_view = $this->get_view_name('oxobject2category');
+        $s_del_id = $request->get_request_parameter('oxid');
+        $s_synch_del_id = $request->get_request_parameter('synchoxid');
         // category selected or not ?
-        if (!$sDelId) {
+        if (!$s_del_id) {
             // performance
-            $sQAdd = " from $sArtTable where 1 ";
-            $sQAdd .= $config->getConfigParam('blVariantsSelection') ? '' : "and $sArtTable.oxparentid = '' ";
+            $s_q_add = " from {$s_art_table} where 1 ";
+            $s_q_add .= $config->get_config_param('blVariantsSelection') ? '' : "and {$s_art_table}.oxparentid = '' ";
+        } else if ($s_synch_del_id && $s_del_id != $s_synch_del_id) {
+            $s_q_add = " from {$s_o2c_view} left join {$s_art_table} on ";
+            $s_q_add .= $config->get_config_param('blVariantsSelection') ? " ( {$s_art_table}.oxid={$s_o2c_view}.oxobjectid or {$s_art_table}.oxparentid={$s_o2c_view}.oxobjectid)" : " {$s_art_table}.oxid={$s_o2c_view}.oxobjectid ";
+            $s_q_add .= "where {$s_o2c_view}.oxcatnid = " . $o_db->quote($s_del_id);
         } else {
-            // selected category ?
-            if ($sSynchDelId && $sDelId != $sSynchDelId) {
-                $sQAdd = " from $sO2CView left join $sArtTable on ";
-                $sQAdd .= $config->getConfigParam('blVariantsSelection') ? " ( $sArtTable.oxid=$sO2CView.oxobjectid or $sArtTable.oxparentid=$sO2CView.oxobjectid)" : " $sArtTable.oxid=$sO2CView.oxobjectid ";
-                $sQAdd .= "where $sO2CView.oxcatnid = " . $oDb->quote($sDelId);
-            } else {
-                $sQAdd = ' from oxobject2delivery left join ' . $sArtTable . ' on ' . $sArtTable . '.oxid=oxobject2delivery.oxobjectid ';
-                $sQAdd .= 'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sDelId) . ' and oxobject2delivery.oxtype = "oxarticles" ';
-            }
+            $s_q_add = ' from oxobject2delivery left join ' . $s_art_table . ' on ' . $s_art_table . '.oxid=oxobject2delivery.oxobjectid ';
+            $s_q_add .= 'where oxobject2delivery.oxdeliveryid = ' . $o_db->quote($s_del_id) . ' and oxobject2delivery.oxtype = "oxarticles" ';
         }
-
-        if ($sSynchDelId && $sSynchDelId != $sDelId) {
-            $sQAdd .= 'and ' . $sArtTable . '.oxid not in ( ';
-            $sQAdd .= 'select oxobject2delivery.oxobjectid from oxobject2delivery ';
-            $sQAdd .= 'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchDelId) . ' and oxobject2delivery.oxtype = "oxarticles" ) ';
+        if ($s_synch_del_id && $s_synch_del_id != $s_del_id) {
+            $s_q_add .= 'and ' . $s_art_table . '.oxid not in ( ';
+            $s_q_add .= 'select oxobject2delivery.oxobjectid from oxobject2delivery ';
+            $s_q_add .= 'where oxobject2delivery.oxdeliveryid = ' . $o_db->quote($s_synch_del_id) . ' and oxobject2delivery.oxtype = "oxarticles" ) ';
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Removes article from delivery configuration
      */
-    public function removeArtFromDel(): void
+    public function remove_art_from_del(): void
     {
-        $aChosenArt = $this->getActionIds('oxobject2delivery.oxid');
+        $a_chosen_art = $this->get_action_ids('oxobject2delivery.oxid');
         // removing all
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = parent::addFilter('delete oxobject2delivery.* ' . $this->getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
-        } elseif (is_array($aChosenArt)) {
-            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ') ';
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_q = parent::add_filter('delete oxobject2delivery.* ' . $this->get_query());
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
+        } elseif (is_array($a_chosen_art)) {
+            $s_q = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_chosen_art)) . ') ';
+            \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->Execute($s_q);
         }
     }
-
     /**
      * Adds article to delivery configuration
      */
-    public function addArtToDel(): void
+    public function add_art_to_del(): void
     {
-        $aChosenArt = $this->getActionIds('oxarticles.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
+        $a_chosen_art = $this->get_action_ids('oxarticles.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
         // adding
-        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sArtTable = $this->getViewName('oxarticles');
-            $aChosenArt = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
+        if (Registry::get_request()->get_request_escaped_parameter('all')) {
+            $s_art_table = $this->get_view_name('oxarticles');
+            $a_chosen_art = $this->get_all($this->add_filter("select {$s_art_table}.oxid " . $this->get_query()));
         }
-
-        if ($soxId && $soxId != '-1' && is_array($aChosenArt)) {
-            foreach ($aChosenArt as $sChosenArt) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenArt);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field('oxarticles');
-                $oObject2Delivery->save();
+        if ($sox_id && $sox_id != '-1' && is_array($a_chosen_art)) {
+            foreach ($a_chosen_art as $s_chosen_art) {
+                $o_object2delivery = ox_new(\Oxid_Esales\Eshop\Core\Model\Base_Model::class);
+                $o_object2delivery->init('oxobject2delivery');
+                $o_object2delivery->oxobject2delivery__oxdeliveryid = new \Oxid_Esales\Eshop\Core\Field($sox_id);
+                $o_object2delivery->oxobject2delivery__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($s_chosen_art);
+                $o_object2delivery->oxobject2delivery__oxtype = new \Oxid_Esales\Eshop\Core\Field('oxarticles');
+                $o_object2delivery->save();
             }
         }
     }

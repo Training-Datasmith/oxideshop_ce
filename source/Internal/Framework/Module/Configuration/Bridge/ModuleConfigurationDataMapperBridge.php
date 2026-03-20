@@ -4,24 +4,18 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\{
-    ModuleConfigurationExportDataMapperInterface
-};
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-
-readonly class ModuleConfigurationDataMapperBridge implements ModuleConfigurationDataMapperBridgeInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\{Module_Configuration_Export_Data_Mapper_Interface};
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration;
+readonly class Module_Configuration_Data_Mapper_Bridge implements Module_Configuration_Data_Mapper_Bridge_Interface
 {
-    public function __construct(private ModuleConfigurationExportDataMapperInterface $moduleConfigurationDataMapper)
+    public function __construct(private Module_Configuration_Export_Data_Mapper_Interface $module_configuration_data_mapper)
     {
     }
-
-    public function toData(ModuleConfiguration $configuration): array
+    public function to_data(Module_Configuration $configuration): array
     {
-        return $this->moduleConfigurationDataMapper->toData($configuration);
+        return $this->module_configuration_data_mapper->to_data($configuration);
     }
 }

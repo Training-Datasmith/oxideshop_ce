@@ -4,14 +4,11 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao\Chain;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\Chain;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleTemplateExtensionChain;
-
-interface TemplateExtensionChainDaoInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Template_Extension_Chain;
+interface Template_Extension_Chain_Dao_Interface
 {
-    public function getChain(int $shopId): ModuleTemplateExtensionChain;
+    public function get_chain(int $shop_id): Module_Template_Extension_Chain;
 }

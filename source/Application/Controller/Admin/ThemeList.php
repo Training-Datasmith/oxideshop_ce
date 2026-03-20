@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin actionss manager.
@@ -15,7 +13,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * field ('oxactions.oxtitle').
  * Admin Menu: Manage Products -> Actions.
  */
-class ThemeList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class Theme_List extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_List_Controller
 {
     /**
      * Calls parent::render() and returns name of template to render
@@ -24,13 +22,10 @@ class ThemeList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      */
     public function render()
     {
-        $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
-
+        $o_theme = ox_new(\Oxid_Esales\Eshop\Core\Theme::class);
         parent::render();
-
         // assign our list
-        $this->_aViewData['mylist'] = $oTheme->getList();
-
+        $this->_a_view_data['mylist'] = $o_theme->get_list();
         return 'theme_list';
     }
 }

@@ -4,19 +4,16 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject;
-
-class OxidEshopPackage
+class Oxid_Eshop_Package
 {
-    public function __construct(private readonly string $packagePath)
+    public function __construct(private readonly string $package_path)
     {
     }
-
-    public function getPackagePath(): string
+    public function get_package_path(): string
     {
-        return $this->packagePath;
+        return $this->package_path;
     }
 }

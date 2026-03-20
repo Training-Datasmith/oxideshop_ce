@@ -1,28 +1,24 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
 /**
  * State handler
  */
-class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class State extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model
 {
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxstate';
-
+    protected $_s_class_name = 'oxstate';
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
      */
@@ -31,7 +27,6 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         parent::__construct();
         $this->init('oxstates');
     }
-
     /**
      * Returns country id by code
      *
@@ -40,19 +35,14 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return string
      */
-    public function getIdByCode($sCode, $sCountryId)
+    public function get_id_by_code($s_code, $s_country_id)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $params = [
-            'oxisoalpha2' => $sCode,
-            'oxcountryid' => $sCountryId,
-        ];
-
-        return $oDb->getOne('SELECT oxid FROM oxstates 
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $params = ['oxisoalpha2' => $s_code, 'oxcountryid' => $s_country_id];
+        return $o_db->get_one('SELECT oxid FROM oxstates 
             WHERE oxisoalpha2 = :oxisoalpha2 
               AND oxcountryid = :oxcountryid', $params);
     }
-
     /**
      * Get state title by id
      *
@@ -60,17 +50,13 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return string
      */
-    public function getTitleById($iStateId)
+    public function get_title_by_id($i_state_id)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sQ = 'SELECT oxtitle FROM ' . $tableViewNameGenerator->getViewName('oxstates') . ' 
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_q = 'SELECT oxtitle FROM ' . $table_view_name_generator->get_view_name('oxstates') . ' 
             WHERE oxid = :oxid';
-
-        $sStateTitle = $oDb->getOne($sQ, [
-            'oxid' => $iStateId,
-        ]);
-
-        return (string) $sStateTitle;
+        $s_state_title = $o_db->get_one($s_q, ['oxid' => $i_state_id]);
+        return (string) $s_state_title;
     }
 }

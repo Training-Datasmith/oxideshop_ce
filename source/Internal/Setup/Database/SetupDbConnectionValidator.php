@@ -4,37 +4,25 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Setup\Database;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Setup\Database;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Configuration\DataObject\DatabaseConfiguration;
-
-readonly class SetupDbConnectionValidator implements SetupDbConnectionValidatorInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Configuration\Data_Object\Database_Configuration;
+readonly class Setup_Db_Connection_Validator implements Setup_Db_Connection_Validator_Interface
 {
-    public function __construct(private SetupDbConnectionFactoryInterface $databaseConnectionFactory)
+    public function __construct(private Setup_Db_Connection_Factory_Interface $database_connection_factory)
     {
     }
-
-    public function validate(DatabaseConfiguration $databaseConfiguration): void
+    public function validate(Database_Configuration $database_configuration): void
     {
-        if (
-            $databaseConfiguration->isSocketConnection() ||
-            !$databaseConfiguration->getUser() ||
-            !$databaseConfiguration->getPass() ||
-            !$databaseConfiguration->getName()
-        ) {
-            throw new UnsupportedDatabaseConfigurationException(
-                "Invalid or unsupported database URL '{$databaseConfiguration->getDatabaseUrl()}'!"
-            );
+        if ($database_configuration->is_socket_connection() || !$database_configuration->get_user() || !$database_configuration->get_pass() || !$database_configuration->get_name()) {
+            throw new Unsupported_Database_Configuration_Exception("Invalid or unsupported database URL '{$database_configuration->get_database_url()}'!");
         }
-        $this->canConnectToServer($databaseConfiguration);
+        $this->can_connect_to_server($database_configuration);
     }
-
-    private function canConnectToServer(DatabaseConfiguration $databaseConfiguration): void
+    private function can_connect_to_server(Database_Configuration $database_configuration): void
     {
-        $connection = $this->databaseConnectionFactory->getServerConnection($databaseConfiguration);
+        $connection = $this->database_connection_factory->get_server_connection($database_configuration);
         $connection->close();
     }
 }

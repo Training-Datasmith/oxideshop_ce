@@ -1,44 +1,38 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Component;
 
-namespace OxidEsales\EshopCommunity\Application\Component;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Currency manager class.
  *
  * @subpackage oxcmp
  */
-class CurrencyComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class Currency_Component extends \Oxid_Esales\Eshop\Core\Controller\Base_Controller
 {
     /**
      * Array of available currencies.
      *
      * @var array
      */
-    public $aCurrencies;
-
+    public $a_currencies;
     /**
      * Active currency object.
      *
      * @var object
      */
-    protected $_oActCur;
-
+    protected $_o_act_cur;
     /**
      * Marking object as component
      *
      * @var bool
      */
-    protected $_blIsComponent = true;
-
+    protected $_bl_is_component = true;
     /**
      * Checks for currency parameter set in URL, session or post
      * variables. If such were found - loads all currencies possible
@@ -51,45 +45,36 @@ class CurrencyComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     public function init(): void
     {
         // Performance
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-        if (!$myConfig->getConfigParam('bl_perfLoadCurrency')) {
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        if (!$my_config->get_config_param('bl_perfLoadCurrency')) {
             //#861C -  show first currency
-            $aCurrencies = $myConfig->getCurrencyArray();
-            $this->_oActCur = current($aCurrencies);
-
+            $a_currencies = $my_config->get_currency_array();
+            $this->_o_act_cur = current($a_currencies);
             return;
         }
-
-        $iCur = Registry::getRequest()->getRequestEscapedParameter('cur');
-        $session = \OxidEsales\Eshop\Core\Registry::getSession();
-
-        if (isset($iCur)) {
-            $aCurrencies = $myConfig->getCurrencyArray();
-            if (!isset($aCurrencies[$iCur])) {
-                $iCur = 0;
+        $i_cur = Registry::get_request()->get_request_escaped_parameter('cur');
+        $session = \Oxid_Esales\Eshop\Core\Registry::get_session();
+        if (isset($i_cur)) {
+            $a_currencies = $my_config->get_currency_array();
+            if (!isset($a_currencies[$i_cur])) {
+                $i_cur = 0;
             }
-
             // set new currency
-            $myConfig->setActShopCurrency($iCur);
-
+            $my_config->set_act_shop_currency($i_cur);
             // recalc basket
-            $oBasket = $session->getBasket();
-            $oBasket->onUpdate();
+            $o_basket = $session->get_basket();
+            $o_basket->on_update();
         }
-
-        $iActCur = $myConfig->getShopCurrency();
-        $this->aCurrencies = $myConfig->getCurrencyArray($iActCur);
-
-        $this->_oActCur = $this->aCurrencies[$iActCur];
-
+        $i_act_cur = $my_config->get_shop_currency();
+        $this->a_currencies = $my_config->get_currency_array($i_act_cur);
+        $this->_o_act_cur = $this->a_currencies[$i_act_cur];
         //setting basket currency (M:825)
-        if (!isset($oBasket)) {
-            $oBasket = $session->getBasket();
+        if (!isset($o_basket)) {
+            $o_basket = $session->get_basket();
         }
-        $oBasket->setBasketCurrency($this->_oActCur);
+        $o_basket->set_basket_currency($this->_o_act_cur);
         parent::init();
     }
-
     /**
      * Executes parent::render(), passes currency object to template
      * engine and returns currencies array.
@@ -102,19 +87,16 @@ class CurrencyComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     public function render()
     {
         parent::render();
-        $oParentView = $this->getParent();
-        $oParentView->setActCurrency($this->_oActCur);
-
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfLoadCurrency')) {
-            $oUrlUtils = \OxidEsales\Eshop\Core\Registry::getUtilsUrl();
-            $sUrl = $oUrlUtils->cleanUrl(\OxidEsales\Eshop\Core\Registry::getConfig()->getTopActiveView()->getLink(), ['cur']);
-
-            reset($this->aCurrencies);
-            foreach ($this->aCurrencies as $oItem) {
-                $oItem->link = $oUrlUtils->processUrl($sUrl, true, ['cur' => $oItem->id]);
+        $o_parent_view = $this->get_parent();
+        $o_parent_view->set_act_currency($this->_o_act_cur);
+        if (\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('bl_perfLoadCurrency')) {
+            $o_url_utils = \Oxid_Esales\Eshop\Core\Registry::get_utils_url();
+            $s_url = $o_url_utils->clean_url(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_top_active_view()->get_link(), ['cur']);
+            reset($this->a_currencies);
+            foreach ($this->a_currencies as $o_item) {
+                $o_item->link = $o_url_utils->process_url($s_url, true, ['cur' => $o_item->id]);
             }
         }
-
-        return $this->aCurrencies;
+        return $this->a_currencies;
     }
 }

@@ -1,62 +1,54 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceBridgeInterface;
-
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service_Bridge_Interface;
 /**
  * Newsletter opt-in/out.
  * Arranges newsletter opt-in form, have some methods to confirm
  * user opt-in or remove user from newsletter list. OXID eShop ->
  * (Newsletter).
  */
-class NewsletterController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Newsletter_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Home country id
      *
      * @var string
      */
-    protected $_sHomeCountryId;
-
+    protected $_s_home_country_id;
     /**
      * Newletter status.
      *
      * @var integer
      */
-    protected $_iNewsletterStatus;
-
+    protected $_i_newsletter_status;
     /**
      * User newsletter registration data.
      *
      * @var object
      */
-    protected $_aRegParams;
-
+    protected $_a_reg_params;
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'page/info/newsletter';
-
+    protected $_s_this_template = 'page/info/newsletter';
     /**
      * Current view search engine indexing state
      *
      * @var int
      */
-    protected $_iViewIndexState = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
-
+    protected $_i_view_index_state = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
     /**
      * Only loads newsletter subscriber data.
      *
@@ -66,9 +58,8 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     public function fill(): void
     {
         // loads submited values
-        $this->_aRegParams = Registry::getRequest()->getRequestEscapedParameter('editval');
+        $this->_a_reg_params = Registry::get_request()->get_request_escaped_parameter('editval');
     }
-
     /**
      * Checks for newsletter subscriber data, if OK - creates new user as
      * subscriber or assigns existing user to newsletter group and sends
@@ -79,70 +70,61 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
      */
     public function send(): void
     {
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-        $emailValidator = ContainerFacade::get(EmailValidatorServiceBridgeInterface::class);
-
+        $a_params = Registry::get_request()->get_request_escaped_parameter('editval');
+        $email_validator = Container_Facade::get(Email_Validator_Service_Bridge_Interface::class);
         // loads submited values
-        $this->_aRegParams = $aParams;
-        if (!$aParams['oxuser__oxusername']) {
-            Registry::getUtilsView()->addErrorToDisplay('ERROR_MESSAGE_COMPLETE_FIELDS_CORRECTLY');
+        $this->_a_reg_params = $a_params;
+        if (!$a_params['oxuser__oxusername']) {
+            Registry::get_utils_view()->add_error_to_display('ERROR_MESSAGE_COMPLETE_FIELDS_CORRECTLY');
             return;
         }
-
-        if (!$emailValidator->isEmailValid($aParams['oxuser__oxusername'])) {
+        if (!$email_validator->is_email_valid($a_params['oxuser__oxusername'])) {
             // #1052C - eMail validation added
-            Registry::getUtilsView()->addErrorToDisplay('MESSAGE_INVALID_EMAIL');
+            Registry::get_utils_view()->add_error_to_display('MESSAGE_INVALID_EMAIL');
             return;
         }
-
-        $blSubscribe = Registry::getRequest()->getRequestEscapedParameter('subscribeStatus');
-
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        $oUser->oxuser__oxusername = new Field($aParams['oxuser__oxusername'], Field::T_RAW);
-
+        $bl_subscribe = Registry::get_request()->get_request_escaped_parameter('subscribeStatus');
+        $o_user = ox_new(\Oxid_Esales\Eshop\Application\Model\User::class);
+        $o_user->oxuser__oxusername = new Field($a_params['oxuser__oxusername'], Field::T_RAW);
         // if such user does not exist
-        if (!$oUser->exists()) {
+        if (!$o_user->exists()) {
             // and subscribe is off - error, on - create
-            if (!$blSubscribe) {
-                Registry::getUtilsView()->addErrorToDisplay('NEWSLETTER_EMAIL_NOT_EXIST');
-
+            if (!$bl_subscribe) {
+                Registry::get_utils_view()->add_error_to_display('NEWSLETTER_EMAIL_NOT_EXIST');
                 return;
             }
-            $oUser->oxuser__oxactive = new \OxidEsales\Eshop\Core\Field(1, \OxidEsales\Eshop\Core\Field::T_RAW);
-            $oUser->oxuser__oxrights = new \OxidEsales\Eshop\Core\Field('user', \OxidEsales\Eshop\Core\Field::T_RAW);
-            $oUser->oxuser__oxshopid = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopId(), \OxidEsales\Eshop\Core\Field::T_RAW);
-            $oUser->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxfname'], \OxidEsales\Eshop\Core\Field::T_RAW);
-            $oUser->oxuser__oxlname = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxlname'], \OxidEsales\Eshop\Core\Field::T_RAW);
-            $oUser->oxuser__oxsal = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxsal'], \OxidEsales\Eshop\Core\Field::T_RAW);
-            $oUser->oxuser__oxcountryid = new \OxidEsales\Eshop\Core\Field($aParams['oxuser__oxcountryid'], \OxidEsales\Eshop\Core\Field::T_RAW);
-            $blUserLoaded = $oUser->save();
+            $o_user->oxuser__oxactive = new \Oxid_Esales\Eshop\Core\Field(1, \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $o_user->oxuser__oxrights = new \Oxid_Esales\Eshop\Core\Field('user', \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $o_user->oxuser__oxshopid = new \Oxid_Esales\Eshop\Core\Field(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_id(), \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $o_user->oxuser__oxfname = new \Oxid_Esales\Eshop\Core\Field($a_params['oxuser__oxfname'], \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $o_user->oxuser__oxlname = new \Oxid_Esales\Eshop\Core\Field($a_params['oxuser__oxlname'], \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $o_user->oxuser__oxsal = new \Oxid_Esales\Eshop\Core\Field($a_params['oxuser__oxsal'], \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $o_user->oxuser__oxcountryid = new \Oxid_Esales\Eshop\Core\Field($a_params['oxuser__oxcountryid'], \Oxid_Esales\Eshop\Core\Field::T_RAW);
+            $bl_user_loaded = $o_user->save();
         } else {
-            $blUserLoaded = $oUser->load($oUser->getId());
+            $bl_user_loaded = $o_user->load($o_user->get_id());
         }
-
         // if user was added/loaded successfully and subscribe is on - subscribing to newsletter
-        if ($blSubscribe && $blUserLoaded) {
+        if ($bl_subscribe && $bl_user_loaded) {
             //removing user from subscribe list before adding
-            $oUser->setNewsSubscription(false, false);
-
-            $blOrderOptInEmail = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blOrderOptInEmail');
-            if ($oUser->setNewsSubscription(true, $blOrderOptInEmail)) {
+            $o_user->set_news_subscription(false, false);
+            $bl_order_opt_in_email = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blOrderOptInEmail');
+            if ($o_user->set_news_subscription(true, $bl_order_opt_in_email)) {
                 // done, confirmation required?
-                if ($blOrderOptInEmail) {
-                    $this->_iNewsletterStatus = 1;
+                if ($bl_order_opt_in_email) {
+                    $this->_i_newsletter_status = 1;
                 } else {
-                    $this->_iNewsletterStatus = 2;
+                    $this->_i_newsletter_status = 2;
                 }
             } else {
-                Registry::getUtilsView()->addErrorToDisplay('MESSAGE_NOT_ABLE_TO_SEND_EMAIL');
+                Registry::get_utils_view()->add_error_to_display('MESSAGE_NOT_ABLE_TO_SEND_EMAIL');
             }
-        } elseif (!$blSubscribe && $blUserLoaded) {
+        } elseif (!$bl_subscribe && $bl_user_loaded) {
             // unsubscribing user
-            $oUser->setNewsSubscription(false, false);
-            $this->_iNewsletterStatus = 3;
+            $o_user->set_news_subscription(false, false);
+            $this->_i_newsletter_status = 3;
         }
     }
-
     /**
      * Loads user and Adds him to newsletter group.
      *
@@ -152,35 +134,31 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     public function addme(): void
     {
         // user exists ?
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        if ($oUser->load(Registry::getRequest()->getRequestEscapedParameter('uid'))) {
-            $sConfirmCode = md5($oUser->oxuser__oxusername->value . $oUser->oxuser__oxpasssalt->value);
+        $o_user = ox_new(\Oxid_Esales\Eshop\Application\Model\User::class);
+        if ($o_user->load(Registry::get_request()->get_request_escaped_parameter('uid'))) {
+            $s_confirm_code = md5($o_user->oxuser__oxusername->value . $o_user->oxuser__oxpasssalt->value);
             // is confirm code ok?
-            if (Registry::getRequest()->getRequestEscapedParameter('confirm') == $sConfirmCode) {
-                $oUser->getNewsSubscription()->setOptInStatus(1);
-                $oUser->addToGroup('oxidnewsletter');
-                $this->_iNewsletterStatus = 2;
+            if (Registry::get_request()->get_request_escaped_parameter('confirm') == $s_confirm_code) {
+                $o_user->get_news_subscription()->set_opt_in_status(1);
+                $o_user->add_to_group('oxidnewsletter');
+                $this->_i_newsletter_status = 2;
             }
         }
     }
-
     /**
      * Loads user and removes him from newsletter group.
      */
     public function removeme(): void
     {
         // existing user ?
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        if ($oUser->load(Registry::getRequest()->getRequestEscapedParameter('uid'))) {
-            $oUser->getNewsSubscription()->setOptInStatus(0);
-
+        $o_user = ox_new(\Oxid_Esales\Eshop\Application\Model\User::class);
+        if ($o_user->load(Registry::get_request()->get_request_escaped_parameter('uid'))) {
+            $o_user->get_news_subscription()->set_opt_in_status(0);
             // removing from group ..
-            $oUser->removeFromGroup('oxidnewsletter');
-
-            $this->_iNewsletterStatus = 3;
+            $o_user->remove_from_group('oxidnewsletter');
+            $this->_i_newsletter_status = 3;
         }
     }
-
     /**
      * simlink to function removeme bug fix #0002894
      */
@@ -188,80 +166,71 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     {
         $this->removeme();
     }
-
     /**
      * Template variable getter. Returns country id
      *
      * @return string
      */
-    public function getHomeCountryId()
+    public function get_home_country_id()
     {
-        if ($this->_sHomeCountryId === null) {
-            $this->_sHomeCountryId = false;
-            $aHomeCountry = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('aHomeCountry');
-            if (is_array($aHomeCountry)) {
-                $this->_sHomeCountryId = current($aHomeCountry);
+        if ($this->_s_home_country_id === null) {
+            $this->_s_home_country_id = false;
+            $a_home_country = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('aHomeCountry');
+            if (is_array($a_home_country)) {
+                $this->_s_home_country_id = current($a_home_country);
             }
         }
-
-        return $this->_sHomeCountryId;
+        return $this->_s_home_country_id;
     }
-
     /**
      * Template variable getter. Returns newsletter subscription status
      *
      * @return integer
      */
-    public function getNewsletterStatus()
+    public function get_newsletter_status()
     {
-        return $this->_iNewsletterStatus;
+        return $this->_i_newsletter_status;
     }
-
     /**
      * Template variable getter. Returns user newsletter registration data
      *
      * @return array
      */
-    public function getRegParams()
+    public function get_reg_params()
     {
-        return $this->_aRegParams;
+        return $this->_a_reg_params;
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        $aPaths = [];
-        $aPath = [];
-        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
-        $aPath['title'] = Registry::getLang()->translateString('STAY_INFORMED', $iBaseLanguage, false);
-        $aPath['link'] = $this->getLink();
-
-        $aPaths[] = $aPath;
-
-        return $aPaths;
+        $a_paths = [];
+        $a_path = [];
+        $i_base_language = Registry::get_lang()->get_base_language();
+        $a_path['title'] = Registry::get_lang()->translate_string('STAY_INFORMED', $i_base_language, false);
+        $a_path['link'] = $this->get_link();
+        $a_paths[] = $a_path;
+        return $a_paths;
     }
-
     /**
      * Page title
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        if ($this->getNewsletterStatus() == 4 || !$this->getNewsletterStatus()) {
-            $sConstant = 'STAY_INFORMED';
-        } elseif ($this->getNewsletterStatus() == 1) {
-            $sConstant = 'MESSAGE_THANKYOU_FOR_SUBSCRIBING_NEWSLETTERS';
-        } elseif ($this->getNewsletterStatus() == 2) {
-            $sConstant = 'MESSAGE_NEWSLETTER_CONGRATULATIONS';
-        } elseif ($this->getNewsletterStatus() == 3) {
-            $sConstant = 'SUCCESS';
+        if ($this->get_newsletter_status() == 4 || !$this->get_newsletter_status()) {
+            $s_constant = 'STAY_INFORMED';
+        } elseif ($this->get_newsletter_status() == 1) {
+            $s_constant = 'MESSAGE_THANKYOU_FOR_SUBSCRIBING_NEWSLETTERS';
+        } elseif ($this->get_newsletter_status() == 2) {
+            $s_constant = 'MESSAGE_NEWSLETTER_CONGRATULATIONS';
+        } elseif ($this->get_newsletter_status() == 3) {
+            $s_constant = 'SUCCESS';
         }
-
-        return Registry::getLang()->translateString($sConstant, Registry::getLang()->getBaseLanguage(), false);
+        return Registry::get_lang()->translate_string($s_constant, Registry::get_lang()->get_base_language(), false);
     }
 }

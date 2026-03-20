@@ -1,273 +1,212 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Application\Model\Object2Category;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Application\Model\Object2Category;
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Class manages category articles order
  */
-class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class Category_Order_Ajax extends \Oxid_Esales\Eshop\Application\Controller\Admin\List_Component_Ajax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = [
-        'container1' => [ // field , table, visible, multilanguage, ident
-            ['oxartnum', 'oxarticles', 1, 0, 0],
-            ['oxtitle', 'oxarticles', 1, 1, 0],
-            ['oxpos', 'oxobject2category', 1, 0, 0],
-            ['oxean', 'oxarticles', 0, 0, 0],
-            ['oxmpn', 'oxarticles', 0, 0, 0],
-            ['oxprice', 'oxarticles', 0, 0, 0],
-            ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1],
-        ],
-         'container2' => [
-            ['oxartnum', 'oxarticles', 1, 0, 0],
-            ['oxtitle', 'oxarticles', 1, 1, 0],
-            ['oxean', 'oxarticles', 0, 0, 0],
-            ['oxmpn', 'oxarticles', 0, 0, 0],
-            ['oxprice', 'oxarticles', 0, 0, 0],
-            ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1],
-         ],
-    ];
-
+    protected $_a_columns = ['container1' => [
+        // field , table, visible, multilanguage, ident
+        ['oxartnum', 'oxarticles', 1, 0, 0],
+        ['oxtitle', 'oxarticles', 1, 1, 0],
+        ['oxpos', 'oxobject2category', 1, 0, 0],
+        ['oxean', 'oxarticles', 0, 0, 0],
+        ['oxmpn', 'oxarticles', 0, 0, 0],
+        ['oxprice', 'oxarticles', 0, 0, 0],
+        ['oxstock', 'oxarticles', 0, 0, 0],
+        ['oxid', 'oxarticles', 0, 0, 1],
+    ], 'container2' => [['oxartnum', 'oxarticles', 1, 0, 0], ['oxtitle', 'oxarticles', 1, 1, 0], ['oxean', 'oxarticles', 0, 0, 0], ['oxmpn', 'oxarticles', 0, 0, 0], ['oxprice', 'oxarticles', 0, 0, 0], ['oxstock', 'oxarticles', 0, 0, 0], ['oxid', 'oxarticles', 0, 0, 1]]];
     /**
      * Returns SQL query for data to fetc
      *
      * @return string
      */
-    protected function getQuery()
+    protected function get_query()
     {
         // looking for table/view
-        $sArtTable = $this->getViewName('oxarticles');
-        $sO2CView = $this->getViewName('oxobject2category');
-        $oDb = DatabaseProvider::getDb();
-
+        $s_art_table = $this->get_view_name('oxarticles');
+        $s_o2c_view = $this->get_view_name('oxobject2category');
+        $o_db = Database_Provider::get_db();
         // category selected or not ?
-        if ($sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
-            $sQAdd = " from $sArtTable left join $sO2CView on $sArtTable.oxid=$sO2CView.oxobjectid where"
-                . " $sO2CView.oxcatnid = " . $oDb->quote($sSynchOxid);
-            if ($aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess')) {
-                $sQAdd .= " and $sArtTable.oxid not in ( "
-                    . implode(', ', DatabaseProvider::getDb()->quoteArray($aSkipArt))
-                    . ' ) ';
+        if ($s_synch_oxid = Registry::get_request()->get_request_escaped_parameter('synchoxid')) {
+            $s_q_add = " from {$s_art_table} left join {$s_o2c_view} on {$s_art_table}.oxid={$s_o2c_view}.oxobjectid where" . " {$s_o2c_view}.oxcatnid = " . $o_db->quote($s_synch_oxid);
+            if ($a_skip_art = \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('neworder_sess')) {
+                $s_q_add .= " and {$s_art_table}.oxid not in ( " . implode(', ', Database_Provider::get_db()->quote_array($a_skip_art)) . ' ) ';
             }
         } else {
             // which fields to load ?
-            $sQAdd = " from $sArtTable where ";
-            if ($aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess')) {
-                $sQAdd .= " $sArtTable.oxid in ( "
-                    . implode(', ', DatabaseProvider::getDb()->quoteArray($aSkipArt))
-                    . ' ) ';
+            $s_q_add = " from {$s_art_table} where ";
+            if ($a_skip_art = \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('neworder_sess')) {
+                $s_q_add .= " {$s_art_table}.oxid in ( " . implode(', ', Database_Provider::get_db()->quote_array($a_skip_art)) . ' ) ';
             } else {
-                $sQAdd .= ' 1 = 0 ';
+                $s_q_add .= ' 1 = 0 ';
             }
         }
-
-        return $sQAdd;
+        return $s_q_add;
     }
-
     /**
      * Returns SQL query addon for sorting
      *
      * @return string
      */
-    protected function getSorting()
+    protected function get_sorting()
     {
-        $sOrder = '';
-        if (Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
-            $sOrder = parent::getSorting();
-        } elseif (($aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess'))) {
-            $sOrderBy = '';
-            $sArtTable = $this->getViewName('oxarticles');
-            $sSep = '';
-            foreach ($aSkipArt as $sId) {
-                $sOrderBy = " $sArtTable.oxid=" . DatabaseProvider::getDb()->quote($sId) . ' ' . $sSep . $sOrderBy;
-                $sSep = ', ';
+        $s_order = '';
+        if (Registry::get_request()->get_request_escaped_parameter('synchoxid')) {
+            $s_order = parent::get_sorting();
+        } elseif ($a_skip_art = \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('neworder_sess')) {
+            $s_order_by = '';
+            $s_art_table = $this->get_view_name('oxarticles');
+            $s_sep = '';
+            foreach ($a_skip_art as $s_id) {
+                $s_order_by = " {$s_art_table}.oxid=" . Database_Provider::get_db()->quote($s_id) . ' ' . $s_sep . $s_order_by;
+                $s_sep = ', ';
             }
-            $sOrder = 'order by ' . $sOrderBy;
+            $s_order = 'order by ' . $s_order_by;
         }
-
-        return $sOrder;
+        return $s_order;
     }
-
     /**
      * Removes article from list for sorting in category
      */
-    public function removeCatOrderArticle(): void
+    public function remove_cat_order_article(): void
     {
-        $aRemoveArt = $this->getActionIds('oxarticles.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess');
-
-        if (is_array($aRemoveArt) && is_array($aSkipArt)) {
-            foreach ($aRemoveArt as $sRem) {
-                if (($iKey = array_search($sRem, $aSkipArt)) !== false) {
-                    unset($aSkipArt[$iKey]);
+        $a_remove_art = $this->get_action_ids('oxarticles.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $a_skip_art = \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('neworder_sess');
+        if (is_array($a_remove_art) && is_array($a_skip_art)) {
+            foreach ($a_remove_art as $s_rem) {
+                if (($i_key = array_search($s_rem, $a_skip_art)) !== false) {
+                    unset($a_skip_art[$i_key]);
                 }
             }
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', $aSkipArt);
-
-            $sArticleTable = $this->getViewName('oxarticles');
-            $sO2CView = $this->getViewName('oxobject2category');
-
+            \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('neworder_sess', $a_skip_art);
+            $s_article_table = $this->get_view_name('oxarticles');
+            $s_o2c_view = $this->get_view_name('oxobject2category');
             // checking if all articles were moved from one
-            $sSelect = "select 1 from $sArticleTable left join $sO2CView on $sArticleTable.oxid=$sO2CView.oxobjectid ";
-            $sSelect .= "where $sO2CView.oxcatnid = :oxcatnid";
-            if (count($aSkipArt)) {
-                $sSelect .= " and $sArticleTable.oxparentid = '' and $sArticleTable.oxid ";
-                $sSelect .= 'not in ( ' . implode(', ', DatabaseProvider::getDb()->quoteArray($aSkipArt)) . ' ) ';
+            $s_select = "select 1 from {$s_article_table} left join {$s_o2c_view} on {$s_article_table}.oxid={$s_o2c_view}.oxobjectid ";
+            $s_select .= "where {$s_o2c_view}.oxcatnid = :oxcatnid";
+            if (count($a_skip_art)) {
+                $s_select .= " and {$s_article_table}.oxparentid = '' and {$s_article_table}.oxid ";
+                $s_select .= 'not in ( ' . implode(', ', Database_Provider::get_db()->quote_array($a_skip_art)) . ' ) ';
             }
-
             // Simply echoing "1" if some items found, and 0 if nothing was found
             // We force reading from master to prevent issues with slow replications or open transactions
             // (see ESDEV-3804).
-            echo (int) DatabaseProvider::getMaster()->getOne($sSelect, [
-                'oxcatnid' => $soxId,
-            ]);
+            echo (int) Database_Provider::get_master()->get_one($s_select, ['oxcatnid' => $sox_id]);
         }
     }
-
     /**
      * Adds article to list for sorting in category
      */
-    public function addCatOrderArticle(): void
+    public function add_cat_order_article(): void
     {
-        $aAddArticle = $this->getActionIds('oxarticles.oxid');
-        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-
-        $aOrdArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess');
-        if (!is_array($aOrdArt)) {
-            $aOrdArt = [];
+        $a_add_article = $this->get_action_ids('oxarticles.oxid');
+        $sox_id = Registry::get_request()->get_request_escaped_parameter('synchoxid');
+        $a_ord_art = \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('neworder_sess');
+        if (!is_array($a_ord_art)) {
+            $a_ord_art = [];
         }
-
-        if (is_array($aAddArticle)) {
+        if (is_array($a_add_article)) {
             // storing newly ordered article seq.
-            foreach ($aAddArticle as $sAdd) {
-                if (array_search($sAdd, $aOrdArt) === false) {
-                    $aOrdArt[] = $sAdd;
+            foreach ($a_add_article as $s_add) {
+                if (array_search($s_add, $a_ord_art) === false) {
+                    $a_ord_art[] = $s_add;
                 }
             }
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', $aOrdArt);
-
-            $sArticleTable = $this->getViewName('oxarticles');
-            $sO2CView = $this->getViewName('oxobject2category');
-
+            \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('neworder_sess', $a_ord_art);
+            $s_article_table = $this->get_view_name('oxarticles');
+            $s_o2c_view = $this->get_view_name('oxobject2category');
             // checking if all articles were moved from one
-            $sSelect = "select 1 from $sArticleTable left join $sO2CView on $sArticleTable.oxid=$sO2CView.oxobjectid "
-            . "where $sO2CView.oxcatnid = :oxcatnid and $sArticleTable.oxparentid = '' and $sArticleTable.oxid "
-            . 'not in ( ' . implode(', ', DatabaseProvider::getDb()->quoteArray($aOrdArt)) . ' ) ';
-
+            $s_select = "select 1 from {$s_article_table} left join {$s_o2c_view} on {$s_article_table}.oxid={$s_o2c_view}.oxobjectid " . "where {$s_o2c_view}.oxcatnid = :oxcatnid and {$s_article_table}.oxparentid = '' and {$s_article_table}.oxid " . 'not in ( ' . implode(', ', Database_Provider::get_db()->quote_array($a_ord_art)) . ' ) ';
             // Simply echoing "1" if some items found, and 0 if nothing was found
             // We force reading from master to prevent issues with slow replications or open transactions
             // (see ESDEV-3804).
-            echo (int) DatabaseProvider::getMaster()->getOne($sSelect, [
-                'oxcatnid' => $soxId,
-            ]);
+            echo (int) Database_Provider::get_master()->get_one($s_select, ['oxcatnid' => $sox_id]);
         }
     }
-
     /**
      * Saves category articles ordering.
      */
-    public function saveNewOrder(): void
+    public function save_new_order(): void
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        if ($oCategory->load($sId)) {
+        $o_category = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+        $s_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        if ($o_category->load($s_id)) {
             //Disable editing for derived items
-            if ($oCategory->isDerived()) {
+            if ($o_category->is_derived()) {
                 return;
             }
-
-            $this->resetContentCache();
-
-            $aNewOrder = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess');
-            if (is_array($aNewOrder) && count($aNewOrder)) {
-                $sO2CView = $this->getViewName('oxobject2category');
-                $sSelect = "select * from $sO2CView where $sO2CView.oxcatnid = :oxcatnid and $sO2CView.oxobjectid in ("
-                    . implode(', ', DatabaseProvider::getDb()->quoteArray($aNewOrder))
-                    . ' )';
-                $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-                $oList->init($this->getObject2CategoryClass(), 'oxobject2category');
-                $oList->selectString($sSelect, [
-                    'oxcatnid' => $oCategory->getId(),
-                ]);
-
+            $this->reset_content_cache();
+            $a_new_order = \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('neworder_sess');
+            if (is_array($a_new_order) && count($a_new_order)) {
+                $s_o2c_view = $this->get_view_name('oxobject2category');
+                $s_select = "select * from {$s_o2c_view} where {$s_o2c_view}.oxcatnid = :oxcatnid and {$s_o2c_view}.oxobjectid in (" . implode(', ', Database_Provider::get_db()->quote_array($a_new_order)) . ' )';
+                $o_list = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+                $o_list->init($this->get_object2category_class(), 'oxobject2category');
+                $o_list->select_string($s_select, ['oxcatnid' => $o_category->get_id()]);
                 // setting new position
-                foreach ($oList as $oObj) {
-                    if (($iNewPos = array_search($oObj->oxobject2category__oxobjectid->value, $aNewOrder)) !== false) {
-                        $oObj->oxobject2category__oxpos->setValue($iNewPos);
-                        $oObj->save();
+                foreach ($o_list as $o_obj) {
+                    if (($i_new_pos = array_search($o_obj->oxobject2category__oxobjectid->value, $a_new_order)) !== false) {
+                        $o_obj->oxobject2category__oxpos->set_value($i_new_pos);
+                        $o_obj->save();
                     }
                 }
-
-                \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', null);
+                \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('neworder_sess', null);
             }
-
-            $this->onCategoryChange($sId);
+            $this->on_category_change($s_id);
         }
     }
-
     /**
      * Removes category articles ordering set by saveneworder() method.
      */
-    public function remNewOrder(): void
+    public function rem_new_order(): void
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        if ($oCategory->load($sId)) {
+        $o_category = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+        $s_id = Registry::get_request()->get_request_escaped_parameter('oxid');
+        if ($o_category->load($s_id)) {
             //Disable editing for derived items
-            if ($oCategory->isDerived()) {
+            if ($o_category->is_derived()) {
                 return;
             }
-
-            $oDb = DatabaseProvider::getDb();
-            $sSqlShopFilter = $this->updateQueryFilterForResetCategoryArticlesOrder();
-
-            $sSelect = sprintf(
-                "update oxobject2category set oxpos = '0' where oxobject2category.oxcatnid = :id %s",
-                $sSqlShopFilter
-            );
-            $oDb->execute($sSelect, ['id' => $oCategory->getId()]);
-
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', null);
-
-            $this->onCategoryChange($sId);
+            $o_db = Database_Provider::get_db();
+            $s_sql_shop_filter = $this->update_query_filter_for_reset_category_articles_order();
+            $s_select = sprintf("update oxobject2category set oxpos = '0' where oxobject2category.oxcatnid = :id %s", $s_sql_shop_filter);
+            $o_db->execute($s_select, ['id' => $o_category->get_id()]);
+            \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('neworder_sess', null);
+            $this->on_category_change($s_id);
         }
     }
-
     /**
      * @return string
      */
-    protected function updateQueryFilterForResetCategoryArticlesOrder()
+    protected function update_query_filter_for_reset_category_articles_order()
     {
         return '';
     }
-
     /**
      * @param string $categoryId
      */
-    protected function onCategoryChange($categoryId)
+    protected function on_category_change($category_id)
     {
     }
-
-    private function getObject2CategoryClass(): string
+    private function get_object2category_class(): string
     {
-        return Registry::getUtilsObject()->getClassName(Object2Category::class);
+        return Registry::get_utils_object()->get_class_name(Object2Category::class);
     }
 }

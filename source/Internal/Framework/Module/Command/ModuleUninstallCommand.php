@@ -4,74 +4,57 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Command;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Command;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject\OxidEshopPackage;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleInstallerInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Exception\Module_Configuration_Not_Found_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Data_Object\Oxid_Eshop_Package;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Module_Installer_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Path\Module_Path_Resolver_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-
-class ModuleUninstallCommand extends Command
+use Symfony\Component\Console\Input\Input_Argument;
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+use Symfony\Component\Console\Style\Symfony_Style;
+class Module_Uninstall_Command extends Command
 {
     private const SUCCESS_MESSAGE = 'Module uninstalled successfully';
     private const ERROR_MESSAGE = 'Error uninstalling module: ';
-
-    public function __construct(
-        private readonly ModuleInstallerInterface $moduleInstaller,
-        private readonly ModulePathResolverInterface $modulePathResolver,
-        private readonly ContextInterface $context
-    ) {
+    public function __construct(private readonly Module_Installer_Interface $module_installer, private readonly Module_Path_Resolver_Interface $module_path_resolver, private readonly Context_Interface $context)
+    {
         parent::__construct();
     }
-
     /** @inheritdoc */
     protected function configure(): void
     {
-        $this->setDescription('Uninstall module assets and configuration')
-            ->addArgument(
-                'module-id',
-                InputArgument::REQUIRED,
-                'Module ID (see metadata.php)'
-            );
+        $this->set_description('Uninstall module assets and configuration')->add_argument('module-id', Input_Argument::REQUIRED, 'Module ID (see metadata.php)');
     }
-
     /**
      * @throws \Throwable
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
+        $style = new Symfony_Style($input, $output);
         try {
-            $modulePath = $this->getModulePath($input->getArgument('module-id'));
-            $this->moduleInstaller->uninstall($this->getPackage($modulePath));
+            $module_path = $this->get_module_path($input->get_argument('module-id'));
+            $this->module_installer->uninstall($this->get_package($module_path));
             $style->success(self::SUCCESS_MESSAGE);
             return Command::SUCCESS;
-        } catch (ModuleConfigurationNotFoundException $exception) {
-            $style->error(self::ERROR_MESSAGE . $exception->getMessage());
+        } catch (Module_Configuration_Not_Found_Exception $exception) {
+            $style->error(self::ERROR_MESSAGE . $exception->get_message());
         } catch (\Throwable $throwable) {
-            $style->error(self::ERROR_MESSAGE . $throwable->getMessage());
-            $style->text($throwable->getTraceAsString());
+            $style->error(self::ERROR_MESSAGE . $throwable->get_message());
+            $style->text($throwable->get_trace_as_string());
         }
         return Command::FAILURE;
     }
-
-    private function getModulePath(string $moduleId): string
+    private function get_module_path(string $module_id): string
     {
-        return $this->modulePathResolver
-            ->getFullModulePathFromConfiguration($moduleId, $this->context->getDefaultShopId());
+        return $this->module_path_resolver->get_full_module_path_from_configuration($module_id, $this->context->get_default_shop_id());
     }
-
-    private function getPackage(string $modulePath): OxidEshopPackage
+    private function get_package(string $module_path): Oxid_Eshop_Package
     {
-        return new OxidEshopPackage($modulePath);
+        return new Oxid_Eshop_Package($module_path);
     }
 }

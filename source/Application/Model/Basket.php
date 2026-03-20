@@ -1,395 +1,343 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\Exception\NoArticleException;
-use OxidEsales\Eshop\Core\Price;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use Psr\Log\LoggerInterface;
+use Oxid_Esales\Eshop\Core\Exception\No_Article_Exception;
+use Oxid_Esales\Eshop\Core\Price;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Psr\Log\Logger_Interface;
 use stdClass;
-
 /**
  * Basket manager
  */
-#[\AllowDynamicProperties]
-class Basket extends \OxidEsales\Eshop\Core\Base
+#[\Allow_Dynamic_Properties]
+class Basket extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Array or oxbasketitem objects
      *
      * @var array
      */
-    protected $_aBasketContents = [];
-
+    protected $_a_basket_contents = [];
     /**
      * Number of different product type in basket.
      * The value is updated only after recalculating a basket.
      *
      * @var int
      */
-    protected $_iProductsCnt = 0;
-
+    protected $_i_products_cnt = 0;
     /**
      * Number of basket items.
      * The value is updated only after recalculating a basket.
      *
      * @var double
      */
-    protected $_dItemsCnt = 0.0;
-
+    protected $_d_items_cnt = 0.0;
     /**
      * Basket weight.
      * The value is updated only after recalculating a basket.
      *
      * @var double
      */
-    protected $_dWeight = 0.0;
-
+    protected $_d_weight = 0.0;
     /**
      * Total basket price
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice = null;
-
+    protected $_o_price = null;
     /**
      * Basket calculation mode netto
      *
      * @var bool
      */
-    protected $_isCalculationModeNetto = null;
-
+    protected $_is_calculation_mode_netto = null;
     /**
      * Basket netto sum
      *
      * @var float
      */
-    protected $_dNettoSum = null;
-
+    protected $_d_netto_sum = null;
     /**
      * Basket brutto sum
      *
      * @var float
      */
-    protected $_dBruttoSum = null;
-
+    protected $_d_brutto_sum = null;
     /**
      * The list of all basket item prices
      *
      * @var \OxidEsales\Eshop\Core\PriceList
      */
-    protected $_oProductsPriceList = null;
-
+    protected $_o_products_price_list = null;
     /**
      * Basket discounts information
      *
      * @var array
      */
-    protected $_aDiscounts = [];
-
+    protected $_a_discounts = [];
     /**
      * Basket items discounts information
      *
      * @var array
      */
-    protected $_aItemDiscounts = [];
-
+    protected $_a_item_discounts = [];
     /**
      * Basket order ID. Usually this ID is set on last order step
      *
      * @var string
      */
-    protected $_sOrderId = null;
-
+    protected $_s_order_id = null;
     /**
      * Array of vouchers applied on basket price
      *
      * @var array
      */
-    protected $_aVouchers = [];
-
+    protected $_a_vouchers = [];
     /**
      * Additional costs array of \OxidEsales\Eshop\Core\Price objects
      *
      * @var array
      */
-    protected $_aCosts = [];
-
+    protected $_a_costs = [];
     /**
      * Sum price of articles applicable to discounts
      *
      * @var \OxidEsales\Eshop\Core\PriceList
      */
-    protected $_oDiscountProductsPriceList = null;
-
+    protected $_o_discount_products_price_list = null;
     /**
      * Sum price of articles not applicable to discounts
      *
      * @var \OxidEsales\Eshop\Core\PriceList
      */
-    protected $_oNotDiscountedProductsPriceList = null;
-
+    protected $_o_not_discounted_products_price_list = null;
     /**
      * Basket recalculation marker
      *
      * @var bool
      */
-    protected $_blUpdateNeeded = true;
-
+    protected $_bl_update_needed = true;
     /**
      * oxBasket summary object, usually used for discount calculations etc
      *
      * @var array
      */
-    protected $_aBasketSummary = null;
-
+    protected $_a_basket_summary = null;
     /**
      * Basket Payment ID
      *
      * @var string
      */
-    protected $_sPaymentId = null;
-
+    protected $_s_payment_id = null;
     /**
      * Basket Shipping set ID
      *
      * @var string
      */
-    protected $_sShippingSetId = null;
-
+    protected $_s_shipping_set_id = null;
     /**
      * Ref. to session user
      *
      * @var \OxidEsales\Eshop\Application\Model\User
      */
-    protected $_oUser = null;
-
+    protected $_o_user = null;
     /**
      * Total basket products discount price object (does not include voucher discount)
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oTotalDiscount = null;
-
+    protected $_o_total_discount = null;
     /**
      * Basket voucher discount price object
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oVoucherDiscount = null;
-
+    protected $_o_voucher_discount = null;
     /**
      * Basket currency
      *
      * @var stdClass
      */
-    protected $_oCurrency = null;
-
+    protected $_o_currency = null;
     /**
      * Skip or not vouchers availability checking
      *
      * @var bool
      */
-    protected $_blSkipVouchersAvailabilityChecking = null;
-
+    protected $_bl_skip_vouchers_availability_checking = null;
     /**
      * Netto price including discount and voucher
      *
      * @var double
      */
-    protected $_dDiscountedProductNettoPrice = null;
-
+    protected $_d_discounted_product_netto_price = null;
     /**
      * All VAT values with discount and voucher
      *
      * @var array
      */
-    protected $_aDiscountedVats = null;
-
+    protected $_a_discounted_vats = null;
     /**
      * Skip discounts marker
      *
      * @var boolean
      */
-    protected $_blSkipDiscounts = false;
-
+    protected $_bl_skip_discounts = false;
     /**
      * User set delivery costs
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oDeliveryPrice = null;
-
+    protected $_o_delivery_price = null;
     /**
      * Basket product stock check (live db check) status
      *
      * @var bool
      */
-    protected $_blCheckStock = true;
-
+    protected $_bl_check_stock = true;
     /**
      * discount calculation marker
      *
      * @var bool
      */
-    protected $_blCalcDiscounts = true;
-
+    protected $_bl_calc_discounts = true;
     /**
      * Basket category id
      *
      * @var string
      */
-    protected $_sBasketCategoryId = null;
-
+    protected $_s_basket_category_id = null;
     /**
      * Category change warning state
      *
      * @var bool
      */
-    protected $_blShowCatChangeWarning = false;
-
+    protected $_bl_show_cat_change_warning = false;
     /**
      * new basket item addition state
      *
      * @var bool
      */
-    protected $_blNewITemAdded = null;
-
+    protected $_bl_new_i_tem_added = null;
     /**
      * if basket has downloadable product
      *
      * @var bool
      */
-    protected $_blDownloadableProducts = null;
-
+    protected $_bl_downloadable_products = null;
     /**
      * Save basket to data base if user is logged in
      *
      * @var bool
      */
-    protected $_blSaveToDataBase = null;
-
+    protected $_bl_save_to_data_base = null;
     /**
      * Save card id
      *
      * @var string
      */
-    protected $_sCardId = null;
-
+    protected $_s_card_id = null;
     /**
      * Card message.
      *
      * @var string
      */
-    protected $_sCardMessage = '';
-
+    protected $_s_card_message = '';
     /**
      * Enables or disable saving to data base
      *
      * @param boolean $blSave
      */
-    public function enableSaveToDataBase($blSave = true)
+    public function enable_save_to_data_base($bl_save = true)
     {
-        $this->_blSaveToDataBase = $blSave;
+        $this->_bl_save_to_data_base = $bl_save;
     }
-
     /**
      * Returns true if saving to data base enabled
      *
      * @return boolean
      */
-    public function isSaveToDataBaseEnabled()
+    public function is_save_to_data_base_enabled()
     {
-        if (is_null($this->_blSaveToDataBase)) {
-            $this->_blSaveToDataBase = (bool) !Registry::getConfig()->getConfigParam('blPerfNoBasketSaving');
+        if (is_null($this->_bl_save_to_data_base)) {
+            $this->_bl_save_to_data_base = (bool) !Registry::get_config()->get_config_param('blPerfNoBasketSaving');
         }
-
-        return $this->_blSaveToDataBase;
+        return $this->_bl_save_to_data_base;
     }
-
     /**
      * Return true if calculation mode is netto
      *
      * @return bool
      */
-    public function isCalculationModeNetto()
+    public function is_calculation_mode_netto()
     {
-        if ($this->_isCalculationModeNetto === null) {
-            $this->setCalculationModeNetto($this->isPriceViewModeNetto());
+        if ($this->_is_calculation_mode_netto === null) {
+            $this->set_calculation_mode_netto($this->is_price_view_mode_netto());
         }
-
-        return $this->_isCalculationModeNetto;
+        return $this->_is_calculation_mode_netto;
     }
-
     /**
      * Set netto calculation mode
      *
      * @param bool $blNettoMode - true in netto; false - turn off
      */
-    public function setCalculationModeNetto($blNettoMode = true)
+    public function set_calculation_mode_netto($bl_netto_mode = true)
     {
-        $this->_isCalculationModeNetto = (bool) $blNettoMode;
+        $this->_is_calculation_mode_netto = (bool) $bl_netto_mode;
     }
-
     /**
      * Return basket netto sum (in B2B view mode sum include discount)
      *
      * @return float
      */
-    public function getNettoSum()
+    public function get_netto_sum()
     {
-        return $this->_dNettoSum;
+        return $this->_d_netto_sum;
     }
-
     /**
      * Return basket brutto sum (in B2C view mode sum include discount)
      *
      * @return float
      */
-    public function getBruttoSum()
+    public function get_brutto_sum()
     {
-        return $this->_dBruttoSum;
+        return $this->_d_brutto_sum;
     }
-
     /**
      * Set basket netto sum
      *
      * @param float $dNettoSum sum of basket in netto mode
      */
-    public function setNettoSum($dNettoSum)
+    public function set_netto_sum($d_netto_sum)
     {
-        $this->_dNettoSum = $dNettoSum;
+        $this->_d_netto_sum = $d_netto_sum;
     }
-
     /**
      * Set basket brutto sum
      *
      * @param float $dBruttoSum sum of basket in brutto mode
      */
-    public function setBruttoSum($dBruttoSum)
+    public function set_brutto_sum($d_brutto_sum)
     {
-        $this->_dBruttoSum = $dBruttoSum;
+        $this->_d_brutto_sum = $d_brutto_sum;
     }
-
     /**
      * Checks if configuration allows basket usage or if user agent is search engine
      *
      * @return bool
      */
-    public function isEnabled()
+    public function is_enabled()
     {
-        return !Registry::getUtils()->isSearchEngine();
+        return !Registry::get_utils()->is_search_engine();
     }
-
     /**
      * change old key to new one but retain key position in array
      *
@@ -397,21 +345,16 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * @param string $sNewKey new key to place in old one's place
      * @param mixed  $value   (optional)
      */
-    protected function changeBasketItemKey($sOldKey, $sNewKey, $value = null)
+    protected function change_basket_item_key($s_old_key, $s_new_key, $value = null)
     {
-        reset($this->_aBasketContents);
-        $iOldKeyPlace = 0;
-        while (key($this->_aBasketContents) != $sOldKey && next($this->_aBasketContents)) {
-            ++$iOldKeyPlace;
+        reset($this->_a_basket_contents);
+        $i_old_key_place = 0;
+        while (key($this->_a_basket_contents) != $s_old_key && next($this->_a_basket_contents)) {
+            ++$i_old_key_place;
         }
-        $aNewCopy = array_merge(
-            array_slice($this->_aBasketContents, 0, $iOldKeyPlace, true),
-            [$sNewKey => $value],
-            array_slice($this->_aBasketContents, $iOldKeyPlace + 1, count($this->_aBasketContents) - $iOldKeyPlace, true)
-        );
-        $this->_aBasketContents = $aNewCopy;
+        $a_new_copy = array_merge(array_slice($this->_a_basket_contents, 0, $i_old_key_place, true), [$s_new_key => $value], array_slice($this->_a_basket_contents, $i_old_key_place + 1, count($this->_a_basket_contents) - $i_old_key_place, true));
+        $this->_a_basket_contents = $a_new_copy;
     }
-
     /**
      * Adds user item to basket. Returns oxBasketItem object if adding succeeded
      *
@@ -429,103 +372,88 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return null|\OxidEsales\Eshop\Application\Model\BasketItem
      */
-    public function addToBasket($sProductID, $dAmount, $aSel = null, $aPersParam = null, $blOverride = false, $blBundle = false, $sOldBasketItemId = null)
+    public function add_to_basket($s_product_id, $d_amount, $a_sel = null, $a_pers_param = null, $bl_override = false, $bl_bundle = false, $s_old_basket_item_id = null)
     {
         // enabled ?
-        if (!$this->isEnabled()) {
+        if (!$this->is_enabled()) {
             return null;
         }
-
         // basket exclude
-        if (Registry::getConfig()->getConfigParam('blBasketExcludeEnabled')) {
-            if (!$this->canAddProductToBasket($sProductID)) {
-                $this->setCatChangeWarningState(true);
-
+        if (Registry::get_config()->get_config_param('blBasketExcludeEnabled')) {
+            if (!$this->can_add_product_to_basket($s_product_id)) {
+                $this->set_cat_change_warning_state(true);
                 return null;
             } else {
-                $this->setCatChangeWarningState(false);
+                $this->set_cat_change_warning_state(false);
             }
         }
-
-        $sItemId = $this->getItemKey($sProductID, $aSel, $aPersParam, $blBundle);
-        if ($sOldBasketItemId && (strcmp($sOldBasketItemId, $sItemId) != 0)) {
-            if (isset($this->_aBasketContents[$sItemId])) {
+        $s_item_id = $this->get_item_key($s_product_id, $a_sel, $a_pers_param, $bl_bundle);
+        if ($s_old_basket_item_id && strcmp($s_old_basket_item_id, $s_item_id) != 0) {
+            if (isset($this->_a_basket_contents[$s_item_id])) {
                 // we are merging, so params will just go to the new key
-                unset($this->_aBasketContents[$sOldBasketItemId]);
+                unset($this->_a_basket_contents[$s_old_basket_item_id]);
                 // do not override stock
-                $blOverride = false;
+                $bl_override = false;
             } else {
                 // value is null - means isset will fail and real values will be filled
-                $this->changeBasketItemKey($sOldBasketItemId, $sItemId);
+                $this->change_basket_item_key($s_old_basket_item_id, $s_item_id);
             }
         }
-
         // after some checks item must be removed from basket
-        $blRemoveItem = false;
-
+        $bl_remove_item = false;
         // initialling exception storage
-        $oEx = null;
-
-        if (isset($this->_aBasketContents[$sItemId])) {
+        $o_ex = null;
+        if (isset($this->_a_basket_contents[$s_item_id])) {
             //updating existing
             try {
                 // setting stock check status
-                $this->_aBasketContents[$sItemId]->setStockCheckStatus($this->getStockCheckMode());
+                $this->_a_basket_contents[$s_item_id]->set_stock_check_status($this->get_stock_check_mode());
                 //validate amount
                 //possibly throws exception
-                $this->_aBasketContents[$sItemId]->setAmount($dAmount, $blOverride, $sItemId);
-            } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
+                $this->_a_basket_contents[$s_item_id]->set_amount($d_amount, $bl_override, $s_item_id);
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Out_Of_Stock_Exception $o_ex) {
                 // rethrow later
             }
         } else {
             //inserting new
-            $oBasketItem = oxNew(\OxidEsales\Eshop\Application\Model\BasketItem::class);
+            $o_basket_item = ox_new(\Oxid_Esales\Eshop\Application\Model\Basket_Item::class);
             try {
-                $oBasketItem->setStockCheckStatus($this->getStockCheckMode());
-                $oBasketItem->init($sProductID, $dAmount, $aSel, $aPersParam, $blBundle);
-            } catch (NoArticleException $oEx) {
+                $o_basket_item->set_stock_check_status($this->get_stock_check_mode());
+                $o_basket_item->init($s_product_id, $d_amount, $a_sel, $a_pers_param, $bl_bundle);
+            } catch (No_Article_Exception $o_ex) {
                 // in this case that the article does not exist remove the item from the basket by setting its amount to 0
                 //$oBasketItem->dAmount = 0;
-                $blRemoveItem = true;
-            } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
+                $bl_remove_item = true;
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Out_Of_Stock_Exception $o_ex) {
                 // rethrow later
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Article_Input_Exception $o_ex) {
                 // rethrow later
-                $blRemoveItem = true;
+                $bl_remove_item = true;
             }
-
-            $this->_aBasketContents[$sItemId] = $oBasketItem;
+            $this->_a_basket_contents[$s_item_id] = $o_basket_item;
         }
-
         //in case amount is 0 removing item
-        if ($this->_aBasketContents[$sItemId]->getAmount() == 0 || $blRemoveItem) {
-            $this->removeItem($sItemId);
-        } elseif ($blBundle) {
+        if ($this->_a_basket_contents[$s_item_id]->get_amount() == 0 || $bl_remove_item) {
+            $this->remove_item($s_item_id);
+        } elseif ($bl_bundle) {
             //marking bundles
-            $this->_aBasketContents[$sItemId]->setBundle(true);
+            $this->_a_basket_contents[$s_item_id]->set_bundle(true);
         }
-
         //calling update method
-        $this->onUpdate();
-
-        if ($oEx) {
-            throw $oEx;
+        $this->on_update();
+        if ($o_ex) {
+            throw $o_ex;
         }
-
         // notifying that new basket item was added
-        if (!$blBundle) {
-            $this->addedNewItem($blOverride);
+        if (!$bl_bundle) {
+            $this->added_new_item($bl_override);
         }
-
         // returning basket item object
-        if (isset($this->_aBasketContents[$sItemId])
-            && $this->_aBasketContents[$sItemId] instanceof \OxidEsales\Eshop\Application\Model\BasketItem) {
-            $this->_aBasketContents[$sItemId]->setBasketItemKey($sItemId);
+        if (isset($this->_a_basket_contents[$s_item_id]) && $this->_a_basket_contents[$s_item_id] instanceof \Oxid_Esales\Eshop\Application\Model\Basket_Item) {
+            $this->_a_basket_contents[$s_item_id]->set_basket_item_key($s_item_id);
         }
-
-        return $this->_aBasketContents[$sItemId] ?? null;
+        return $this->_a_basket_contents[$s_item_id] ?? null;
     }
-
     /**
      * Adds order article to basket (method normally used while recalculating order)
      *
@@ -533,49 +461,43 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return \OxidEsales\Eshop\Application\Model\BasketItem
      */
-    public function addOrderArticleToBasket($oOrderArticle)
+    public function add_order_article_to_basket($o_order_article)
     {
         // adding only if amount > 0
-        if ($oOrderArticle->oxorderarticles__oxamount->value > 0 && !$oOrderArticle->isBundle()) {
-            $this->_isForOrderRecalculation = true;
-            $sItemId = $oOrderArticle->getId();
-
+        if ($o_order_article->oxorderarticles__oxamount->value > 0 && !$o_order_article->is_bundle()) {
+            $this->_is_for_order_recalculation = true;
+            $s_item_id = $o_order_article->get_id();
             //inserting new
-            $this->_aBasketContents[$sItemId] = oxNew(\OxidEsales\Eshop\Application\Model\BasketItem::class);
-            $this->_aBasketContents[$sItemId]->initFromOrderArticle($oOrderArticle);
-            $this->_aBasketContents[$sItemId]->setWrapping($oOrderArticle->oxorderarticles__oxwrapid->value);
-            $this->_aBasketContents[$sItemId]->setBundle($oOrderArticle->isBundle());
-
+            $this->_a_basket_contents[$s_item_id] = ox_new(\Oxid_Esales\Eshop\Application\Model\Basket_Item::class);
+            $this->_a_basket_contents[$s_item_id]->init_from_order_article($o_order_article);
+            $this->_a_basket_contents[$s_item_id]->set_wrapping($o_order_article->oxorderarticles__oxwrapid->value);
+            $this->_a_basket_contents[$s_item_id]->set_bundle($o_order_article->is_bundle());
             //calling update method
-            $this->onUpdate();
-
-            return $this->_aBasketContents[$sItemId];
-        } elseif ($oOrderArticle->isBundle()) {
+            $this->on_update();
+            return $this->_a_basket_contents[$s_item_id];
+        } elseif ($o_order_article->is_bundle()) {
             // deleting bundles, they are handled automatically
-            $oOrderArticle->delete();
+            $o_order_article->delete();
         }
     }
-
     /**
      * Sets stock control mode
      *
      * @param bool $blCheck stock control mode
      */
-    public function setStockCheckMode($blCheck)
+    public function set_stock_check_mode($bl_check)
     {
-        $this->_blCheckStock = $blCheck;
+        $this->_bl_check_stock = $bl_check;
     }
-
     /**
      * Returns stock control mode
      *
      * @return bool
      */
-    public function getStockCheckMode()
+    public function get_stock_check_mode()
     {
-        return $this->_blCheckStock;
+        return $this->_bl_check_stock;
     }
-
     /**
      * Returns unique basket item identifier which consist from product ID,
      * select lists data, persistent info and bundle property
@@ -588,52 +510,46 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getItemKey($sProductId, $aSel = null, $aPersParam = null, $blBundle = false, $sAdditionalParam = '')
+    public function get_item_key($s_product_id, $a_sel = null, $a_pers_param = null, $bl_bundle = false, $s_additional_param = '')
     {
-        $aSel = ($aSel != null) ? $aSel : [0 => '0'];
-
-        $sItemKey = md5($sProductId . '|' . serialize($aSel) . '|' . serialize($aPersParam) . '|' . (int) $blBundle . '|' . serialize($sAdditionalParam));
-
-        return $sItemKey;
+        $a_sel = $a_sel != null ? $a_sel : [0 => '0'];
+        $s_item_key = md5($s_product_id . '|' . serialize($a_sel) . '|' . serialize($a_pers_param) . '|' . (int) $bl_bundle . '|' . serialize($s_additional_param));
+        return $s_item_key;
     }
-
     /**
      * Removes item from basket
      *
      * @param string $sItemKey basket item key
      */
-    public function removeItem($sItemKey)
+    public function remove_item($s_item_key)
     {
-        if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-            if (isset($this->_aBasketContents[$sItemKey])) {
-                $sArticleId = $this->_aBasketContents[$sItemKey]->getProductId();
-                if ($sArticleId) {
-                    $session = Registry::getSession();
-                    $session->getBasketReservations()->discardArticleReservation($sArticleId);
+        if (Registry::get_config()->get_config_param('blPsBasketReservationEnabled')) {
+            if (isset($this->_a_basket_contents[$s_item_key])) {
+                $s_article_id = $this->_a_basket_contents[$s_item_key]->get_product_id();
+                if ($s_article_id) {
+                    $session = Registry::get_session();
+                    $session->get_basket_reservations()->discard_article_reservation($s_article_id);
                 }
             }
         }
-        unset($this->_aBasketContents[$sItemKey]);
-
+        unset($this->_a_basket_contents[$s_item_key]);
         // basket exclude
-        if (!count($this->_aBasketContents) && Registry::getConfig()->getConfigParam('blBasketExcludeEnabled')) {
-            $this->setBasketRootCatId(null);
+        if (!count($this->_a_basket_contents) && Registry::get_config()->get_config_param('blBasketExcludeEnabled')) {
+            $this->set_basket_root_cat_id(null);
         }
     }
-
     /**
      * Unsets bundled basket items from basket contents array
      */
-    protected function clearBundles()
+    protected function clear_bundles()
     {
-        reset($this->_aBasketContents);
-        foreach ($this->_aBasketContents as $sItemKey => $oBasketItem) {
-            if ($oBasketItem->isBundle()) {
-                $this->removeItem($sItemKey);
+        reset($this->_a_basket_contents);
+        foreach ($this->_a_basket_contents as $s_item_key => $o_basket_item) {
+            if ($o_basket_item->is_bundle()) {
+                $this->remove_item($s_item_key);
             }
         }
     }
-
     /**
      * Returns array of bundled articles IDs for basket item
      *
@@ -641,22 +557,18 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    protected function getArticleBundles($oBasketItem)
+    protected function get_article_bundles($o_basket_item)
     {
-        $aBundles = [];
-
-        if ($oBasketItem->isBundle()) {
-            return $aBundles;
+        $a_bundles = [];
+        if ($o_basket_item->is_bundle()) {
+            return $a_bundles;
         }
-
-        $oArticle = $oBasketItem->getArticle(true);
-        if ($oArticle && $oArticle->getFieldData('oxbundleid')) {
-            $aBundles[$oArticle->getFieldData('oxbundleid')] = 1;
+        $o_article = $o_basket_item->get_article(true);
+        if ($o_article && $o_article->get_field_data('oxbundleid')) {
+            $a_bundles[$o_article->get_field_data('oxbundleid')] = 1;
         }
-
-        return $aBundles;
+        return $a_bundles;
     }
-
     /**
      * Returns array of bundled discount articles
      *
@@ -665,36 +577,31 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    protected function getItemBundles($oBasketItem, $aBundles = [])
+    protected function get_item_bundles($o_basket_item, $a_bundles = [])
     {
-        if ($oBasketItem->isBundle()) {
+        if ($o_basket_item->is_bundle()) {
             return [];
         }
-
         // does this object still exists ?
-        if ($oArticle = $oBasketItem->getArticle()) {
-            $aDiscounts = Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->getBasketItemBundleDiscounts($oArticle, $this, $this->getBasketUser());
-
-            foreach ($aDiscounts as $oDiscount) {
-                $iAmnt = $oDiscount->getBundleAmount($oBasketItem->getAmount());
-                if ($iAmnt) {
+        if ($o_article = $o_basket_item->get_article()) {
+            $a_discounts = Registry::get(\Oxid_Esales\Eshop\Application\Model\Discount_List::class)->get_basket_item_bundle_discounts($o_article, $this, $this->get_basket_user());
+            foreach ($a_discounts as $o_discount) {
+                $i_amnt = $o_discount->get_bundle_amount($o_basket_item->get_amount());
+                if ($i_amnt) {
                     //init array element
-                    if (!isset($aBundles[$oDiscount->oxdiscount__oxitmartid->value])) {
-                        $aBundles[$oDiscount->oxdiscount__oxitmartid->value] = 0;
+                    if (!isset($a_bundles[$o_discount->oxdiscount__oxitmartid->value])) {
+                        $a_bundles[$o_discount->oxdiscount__oxitmartid->value] = 0;
                     }
-
-                    if ($oDiscount->oxdiscount__oxitmmultiple->value) {
-                        $aBundles[$oDiscount->oxdiscount__oxitmartid->value] += $iAmnt;
+                    if ($o_discount->oxdiscount__oxitmmultiple->value) {
+                        $a_bundles[$o_discount->oxdiscount__oxitmartid->value] += $i_amnt;
                     } else {
-                        $aBundles[$oDiscount->oxdiscount__oxitmartid->value] = $iAmnt;
+                        $a_bundles[$o_discount->oxdiscount__oxitmartid->value] = $i_amnt;
                     }
                 }
             }
         }
-
-        return $aBundles;
+        return $a_bundles;
     }
-
     /**
      * Returns array of bundled discount articles for whole basket
      *
@@ -702,167 +609,150 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    protected function getBasketBundles($aBundles = [])
+    protected function get_basket_bundles($a_bundles = [])
     {
-        $aDiscounts = Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->getBasketBundleDiscounts($this, $this->getBasketUser());
-
+        $a_discounts = Registry::get(\Oxid_Esales\Eshop\Application\Model\Discount_List::class)->get_basket_bundle_discounts($this, $this->get_basket_user());
         // calculating amount of non bundled/discount items
-        $dAmount = 0;
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            if (!($oBasketItem->isBundle() || $oBasketItem->isDiscountArticle())) {
-                $dAmount += $oBasketItem->getAmount();
+        $d_amount = 0;
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            if (!($o_basket_item->is_bundle() || $o_basket_item->is_discount_article())) {
+                $d_amount += $o_basket_item->get_amount();
             }
         }
-
-        foreach ($aDiscounts as $oDiscount) {
-            if ($oDiscount->oxdiscount__oxitmartid->value) {
-                if (!isset($aBundles[$oDiscount->oxdiscount__oxitmartid->value])) {
-                    $aBundles[$oDiscount->oxdiscount__oxitmartid->value] = 0;
+        foreach ($a_discounts as $o_discount) {
+            if ($o_discount->oxdiscount__oxitmartid->value) {
+                if (!isset($a_bundles[$o_discount->oxdiscount__oxitmartid->value])) {
+                    $a_bundles[$o_discount->oxdiscount__oxitmartid->value] = 0;
                 }
-
-                $aBundles[$oDiscount->oxdiscount__oxitmartid->value] += $oDiscount->getBundleAmount($dAmount);
+                $a_bundles[$o_discount->oxdiscount__oxitmartid->value] += $o_discount->get_bundle_amount($d_amount);
             }
         }
-
-        return $aBundles;
+        return $a_bundles;
     }
-
     /**
      * Iterates through basket contents and adds bundles to items + adds
      * global basket bundles
      */
-    protected function addBundles()
+    protected function add_bundles()
     {
         $bundles = [];
-        foreach ($this->_aBasketContents as $key => $basketItem) {
+        foreach ($this->_a_basket_contents as $key => $basket_item) {
             try {
-                if (!$basketItem->isDiscountArticle() && !$basketItem->isBundle()) {
-                    $bundles = $this->getItemBundles($basketItem, $bundles);
+                if (!$basket_item->is_discount_article() && !$basket_item->is_bundle()) {
+                    $bundles = $this->get_item_bundles($basket_item, $bundles);
                 } else {
                     continue;
                 }
-
-                $artBundles = $this->getArticleBundles($basketItem);
-                $this->addBundlesToBasket($artBundles);
-            } catch (NoArticleException $exception) {
-                $this->handleNoArticleException($basketItem, $exception);
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $exception) {
-                $this->removeItem($key);
-                Registry::getUtilsView()->addErrorToDisplay($exception);
+                $art_bundles = $this->get_article_bundles($basket_item);
+                $this->add_bundles_to_basket($art_bundles);
+            } catch (No_Article_Exception $exception) {
+                $this->handle_no_article_exception($basket_item, $exception);
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Article_Input_Exception $exception) {
+                $this->remove_item($key);
+                Registry::get_utils_view()->add_error_to_display($exception);
             }
         }
-
-        $bundles = $this->getBasketBundles($bundles);
-
+        $bundles = $this->get_basket_bundles($bundles);
         if ($bundles) {
-            $this->addBundlesToBasket($bundles);
+            $this->add_bundles_to_basket($bundles);
         }
     }
-
     /**
      * Adds bundles to basket
      *
      * @param array $aBundles added bundle articles
      */
-    protected function addBundlesToBasket($aBundles)
+    protected function add_bundles_to_basket($a_bundles)
     {
-        foreach ($aBundles as $sBundleId => $dAmount) {
-            if ($dAmount) {
+        foreach ($a_bundles as $s_bundle_id => $d_amount) {
+            if ($d_amount) {
                 try {
-                    if ($oBundleItem = $this->addToBasket($sBundleId, $dAmount, null, null, false, true)) {
-                        $oBundleItem->setAsDiscountArticle(true);
+                    if ($o_bundle_item = $this->add_to_basket($s_bundle_id, $d_amount, null, null, false, true)) {
+                        $o_bundle_item->set_as_discount_article(true);
                     }
-                } catch (\OxidEsales\Eshop\Core\Exception\ArticleException $oEx) {
+                } catch (\Oxid_Esales\Eshop\Core\Exception\Article_Exception $o_ex) {
                     // caught and ignored
-                    if ($oEx instanceof \OxidEsales\Eshop\Core\Exception\OutOfStockException && $oEx->getRemainingAmount() > 0) {
-                        $sItemId = $this->getItemKey($sBundleId, null, null, true);
-                        $this->_aBasketContents[$sItemId]->setAsDiscountArticle(true);
+                    if ($o_ex instanceof \Oxid_Esales\Eshop\Core\Exception\Out_Of_Stock_Exception && $o_ex->get_remaining_amount() > 0) {
+                        $s_item_id = $this->get_item_key($s_bundle_id, null, null, true);
+                        $this->_a_basket_contents[$s_item_id]->set_as_discount_article(true);
                     }
                 }
             }
         }
     }
-
     /**
      * Iterates through basket items and calculates its prices and discounts
      */
-    protected function calcItemsPrice()
+    protected function calc_items_price()
     {
         // resetting
-        $this->setSkipDiscounts(false);
-        $this->_iProductsCnt = 0; // count different types
-        $this->_dItemsCnt = 0; // count of item units
-        $this->_dWeight = 0; // basket weight
-
-        $this->_oProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
-        $this->_oDiscountProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
-        $this->_oNotDiscountedProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
-
-        $oDiscountList = Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class);
-
+        $this->set_skip_discounts(false);
+        $this->_i_products_cnt = 0;
+        // count different types
+        $this->_d_items_cnt = 0;
+        // count of item units
+        $this->_d_weight = 0;
+        // basket weight
+        $this->_o_products_price_list = ox_new(\Oxid_Esales\Eshop\Core\Price_List::class);
+        $this->_o_discount_products_price_list = ox_new(\Oxid_Esales\Eshop\Core\Price_List::class);
+        $this->_o_not_discounted_products_price_list = ox_new(\Oxid_Esales\Eshop\Core\Price_List::class);
+        $o_discount_list = Registry::get(\Oxid_Esales\Eshop\Application\Model\Discount_List::class);
         /** @var \oxBasketItem $oBasketItem */
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            $this->_iProductsCnt++;
-            $this->_dItemsCnt += $oBasketItem->getAmount();
-            $this->_dWeight += $oBasketItem->getWeight();
-
-            if (!$oBasketItem->isDiscountArticle() && ($oArticle = $oBasketItem->getArticle(true))) {
-                $oBasketPrice = $oArticle->getBasketPrice($oBasketItem->getAmount(), $oBasketItem->getSelList(), $this);
-                $oBasketItem->setRegularUnitPrice(clone $oBasketPrice);
-
-                if (!$oArticle->skipDiscounts() && $this->canCalcDiscounts()) {
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            $this->_i_products_cnt++;
+            $this->_d_items_cnt += $o_basket_item->get_amount();
+            $this->_d_weight += $o_basket_item->get_weight();
+            if (!$o_basket_item->is_discount_article() && $o_article = $o_basket_item->get_article(true)) {
+                $o_basket_price = $o_article->get_basket_price($o_basket_item->get_amount(), $o_basket_item->get_sel_list(), $this);
+                $o_basket_item->set_regular_unit_price(clone $o_basket_price);
+                if (!$o_article->skip_discounts() && $this->can_calc_discounts()) {
                     // apply basket type discounts for item
-                    $aDiscounts = $oDiscountList->getBasketItemDiscounts($oArticle, $this, $this->getBasketUser());
-                    reset($aDiscounts);
+                    $a_discounts = $o_discount_list->get_basket_item_discounts($o_article, $this, $this->get_basket_user());
+                    reset($a_discounts);
                     /** @var \oxDiscount $oDiscount */
-                    foreach ($aDiscounts as $oDiscount) {
-                        $oBasketPrice->setDiscount($oDiscount->getAddSum(), $oDiscount->getAddSumType());
+                    foreach ($a_discounts as $o_discount) {
+                        $o_basket_price->set_discount($o_discount->get_add_sum(), $o_discount->get_add_sum_type());
                     }
-                    $oBasketPrice->calculateDiscount();
+                    $o_basket_price->calculate_discount();
                 } else {
-                    $oBasketItem->setSkipDiscounts(true);
-                    $this->setSkipDiscounts(true);
+                    $o_basket_item->set_skip_discounts(true);
+                    $this->set_skip_discounts(true);
                 }
-
-                $oBasketItem->setPrice($oBasketPrice);
-                $this->_oProductsPriceList->addToPriceList($oBasketItem->getPrice());
-
+                $o_basket_item->set_price($o_basket_price);
+                $this->_o_products_price_list->add_to_price_list($o_basket_item->get_price());
                 //P collect discount values for basket items which are discountable
-                if (!$oArticle->skipDiscounts()) {
-                    $this->_oDiscountProductsPriceList->addToPriceList($oBasketItem->getPrice());
+                if (!$o_article->skip_discounts()) {
+                    $this->_o_discount_products_price_list->add_to_price_list($o_basket_item->get_price());
                 } else {
-                    $this->_oNotDiscountedProductsPriceList->addToPriceList($oBasketItem->getPrice());
-                    $oBasketItem->setSkipDiscounts(true);
-                    $this->setSkipDiscounts(true);
+                    $this->_o_not_discounted_products_price_list->add_to_price_list($o_basket_item->get_price());
+                    $o_basket_item->set_skip_discounts(true);
+                    $this->set_skip_discounts(true);
                 }
-            } elseif ($oBasketItem->isBundle()) {
+            } elseif ($o_basket_item->is_bundle()) {
                 // if bundles price is set to zero
-                $oPrice = oxNew(Price::class);
-                $oBasketItem->setPrice($oPrice);
+                $o_price = ox_new(Price::class);
+                $o_basket_item->set_price($o_price);
             }
         }
     }
-
     /**
      * Sets discount calculation mode
      *
      * @param bool $blCalcDiscounts calculate discounts or not
      */
-    public function setDiscountCalcMode($blCalcDiscounts)
+    public function set_discount_calc_mode($bl_calc_discounts)
     {
-        $this->_blCalcDiscounts = $blCalcDiscounts;
+        $this->_bl_calc_discounts = $bl_calc_discounts;
     }
-
     /**
      * Returns true if discount calculation is enabled
      *
      * @return bool
      */
-    public function canCalcDiscounts()
+    public function can_calc_discounts()
     {
-        return $this->_blCalcDiscounts;
+        return $this->_bl_calc_discounts;
     }
-
     /**
      * Merges two discount arrays. If there are two the same
      * discounts, discount values will be added.
@@ -872,403 +762,338 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return array $aDiscounts
      */
-    protected function mergeDiscounts($aDiscounts, $aItemDiscounts)
+    protected function merge_discounts($a_discounts, $a_item_discounts)
     {
-        foreach ($aItemDiscounts as $sKey => $oDiscount) {
+        foreach ($a_item_discounts as $s_key => $o_discount) {
             // add prices of the same discounts
-            if (array_key_exists($sKey, $aDiscounts)) {
-                $aDiscounts[$sKey]->dDiscount += $oDiscount->dDiscount;
+            if (array_key_exists($s_key, $a_discounts)) {
+                $a_discounts[$s_key]->d_discount += $o_discount->d_discount;
             } else {
-                $aDiscounts[$sKey] = $oDiscount;
+                $a_discounts[$s_key] = $o_discount;
             }
         }
-
-        return $aDiscounts;
+        return $a_discounts;
     }
-
     /**
      * Iterates through basket items and calculates its delivery costs
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    protected function calcDeliveryCost()
+    protected function calc_delivery_cost()
     {
-        if ($this->_oDeliveryPrice !== null) {
-            return $this->_oDeliveryPrice;
+        if ($this->_o_delivery_price !== null) {
+            return $this->_o_delivery_price;
         }
-        $myConfig = Registry::getConfig();
-        $oDeliveryPrice = oxNew(Price::class);
-
-        if (Registry::getConfig()->getConfigParam('blDeliveryVatOnTop')) {
-            $oDeliveryPrice->setNettoPriceMode();
+        $my_config = Registry::get_config();
+        $o_delivery_price = ox_new(Price::class);
+        if (Registry::get_config()->get_config_param('blDeliveryVatOnTop')) {
+            $o_delivery_price->set_netto_price_mode();
         } else {
-            $oDeliveryPrice->setBruttoPriceMode();
+            $o_delivery_price->set_brutto_price_mode();
         }
-
         // don't calculate if not logged in
-        $oUser = $this->getBasketUser();
-
-        if (!$oUser && !$myConfig->getConfigParam('blCalculateDelCostIfNotLoggedIn')) {
-            return $oDeliveryPrice;
+        $o_user = $this->get_basket_user();
+        if (!$o_user && !$my_config->get_config_param('blCalculateDelCostIfNotLoggedIn')) {
+            return $o_delivery_price;
         }
-
-        $fDelVATPercent = $this->getAdditionalServicesVatPercent();
-        $oDeliveryPrice->setVat($fDelVATPercent);
-
+        $f_del_vat_percent = $this->get_additional_services_vat_percent();
+        $o_delivery_price->set_vat($f_del_vat_percent);
         // list of active delivery costs
-        if ($myConfig->getConfigParam('bl_perfLoadDelivery')) {
-            $aDeliveryList = Registry::get(\OxidEsales\Eshop\Application\Model\DeliveryList::class)->getDeliveryList(
-                $this,
-                $oUser,
-                $this->findDelivCountry(),
-                $this->getShippingId()
-            );
-
-            if (count($aDeliveryList) > 0) {
-                foreach ($aDeliveryList as $oDelivery) {
-                    $oDeliveryPrice->addPrice($oDelivery->getDeliveryPrice($fDelVATPercent));
+        if ($my_config->get_config_param('bl_perfLoadDelivery')) {
+            $a_delivery_list = Registry::get(\Oxid_Esales\Eshop\Application\Model\Delivery_List::class)->get_delivery_list($this, $o_user, $this->find_deliv_country(), $this->get_shipping_id());
+            if (count($a_delivery_list) > 0) {
+                foreach ($a_delivery_list as $o_delivery) {
+                    $o_delivery_price->add_price($o_delivery->get_delivery_price($f_del_vat_percent));
                 }
             }
         }
-
-        return $oDeliveryPrice;
+        return $o_delivery_price;
     }
-
     /**
      * Basket user getter
      *
      * @return \OxidEsales\Eshop\Application\Model\User
      */
-    public function getBasketUser()
+    public function get_basket_user()
     {
-        if ($this->_oUser == null) {
-            return $this->getUser();
+        if ($this->_o_user == null) {
+            return $this->get_user();
         }
-
-        return $this->_oUser;
+        return $this->_o_user;
     }
-
     /**
      * Basket user setter
      *
      * @param \OxidEsales\Eshop\Application\Model\User $oUser Basket user
      */
-    public function setBasketUser($oUser)
+    public function set_basket_user($o_user)
     {
-        $this->_oUser = $oUser;
+        $this->_o_user = $o_user;
     }
-
     /**
      * Get most used vat percent:
      *
      * @return double
      */
-    public function getMostUsedVatPercent()
+    public function get_most_used_vat_percent()
     {
-        if ($this->_oProductsPriceList) {
-            return $this->_oProductsPriceList->getMostUsedVatPercent();
+        if ($this->_o_products_price_list) {
+            return $this->_o_products_price_list->get_most_used_vat_percent();
         }
     }
-
     /**
      * Get most used vat percent:
      *
      * @return double
      */
-    public function getAdditionalServicesVatPercent()
+    public function get_additional_services_vat_percent()
     {
-        if ($this->_oProductsPriceList) {
-            if (Registry::getConfig()->getConfigParam('sAdditionalServVATCalcMethod') == 'proportional') {
-                return $this->_oProductsPriceList->getProportionalVatPercent();
+        if ($this->_o_products_price_list) {
+            if (Registry::get_config()->get_config_param('sAdditionalServVATCalcMethod') == 'proportional') {
+                return $this->_o_products_price_list->get_proportional_vat_percent();
             } else {
-                return $this->_oProductsPriceList->getMostUsedVatPercent();
+                return $this->_o_products_price_list->get_most_used_vat_percent();
             }
         }
     }
-
     /**
      * Get most used vat percent:
      *
      * @return double
      */
-    public function isProportionalCalculationOn()
+    public function is_proportional_calculation_on()
     {
-        if (Registry::getConfig()->getConfigParam('sAdditionalServVATCalcMethod') == 'proportional') {
+        if (Registry::get_config()->get_config_param('sAdditionalServVATCalcMethod') == 'proportional') {
             return true;
         }
-
         return false;
     }
-
     //P
     /**
      * Performs final sum calculation and rounding.
      */
-    protected function calcTotalPrice()
+    protected function calc_total_price()
     {
         // 1. add products price
-        $dPrice = $this->_dBruttoSum;
-
+        $d_price = $this->_d_brutto_sum;
         /** @var \OxidEsales\Eshop\Core\Price $oTotalPrice */
-        $oTotalPrice = oxNew(Price::class);
-        $oTotalPrice->setBruttoPriceMode();
-        $oTotalPrice->setPrice($dPrice);
-
+        $o_total_price = ox_new(Price::class);
+        $o_total_price->set_brutto_price_mode();
+        $o_total_price->set_price($d_price);
         // 2. subtract discounts
-        if ($dPrice && !$this->isCalculationModeNetto()) {
+        if ($d_price && !$this->is_calculation_mode_netto()) {
             // 2.2 applying basket discounts
-            $oTotalPrice->subtract($this->_oTotalDiscount->getBruttoPrice());
-
+            $o_total_price->subtract($this->_o_total_discount->get_brutto_price());
             // 2.3 applying voucher discounts
-            if ($oVoucherDisc = $this->getVoucherDiscount()) {
-                $oTotalPrice->subtract($oVoucherDisc->getBruttoPrice());
+            if ($o_voucher_disc = $this->get_voucher_discount()) {
+                $o_total_price->subtract($o_voucher_disc->get_brutto_price());
             }
         }
-
         // 2.3 add delivery cost
-        if (isset($this->_aCosts['oxdelivery'])) {
-            $oTotalPrice->add($this->_aCosts['oxdelivery']->getBruttoPrice());
+        if (isset($this->_a_costs['oxdelivery'])) {
+            $o_total_price->add($this->_a_costs['oxdelivery']->get_brutto_price());
         }
-
         // 2.4 add wrapping price
-        if (isset($this->_aCosts['oxwrapping'])) {
-            $oTotalPrice->add($this->_aCosts['oxwrapping']->getBruttoPrice());
+        if (isset($this->_a_costs['oxwrapping'])) {
+            $o_total_price->add($this->_a_costs['oxwrapping']->get_brutto_price());
         }
-        if (isset($this->_aCosts['oxgiftcard'])) {
-            $oTotalPrice->add($this->_aCosts['oxgiftcard']->getBruttoPrice());
+        if (isset($this->_a_costs['oxgiftcard'])) {
+            $o_total_price->add($this->_a_costs['oxgiftcard']->get_brutto_price());
         }
-
         // 2.5 add payment price
-        if (isset($this->_aCosts['oxpayment'])) {
-            $oTotalPrice->add($this->_aCosts['oxpayment']->getBruttoPrice());
+        if (isset($this->_a_costs['oxpayment'])) {
+            $o_total_price->add($this->_a_costs['oxpayment']->get_brutto_price());
         }
-
-        $this->setPrice($oTotalPrice);
+        $this->set_price($o_total_price);
     }
-
     /**
      * Voucher discount setter
      *
      * @param double $dDiscount voucher discount value
      */
-    public function setVoucherDiscount($dDiscount)
+    public function set_voucher_discount($d_discount)
     {
-        $this->_oVoucherDiscount = oxNew(Price::class);
-        $this->_oVoucherDiscount->setBruttoPriceMode();
-        $this->_oVoucherDiscount->add($dDiscount);
+        $this->_o_voucher_discount = ox_new(Price::class);
+        $this->_o_voucher_discount->set_brutto_price_mode();
+        $this->_o_voucher_discount->add($d_discount);
     }
-
     /**
      * Calculates voucher discount
      */
-    protected function calcVoucherDiscount()
+    protected function calc_voucher_discount()
     {
-        if (Registry::getConfig()->getConfigParam('bl_showVouchers') && ($this->_oVoucherDiscount === null || ($this->_blUpdateNeeded && !$this->isAdmin()))) {
-            $this->_oVoucherDiscount = $this->getPriceObject();
-
+        if (Registry::get_config()->get_config_param('bl_showVouchers') && ($this->_o_voucher_discount === null || $this->_bl_update_needed && !$this->is_admin())) {
+            $this->_o_voucher_discount = $this->get_price_object();
             // calculating price to apply discount
-            $dPrice = $this->_oDiscountProductsPriceList->getSum($this->isCalculationModeNetto()) - $this->_oTotalDiscount->getPrice();
-
+            $d_price = $this->_o_discount_products_price_list->get_sum($this->is_calculation_mode_netto()) - $this->_o_total_discount->get_price();
             // recalculating
-            if (count($this->_aVouchers)) {
-                $oLang = Registry::getLang();
-                foreach ($this->_aVouchers as $sVoucherId => $oStdVoucher) {
-                    $oVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
-                    try { // checking
-                        $oVoucher->load($oStdVoucher->sVoucherId);
-
-                        if (!$this->_blSkipVouchersAvailabilityChecking) {
-                            $oVoucher->checkBasketVoucherAvailability($this->_aVouchers, $dPrice);
-                            $oVoucher->checkUserAvailability($this->getBasketUser());
-                            $oVoucher->markAsReserved();
+            if (count($this->_a_vouchers)) {
+                $o_lang = Registry::get_lang();
+                foreach ($this->_a_vouchers as $s_voucher_id => $o_std_voucher) {
+                    $o_voucher = ox_new(\Oxid_Esales\Eshop\Application\Model\Voucher::class);
+                    try {
+                        // checking
+                        $o_voucher->load($o_std_voucher->s_voucher_id);
+                        if (!$this->_bl_skip_vouchers_availability_checking) {
+                            $o_voucher->check_basket_voucher_availability($this->_a_vouchers, $d_price);
+                            $o_voucher->check_user_availability($this->get_basket_user());
+                            $o_voucher->mark_as_reserved();
                         }
-
                         // assigning real voucher discount value as this is the only place where real value is calculated
-                        $dVoucherdiscount = $oVoucher->getDiscountValue($dPrice);
-
-                        if ($dVoucherdiscount > 0) {
-                            $dVatPart = ($dPrice - $dVoucherdiscount) / $dPrice * 100;
-
-                            if (!$this->_aDiscountedVats) {
-                                if ($oPriceList = $this->getDiscountProductsPrice()) {
-                                    $this->_aDiscountedVats = $oPriceList->getVatInfo($this->isCalculationModeNetto());
+                        $d_voucherdiscount = $o_voucher->get_discount_value($d_price);
+                        if ($d_voucherdiscount > 0) {
+                            $d_vat_part = ($d_price - $d_voucherdiscount) / $d_price * 100;
+                            if (!$this->_a_discounted_vats) {
+                                if ($o_price_list = $this->get_discount_products_price()) {
+                                    $this->_a_discounted_vats = $o_price_list->get_vat_info($this->is_calculation_mode_netto());
                                 }
                             }
-
                             // apply discount to vat
-                            foreach ($this->_aDiscountedVats as $sKey => $dVat) {
-                                $this->_aDiscountedVats[$sKey] = Price::percent($dVat, $dVatPart);
+                            foreach ($this->_a_discounted_vats as $s_key => $d_vat) {
+                                $this->_a_discounted_vats[$s_key] = Price::percent($d_vat, $d_vat_part);
                             }
                         }
-
                         // accumulating discount value
-                        $this->_oVoucherDiscount->add($dVoucherdiscount);
-
+                        $this->_o_voucher_discount->add($d_voucherdiscount);
                         // collecting formatted for preview
-                        $oStdVoucher->fVoucherdiscount = $oLang->formatCurrency($dVoucherdiscount, $this->getBasketCurrency());
-                        $oStdVoucher->dVoucherdiscount = $dVoucherdiscount;
-
+                        $o_std_voucher->f_voucherdiscount = $o_lang->format_currency($d_voucherdiscount, $this->get_basket_currency());
+                        $o_std_voucher->d_voucherdiscount = $d_voucherdiscount;
                         // subtracting voucher discount
-                        $dPrice = $dPrice - $dVoucherdiscount;
-                    } catch (\OxidEsales\Eshop\Core\Exception\VoucherException $oEx) {
+                        $d_price = $d_price - $d_voucherdiscount;
+                    } catch (\Oxid_Esales\Eshop\Core\Exception\Voucher_Exception $o_ex) {
                         // removing voucher on error
-                        $oVoucher->unMarkAsReserved();
-                        unset($this->_aVouchers[$sVoucherId]);
-
+                        $o_voucher->un_mark_as_reserved();
+                        unset($this->_a_vouchers[$s_voucher_id]);
                         // storing voucher error info
-                        Registry::getUtilsView()->addErrorToDisplay($oEx, false, true);
+                        Registry::get_utils_view()->add_error_to_display($o_ex, false, true);
                     }
                 }
             }
         }
     }
-
     /**
      * Performs netto price and VATs calculations including discounts and vouchers.
      */
-    protected function applyDiscounts()
+    protected function apply_discounts()
     {
         //apply discounts for brutto price
-        $dDiscountedSum = $this->getDiscountedProductsSum();
-
-        $oUtils = Registry::getUtils();
-        $dVatSum = 0;
-        foreach ($this->_aDiscountedVats as $dVat) {
-            $dVatSum += $oUtils->fRound($dVat, $this->_oCurrency);
+        $d_discounted_sum = $this->get_discounted_products_sum();
+        $o_utils = Registry::get_utils();
+        $d_vat_sum = 0;
+        foreach ($this->_a_discounted_vats as $d_vat) {
+            $d_vat_sum += $o_utils->f_round($d_vat, $this->_o_currency);
         }
-
-        $oNotDiscounted = $this->getNotDiscountProductsPrice();
-
-        if ($this->isCalculationModeNetto()) {
+        $o_not_discounted = $this->get_not_discount_products_price();
+        if ($this->is_calculation_mode_netto()) {
             // netto view mode
-            $this->setNettoSum($this->getProductsPrice()->getSum());
-            $this->setBruttoSum($oNotDiscounted->getSum(false) + $dDiscountedSum + $dVatSum);
+            $this->set_netto_sum($this->get_products_price()->get_sum());
+            $this->set_brutto_sum($o_not_discounted->get_sum(false) + $d_discounted_sum + $d_vat_sum);
         } else {
             // brutto view mode
-            $this->setNettoSum($oNotDiscounted->getSum() + $dDiscountedSum - $dVatSum);
-            $this->setBruttoSum($this->getProductsPrice()->getSum(false));
+            $this->set_netto_sum($o_not_discounted->get_sum() + $d_discounted_sum - $d_vat_sum);
+            $this->set_brutto_sum($this->get_products_price()->get_sum(false));
         }
     }
-
     /**
      * Returns true if view mode is netto
      *
      * @return bool
      */
-    public function isPriceViewModeNetto()
+    public function is_price_view_mode_netto()
     {
-        $blResult = (bool) Registry::getConfig()->getConfigParam('blShowNetPrice');
-        $oUser = $this->getBasketUser();
-        if ($oUser) {
-            $blResult = $oUser->isPriceViewModeNetto();
+        $bl_result = (bool) Registry::get_config()->get_config_param('blShowNetPrice');
+        $o_user = $this->get_basket_user();
+        if ($o_user) {
+            $bl_result = $o_user->is_price_view_mode_netto();
         }
-
-        return $blResult;
+        return $bl_result;
     }
-
     /**
      * Returns prepared price object depending on view mode
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    protected function getPriceObject()
+    protected function get_price_object()
     {
-        $oPrice = oxNew(Price::class);
-
-        if ($this->isCalculationModeNetto()) {
-            $oPrice->setNettoPriceMode();
+        $o_price = ox_new(Price::class);
+        if ($this->is_calculation_mode_netto()) {
+            $o_price->set_netto_price_mode();
         } else {
-            $oPrice->setBruttoPriceMode();
+            $o_price->set_brutto_price_mode();
         }
-
-        return $oPrice;
+        return $o_price;
     }
-
     /**
      * Loads basket discounts and calculates discount values.
      */
-    protected function calcBasketDiscount()
+    protected function calc_basket_discount()
     {
         // resetting
-        $this->_aDiscounts = [];
-
+        $this->_a_discounts = [];
         // P using prices sum which has discount, not sum of skipped discounts
-        $dOldPrice = $this->_oDiscountProductsPriceList->getSum($this->isCalculationModeNetto());
-
+        $d_old_price = $this->_o_discount_products_price_list->get_sum($this->is_calculation_mode_netto());
         // add basket discounts
-        if ($this->_oTotalDiscount !== null && isset($this->_isForOrderRecalculation) && $this->_isForOrderRecalculation) {
+        if ($this->_o_total_discount !== null && isset($this->_is_for_order_recalculation) && $this->_is_for_order_recalculation) {
             //if total discount was set on order recalculation
-            $oTotalPrice = $this->getTotalDiscount();
-            $oDiscount = oxNew(\OxidEsales\Eshop\Application\Model\Discount::class);
-            $oDiscount->oxdiscount__oxaddsum = new \OxidEsales\Eshop\Core\Field($oTotalPrice->getPrice());
-            $oDiscount->oxdiscount__oxaddsumtype = new \OxidEsales\Eshop\Core\Field('abs');
-            $aDiscounts[] = $oDiscount;
+            $o_total_price = $this->get_total_discount();
+            $o_discount = ox_new(\Oxid_Esales\Eshop\Application\Model\Discount::class);
+            $o_discount->oxdiscount__oxaddsum = new \Oxid_Esales\Eshop\Core\Field($o_total_price->get_price());
+            $o_discount->oxdiscount__oxaddsumtype = new \Oxid_Esales\Eshop\Core\Field('abs');
+            $a_discounts[] = $o_discount;
         } else {
             // discounts for basket
-            $aDiscounts = Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->getBasketDiscounts($this, $this->getBasketUser());
+            $a_discounts = Registry::get(\Oxid_Esales\Eshop\Application\Model\Discount_List::class)->get_basket_discounts($this, $this->get_basket_user());
         }
-
-        if ($oPriceList = $this->getDiscountProductsPrice()) {
-            $this->_aDiscountedVats = $oPriceList->getVatInfo($this->isCalculationModeNetto());
+        if ($o_price_list = $this->get_discount_products_price()) {
+            $this->_a_discounted_vats = $o_price_list->get_vat_info($this->is_calculation_mode_netto());
         }
-
         /** @var \oxDiscount $oDiscount */
-        foreach ($aDiscounts as $oDiscount) {
+        foreach ($a_discounts as $o_discount) {
             // storing applied discounts
-            $oStdDiscount = $oDiscount->getSimpleDiscount();
-
+            $o_std_discount = $o_discount->get_simple_discount();
             // skipping bundle discounts
-            if ($oDiscount->oxdiscount__oxaddsumtype->value == 'itm') {
+            if ($o_discount->oxdiscount__oxaddsumtype->value == 'itm') {
                 continue;
             }
-
             // saving discount info
-            $oStdDiscount->dDiscount = $oDiscount->getAbsValue($dOldPrice);
-
-            $dVatPart = 100 - $oDiscount->getPercentage($dOldPrice);
-
+            $o_std_discount->d_discount = $o_discount->get_abs_value($d_old_price);
+            $d_vat_part = 100 - $o_discount->get_percentage($d_old_price);
             // if discount is more than basket sum
-            if ($dOldPrice < $oStdDiscount->dDiscount) {
-                $oStdDiscount->dDiscount = $dOldPrice;
-                $dVatPart = 0;
+            if ($d_old_price < $o_std_discount->d_discount) {
+                $o_std_discount->d_discount = $d_old_price;
+                $d_vat_part = 0;
             }
-
             // apply discount to vat
-            foreach ($this->_aDiscountedVats as $sKey => $dVat) {
-                $this->_aDiscountedVats[$sKey] = Price::percent($dVat, $dVatPart);
+            foreach ($this->_a_discounted_vats as $s_key => $d_vat) {
+                $this->_a_discounted_vats[$s_key] = Price::percent($d_vat, $d_vat_part);
             }
-
             //storing discount
-            if ($oStdDiscount->dDiscount != 0) {
-                $this->_aDiscounts[$oDiscount->getId()] = $oStdDiscount;
+            if ($o_std_discount->d_discount != 0) {
+                $this->_a_discounts[$o_discount->get_id()] = $o_std_discount;
                 // subtracting product price after discount
-                $dOldPrice = $dOldPrice - $oStdDiscount->dDiscount;
+                $d_old_price = $d_old_price - $o_std_discount->d_discount;
             }
         }
     }
-
     /**
      * Calculates total basket discount value.
      */
-    protected function calcBasketTotalDiscount()
+    protected function calc_basket_total_discount()
     {
-        if ($this->_oTotalDiscount === null || (!$this->isAdmin())) {
-            $this->_oTotalDiscount = $this->getPriceObject();
-
-            if (is_array($this->_aDiscounts)) {
-                foreach ($this->_aDiscounts as $oDiscount) {
+        if ($this->_o_total_discount === null || !$this->is_admin()) {
+            $this->_o_total_discount = $this->get_price_object();
+            if (is_array($this->_a_discounts)) {
+                foreach ($this->_a_discounts as $o_discount) {
                     // skipping bundle discounts
-                    if ($oDiscount->sType == 'itm') {
+                    if ($o_discount->s_type == 'itm') {
                         continue;
                     }
-
                     // add discount value to total basket discount
-                    $this->_oTotalDiscount->add($oDiscount->dDiscount);
+                    $this->_o_total_discount->add($o_discount->d_discount);
                 }
             }
         }
     }
-
     /**
      * Adds Gift price info to $this->oBasket (additional field for
      * basket item "oWrap""). Loads each basket item, checks for
@@ -1277,23 +1102,19 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    protected function calcBasketWrapping()
+    protected function calc_basket_wrapping()
     {
-        $oWrappingPrices = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
-
+        $o_wrapping_prices = ox_new(\Oxid_Esales\Eshop\Core\Price_List::class);
         /** @var \oxBasketItem $oBasketItem */
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            if (($oWrapping = $oBasketItem->getWrapping())) {
-                $oWrappingPrice = $oWrapping->getWrappingPrice($oBasketItem->getAmount());
-                $oWrappingPrice->setVat($oBasketItem->getPrice()->getVat());
-
-                $oWrappingPrices->addToPriceList($oWrappingPrice);
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            if ($o_wrapping = $o_basket_item->get_wrapping()) {
+                $o_wrapping_price = $o_wrapping->get_wrapping_price($o_basket_item->get_amount());
+                $o_wrapping_price->set_vat($o_basket_item->get_price()->get_vat());
+                $o_wrapping_prices->add_to_price_list($o_wrapping_price);
             }
         }
-
-        return $oWrappingPrices->calculateToPrice();
+        return $o_wrapping_prices->calculate_to_price();
     }
-
     /**
      * Adds Gift price info to $this->oBasket (additional field for
      * basket item "oWrap""). Loads each basket item, checks for
@@ -1302,64 +1123,53 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    protected function calcBasketGiftCard()
+    protected function calc_basket_gift_card()
     {
-        $oGiftCardPrice = oxNew(Price::class);
-
-        if (Registry::getConfig()->getConfigParam('blWrappingVatOnTop')) {
-            $oGiftCardPrice->setNettoPriceMode();
+        $o_gift_card_price = ox_new(Price::class);
+        if (Registry::get_config()->get_config_param('blWrappingVatOnTop')) {
+            $o_gift_card_price->set_netto_price_mode();
         } else {
-            $oGiftCardPrice->setBruttoPriceMode();
+            $o_gift_card_price->set_brutto_price_mode();
         }
-
-        $dVATPercent = $this->getAdditionalServicesVatPercent();
-
-        $oGiftCardPrice->setVat($dVATPercent);
-
+        $d_vat_percent = $this->get_additional_services_vat_percent();
+        $o_gift_card_price->set_vat($d_vat_percent);
         // gift card price calculation
-        if (($oCard = $this->getCard())) {
-            if ($dVATPercent !== null) {
-                $oCard->setWrappingVat($dVATPercent);
+        if ($o_card = $this->get_card()) {
+            if ($d_vat_percent !== null) {
+                $o_card->set_wrapping_vat($d_vat_percent);
             }
-            $oGiftCardPrice->addPrice($oCard->getWrappingPrice());
+            $o_gift_card_price->add_price($o_card->get_wrapping_price());
         }
-
-        return $oGiftCardPrice;
+        return $o_gift_card_price;
     }
-
     /**
      * Payment cost calculation, applying payment discount if available.
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    protected function calcPaymentCost()
+    protected function calc_payment_cost()
     {
         // resetting values
-        $oPaymentPrice = oxNew(Price::class);
-
+        $o_payment_price = ox_new(Price::class);
         // payment
-        if (($this->_sPaymentId = $this->getPaymentId())) {
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
-            $oPayment->load($this->_sPaymentId);
-
-            $oPayment->calculate($this);
-            $oPaymentPrice = $oPayment->getPrice();
+        if ($this->_s_payment_id = $this->get_payment_id()) {
+            $o_payment = ox_new(\Oxid_Esales\Eshop\Application\Model\Payment::class);
+            $o_payment->load($this->_s_payment_id);
+            $o_payment->calculate($this);
+            $o_payment_price = $o_payment->get_price();
         }
-
-        return $oPaymentPrice;
+        return $o_payment_price;
     }
-
     /**
      * Sets basket additional costs
      *
      * @param string $sCostName additional costs
      * @param object $oPrice    \OxidEsales\Eshop\Core\Price
      */
-    public function setCost($sCostName, $oPrice = null)
+    public function set_cost($s_cost_name, $o_price = null)
     {
-        $this->_aCosts[$sCostName] = $oPrice;
+        $this->_a_costs[$s_cost_name] = $o_price;
     }
-
     /**
      * Executes all needed functions to calculate basket price and other needed
      * info
@@ -1368,97 +1178,75 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return null
      */
-    public function calculateBasket($blForceUpdate = false)
+    public function calculate_basket($bl_force_update = false)
     {
         /*
-        //would be good to perform the reset of previous calculation
-        //at least you can use it for the debug
-        $this->_aDiscounts = array();
-        $this->_aItemDiscounts = array();
-        $this->_oTotalDiscount = null;
-        $this->_dDiscountedProductNettoPrice = 0;
-        $this->_aDiscountedVats = array();
-        $this->_oPrice = null;
-        $this->_oNotDiscountedProductsPriceList = null;
-        $this->_oProductsPriceList = null;
-        $this->_oDiscountProductsPriceList = null;*/
-
-        if (!$this->isEnabled()) {
+                //would be good to perform the reset of previous calculation
+                //at least you can use it for the debug
+                $this->_aDiscounts = array();
+                $this->_aItemDiscounts = array();
+                $this->_oTotalDiscount = null;
+                $this->_dDiscountedProductNettoPrice = 0;
+                $this->_aDiscountedVats = array();
+                $this->_oPrice = null;
+                $this->_oNotDiscountedProductsPriceList = null;
+                $this->_oProductsPriceList = null;
+                $this->_oDiscountProductsPriceList = null;*/
+        if (!$this->is_enabled()) {
             return;
         }
-
-        if ($blForceUpdate) {
-            $this->onUpdate();
+        if ($bl_force_update) {
+            $this->on_update();
         }
-
-        if (!($this->_blUpdateNeeded || $blForceUpdate)) {
+        if (!($this->_bl_update_needed || $bl_force_update)) {
             return;
         }
-
-        $this->_aCosts = [];
-
+        $this->_a_costs = [];
         //  1. saving basket to the database
         $this->save();
-
         //  2. remove all bundles
-        $this->clearBundles();
-
+        $this->clear_bundles();
         //  3. generate bundle items
-        $this->addBundles();
-
+        $this->add_bundles();
         //  4. calculating item prices
-        $this->calcItemsPrice();
-
+        $this->calc_items_price();
         //  5. calculating/applying discounts
-        $this->calcBasketDiscount();
-
+        $this->calc_basket_discount();
         //  6. calculating basket total discount
-        $this->calcBasketTotalDiscount();
-
+        $this->calc_basket_total_discount();
         //  7. check for vouchers
-        $this->calcVoucherDiscount();
-
+        $this->calc_voucher_discount();
         //  8. applies all discounts to pricelist
-        $this->applyDiscounts();
-
+        $this->apply_discounts();
         //  9. calculating additional costs:
         //  9.1: delivery
-        $this->setCost('oxdelivery', $this->calcDeliveryCost());
-
+        $this->set_cost('oxdelivery', $this->calc_delivery_cost());
         //  9.2: adding wrapping and gift card costs
-        $this->setCost('oxwrapping', $this->calcBasketWrapping());
-
-        $this->setCost('oxgiftcard', $this->calcBasketGiftCard());
-
+        $this->set_cost('oxwrapping', $this->calc_basket_wrapping());
+        $this->set_cost('oxgiftcard', $this->calc_basket_gift_card());
         //  9.3: adding payment cost
-        $this->setCost('oxpayment', $this->calcPaymentCost());
-
+        $this->set_cost('oxpayment', $this->calc_payment_cost());
         //  10. calculate total price
-        $this->calcTotalPrice();
-
+        $this->calc_total_price();
         //  11. formatting discounts
-        $this->formatDiscount();
-
+        $this->format_discount();
         //  12.setting to up-to-date status
-        $this->afterUpdate();
+        $this->after_update();
     }
-
     /**
      * Notifies basket that recalculation is needed
      */
-    public function onUpdate()
+    public function on_update()
     {
-        $this->_blUpdateNeeded = true;
+        $this->_bl_update_needed = true;
     }
-
     /**
      * Marks basket as up-to-date
      */
-    public function afterUpdate()
+    public function after_update()
     {
-        $this->_blUpdateNeeded = false;
+        $this->_bl_update_needed = false;
     }
-
     /**
      * Function collects summary information about basket. Usually this info
      * is used while calculating discounts or so. Data is stored in static
@@ -1466,75 +1254,66 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return object
      */
-    public function getBasketSummary()
+    public function get_basket_summary()
     {
-        if ($this->_blUpdateNeeded || $this->_aBasketSummary === null) {
-            $this->_aBasketSummary = new stdclass();
-            $this->_aBasketSummary->aArticles = [];
-            $this->_aBasketSummary->aCategories = [];
-            $this->_aBasketSummary->iArticleCount = 0;
-            $this->_aBasketSummary->dArticlePrice = 0;
-            $this->_aBasketSummary->dArticleDiscountablePrice = 0;
+        if ($this->_bl_update_needed || $this->_a_basket_summary === null) {
+            $this->_a_basket_summary = new stdclass();
+            $this->_a_basket_summary->a_articles = [];
+            $this->_a_basket_summary->a_categories = [];
+            $this->_a_basket_summary->i_article_count = 0;
+            $this->_a_basket_summary->d_article_price = 0;
+            $this->_a_basket_summary->d_article_discountable_price = 0;
         }
-
-        if (!$this->isEnabled()) {
-            return $this->_aBasketSummary;
+        if (!$this->is_enabled()) {
+            return $this->_a_basket_summary;
         }
-
-        $myConfig = Registry::getConfig();
+        $my_config = Registry::get_config();
         /** @var \OxidEsales\EshopCommunity\Application\Model\BasketItem $oBasketItem */
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            if (!$oBasketItem->isBundle() && $oArticle = $oBasketItem->getArticle(false)) {
-                $aCatIds = $oArticle->getCategoryIds();
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            if (!$o_basket_item->is_bundle() && $o_article = $o_basket_item->get_article(false)) {
+                $a_cat_ids = $o_article->get_category_ids();
                 //#M530 if price is not loaded for articles
-                $dPrice = 0;
-                $dDiscountablePrice = 0;
-                if (($oPrice = $oArticle->getBasketPrice($oBasketItem->getAmount(), $oBasketItem->getSelList(), $this))) {
-                    $dPrice = $oPrice->getPrice();
-                    if (!$oArticle->skipDiscounts()) {
-                        $dDiscountablePrice = $dPrice;
+                $d_price = 0;
+                $d_discountable_price = 0;
+                if ($o_price = $o_article->get_basket_price($o_basket_item->get_amount(), $o_basket_item->get_sel_list(), $this)) {
+                    $d_price = $o_price->get_price();
+                    if (!$o_article->skip_discounts()) {
+                        $d_discountable_price = $d_price;
                     }
                 }
-
-                foreach ($aCatIds as $sCatId) {
-                    if (!isset($this->_aBasketSummary->aCategories[$sCatId])) {
-                        $priceObject = new stdClass();
-                        $priceObject->dPrice = 0;
-                        $priceObject->dDiscountablePrice = 0;
-                        $priceObject->dAmount = 0;
-                        $priceObject->iCount = 0;
-                        $this->_aBasketSummary->aCategories[$sCatId] = $priceObject;
+                foreach ($a_cat_ids as $s_cat_id) {
+                    if (!isset($this->_a_basket_summary->a_categories[$s_cat_id])) {
+                        $price_object = new stdClass();
+                        $price_object->d_price = 0;
+                        $price_object->d_discountable_price = 0;
+                        $price_object->d_amount = 0;
+                        $price_object->i_count = 0;
+                        $this->_a_basket_summary->a_categories[$s_cat_id] = $price_object;
                     }
-
-                    $categorySummaryPrice = $this->_aBasketSummary->aCategories[$sCatId];
-                    $categorySummaryPrice->dPrice += $dPrice * $oBasketItem->getAmount();
-                    $categorySummaryPrice->dDiscountablePrice += $dDiscountablePrice * $oBasketItem->getAmount();
-                    $categorySummaryPrice->dAmount += $oBasketItem->getAmount();
-                    $categorySummaryPrice->iCount++;
+                    $category_summary_price = $this->_a_basket_summary->a_categories[$s_cat_id];
+                    $category_summary_price->d_price += $d_price * $o_basket_item->get_amount();
+                    $category_summary_price->d_discountable_price += $d_discountable_price * $o_basket_item->get_amount();
+                    $category_summary_price->d_amount += $o_basket_item->get_amount();
+                    $category_summary_price->i_count++;
                 }
-
                 // variant handling
-                if (($sParentId = $oArticle->getParentId()) && $myConfig->getConfigParam('blVariantParentBuyable')) {
-                    if (!isset($this->_aBasketSummary->aArticles[$sParentId])) {
-                        $this->_aBasketSummary->aArticles[$sParentId] = 0;
+                if (($s_parent_id = $o_article->get_parent_id()) && $my_config->get_config_param('blVariantParentBuyable')) {
+                    if (!isset($this->_a_basket_summary->a_articles[$s_parent_id])) {
+                        $this->_a_basket_summary->a_articles[$s_parent_id] = 0;
                     }
-                    $this->_aBasketSummary->aArticles[$sParentId] += $oBasketItem->getAmount();
+                    $this->_a_basket_summary->a_articles[$s_parent_id] += $o_basket_item->get_amount();
                 }
-
-                if (!isset($this->_aBasketSummary->aArticles[$oBasketItem->getProductId()])) {
-                    $this->_aBasketSummary->aArticles[$oBasketItem->getProductId()] = 0;
+                if (!isset($this->_a_basket_summary->a_articles[$o_basket_item->get_product_id()])) {
+                    $this->_a_basket_summary->a_articles[$o_basket_item->get_product_id()] = 0;
                 }
-
-                $this->_aBasketSummary->aArticles[$oBasketItem->getProductId()] += $oBasketItem->getAmount();
-                $this->_aBasketSummary->iArticleCount += $oBasketItem->getAmount();
-                $this->_aBasketSummary->dArticlePrice += $dPrice * $oBasketItem->getAmount();
-                $this->_aBasketSummary->dArticleDiscountablePrice += $dDiscountablePrice * $oBasketItem->getAmount();
+                $this->_a_basket_summary->a_articles[$o_basket_item->get_product_id()] += $o_basket_item->get_amount();
+                $this->_a_basket_summary->i_article_count += $o_basket_item->get_amount();
+                $this->_a_basket_summary->d_article_price += $d_price * $o_basket_item->get_amount();
+                $this->_a_basket_summary->d_article_discountable_price += $d_discountable_price * $o_basket_item->get_amount();
             }
         }
-
-        return $this->_aBasketSummary;
+        return $this->_a_basket_summary;
     }
-
     /**
      * Checks and sets voucher information. Checks it's availability according
      * to few conditions: oxvoucher::checkVoucherAvailability(),
@@ -1544,97 +1323,83 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * @param string $sVoucherId voucher ID
      * @throws \OxidEsales\Eshop\Core\Exception\VoucherException
      */
-    public function addVoucher($sVoucherId)
+    public function add_voucher($s_voucher_id)
     {
         // calculating price to check
         // P using prices sum which has discount, not sum of skipped discounts
-        $dPrice = 0;
-        if ($this->_oDiscountProductsPriceList) {
-            $dPrice = $this->_oDiscountProductsPriceList->getSum($this->isCalculationModeNetto());
+        $d_price = 0;
+        if ($this->_o_discount_products_price_list) {
+            $d_price = $this->_o_discount_products_price_list->get_sum($this->is_calculation_mode_netto());
         }
-
         // trying to load voucher and apply it
-        $oVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
-
-        if (!$this->_blSkipVouchersAvailabilityChecking) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
-
-            $oDb->startTransaction();
-
+        $o_voucher = ox_new(\Oxid_Esales\Eshop\Application\Model\Voucher::class);
+        if (!$this->_bl_skip_vouchers_availability_checking) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_master();
+            $o_db->start_transaction();
             try {
-                $oVoucher->getVoucherByNr($sVoucherId, $this->_aVouchers, true);
-                $oVoucher->checkVoucherAvailability($this->_aVouchers, $dPrice);
-                $oVoucher->checkUserAvailability($this->getBasketUser());
-                $oVoucher->markAsReserved();
+                $o_voucher->get_voucher_by_nr($s_voucher_id, $this->_a_vouchers, true);
+                $o_voucher->check_voucher_availability($this->_a_vouchers, $d_price);
+                $o_voucher->check_user_availability($this->get_basket_user());
+                $o_voucher->mark_as_reserved();
             } catch (\Exception $exception) {
-                $oDb->rollbackTransaction();
-
-                if ($exception instanceof \OxidEsales\Eshop\Core\Exception\VoucherException) {
+                $o_db->rollback_transaction();
+                if ($exception instanceof \Oxid_Esales\Eshop\Core\Exception\Voucher_Exception) {
                     throw $exception;
                 } else {
-                    $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
-                    $oEx->setMessage('Something went wrong, please try again');
-                    $oEx->setVoucherNr($oVoucher->oxvouchers__oxvouchernr->value);
-                    throw $oEx;
+                    $o_ex = ox_new(\Oxid_Esales\Eshop\Core\Exception\Voucher_Exception::class);
+                    $o_ex->set_message('Something went wrong, please try again');
+                    $o_ex->set_voucher_nr($o_voucher->oxvouchers__oxvouchernr->value);
+                    throw $o_ex;
                 }
             }
-
-            $oDb->commitTransaction();
+            $o_db->commit_transaction();
         } else {
-            $oVoucher->load($sVoucherId);
+            $o_voucher->load($s_voucher_id);
         }
-
         // saving voucher info
-        $this->_aVouchers[$oVoucher->oxvouchers__oxid->value] = $oVoucher->getSimpleVoucher();
-
-        $this->onUpdate();
+        $this->_a_vouchers[$o_voucher->oxvouchers__oxid->value] = $o_voucher->get_simple_voucher();
+        $this->on_update();
     }
-
     /**
      * Removes voucher from basket and unreserved it.
      *
      * @param string $sVoucherId removable voucher ID
      */
-    public function removeVoucher($sVoucherId)
+    public function remove_voucher($s_voucher_id)
     {
         // removing if it exists
-        if (isset($this->_aVouchers[$sVoucherId])) {
-            $oVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
-            $oVoucher->load($sVoucherId);
-
-            $oVoucher->unMarkAsReserved();
-
+        if (isset($this->_a_vouchers[$s_voucher_id])) {
+            $o_voucher = ox_new(\Oxid_Esales\Eshop\Application\Model\Voucher::class);
+            $o_voucher->load($s_voucher_id);
+            $o_voucher->un_mark_as_reserved();
             // unset it if exists this voucher in DB or not
-            unset($this->_aVouchers[$sVoucherId]);
-            $this->onUpdate();
+            unset($this->_a_vouchers[$s_voucher_id]);
+            $this->on_update();
         }
     }
-
     /**
      * Resets user related information kept in basket object
      */
-    public function resetUserInfo()
+    public function reset_user_info()
     {
-        $this->setPayment(null);
-        $this->setShipping(null);
+        $this->set_payment(null);
+        $this->set_shipping(null);
     }
-
     /**
      * Formatting discounts
      */
-    protected function formatDiscount()
+    protected function format_discount()
     {
         // discount information
         // formatting discount value
-        $this->aDiscounts = $this->getDiscounts();
-        if (is_array($this->aDiscounts) && count($this->aDiscounts) > 0) {
-            $oLang = Registry::getLang();
-            foreach ($this->aDiscounts as $oDiscount) {
-                $oDiscount->fDiscount = $oLang->formatCurrency($oDiscount->dDiscount, $this->getBasketCurrency());
+        $this->a_discounts = $this->get_discounts();
+        if (is_array($this->a_discounts) && count($this->a_discounts) > 0) {
+            $o_lang = Registry::get_lang();
+            foreach ($this->a_discounts as $o_discount) {
+                $o_discount->f_discount = $o_lang->format_currency($o_discount->d_discount, $this->get_basket_currency());
             }
         }
     }
-
     /**
      * Populates current basket from the saved one.
      *
@@ -1642,309 +1407,272 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function load()
     {
-        $oUser = $this->getBasketUser();
-        if (!$oUser) {
+        $o_user = $this->get_basket_user();
+        if (!$o_user) {
             return;
         }
-
-        $oBasket = $oUser->getBasket('savedbasket');
-
+        $o_basket = $o_user->get_basket('savedbasket');
         // restoring from saved history
-        $aSavedItems = $oBasket->getItems();
-        foreach ($aSavedItems as $oItem) {
+        $a_saved_items = $o_basket->get_items();
+        foreach ($a_saved_items as $o_item) {
             try {
-                $oSelList = $oItem->getSelList();
-
-                $this->addToBasket($oItem->oxuserbasketitems__oxartid->value, $oItem->oxuserbasketitems__oxamount->value, $oSelList, $oItem->getPersParams(), true);
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleException $oEx) {
+                $o_sel_list = $o_item->get_sel_list();
+                $this->add_to_basket($o_item->oxuserbasketitems__oxartid->value, $o_item->oxuserbasketitems__oxamount->value, $o_sel_list, $o_item->get_pers_params(), true);
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Article_Exception $o_ex) {
                 // caught and ignored
             }
         }
     }
-
     /**
      * Saves existing basket to database
      */
     protected function save()
     {
-        if ($this->isSaveToDataBaseEnabled()) {
-            if ($oUser = $this->getBasketUser()) {
+        if ($this->is_save_to_data_base_enabled()) {
+            if ($o_user = $this->get_basket_user()) {
                 //first delete all contents
                 //#2039
-                $oSavedBasket = $oUser->getBasket('savedbasket');
-                $oSavedBasket->delete();
-
+                $o_saved_basket = $o_user->get_basket('savedbasket');
+                $o_saved_basket->delete();
                 //then save
                 /** @var \oxBasketItem $oBasketItem */
-                foreach ($this->_aBasketContents as $oBasketItem) {
+                foreach ($this->_a_basket_contents as $o_basket_item) {
                     // discount or bundled products will be added automatically if available
-                    if (!$oBasketItem->isBundle() && !$oBasketItem->isDiscountArticle()) {
-                        $oSavedBasket->addItemToBasket($oBasketItem->getProductId(), $oBasketItem->getAmount(), $oBasketItem->getSelList(), true, $oBasketItem->getPersParams());
+                    if (!$o_basket_item->is_bundle() && !$o_basket_item->is_discount_article()) {
+                        $o_saved_basket->add_item_to_basket($o_basket_item->get_product_id(), $o_basket_item->get_amount(), $o_basket_item->get_sel_list(), true, $o_basket_item->get_pers_params());
                     }
                 }
             }
         }
     }
-
     /**
      * Cleans up saved basket data. This method usually is initiated by
      * \OxidEsales\Eshop\Application\Model\Basket::deleteBasket() method which cleans up basket data when
      * user completes order.
      */
-    protected function deleteSavedBasket()
+    protected function delete_saved_basket()
     {
         // deleting basket if session user available
-        if ($oUser = $this->getBasketUser()) {
-            $oUser->getBasket('savedbasket')->delete();
+        if ($o_user = $this->get_basket_user()) {
+            $o_user->get_basket('savedbasket')->delete();
         }
-
         // basket exclude
-        if (Registry::getConfig()->getConfigParam('blBasketExcludeEnabled')) {
-            $this->setBasketRootCatId(null);
+        if (Registry::get_config()->get_config_param('blBasketExcludeEnabled')) {
+            $this->set_basket_root_cat_id(null);
         }
     }
-
     /**
      * Tries to fetch user delivery country ID
      *
      * @return string
      */
-    protected function findDelivCountry()
+    protected function find_deliv_country()
     {
-        $myConfig = Registry::getConfig();
-        $oUser = $this->getBasketUser();
-
-        $sDeliveryCountry = null;
-
-        if (!$oUser) {
+        $my_config = Registry::get_config();
+        $o_user = $this->get_basket_user();
+        $s_delivery_country = null;
+        if (!$o_user) {
             // don't calculate if not logged in unless specified otherwise
-            $aHomeCountry = $myConfig->getConfigParam('aHomeCountry');
-            if ($myConfig->getConfigParam('blCalculateDelCostIfNotLoggedIn') && is_array($aHomeCountry)) {
-                $sDeliveryCountry = current($aHomeCountry);
+            $a_home_country = $my_config->get_config_param('aHomeCountry');
+            if ($my_config->get_config_param('blCalculateDelCostIfNotLoggedIn') && is_array($a_home_country)) {
+                $s_delivery_country = current($a_home_country);
             }
         } else {
             // ok, logged in
-            if ($sCountryId = $myConfig->getGlobalParameter('delcountryid')) {
-                $sDeliveryCountry = $sCountryId;
-            } elseif ($sAddressId = Registry::getSession()->getVariable('deladrid')) {
-                $oDeliveryAddress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
-                if ($oDeliveryAddress->load($sAddressId)) {
-                    $sDeliveryCountry = $oDeliveryAddress->oxaddress__oxcountryid->value;
+            if ($s_country_id = $my_config->get_global_parameter('delcountryid')) {
+                $s_delivery_country = $s_country_id;
+            } elseif ($s_address_id = Registry::get_session()->get_variable('deladrid')) {
+                $o_delivery_address = ox_new(\Oxid_Esales\Eshop\Application\Model\Address::class);
+                if ($o_delivery_address->load($s_address_id)) {
+                    $s_delivery_country = $o_delivery_address->oxaddress__oxcountryid->value;
                 }
             }
-
             // still not found ?
-            if (!$sDeliveryCountry) {
-                $sDeliveryCountry = $oUser->getFieldData('oxcountryid');
+            if (!$s_delivery_country) {
+                $s_delivery_country = $o_user->get_field_data('oxcountryid');
             }
         }
-
-        return $sDeliveryCountry;
+        return $s_delivery_country;
     }
-
     /**
      * Deletes user basket object from session
      */
-    public function deleteBasket()
+    public function delete_basket()
     {
-        $session = Registry::getSession();
-        $this->_aBasketContents = [];
-        $session->delBasket();
-
-        if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-            $session->getBasketReservations()->discardReservations();
+        $session = Registry::get_session();
+        $this->_a_basket_contents = [];
+        $session->del_basket();
+        if (Registry::get_config()->get_config_param('blPsBasketReservationEnabled')) {
+            $session->get_basket_reservations()->discard_reservations();
         }
-
         // merging basket history
-        $this->deleteSavedBasket();
+        $this->delete_saved_basket();
     }
-
     /**
      * Set basket payment ID
      *
      * @param string $sPaymentId payment id
      */
-    public function setPayment($sPaymentId = null)
+    public function set_payment($s_payment_id = null)
     {
-        $this->_sPaymentId = $sPaymentId;
+        $this->_s_payment_id = $s_payment_id;
     }
-
     /**
      * Get basket payment, if payment id is not set, try to get it from session
      *
      * @return string
      */
-    public function getPaymentId()
+    public function get_payment_id()
     {
-        if (!$this->_sPaymentId) {
-            $this->_sPaymentId = Registry::getSession()->getVariable('paymentid');
+        if (!$this->_s_payment_id) {
+            $this->_s_payment_id = Registry::get_session()->get_variable('paymentid');
         }
-
-        return $this->_sPaymentId;
+        return $this->_s_payment_id;
     }
-
     /**
      * Set basket shipping set ID
      *
      * @param string $sShippingSetId delivery set id
      */
-    public function setShipping($sShippingSetId = null)
+    public function set_shipping($s_shipping_set_id = null)
     {
-        $this->_sShippingSetId = $sShippingSetId;
-        Registry::getSession()->setVariable('sShipSet', $sShippingSetId);
+        $this->_s_shipping_set_id = $s_shipping_set_id;
+        Registry::get_session()->set_variable('sShipSet', $s_shipping_set_id);
     }
-
     /**
      * Set basket shipping price
      *
      * @param \OxidEsales\Eshop\Core\Price $oShippingPrice delivery costs
      */
-    public function setDeliveryPrice($oShippingPrice = null)
+    public function set_delivery_price($o_shipping_price = null)
     {
-        $this->_oDeliveryPrice = $oShippingPrice;
+        $this->_o_delivery_price = $o_shipping_price;
     }
-
     /**
      * Get basket shipping set, if shipping set id is not set, try to get it from session
      *
      * @return string oxDeliverySet
      */
-    public function getShippingId()
+    public function get_shipping_id()
     {
-        if (!$this->_sShippingSetId) {
-            $this->_sShippingSetId = Registry::getSession()->getVariable('sShipSet');
+        if (!$this->_s_shipping_set_id) {
+            $this->_s_shipping_set_id = Registry::get_session()->get_variable('sShipSet');
         }
-
-        $sActPaymentId = $this->getPaymentId();
+        $s_act_payment_id = $this->get_payment_id();
         // setting default if none is set
-        if (!$this->_sShippingSetId && $sActPaymentId != 'oxempty') {
-            $oUser = $this->getUser();
-
+        if (!$this->_s_shipping_set_id && $s_act_payment_id != 'oxempty') {
+            $o_user = $this->get_user();
             // choosing first preferred delivery set
-            list(, $sActShipSet) = Registry::get(\OxidEsales\Eshop\Application\Model\DeliverySetList::class)->getDeliverySetData(null, $oUser, $this);
+            list(, $s_act_ship_set) = Registry::get(\Oxid_Esales\Eshop\Application\Model\Delivery_Set_List::class)->get_delivery_set_data(null, $o_user, $this);
             // in case nothing was found and no user set - choosing default
-            $this->_sShippingSetId = $sActShipSet ? $sActShipSet : ($oUser ? null : 'oxidstandard');
-        } elseif (!$this->isAdmin() && $sActPaymentId == 'oxempty') {
+            $this->_s_shipping_set_id = $s_act_ship_set ? $s_act_ship_set : ($o_user ? null : 'oxidstandard');
+        } elseif (!$this->is_admin() && $s_act_payment_id == 'oxempty') {
             // in case 'oxempty' is payment id - delivery set must be reset
-            $this->_sShippingSetId = null;
+            $this->_s_shipping_set_id = null;
         }
-
-        return $this->_sShippingSetId;
+        return $this->_s_shipping_set_id;
     }
-
     /**
      * Returns array of basket oxarticle objects
      *
      * @return array
      */
-    public function getBasketArticles()
+    public function get_basket_articles()
     {
-        $aBasketArticles = [];
+        $a_basket_articles = [];
         /** @var \oxBasketItem $oBasketItem */
-        foreach ($this->_aBasketContents as $sItemKey => $oBasketItem) {
+        foreach ($this->_a_basket_contents as $s_item_key => $o_basket_item) {
             try {
-                $oProduct = $oBasketItem->getArticle(true);
-
-                if (Registry::getConfig()->getConfigParam('bl_perfLoadSelectLists')) {
+                $o_product = $o_basket_item->get_article(true);
+                if (Registry::get_config()->get_config_param('bl_perfLoadSelectLists')) {
                     // marking chosen select list
-                    $aSelList = $oBasketItem->getSelList();
-                    if (is_array($aSelList) && ($aSelectlist = $oProduct->getSelectLists($sItemKey))) {
-                        reset($aSelList);
-                        foreach ($aSelList as $conkey => $iSel) {
-                            $aSelectlist[$conkey][$iSel]->selected = 1;
+                    $a_sel_list = $o_basket_item->get_sel_list();
+                    if (is_array($a_sel_list) && $a_selectlist = $o_product->get_select_lists($s_item_key)) {
+                        reset($a_sel_list);
+                        foreach ($a_sel_list as $conkey => $i_sel) {
+                            $a_selectlist[$conkey][$i_sel]->selected = 1;
                         }
-                        $oProduct->setSelectlist($aSelectlist);
+                        $o_product->set_selectlist($a_selectlist);
                     }
                 }
-            } catch (NoArticleException $oEx) {
-                Registry::getUtilsView()->addErrorToDisplay($oEx);
-                $this->removeItem($sItemKey);
-                $this->calculateBasket(true);
+            } catch (No_Article_Exception $o_ex) {
+                Registry::get_utils_view()->add_error_to_display($o_ex);
+                $this->remove_item($s_item_key);
+                $this->calculate_basket(true);
                 continue;
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
-                Registry::getUtilsView()->addErrorToDisplay($oEx);
-                $this->removeItem($sItemKey);
-                $this->calculateBasket(true);
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Article_Input_Exception $o_ex) {
+                Registry::get_utils_view()->add_error_to_display($o_ex);
+                $this->remove_item($s_item_key);
+                $this->calculate_basket(true);
                 continue;
             }
-
-            $aBasketArticles[$sItemKey] = $oProduct;
+            $a_basket_articles[$s_item_key] = $o_product;
         }
-
-        return $aBasketArticles;
+        return $a_basket_articles;
     }
-
     /**
      * Returns price list object of discounted products
      *
      * @return \OxidEsales\Eshop\Core\PriceList
      */
-    public function getDiscountProductsPrice()
+    public function get_discount_products_price()
     {
-        return $this->_oDiscountProductsPriceList;
+        return $this->_o_discount_products_price_list;
     }
-
     /**
      * Returns basket products price list object
      *
      * @return \OxidEsales\Eshop\Core\PriceList
      */
-    public function getProductsPrice()
+    public function get_products_price()
     {
-        if (is_null($this->_oProductsPriceList)) {
-            $this->_oProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
+        if (is_null($this->_o_products_price_list)) {
+            $this->_o_products_price_list = ox_new(\Oxid_Esales\Eshop\Core\Price_List::class);
         }
-
-        return $this->_oProductsPriceList;
+        return $this->_o_products_price_list;
     }
-
     /**
      * Returns basket price object
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getPrice()
+    public function get_price()
     {
-        if (is_null($this->_oPrice)) {
+        if (is_null($this->_o_price)) {
             /** @var \OxidEsales\Eshop\Core\Price $price */
-            $price = oxNew(Price::class);
-            $this->setPrice($price);
+            $price = ox_new(Price::class);
+            $this->set_price($price);
         }
-
-        return $this->_oPrice;
+        return $this->_o_price;
     }
-
     /**
      * Set basket total sum price object
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
      */
-    public function setPrice($oPrice)
+    public function set_price($o_price)
     {
-        $this->_oPrice = $oPrice;
+        $this->_o_price = $o_price;
     }
-
     /**
      * Returns unique order ID assigned to current basket.
      * This id is only available on last order step
      *
      * @return string
      */
-    public function getOrderId()
+    public function get_order_id()
     {
-        return $this->_sOrderId;
+        return $this->_s_order_id;
     }
-
     /**
      * Basket order ID setter
      *
      * @param string $sId unique id for basket order
      */
-    public function setOrderId($sId)
+    public function set_order_id($s_id)
     {
-        $this->_sOrderId = $sId;
+        $this->_s_order_id = $s_id;
     }
-
     /**
      * Returns array of basket costs. By passing cost identifier method will return
      * this cost if available
@@ -1953,78 +1681,67 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return array|\OxidEsales\Eshop\Core\Price|null
      */
-    public function getCosts($sId = null)
+    public function get_costs($s_id = null)
     {
         // if user want some specific cost - return it
-        if ($sId) {
-            return isset($this->_aCosts[$sId]) ? $this->_aCosts[$sId] : null;
+        if ($s_id) {
+            return isset($this->_a_costs[$s_id]) ? $this->_a_costs[$s_id] : null;
         }
-
-        return $this->_aCosts;
+        return $this->_a_costs;
     }
-
     /**
      * Returns array of vouchers applied to basket
      *
      * @return array
      */
-    public function getVouchers()
+    public function get_vouchers()
     {
-        return $this->_aVouchers;
+        return $this->_a_vouchers;
     }
-
     /**
      * Returns number of different products stored in basket.
      *
      * @return int
      */
-    public function getProductsCount()
+    public function get_products_count()
     {
-        return count($this->_aBasketContents);
+        return count($this->_a_basket_contents);
     }
-
     /**
      * Returns count of items stored in basket.
      *
      * @return double
      */
-    public function getItemsCount()
+    public function get_items_count()
     {
-        $itemsCount = 0;
-
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            $itemsCount += $oBasketItem->getAmount();
+        $items_count = 0;
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            $items_count += $o_basket_item->get_amount();
         }
-
-        return $itemsCount;
+        return $items_count;
     }
-
     /**
      * Returns total basket weight.
      *
      * @return double
      */
-    public function getWeight()
+    public function get_weight()
     {
         $weight = 0;
-
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            $weight += $oBasketItem->getWeight();
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            $weight += $o_basket_item->get_weight();
         }
-
         return $weight;
     }
-
     /**
      * Returns basket items array
      *
      * @return array
      */
-    public function getContents()
+    public function get_contents()
     {
-        return $this->_aBasketContents;
+        return $this->_a_basket_contents;
     }
-
     /**
      * Returns array of plain of formatted VATs which were calculated for basket
      *
@@ -2032,182 +1749,160 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    public function getProductVats($blFormatCurrency = true)
+    public function get_product_vats($bl_format_currency = true)
     {
-        if (!$this->_oNotDiscountedProductsPriceList) {
+        if (!$this->_o_not_discounted_products_price_list) {
             return [];
         }
-
-        $aVats = $this->_oNotDiscountedProductsPriceList->getVatInfo($this->isCalculationModeNetto());
-
-        $oUtils = Registry::getUtils();
-        foreach ((array)$this->_aDiscountedVats as $sKey => $dVat) {
-            if (!isset($aVats[$sKey])) {
-                $aVats[$sKey] = 0;
+        $a_vats = $this->_o_not_discounted_products_price_list->get_vat_info($this->is_calculation_mode_netto());
+        $o_utils = Registry::get_utils();
+        foreach ((array) $this->_a_discounted_vats as $s_key => $d_vat) {
+            if (!isset($a_vats[$s_key])) {
+                $a_vats[$s_key] = 0;
             }
             // add prices of the same discounts
-            $aVats[$sKey] += $oUtils->fRound($dVat, $this->_oCurrency);
+            $a_vats[$s_key] += $o_utils->f_round($d_vat, $this->_o_currency);
         }
-
-        if ($blFormatCurrency) {
-            $oLang = Registry::getLang();
-            foreach ($aVats as $sKey => $dVat) {
-                $aVats[$sKey] = $oLang->formatCurrency($dVat, $this->getBasketCurrency());
+        if ($bl_format_currency) {
+            $o_lang = Registry::get_lang();
+            foreach ($a_vats as $s_key => $d_vat) {
+                $a_vats[$s_key] = $o_lang->format_currency($d_vat, $this->get_basket_currency());
             }
         }
-
-        return $aVats;
+        return $a_vats;
     }
-
     /**
      * Gift card message setter
      *
      * @param string $sMessage gift card message
      */
-    public function setCardMessage($sMessage)
+    public function set_card_message($s_message)
     {
-        $this->_sCardMessage = $sMessage;
+        $this->_s_card_message = $s_message;
     }
-
     /**
      * Returns gift card message text
      *
      * @return string
      */
-    public function getCardMessage()
+    public function get_card_message()
     {
-        return $this->_sCardMessage;
+        return $this->_s_card_message;
     }
-
     /**
      * Gift card ID setter
      *
      * @param string $sCardId gift card id
      */
-    public function setCardId($sCardId)
+    public function set_card_id($s_card_id)
     {
-        $this->_sCardId = $sCardId;
+        $this->_s_card_id = $s_card_id;
     }
-
     /**
      * Returns applied gift card ID
      *
      * @return string
      */
-    public function getCardId()
+    public function get_card_id()
     {
-        return $this->_sCardId;
+        return $this->_s_card_id;
     }
-
     /**
      * Returns gift card object (if available)
      *
      * @return \OxidEsales\Eshop\Application\Model\Wrapping|null
      */
-    public function getCard()
+    public function get_card()
     {
-        $oCard = null;
-        if ($sCardId = $this->getCardId()) {
-            $oCard = oxNew(\OxidEsales\Eshop\Application\Model\Wrapping::class);
-            $oCard->load($sCardId);
-            $oCard->setWrappingVat($this->getAdditionalServicesVatPercent());
+        $o_card = null;
+        if ($s_card_id = $this->get_card_id()) {
+            $o_card = ox_new(\Oxid_Esales\Eshop\Application\Model\Wrapping::class);
+            $o_card->load($s_card_id);
+            $o_card->set_wrapping_vat($this->get_additional_services_vat_percent());
         }
-
-        return $oCard;
+        return $o_card;
     }
-
     /**
      * Returns total basket discount Price object
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getTotalDiscount()
+    public function get_total_discount()
     {
-        return $this->_oTotalDiscount;
+        return $this->_o_total_discount;
     }
-
     /**
      * Returns applied discount information array
      *
      * @return array
      */
-    public function getDiscounts()
+    public function get_discounts()
     {
-        if ($this->getTotalDiscount() && $this->getTotalDiscount()->getBruttoPrice() == 0 && count($this->_aItemDiscounts) == 0) {
+        if ($this->get_total_discount() && $this->get_total_discount()->get_brutto_price() == 0 && count($this->_a_item_discounts) == 0) {
             return [];
         }
-
-        return array_merge($this->_aItemDiscounts, $this->_aDiscounts);
+        return array_merge($this->_a_item_discounts, $this->_a_discounts);
     }
-
     /**
      * Returns basket voucher discount price object
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getVoucherDiscount()
+    public function get_voucher_discount()
     {
-        if (Registry::getConfig()->getConfigParam('bl_showVouchers')) {
-            return $this->_oVoucherDiscount;
+        if (Registry::get_config()->get_config_param('bl_showVouchers')) {
+            return $this->_o_voucher_discount;
         }
-
         return null;
     }
-
     /**
      * Set basket currency
      *
      * @param stdClass $oCurrency currency object
      */
-    public function setBasketCurrency($oCurrency)
+    public function set_basket_currency($o_currency)
     {
-        $this->_oCurrency = $oCurrency;
+        $this->_o_currency = $o_currency;
     }
-
     /**
      * Basket currency getter
      *
      * @return stdClass
      */
-    public function getBasketCurrency()
+    public function get_basket_currency()
     {
-        if ($this->_oCurrency === null) {
-            $this->_oCurrency = Registry::getConfig()->getActShopCurrencyObject();
+        if ($this->_o_currency === null) {
+            $this->_o_currency = Registry::get_config()->get_act_shop_currency_object();
         }
-
-        return $this->_oCurrency;
+        return $this->_o_currency;
     }
-
     /**
      * Set skip or not vouchers availability checking
      *
      * @param bool $blSkipChecking skip or not vouchers checking
      */
-    public function setSkipVouchersChecking($blSkipChecking = null)
+    public function set_skip_vouchers_checking($bl_skip_checking = null)
     {
-        $this->_blSkipVouchersAvailabilityChecking = $blSkipChecking;
+        $this->_bl_skip_vouchers_availability_checking = $bl_skip_checking;
     }
-
     /**
      * Returns true if discount must be skipped for one of the products
      *
      * @return bool
      */
-    public function hasSkipedDiscount()
+    public function has_skiped_discount()
     {
-        return $this->_blSkipDiscounts;
+        return $this->_bl_skip_discounts;
     }
-
     /**
      * Used to set "skip discounts" status for basket
      *
      * @param bool $blSkip set true to skip discounts
      */
-    public function setSkipDiscounts($blSkip)
+    public function set_skip_discounts($bl_skip)
     {
-        $this->_blSkipDiscounts = $blSkip;
+        $this->_bl_skip_discounts = $bl_skip;
     }
-
     /**
      * Formatted Products net price getter
      *
@@ -2215,11 +1910,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getProductsNetPrice()
+    public function get_products_net_price()
     {
-        return Registry::getLang()->formatCurrency($this->getNettoSum(), $this->getBasketCurrency());
+        return Registry::get_lang()->format_currency($this->get_netto_sum(), $this->get_basket_currency());
     }
-
     /**
      * Formatted Products price getter
      *
@@ -2227,11 +1921,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getFProductsPrice()
+    public function get_f_products_price()
     {
-        return Registry::getLang()->formatCurrency($this->getBruttoSum(), $this->getBasketCurrency());
+        return Registry::get_lang()->format_currency($this->get_brutto_sum(), $this->get_basket_currency());
     }
-
     /**
      * Returns VAT of delivery costs
      *
@@ -2239,11 +1932,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return double
      */
-    public function getDelCostVatPercent()
+    public function get_del_cost_vat_percent()
     {
-        return $this->getCosts('oxdelivery')->getVat();
+        return $this->get_costs('oxdelivery')->get_vat();
     }
-
     /**
      * Returns formatted VAT of delivery costs
      *
@@ -2251,18 +1943,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getDelCostVat()
+    public function get_del_cost_vat()
     {
-        $dDelVAT = $this->getCosts('oxdelivery')->getVatValue();
-
+        $d_del_vat = $this->get_costs('oxdelivery')->get_vat_value();
         // blShowVATForDelivery option will be used, only for displaying, but not calculation
-        if ($dDelVAT > 0 && Registry::getConfig()->getConfigParam('blShowVATForDelivery')) {
-            return Registry::getLang()->formatCurrency($dDelVAT, $this->getBasketCurrency());
+        if ($d_del_vat > 0 && Registry::get_config()->get_config_param('blShowVATForDelivery')) {
+            return Registry::get_lang()->format_currency($d_del_vat, $this->get_basket_currency());
         }
-
         return false;
     }
-
     /**
      * Returns formatted netto price of delivery costs
      *
@@ -2270,21 +1959,18 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getDelCostNet()
+    public function get_del_cost_net()
     {
-        $oConfig = Registry::getConfig();
-
+        $o_config = Registry::get_config();
         // blShowVATForDelivery option will be used, only for displaying, but not calculation
-        if ($oConfig->getConfigParam('blShowVATForDelivery') && ($this->getBasketUser() || $oConfig->getConfigParam('blCalculateDelCostIfNotLoggedIn'))) {
-            $dNetPrice = $this->getCosts('oxdelivery')->getNettoPrice();
-            if ($dNetPrice > 0) {
-                return Registry::getLang()->formatCurrency($dNetPrice, $this->getBasketCurrency());
+        if ($o_config->get_config_param('blShowVATForDelivery') && ($this->get_basket_user() || $o_config->get_config_param('blCalculateDelCostIfNotLoggedIn'))) {
+            $d_net_price = $this->get_costs('oxdelivery')->get_netto_price();
+            if ($d_net_price > 0) {
+                return Registry::get_lang()->format_currency($d_net_price, $this->get_basket_currency());
             }
         }
-
         return false;
     }
-
     /**
      * Returns VAT of payment costs
      *
@@ -2292,11 +1978,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return double
      */
-    public function getPayCostVatPercent()
+    public function get_pay_cost_vat_percent()
     {
-        return $this->getCosts('oxpayment')->getVat();
+        return $this->get_costs('oxpayment')->get_vat();
     }
-
     /**
      * Returns formatted VAT of payment costs
      *
@@ -2304,18 +1989,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getPayCostVat()
+    public function get_pay_cost_vat()
     {
-        $dPayVAT = $this->getCosts('oxpayment')->getVatValue();
-
+        $d_pay_vat = $this->get_costs('oxpayment')->get_vat_value();
         // blShowVATForPayCharge option will be used, only for displaying, but not calculation
-        if ($dPayVAT > 0 && Registry::getConfig()->getConfigParam('blShowVATForPayCharge')) {
-            return Registry::getLang()->formatCurrency($dPayVAT, $this->getBasketCurrency());
+        if ($d_pay_vat > 0 && Registry::get_config()->get_config_param('blShowVATForPayCharge')) {
+            return Registry::get_lang()->format_currency($d_pay_vat, $this->get_basket_currency());
         }
-
         return false;
     }
-
     /**
      * Returns formatted netto price of payment costs
      *
@@ -2323,19 +2005,17 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getPayCostNet()
+    public function get_pay_cost_net()
     {
         // blShowVATForPayCharge option will be used, only for displaying, but not calculation
-        if (Registry::getConfig()->getConfigParam('blShowVATForPayCharge')) {
-            $oPaymentCost = $this->getCosts('oxpayment');
-            if ($oPaymentCost && $oPaymentCost->getNettoPrice()) {
-                return Registry::getLang()->formatCurrency($this->getCosts('oxpayment')->getNettoPrice(), $this->getBasketCurrency());
+        if (Registry::get_config()->get_config_param('blShowVATForPayCharge')) {
+            $o_payment_cost = $this->get_costs('oxpayment');
+            if ($o_payment_cost && $o_payment_cost->get_netto_price()) {
+                return Registry::get_lang()->format_currency($this->get_costs('oxpayment')->get_netto_price(), $this->get_basket_currency());
             }
         }
-
         return false;
     }
-
     /**
      * Returns payment costs brutto value
      *
@@ -2343,24 +2023,22 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return double|bool
      */
-    public function getPaymentCosts()
+    public function get_payment_costs()
     {
-        $oPaymentCost = $this->getCosts('oxpayment');
-        if ($oPaymentCost && $oPaymentCost->getBruttoPrice()) {
-            return $oPaymentCost->getBruttoPrice();
+        $o_payment_cost = $this->get_costs('oxpayment');
+        if ($o_payment_cost && $o_payment_cost->get_brutto_price()) {
+            return $o_payment_cost->get_brutto_price();
         }
     }
-
     /**
      * Returns payment costs
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getPaymentCost()
+    public function get_payment_cost()
     {
-        return $this->getCosts('oxpayment');
+        return $this->get_costs('oxpayment');
     }
-
     /**
      * Returns if exists formatted payment costs
      *
@@ -2368,30 +2046,26 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getFPaymentCosts()
+    public function get_f_payment_costs()
     {
-        $oPaymentCost = $this->getCosts('oxpayment');
-        if ($oPaymentCost && $oPaymentCost->getBruttoPrice()) {
-            return Registry::getLang()->formatCurrency($oPaymentCost->getBruttoPrice(), $this->getBasketCurrency());
+        $o_payment_cost = $this->get_costs('oxpayment');
+        if ($o_payment_cost && $o_payment_cost->get_brutto_price()) {
+            return Registry::get_lang()->format_currency($o_payment_cost->get_brutto_price(), $this->get_basket_currency());
         }
-
         return false;
     }
-
     /**
      * Returns value of voucher discount
      *
      * @return double
      */
-    public function getVoucherDiscValue()
+    public function get_voucher_disc_value()
     {
-        if ($this->getVoucherDiscount()) {
-            return $this->getVoucherDiscount()->getBruttoPrice();
+        if ($this->get_voucher_discount()) {
+            return $this->get_voucher_discount()->get_brutto_price();
         }
-
         return false;
     }
-
     /**
      * Returns formatted voucher discount
      *
@@ -2399,17 +2073,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getFVoucherDiscountValue()
+    public function get_f_voucher_discount_value()
     {
-        if ($oVoucherDiscount = $this->getVoucherDiscount()) {
-            if ($oVoucherDiscount->getBruttoPrice()) {
-                return Registry::getLang()->formatCurrency($oVoucherDiscount->getBruttoPrice(), $this->getBasketCurrency());
+        if ($o_voucher_discount = $this->get_voucher_discount()) {
+            if ($o_voucher_discount->get_brutto_price()) {
+                return Registry::get_lang()->format_currency($o_voucher_discount->get_brutto_price(), $this->get_basket_currency());
             }
         }
-
         return false;
     }
-
     /**
      * Returns VAT of wrapping costs
      *
@@ -2417,11 +2089,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return double
      */
-    public function getWrappCostVatPercent()
+    public function get_wrapp_cost_vat_percent()
     {
-        return $this->getCosts('oxwrapping')->getVat();
+        return $this->get_costs('oxwrapping')->get_vat();
     }
-
     /**
      * Returns VAT of gift card costs
      *
@@ -2429,11 +2100,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return double
      */
-    public function getGiftCardCostVatPercent()
+    public function get_gift_card_cost_vat_percent()
     {
-        return $this->getCosts('oxgiftcard')->getVat();
+        return $this->get_costs('oxgiftcard')->get_vat();
     }
-
     /**
      * Returns formatted VAT of wrapping costs
      *
@@ -2441,20 +2111,17 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getWrappCostVat()
+    public function get_wrapp_cost_vat()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
-            $oPrice = $this->getCosts('oxwrapping');
-
-            if ($oPrice && $oPrice->getVatValue() > 0) {
-                return Registry::getLang()->formatCurrency($oPrice->getVatValue(), $this->getBasketCurrency());
+        if (Registry::get_config()->get_config_param('blShowVATForWrapping')) {
+            $o_price = $this->get_costs('oxwrapping');
+            if ($o_price && $o_price->get_vat_value() > 0) {
+                return Registry::get_lang()->format_currency($o_price->get_vat_value(), $this->get_basket_currency());
             }
         }
-
         return false;
     }
-
     /**
      * Returns formatted netto price of wrapping costs
      *
@@ -2462,20 +2129,17 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getWrappCostNet()
+    public function get_wrapp_cost_net()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
-            $oPrice = $this->getCosts('oxwrapping');
-
-            if ($oPrice && $oPrice->getNettoPrice() > 0) {
-                return Registry::getLang()->formatCurrency($oPrice->getNettoPrice(), $this->getBasketCurrency());
+        if (Registry::get_config()->get_config_param('blShowVATForWrapping')) {
+            $o_price = $this->get_costs('oxwrapping');
+            if ($o_price && $o_price->get_netto_price() > 0) {
+                return Registry::get_lang()->format_currency($o_price->get_netto_price(), $this->get_basket_currency());
             }
         }
-
         return false;
     }
-
     /**
      * Returns if exists formatted wrapping costs
      *
@@ -2483,27 +2147,23 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getFWrappingCosts()
+    public function get_f_wrapping_costs()
     {
-        $oPrice = $this->getCosts('oxwrapping');
-
-        if ($oPrice && $oPrice->getBruttoPrice()) {
-            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
+        $o_price = $this->get_costs('oxwrapping');
+        if ($o_price && $o_price->get_brutto_price()) {
+            return Registry::get_lang()->format_currency($o_price->get_brutto_price(), $this->get_basket_currency());
         }
-
         return false;
     }
-
     /**
      * Returns array of wrapping costs
      *
      * @return array
      */
-    public function getWrappingCost()
+    public function get_wrapping_cost()
     {
-        return $this->getCosts('oxwrapping');
+        return $this->get_costs('oxwrapping');
     }
-
     /**
      * Returns formatted VAT of gift card costs
      *
@@ -2511,20 +2171,17 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getGiftCardCostVat()
+    public function get_gift_card_cost_vat()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
-            $oPrice = $this->getCosts('oxgiftcard');
-
-            if ($oPrice && $oPrice->getVatValue() > 0) {
-                return Registry::getLang()->formatCurrency($oPrice->getVatValue(), $this->getBasketCurrency());
+        if (Registry::get_config()->get_config_param('blShowVATForWrapping')) {
+            $o_price = $this->get_costs('oxgiftcard');
+            if ($o_price && $o_price->get_vat_value() > 0) {
+                return Registry::get_lang()->format_currency($o_price->get_vat_value(), $this->get_basket_currency());
             }
         }
-
         return false;
     }
-
     /**
      * Returns formatted netto price of gift card costs
      *
@@ -2532,20 +2189,17 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getGiftCardCostNet()
+    public function get_gift_card_cost_net()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
-            $oPrice = $this->getCosts('oxgiftcard');
-
-            if ($oPrice && $oPrice->getNettoPrice() > 0) {
-                return Registry::getLang()->formatCurrency($oPrice->getNettoPrice(), $this->getBasketCurrency());
+        if (Registry::get_config()->get_config_param('blShowVATForWrapping')) {
+            $o_price = $this->get_costs('oxgiftcard');
+            if ($o_price && $o_price->get_netto_price() > 0) {
+                return Registry::get_lang()->format_currency($o_price->get_netto_price(), $this->get_basket_currency());
             }
         }
-
         return false;
     }
-
     /**
      * Returns if exists formatted gift card costs
      *
@@ -2553,27 +2207,23 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getFGiftCardCosts()
+    public function get_f_gift_card_costs()
     {
-        $oPrice = $this->getCosts('oxgiftcard');
-
-        if ($oPrice && $oPrice->getBruttoPrice()) {
-            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
+        $o_price = $this->get_costs('oxgiftcard');
+        if ($o_price && $o_price->get_brutto_price()) {
+            return Registry::get_lang()->format_currency($o_price->get_brutto_price(), $this->get_basket_currency());
         }
-
         return false;
     }
-
     /**
      * Gets gift card cost.
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getGiftCardCost()
+    public function get_gift_card_cost()
     {
-        return $this->getCosts('oxgiftcard');
+        return $this->get_costs('oxgiftcard');
     }
-
     /**
      * Returns formatted basket total price
      *
@@ -2581,11 +2231,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getFPrice()
+    public function get_f_price()
     {
-        return Registry::getLang()->formatCurrency($this->getPrice()->getBruttoPrice(), $this->getBasketCurrency());
+        return Registry::get_lang()->format_currency($this->get_price()->get_brutto_price(), $this->get_basket_currency());
     }
-
     /**
      * Returns if exists formatted delivery costs
      *
@@ -2593,17 +2242,14 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getFDeliveryCosts()
+    public function get_f_delivery_costs()
     {
-        $oPrice = $this->getCosts('oxdelivery');
-
-        if ($oPrice && ($this->getBasketUser() || Registry::getConfig()->getConfigParam('blCalculateDelCostIfNotLoggedIn'))) {
-            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
+        $o_price = $this->get_costs('oxdelivery');
+        if ($o_price && ($this->get_basket_user() || Registry::get_config()->get_config_param('blCalculateDelCostIfNotLoggedIn'))) {
+            return Registry::get_lang()->format_currency($o_price->get_brutto_price(), $this->get_basket_currency());
         }
-
         return false;
     }
-
     /**
      * Returns if exists delivery costs
      *
@@ -2611,147 +2257,127 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|bool
      */
-    public function getDeliveryCosts()
+    public function get_delivery_costs()
     {
-        if ($oDeliveryCost = $this->getCosts('oxdelivery')) {
-            return $oDeliveryCost->getBruttoPrice();
+        if ($o_delivery_cost = $this->get_costs('oxdelivery')) {
+            return $o_delivery_cost->get_brutto_price();
         }
-
         return false;
     }
-
     /**
      * Returns delivery costs
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getDeliveryCost()
+    public function get_delivery_cost()
     {
-        return $this->getCosts('oxdelivery');
+        return $this->get_costs('oxdelivery');
     }
-
     /**
      * Sets total discount value
      *
      * @param double $dDiscount new total discount value
      */
-    public function setTotalDiscount($dDiscount)
+    public function set_total_discount($d_discount)
     {
-        $this->_oTotalDiscount = oxNew(Price::class);
-        $this->_oTotalDiscount->setBruttoPriceMode();
-        $this->_oTotalDiscount->add($dDiscount);
+        $this->_o_total_discount = ox_new(Price::class);
+        $this->_o_total_discount->set_brutto_price_mode();
+        $this->_o_total_discount->add($d_discount);
     }
-
     /**
      * Get basket price for payment cost calculation. Returned price
      * is with applied discounts, vouchers and added delivery cost
      *
      * @return double
      */
-    public function getPriceForPayment()
+    public function get_price_for_payment()
     {
-        $dPrice = $this->getDiscountedProductsBruttoPrice();
+        $d_price = $this->get_discounted_products_brutto_price();
         //#1905 not discounted products should be included in payment amount calculation
-        if ($oPriceList = $this->getNotDiscountProductsPrice()) {
-            $dPrice += $oPriceList->getBruttoSum();
+        if ($o_price_list = $this->get_not_discount_products_price()) {
+            $d_price += $o_price_list->get_brutto_sum();
         }
-
         // adding delivery price to final price
-        if (isset($this->_aCosts['oxdelivery'])) {
-            $oDeliveryPrice = $this->_aCosts['oxdelivery'];
-            $dPrice += $oDeliveryPrice->getBruttoPrice();
+        if (isset($this->_a_costs['oxdelivery'])) {
+            $o_delivery_price = $this->_a_costs['oxdelivery'];
+            $d_price += $o_delivery_price->get_brutto_price();
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Returns ( current basket products sum - total discount - voucher discount )
      *
      * @return double
      */
-    public function getDiscountedProductsSum()
+    public function get_discounted_products_sum()
     {
-        if ($oProductsPrice = $this->getDiscountProductsPrice()) {
-            $dPrice = $oProductsPrice->getSum($this->isCalculationModeNetto());
+        if ($o_products_price = $this->get_discount_products_price()) {
+            $d_price = $o_products_price->get_sum($this->is_calculation_mode_netto());
         }
-
         // subtracting total discount
-        if ($oPrice = $this->getTotalDiscount()) {
-            $dPrice -= $oPrice->getPrice();
+        if ($o_price = $this->get_total_discount()) {
+            $d_price -= $o_price->get_price();
         }
-
-        if ($oVoucherPrice = $this->getVoucherDiscount()) {
-            $dPrice -= $oVoucherPrice->getPrice();
+        if ($o_voucher_price = $this->get_voucher_discount()) {
+            $d_price -= $o_voucher_price->get_price();
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Gets total discount sum.
      *
      * @return float|int
      */
-    public function getTotalDiscountSum()
+    public function get_total_discount_sum()
     {
-        $dPrice = 0;
+        $d_price = 0;
         // subtracting total discount
-        if ($oPrice = $this->getTotalDiscount()) {
-            $dPrice += $oPrice->getPrice();
+        if ($o_price = $this->get_total_discount()) {
+            $d_price += $o_price->get_price();
         }
-
-        if ($oVoucherPrice = $this->getVoucherDiscount()) {
-            $dPrice += $oVoucherPrice->getPrice();
+        if ($o_voucher_price = $this->get_voucher_discount()) {
+            $d_price += $o_voucher_price->get_price();
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Returns ( current basket products sum - total discount - voucher discount )
      *
      * @return double
      */
-    public function getDiscountedProductsBruttoPrice()
+    public function get_discounted_products_brutto_price()
     {
-        if ($oProductsPrice = $this->getDiscountProductsPrice()) {
-            $dPrice = $oProductsPrice->getBruttoSum();
+        if ($o_products_price = $this->get_discount_products_price()) {
+            $d_price = $o_products_price->get_brutto_sum();
         }
-
         // subtracting total discount
-        if ($oPrice = $this->getTotalDiscount()) {
-            $dPrice -= $oPrice->getBruttoPrice();
+        if ($o_price = $this->get_total_discount()) {
+            $d_price -= $o_price->get_brutto_price();
         }
-
-        if ($oVoucherPrice = $this->getVoucherDiscount()) {
-            $dPrice -= $oVoucherPrice->getBruttoPrice();
+        if ($o_voucher_price = $this->get_voucher_discount()) {
+            $d_price -= $o_voucher_price->get_brutto_price();
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Returns TRUE if ( current basket products sum - total discount - voucher discount ) > 0
      *
      * @return bool
      */
-    public function isBelowMinOrderPrice()
+    public function is_below_min_order_price()
     {
-        $blIsBelowMinOrderPrice = false;
-        $sConfValue = Registry::getConfig()->getConfigParam('iMinOrderPrice');
-        if (is_numeric($sConfValue) && $this->getProductsCount()) {
-            $dMinOrderPrice = Price::getPriceInActCurrency((float) $sConfValue);
-            $dNotDiscountedProductPrice = 0;
-            if ($oPrice = $this->getNotDiscountProductsPrice()) {
-                $dNotDiscountedProductPrice = $oPrice->getBruttoSum();
+        $bl_is_below_min_order_price = false;
+        $s_conf_value = Registry::get_config()->get_config_param('iMinOrderPrice');
+        if (is_numeric($s_conf_value) && $this->get_products_count()) {
+            $d_min_order_price = Price::get_price_in_act_currency((float) $s_conf_value);
+            $d_not_discounted_product_price = 0;
+            if ($o_price = $this->get_not_discount_products_price()) {
+                $d_not_discounted_product_price = $o_price->get_brutto_sum();
             }
-            $blIsBelowMinOrderPrice = ($dMinOrderPrice > ($this->getDiscountedProductsBruttoPrice() + $dNotDiscountedProductPrice));
+            $bl_is_below_min_order_price = $d_min_order_price > $this->get_discounted_products_brutto_price() + $d_not_discounted_product_price;
         }
-
-        return $blIsBelowMinOrderPrice;
+        return $bl_is_below_min_order_price;
     }
-
     /**
      * Returns stock of article in basket, including bundle article
      *
@@ -2760,20 +2386,18 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return double
      */
-    public function getArtStockInBasket($sArtId, $sExpiredArtId = null)
+    public function get_art_stock_in_basket($s_art_id, $s_expired_art_id = null)
     {
-        $dArtStock = 0;
-        foreach ($this->_aBasketContents as $sItemKey => $oOrderArticle) {
-            if ($oOrderArticle && ($sExpiredArtId == null || $sExpiredArtId != $sItemKey)) {
-                if ($oOrderArticle->getArticle(true)->getId() == $sArtId) {
-                    $dArtStock += $oOrderArticle->getAmount();
+        $d_art_stock = 0;
+        foreach ($this->_a_basket_contents as $s_item_key => $o_order_article) {
+            if ($o_order_article && ($s_expired_art_id == null || $s_expired_art_id != $s_item_key)) {
+                if ($o_order_article->get_article(true)->get_id() == $s_art_id) {
+                    $d_art_stock += $o_order_article->get_amount();
                 }
             }
         }
-
-        return $dArtStock;
+        return $d_art_stock;
     }
-
     /**
      * Checks if product can be added to basket
      *
@@ -2781,47 +2405,40 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function canAddProductToBasket($sProductId)
+    public function can_add_product_to_basket($s_product_id)
     {
-        $blCanAdd = null;
-
+        $bl_can_add = null;
         // if basket category is not set..
-        if ($this->_sBasketCategoryId === null) {
-            $oCat = null;
-
+        if ($this->_s_basket_category_id === null) {
+            $o_cat = null;
             // request category
-            if ($oView = Registry::getConfig()->getActiveView()) {
-                if ($oCat = $oView->getActiveCategory()) {
-                    if (!$this->isProductInRootCategory($sProductId, $oCat->oxcategories__oxrootid->value)) {
-                        $oCat = null;
+            if ($o_view = Registry::get_config()->get_active_view()) {
+                if ($o_cat = $o_view->get_active_category()) {
+                    if (!$this->is_product_in_root_category($s_product_id, $o_cat->oxcategories__oxrootid->value)) {
+                        $o_cat = null;
                     } else {
-                        $blCanAdd = true;
+                        $bl_can_add = true;
                     }
                 }
             }
-
             // product main category
-            if (!$oCat) {
-                $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-                if ($oProduct->load($sProductId)) {
-                    $oCat = $oProduct->getCategory();
+            if (!$o_cat) {
+                $o_product = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+                if ($o_product->load($s_product_id)) {
+                    $o_cat = $o_product->get_category();
                 }
             }
-
             // root category id
-            if ($oCat) {
-                $this->setBasketRootCatId($oCat->oxcategories__oxrootid->value);
+            if ($o_cat) {
+                $this->set_basket_root_cat_id($o_cat->oxcategories__oxrootid->value);
             }
         }
-
         // avoiding double check..
-        if ($blCanAdd === null) {
-            $blCanAdd = $this->_sBasketCategoryId ? $this->isProductInRootCategory($sProductId, $this->getBasketRootCatId()) : true;
+        if ($bl_can_add === null) {
+            $bl_can_add = $this->_s_basket_category_id ? $this->is_product_in_root_category($s_product_id, $this->get_basket_root_cat_id()) : true;
         }
-
-        return $blCanAdd;
+        return $bl_can_add;
     }
-
     /**
      * Checks if product is in root category
      *
@@ -2830,202 +2447,161 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    protected function isProductInRootCategory($sProductId, $sRootCatId)
+    protected function is_product_in_root_category($s_product_id, $s_root_cat_id)
     {
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sO2CTable = $tableViewNameGenerator->getViewName('oxobject2category');
-        $sCatTable = $tableViewNameGenerator->getViewName('oxcategories');
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sParentId = $oDb->getOne('select oxparentid from oxarticles where oxid = :oxid', [
-            'oxid' => $sProductId,
-        ]);
-        $sProductId = $sParentId ? $sParentId : $sProductId;
-
-        $sQ = "select 1 from {$sO2CTable}
-                 left join {$sCatTable} on {$sCatTable}.oxid = {$sO2CTable}.oxcatnid
-                 where {$sO2CTable}.oxobjectid = :oxobjectid and
-                       {$sCatTable}.oxrootid = :oxrootid";
-
-        return (bool) $oDb->getOne($sQ, [
-            'oxobjectid' => $sProductId,
-            'oxrootid' => $sRootCatId,
-        ]);
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_o2c_table = $table_view_name_generator->get_view_name('oxobject2category');
+        $s_cat_table = $table_view_name_generator->get_view_name('oxcategories');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_parent_id = $o_db->get_one('select oxparentid from oxarticles where oxid = :oxid', ['oxid' => $s_product_id]);
+        $s_product_id = $s_parent_id ? $s_parent_id : $s_product_id;
+        $s_q = "select 1 from {$s_o2c_table}\n                 left join {$s_cat_table} on {$s_cat_table}.oxid = {$s_o2c_table}.oxcatnid\n                 where {$s_o2c_table}.oxobjectid = :oxobjectid and\n                       {$s_cat_table}.oxrootid = :oxrootid";
+        return (bool) $o_db->get_one($s_q, ['oxobjectid' => $s_product_id, 'oxrootid' => $s_root_cat_id]);
     }
-
     /**
      * Set active basket root category
      *
      * @param string $sRoot Root category id
      */
-    public function setBasketRootCatId($sRoot)
+    public function set_basket_root_cat_id($s_root)
     {
-        $this->_sBasketCategoryId = $sRoot;
+        $this->_s_basket_category_id = $s_root;
     }
-
     /**
      * Get active basket root category
      *
      * @return string
      */
-    public function getBasketRootCatId()
+    public function get_basket_root_cat_id()
     {
-        return $this->_sBasketCategoryId;
+        return $this->_s_basket_category_id;
     }
-
     /**
      * Sets category change warn state
      *
      * @param bool $blShow to show warning or not
      */
-    public function setCatChangeWarningState($blShow)
+    public function set_cat_change_warning_state($bl_show)
     {
-        $this->_blShowCatChangeWarning = $blShow;
+        $this->_bl_show_cat_change_warning = $bl_show;
     }
-
     /**
      * Tells to show category change warning
      *
      * @return bool
      */
-    public function showCatChangeWarning()
+    public function show_cat_change_warning()
     {
-        return $this->_blShowCatChangeWarning;
+        return $this->_bl_show_cat_change_warning;
     }
-
     /**
      * Returns price list object of not discounted products
      *
      * @return \OxidEsales\Eshop\Core\PriceList in v4.8/5.1 on 2013-10-14; for formatting use oxPrice template engine
      *                                          plugin
      */
-    public function getNotDiscountProductsPrice()
+    public function get_not_discount_products_price()
     {
-        return $this->_oNotDiscountedProductsPriceList;
+        return $this->_o_not_discounted_products_price_list;
     }
-
     /**
      * Is called when new basket item is successfully added.
      *
      * @param bool $blOverride marker to accumulate passed amount or renew (default false).
      */
-    protected function addedNewItem($blOverride)
+    protected function added_new_item($bl_override)
     {
-        if (!$blOverride) {
-            $this->_blNewITemAdded = null;
-            Registry::getSession()->setVariable('blAddedNewItem', true);
+        if (!$bl_override) {
+            $this->_bl_new_i_tem_added = null;
+            Registry::get_session()->set_variable('blAddedNewItem', true);
         }
     }
-
     /**
      * Resets new basket item addition state on unserialization
      */
     public function __wakeUp()
     {
-        $this->_blNewITemAdded = null;
-        $this->_isCalculationModeNetto = null;
+        $this->_bl_new_i_tem_added = null;
+        $this->_is_calculation_mode_netto = null;
     }
-
     /**
      * Returns true if new product was just added to basket
      *
      * @return bool
      */
-    public function isNewItemAdded()
+    public function is_new_item_added()
     {
-        if ($this->_blNewITemAdded == null) {
-            $this->_blNewITemAdded = (bool) Registry::getSession()->getVariable('blAddedNewItem');
-            Registry::getSession()->deleteVariable('blAddedNewItem');
+        if ($this->_bl_new_i_tem_added == null) {
+            $this->_bl_new_i_tem_added = (bool) Registry::get_session()->get_variable('blAddedNewItem');
+            Registry::get_session()->delete_variable('blAddedNewItem');
         }
-
-        return $this->_blNewITemAdded;
+        return $this->_bl_new_i_tem_added;
     }
-
     /**
      * Returns true if at least one product is downloadable in basket
      *
      * @return bool
      */
-    public function hasDownloadableProducts()
+    public function has_downloadable_products()
     {
-        $this->_blDownloadableProducts = false;
+        $this->_bl_downloadable_products = false;
         /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            if ($oBasketItem->getArticle(false) && $oBasketItem->getArticle(false)->isDownloadable()) {
-                $this->_blDownloadableProducts = true;
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            if ($o_basket_item->get_article(false) && $o_basket_item->get_article(false)->is_downloadable()) {
+                $this->_bl_downloadable_products = true;
                 break;
             }
         }
-
-        return $this->_blDownloadableProducts;
+        return $this->_bl_downloadable_products;
     }
-
     /**
      * Returns whether there are any articles in basket with intangible products agreement enabled.
      *
      * @return bool
      */
-    public function hasArticlesWithIntangibleAgreement()
+    public function has_articles_with_intangible_agreement()
     {
-        $blHasArticlesWithIntangibleAgreement = false;
-
+        $bl_has_articles_with_intangible_agreement = false;
         /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            if ($oBasketItem->getArticle(false) && $oBasketItem->getArticle(false)->hasIntangibleAgreement()) {
-                $blHasArticlesWithIntangibleAgreement = true;
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            if ($o_basket_item->get_article(false) && $o_basket_item->get_article(false)->has_intangible_agreement()) {
+                $bl_has_articles_with_intangible_agreement = true;
                 break;
             }
         }
-
-        return $blHasArticlesWithIntangibleAgreement;
+        return $bl_has_articles_with_intangible_agreement;
     }
-
     /**
      * Returns whether there are any articles in basket with downloadable products agreement enabled.
      *
      * @return bool
      */
-    public function hasArticlesWithDownloadableAgreement()
+    public function has_articles_with_downloadable_agreement()
     {
-        $blHasArticlesWithIntangibleAgreement = false;
-
+        $bl_has_articles_with_intangible_agreement = false;
         /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
-        foreach ($this->_aBasketContents as $oBasketItem) {
-            if ($oBasketItem->getArticle(false) && $oBasketItem->getArticle(false)->hasDownloadableAgreement()) {
-                $blHasArticlesWithIntangibleAgreement = true;
+        foreach ($this->_a_basket_contents as $o_basket_item) {
+            if ($o_basket_item->get_article(false) && $o_basket_item->get_article(false)->has_downloadable_agreement()) {
+                $bl_has_articles_with_intangible_agreement = true;
                 break;
             }
         }
-
-        return $blHasArticlesWithIntangibleAgreement;
+        return $bl_has_articles_with_intangible_agreement;
     }
-
     /**
      * Returns min order price value
      *
      * @return float
      */
-    public function getMinOrderPrice()
+    public function get_min_order_price()
     {
-        return Price::getPriceInActCurrency(Registry::getConfig()->getConfigParam('iMinOrderPrice'));
+        return Price::get_price_in_act_currency(Registry::get_config()->get_config_param('iMinOrderPrice'));
     }
-
-    private function handleNoArticleException(BasketItem $basketItem, NoArticleException $exception): void
+    private function handle_no_article_exception(Basket_Item $basket_item, No_Article_Exception $exception): void
     {
-        $this->removeItem($basketItem->getBasketItemKey());
-
-        $message = sprintf(
-            Registry::getLang()->translateString('ERROR_MESSAGE_ARTICLE_ARTICLE_DOES_NOT_EXIST'),
-            $basketItem->getTitle()
-        );
-
-        Registry::getUtilsView()->addErrorToDisplay($message);
-        ContainerFacade::get(LoggerInterface::class)->warning(
-            $message,
-            [
-                'product id' => $exception->getProductId(),
-                'shop id' => $basketItem->getShopId(),
-            ]
-        );
+        $this->remove_item($basket_item->get_basket_item_key());
+        $message = sprintf(Registry::get_lang()->translate_string('ERROR_MESSAGE_ARTICLE_ARTICLE_DOES_NOT_EXIST'), $basket_item->get_title());
+        Registry::get_utils_view()->add_error_to_display($message);
+        Container_Facade::get(Logger_Interface::class)->warning($message, ['product id' => $exception->get_product_id(), 'shop id' => $basket_item->get_shop_id()]);
     }
 }

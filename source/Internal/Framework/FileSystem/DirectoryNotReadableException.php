@@ -4,11 +4,9 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\File_System;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\FileSystem;
-
-class DirectoryNotReadableException extends \Exception
+class Directory_Not_Readable_Exception extends \Exception
 {
 }

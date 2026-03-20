@@ -1,63 +1,50 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin article main pricealarm manager.
  * Performs collection and updatind (on user submit) main item information.
  * Admin Menu: Customer Info -> pricealarm -> Main.
  */
-class PriceAlarmMail extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Price_Alarm_Mail extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         parent::render();
-
-        $shopId = $config->getShopId();
+        $shop_id = $config->get_shop_id();
         //articles price in subshop and baseshop can be different
-        $this->_aViewData['iAllCnt'] = 0;
-        $query = "
-            SELECT oxprice, oxartid
-            FROM oxpricealarm
-            WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
-        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->select(
-            $query,
-            [
-                'oxshopid' => $shopId,
-            ]
-        );
+        $this->_a_view_data['iAllCnt'] = 0;
+        $query = "\n            SELECT oxprice, oxartid\n            FROM oxpricealarm\n            WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
+        $result = \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->select($query, ['oxshopid' => $shop_id]);
         if ($result != false && $result->count() > 0) {
-            $simpleCache = [];
+            $simple_cache = [];
             while (!$result->EOF) {
                 $price = $result->fields['oxprice'];
-                $articleId = $result->fields['oxartid'];
-                if (isset($simpleCache[$articleId])) {
-                    if ($simpleCache[$articleId] <= $price) {
-                        $this->_aViewData['iAllCnt'] += 1;
+                $article_id = $result->fields['oxartid'];
+                if (isset($simple_cache[$article_id])) {
+                    if ($simple_cache[$article_id] <= $price) {
+                        $this->_a_view_data['iAllCnt'] += 1;
                     }
                 } else {
-                    $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-                    if ($article->load($articleId)) {
-                        $articlePrice = $simpleCache[$articleId] = $article->getPrice()->getBruttoPrice();
-                        if ($articlePrice <= $price) {
-                            $this->_aViewData['iAllCnt'] += 1;
+                    $article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+                    if ($article->load($article_id)) {
+                        $article_price = $simple_cache[$article_id] = $article->get_price()->get_brutto_price();
+                        if ($article_price <= $price) {
+                            $this->_a_view_data['iAllCnt'] += 1;
                         }
                     }
                 }
-                $result->fetchRow();
+                $result->fetch_row();
             }
         }
-
         return 'pricealarm_mail';
     }
 }

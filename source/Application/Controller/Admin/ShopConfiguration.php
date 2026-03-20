@@ -1,48 +1,36 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Category;
-use OxidEsales\Eshop\Application\Model\Shop;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\DisplayError;
-use OxidEsales\Eshop\Core\NoJsValidator;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfigurationInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Event\SettingChangedEvent;
-
+use Oxid_Esales\Eshop\Application\Model\Category;
+use Oxid_Esales\Eshop\Application\Model\Shop;
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Display_Error;
+use Oxid_Esales\Eshop\Core\No_Js_Validator;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Str;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Bridge_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Form_Configuration\Field_Configuration_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Module_Configuration_Dao_Bridge_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setting\Event\Setting_Changed_Event;
 /**
  * Admin shop config manager.
  * Collects shop config information, updates it on user submit, etc.
  * Admin Menu: Main Menu -> Core Settings -> General.
  */
-class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Shop_Configuration extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
-    protected $_sThisTemplate = 'shop_config';
-    protected $_aSkipMultiline = ['aHomeCountry'];
-    protected $_aParseFloat = ['iMinOrderPrice'];
-
-    protected $_aConfParams = [
-        'bool'   => 'confbools',
-        'str'    => 'confstrs',
-        'arr'    => 'confarrs',
-        'aarr'   => 'confaarrs',
-        'select' => 'confselects',
-        'num'    => 'confnum',
-    ];
-
+    protected $_s_this_template = 'shop_config';
+    protected $_a_skip_multiline = ['aHomeCountry'];
+    protected $_a_parse_float = ['iMinOrderPrice'];
+    protected $_a_conf_params = ['bool' => 'confbools', 'str' => 'confstrs', 'arr' => 'confarrs', 'aarr' => 'confaarrs', 'select' => 'confselects', 'num' => 'confnum'];
     /**
      * Executes parent method parent::render(), passes shop configuration parameters
      * to template engine and returns name of template file "shop_config".
@@ -51,138 +39,113 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      */
     public function render()
     {
-        $config = Registry::getConfig();
-
+        $config = Registry::get_config();
         parent::render();
-
-        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != '-1') {
+        $sox_id = $this->_a_view_data['oxid'] = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
             // load object
-            $this->_aViewData['edit'] = $shop = $this->getEditShop($soxId);
-
+            $this->_a_view_data['edit'] = $shop = $this->get_edit_shop($sox_id);
             try {
                 // category choosen as default
-                $this->_aViewData['defcat'] = null;
+                $this->_a_view_data['defcat'] = null;
                 if ($shop->oxshops__oxdefcat->value) {
-                    $category = oxNew(Category::class);
+                    $category = ox_new(Category::class);
                     if ($category->load($shop->oxshops__oxdefcat->value)) {
-                        $this->_aViewData['defcat'] = $category;
+                        $this->_a_view_data['defcat'] = $category;
                     }
                 }
             } catch (Exception) {
                 // on most cases this means that views are broken, so just
                 // outputting notice and keeping functionality flow ..
-                $this->_aViewData['updateViews'] = 1;
+                $this->_a_view_data['updateViews'] = 1;
             }
-
-            $aoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
+            $aoc = Registry::get_request()->get_request_escaped_parameter('aoc');
             if ($aoc == 1) {
-                $shopDefaultCategoryAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ShopDefaultCategoryAjax::class);
-                $this->_aViewData['oxajax'] = $shopDefaultCategoryAjax->getColumns();
-
+                $shop_default_category_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Shop_Default_Category_Ajax::class);
+                $this->_a_view_data['oxajax'] = $shop_default_category_ajax->get_columns();
                 return 'popups/shop_default_category';
             }
         }
-
-        $dbVariables = $this->loadConfVars($soxId, $this->getModuleForConfigVars());
-        $confVars = $dbVariables['vars'];
-        $confVars['str']['sVersion'] = $config->getConfigParam('sVersion');
-
-        $this->_aViewData['var_constraints'] = $dbVariables['constraints'];
-        $this->_aViewData['var_grouping'] = $dbVariables['grouping'];
-        foreach ($this->_aConfParams as $type => $param) {
-            $this->_aViewData[$param] = $confVars[$type];
+        $db_variables = $this->load_conf_vars($sox_id, $this->get_module_for_config_vars());
+        $conf_vars = $db_variables['vars'];
+        $conf_vars['str']['sVersion'] = $config->get_config_param('sVersion');
+        $this->_a_view_data['var_constraints'] = $db_variables['constraints'];
+        $this->_a_view_data['var_grouping'] = $db_variables['grouping'];
+        foreach ($this->_a_conf_params as $type => $param) {
+            $this->_a_view_data[$param] = $conf_vars[$type];
         }
-
         // #251A passing country list
-        $countryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
-        $countryList->loadActiveCountries(Registry::getLang()->getObjectTplLanguage());
-        if (isset($confVars['arr']['aHomeCountry']) && count($confVars['arr']['aHomeCountry']) && count($countryList)) {
-            foreach ($countryList as $sCountryId => $oCountry) {
-                if (in_array($oCountry->oxcountry__oxid->value, $confVars['arr']['aHomeCountry'])) {
-                    $countryList[$sCountryId]->selected = '1';
+        $country_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Country_List::class);
+        $country_list->load_active_countries(Registry::get_lang()->get_object_tpl_language());
+        if (isset($conf_vars['arr']['aHomeCountry']) && count($conf_vars['arr']['aHomeCountry']) && count($country_list)) {
+            foreach ($country_list as $s_country_id => $o_country) {
+                if (in_array($o_country->oxcountry__oxid->value, $conf_vars['arr']['aHomeCountry'])) {
+                    $country_list[$s_country_id]->selected = '1';
                 }
             }
         }
-
-        $this->_aViewData['countrylist'] = $countryList;
-
+        $this->_a_view_data['countrylist'] = $country_list;
         // checking if cUrl is enabled
-        $this->_aViewData['blCurlIsActive'] = (!function_exists('curl_init')) ? false : true;
-
-        $contactFormConfiguration = ContainerFacade::get(ContactFormBridgeInterface::class)
-            ->getContactFormConfiguration();
-
+        $this->_a_view_data['blCurlIsActive'] = !function_exists('curl_init') ? false : true;
+        $contact_form_configuration = Container_Facade::get(Contact_Form_Bridge_Interface::class)->get_contact_form_configuration();
         /** @var FieldConfigurationInterface $fieldConfiguration */
-        foreach ($contactFormConfiguration->getFieldConfigurations() as $fieldConfiguration) {
-            $this->_aViewData['contactFormFieldConfigurations'][] = [
-                'name' => $fieldConfiguration->getName(),
-                'label' => $fieldConfiguration->getLabel(),
-                'isRequired' => $fieldConfiguration->isRequired(),
-            ];
+        foreach ($contact_form_configuration->get_field_configurations() as $field_configuration) {
+            $this->_a_view_data['contactFormFieldConfigurations'][] = ['name' => $field_configuration->get_name(), 'label' => $field_configuration->get_label(), 'isRequired' => $field_configuration->is_required()];
         }
-
-        return $this->_sThisTemplate;
+        return $this->_s_this_template;
     }
-
     /**
      * return theme filter for config variables
      *
      * @return string
      */
-    protected function getModuleForConfigVars()
+    protected function get_module_for_config_vars()
     {
         return '';
     }
-
     /**
      * Saves shop configuration variables
      */
-    public function saveConfVars(): void
+    public function save_conf_vars(): void
     {
-        $config = Registry::getConfig();
-
-        $this->resetContentCache();
-
-        $configValidator = oxNew(NoJsValidator::class);
-        foreach ($this->_aConfParams as $existingConfigType => $existingConfigName) {
-            $requestValue = Registry::getRequest()->getRequestParameter($existingConfigName);
-            if (is_array($requestValue)) {
-                foreach ($requestValue as $configName => $newConfigValue) {
-                    $oldValue = $config->getConfigParam($configName);
-                    if ($newConfigValue !== $oldValue) {
-                        $sValueToValidate = is_array($newConfigValue) ? join(', ', $newConfigValue) : $newConfigValue;
-                        if (!$configValidator->isValid($sValueToValidate)) {
-                            $error = oxNew(DisplayError::class);
-                            $error->setFormatParameters(htmlspecialchars((string) $sValueToValidate));
-                            $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
-                            Registry::getUtilsView()->addErrorToDisplay($error);
+        $config = Registry::get_config();
+        $this->reset_content_cache();
+        $config_validator = ox_new(No_Js_Validator::class);
+        foreach ($this->_a_conf_params as $existing_config_type => $existing_config_name) {
+            $request_value = Registry::get_request()->get_request_parameter($existing_config_name);
+            if (is_array($request_value)) {
+                foreach ($request_value as $config_name => $new_config_value) {
+                    $old_value = $config->get_config_param($config_name);
+                    if ($new_config_value !== $old_value) {
+                        $s_value_to_validate = is_array($new_config_value) ? join(', ', $new_config_value) : $new_config_value;
+                        if (!$config_validator->is_valid($s_value_to_validate)) {
+                            $error = ox_new(Display_Error::class);
+                            $error->set_format_parameters(htmlspecialchars((string) $s_value_to_validate));
+                            $error->set_message('SHOP_CONFIG_ERROR_INVALID_VALUE');
+                            Registry::get_utils_view()->add_error_to_display($error);
                             continue;
                         }
-                        $this->saveSetting($configName, $existingConfigType, $newConfigValue);
+                        $this->save_setting($config_name, $existing_config_type, $new_config_value);
                     }
                 }
             }
         }
     }
-
     /**
      * Saves changed shop configuration parameters.
      */
     public function save(): void
     {
         // saving config params
-        $this->saveConfVars();
-
+        $this->save_conf_vars();
         //saving additional fields ("oxshops__oxdefcat"") that goes directly to shop (not config)
         /** @var Shop $shop */
-        $shop = oxNew(Shop::class);
-        if ($shop->load($this->getEditObjectId())) {
-            $shop->assign(Registry::getRequest()->getRequestEscapedParameter('editval'));
+        $shop = ox_new(Shop::class);
+        if ($shop->load($this->get_edit_object_id())) {
+            $shop->assign(Registry::get_request()->get_request_escaped_parameter('editval'));
             $shop->save();
         }
     }
-
     /**
      * Load and parse config vars from db.
      * Return value is a map:
@@ -195,20 +158,13 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return array
      */
-    public function loadConfVars($shopId, $moduleId)
+    public function load_conf_vars($shop_id, $module_id)
     {
-        Registry::getConfig();
-        $configurationVariables = [
-            'bool'   => [],
-            'str'    => [],
-            'arr'    => [],
-            'aarr'   => [],
-            'select' => [],
-        ];
+        Registry::get_config();
+        $configuration_variables = ['bool' => [], 'str' => [], 'arr' => [], 'aarr' => [], 'select' => []];
         $constraints = [];
         $groupings = [];
-        $rs = DatabaseProvider::getDb()->select(
-            'select cfg.oxvarname,
+        $rs = Database_Provider::get_db()->select('select cfg.oxvarname,
                     cfg.oxvartype,
                     cfg.oxvarvalue,
                     disp.oxvarconstraint,
@@ -218,18 +174,12 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                         on cfg.oxmodule=disp.oxcfgmodule and cfg.oxvarname=disp.oxcfgvarname
                 where cfg.oxshopid = :oxshopid
                     and cfg.oxmodule = :oxmodule
-                order by disp.oxpos, cfg.oxvarname',
-            [
-                'oxshopid' => $shopId,
-                'oxmodule' => $moduleId,
-            ]
-        );
-
+                order by disp.oxpos, cfg.oxvarname', ['oxshopid' => $shop_id, 'oxmodule' => $module_id]);
         if ($rs != false && $rs->count() > 0) {
             while (!$rs->EOF) {
                 [$name, $type, $value, $constraint, $grouping] = array_values($rs->fields);
-                $configurationVariables[$type][$name] = $this->unserializeConfVar($type, $name, $value);
-                $constraints[$name] = $this->parseConstraint($type, $constraint);
+                $configuration_variables[$type][$name] = $this->unserialize_conf_var($type, $name, $value);
+                $constraints[$name] = $this->parse_constraint($type, $constraint);
                 if ($grouping) {
                     if (!isset($groupings[$grouping])) {
                         $groupings[$grouping] = [$name => $type];
@@ -237,28 +187,21 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                         $groupings[$grouping][$name] = $type;
                     }
                 }
-                $rs->fetchRow();
+                $rs->fetch_row();
             }
         }
-
-        return [
-            'vars'        => $configurationVariables,
-            'constraints' => $constraints,
-            'grouping'    => $groupings,
-        ];
+        return ['vars' => $configuration_variables, 'constraints' => $constraints, 'grouping' => $groupings];
     }
-
     /**
      * If allow to configure information sending to OXID.
      * For PE and EE users it is always turned on.
      *
      * @return bool
      */
-    public function informationSendingToOxidConfigurable()
+    public function information_sending_to_oxid_configurable()
     {
-        return !Registry::getConfig()->getEdition()->isCommunityEdition();
+        return !Registry::get_config()->get_edition()->is_community_edition();
     }
-
     /**
      * parse constraint from type and serialized values
      *
@@ -267,14 +210,13 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return mixed
      */
-    protected function parseConstraint($type, $constraint)
+    protected function parse_constraint($type, $constraint)
     {
         return match ($type) {
             'select' => array_map(trim(...), explode('|', $constraint)),
             default => null,
         };
     }
-
     /**
      * serialize constraint from type and value
      *
@@ -283,14 +225,13 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return string
      */
-    protected function serializeConstraint($type, $constraint)
+    protected function serialize_constraint($type, $constraint)
     {
         return match ($type) {
             'select' => implode('|', array_map(trim(...), $constraint)),
             default => '',
         };
     }
-
     /**
      * Unserialize config var depending on it's type
      *
@@ -300,46 +241,40 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return mixed
      */
-    public function unserializeConfVar($type, $name, $value)
+    public function unserialize_conf_var($type, $name, $value)
     {
-        $str = Str::getStr();
+        $str = Str::get_str();
         $data = null;
-
         switch ($type) {
             case 'bool':
-                $data = ($value == 'true' || $value == '1');
+                $data = $value == 'true' || $value == '1';
                 break;
-
             case 'str':
             case 'select':
             case 'num':
             case 'int':
                 $data = $str->htmlentities($value);
-                if (in_array($name, $this->_aParseFloat)) {
+                if (in_array($name, $this->_a_parse_float)) {
                     $data = str_replace(',', '.', $data);
                 }
                 break;
-
             case 'arr':
-                if (in_array($name, $this->_aSkipMultiline)) {
+                if (in_array($name, $this->_a_skip_multiline)) {
                     $data = unserialize($value);
                 } else {
-                    $data = $str->htmlentities($this->arrayToMultiline(unserialize($value)));
+                    $data = $str->htmlentities($this->array_to_multiline(unserialize($value)));
                 }
                 break;
-
             case 'aarr':
-                if (in_array($name, $this->_aSkipMultiline)) {
+                if (in_array($name, $this->_a_skip_multiline)) {
                     $data = unserialize($value);
                 } else {
-                    $data = $str->htmlentities($this->aarrayToMultiline(unserialize($value)));
+                    $data = $str->htmlentities($this->aarray_to_multiline(unserialize($value)));
                 }
                 break;
         }
-
         return $data;
     }
-
     /**
      * Prepares data for storing to database.
      * Example: $sType='aarr', $sName='someName', $mValue='key1=>val1\nkey2=>val2'
@@ -350,36 +285,30 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return string
      */
-    public function serializeConfVar($type, $name, $value)
+    public function serialize_conf_var($type, $name, $value)
     {
         $data = $value;
-
         switch ($type) {
             case 'bool':
                 break;
-
             case 'str':
             case 'select':
             case 'int':
-                if (in_array($name, $this->_aParseFloat)) {
+                if (in_array($name, $this->_a_parse_float)) {
                     $data = str_replace(',', '.', $data);
                 }
                 break;
-
             case 'arr':
                 if (!is_array($value)) {
-                    $data = $this->multilineToArray($value);
+                    $data = $this->multiline_to_array($value);
                 }
                 break;
-
             case 'aarr':
-                $data = $this->multilineToAarray($value);
+                $data = $this->multiline_to_aarray($value);
                 break;
         }
-
         return $data;
     }
-
     /**
      * Converts simple array to multiline text. Returns this text.
      *
@@ -387,11 +316,10 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return string
      */
-    protected function arrayToMultiline($input)
+    protected function array_to_multiline($input)
     {
         return implode("\n", (array) $input);
     }
-
     /**
      * Converts Multiline text to simple array. Returns this array.
      *
@@ -399,7 +327,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return array
      */
-    protected function multilineToArray($multiline)
+    protected function multiline_to_array($multiline)
     {
         $array = explode("\n", $multiline);
         if (is_array($array)) {
@@ -409,11 +337,9 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                     unset($array[$key]);
                 }
             }
-
             return $array;
         }
     }
-
     /**
      * Converts associative array to multiline text. Returns this text.
      *
@@ -421,7 +347,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return string
      */
-    protected function aarrayToMultiline($input)
+    protected function aarray_to_multiline($input)
     {
         if (is_array($input)) {
             $multiline = '';
@@ -429,21 +355,15 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                 if ($multiline) {
                     $multiline .= "\n";
                 }
-
                 if (is_string($value)) {
                     $multiline .= $key . ' => ' . $value;
                 } else {
-                    Registry::getLogger()->warning(
-                        'The value in ShopConfiguration::aarrayToMultiline() is not a string. The nested values are not supported.',
-                        [$value]
-                    );
+                    Registry::get_logger()->warning('The value in ShopConfiguration::aarrayToMultiline() is not a string. The nested values are not supported.', [$value]);
                 }
             }
-
             return $multiline;
         }
     }
-
     /**
      * Converts Multiline text to associative array. Returns this array.
      *
@@ -451,9 +371,9 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @return array
      */
-    protected function multilineToAarray($multiline)
+    protected function multiline_to_aarray($multiline)
     {
-        $string = Str::getStr();
+        $string = Str::get_str();
         $array = [];
         $lines = explode("\n", $multiline);
         foreach ($lines as $line) {
@@ -466,53 +386,44 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                 }
             }
         }
-
         return $array;
     }
-
     /**
      * Returns active/editable object id
      *
      * @return string
      */
-    public function getEditObjectId()
+    public function get_edit_object_id()
     {
-        $editId = parent::getEditObjectId();
-        if (!$editId) {
-            return Registry::getConfig()->getShopId();
+        $edit_id = parent::get_edit_object_id();
+        if (!$edit_id) {
+            return Registry::get_config()->get_shop_id();
         }
-
-        return $editId;
+        return $edit_id;
     }
-
     /**
      * @param mixed $configValue
      */
-    private function saveSetting(string $configName, string $existingConfigType, $configValue): void
+    private function save_setting(string $config_name, string $existing_config_type, $config_value): void
     {
-        $shopId = (int)$this->getEditObjectId();
-        $module = $this->getModuleForConfigVars();
-        $preparedConfigValue = $this->serializeConfVar($existingConfigType, $configName, $configValue);
+        $shop_id = (int) $this->get_edit_object_id();
+        $module = $this->get_module_for_config_vars();
+        $prepared_config_value = $this->serialize_conf_var($existing_config_type, $config_name, $config_value);
         if (str_contains($module, 'module:')) {
-            $moduleId = explode(':', $module)[1];
-            $moduleConfigurationBridge = ContainerFacade::get(ModuleConfigurationDaoBridgeInterface::class);
-            $moduleConfiguration = $moduleConfigurationBridge->get($moduleId);
-
-            if ($moduleConfiguration->hasModuleSetting($configName)) {
-                $setting = $moduleConfiguration->getModuleSetting($configName);
-                $setting->setValue($preparedConfigValue);
-
-                $moduleConfigurationBridge->save($moduleConfiguration);
-
-                ContainerFacade::dispatch(new SettingChangedEvent($configName, $shopId, $moduleId));
+            $module_id = explode(':', $module)[1];
+            $module_configuration_bridge = Container_Facade::get(Module_Configuration_Dao_Bridge_Interface::class);
+            $module_configuration = $module_configuration_bridge->get($module_id);
+            if ($module_configuration->has_module_setting($config_name)) {
+                $setting = $module_configuration->get_module_setting($config_name);
+                $setting->set_value($prepared_config_value);
+                $module_configuration_bridge->save($module_configuration);
+                Container_Facade::dispatch(new Setting_Changed_Event($config_name, $shop_id, $module_id));
             } else {
-                Registry::getLogger()->warning(
-                    "Module \"$moduleId\" setting \"$configName\" is missing in metadata.php or configuration file."
-                );
-                Registry::getConfig()->saveShopConfVar($existingConfigType, $configName, $preparedConfigValue, $shopId, $module);
+                Registry::get_logger()->warning("Module \"{$module_id}\" setting \"{$config_name}\" is missing in metadata.php or configuration file.");
+                Registry::get_config()->save_shop_conf_var($existing_config_type, $config_name, $prepared_config_value, $shop_id, $module);
             }
         } else {
-            Registry::getConfig()->saveShopConfVar($existingConfigType, $configName, $preparedConfigValue, $shopId, $module);
+            Registry::get_config()->save_shop_conf_var($existing_config_type, $config_name, $prepared_config_value, $shop_id, $module);
         }
     }
 }

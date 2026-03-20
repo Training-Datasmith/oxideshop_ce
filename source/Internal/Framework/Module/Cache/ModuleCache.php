@@ -4,47 +4,38 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Cache;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Cache;
-
-use Psr\Cache\CacheItemPoolInterface;
-
-class ModuleCache implements ModuleCacheInterface
+use Psr\Cache\Cache_Item_Pool_Interface;
+class Module_Cache implements Module_Cache_Interface
 {
-    public function __construct(private readonly CacheItemPoolInterface $cache)
+    public function __construct(private readonly Cache_Item_Pool_Interface $cache)
     {
     }
-
-    public function deleteItem(string $key): void
+    public function delete_item(string $key): void
     {
-        $this->cache->deleteItem($key);
+        $this->cache->delete_item($key);
     }
-
     public function put(string $key, array $data): void
     {
-        $cacheItem = $this->cache->getItem($key);
-        $cacheItem->set($data);
-        $this->cache->save($cacheItem);
+        $cache_item = $this->cache->get_item($key);
+        $cache_item->set($data);
+        $this->cache->save($cache_item);
     }
-
     /**
      * @throws CacheNotFoundException
      */
     public function get(string $key): array
     {
-        $cacheItem = $this->cache->getItem($key);
-
-        if (!$cacheItem->isHit()) {
-            throw new CacheNotFoundException("Cache with key '$key' not found.");
+        $cache_item = $this->cache->get_item($key);
+        if (!$cache_item->is_hit()) {
+            throw new Cache_Not_Found_Exception("Cache with key '{$key}' not found.");
         }
-
-        return $cacheItem->get();
+        return $cache_item->get();
     }
-
     public function exists(string $key): bool
     {
-        return $this->cache->getItem($key)->isHit();
+        return $this->cache->get_item($key)->is_hit();
     }
 }

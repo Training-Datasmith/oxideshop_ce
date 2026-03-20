@@ -1,289 +1,230 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 use Exception;
-use OxidEsales\Eshop\Core\Dao\ApplicationServerDao;
-use OxidEsales\Eshop\Core\Module\ModuleList;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Service\ApplicationServerExporter;
-use OxidEsales\Eshop\Core\Service\ApplicationServerService;
-
+use Oxid_Esales\Eshop\Core\Dao\Application_Server_Dao;
+use Oxid_Esales\Eshop\Core\Module\Module_List;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Service\Application_Server_Exporter;
+use Oxid_Esales\Eshop\Core\Service\Application_Server_Service;
 /**
  * Contains system event handler methods
  *
  * @internal Do not make a module extension for this class.
  */
-class SystemEventHandler
+class System_Event_Handler
 {
     /**
      * @var \OxidEsales\Eshop\Core\OnlineModuleVersionNotifier
      */
-    private $onlineModuleVersionNotifier;
-
+    private $online_module_version_notifier;
     /**
      * @var \OxidEsales\Eshop\Core\OnlineLicenseCheck
      */
-    private $onlineLicenseCheck;
-
+    private $online_license_check;
     /**
      * OLC dependency setter
      */
-    public function setOnlineLicenseCheck(\OxidEsales\Eshop\Core\OnlineLicenseCheck $onlineLicenseCheck): void
+    public function set_online_license_check(\Oxid_Esales\Eshop\Core\Online_License_Check $online_license_check): void
     {
-        $this->onlineLicenseCheck = $onlineLicenseCheck;
+        $this->online_license_check = $online_license_check;
     }
-
     /**
      * OLC dependency getter
      *
      * @return \OxidEsales\Eshop\Core\OnlineLicenseCheck
      */
-    public function getOnlineLicenseCheck()
+    public function get_online_license_check()
     {
-        if (!$this->onlineLicenseCheck) {
+        if (!$this->online_license_check) {
             /** @var \OxidEsales\Eshop\Core\Curl $curl */
-            $curl = oxNew(\OxidEsales\Eshop\Core\Curl::class);
-
+            $curl = ox_new(\Oxid_Esales\Eshop\Core\Curl::class);
             /** @var \OxidEsales\Eshop\Core\OnlineServerEmailBuilder $emailBuilder */
-            $emailBuilder = oxNew(\OxidEsales\Eshop\Core\OnlineServerEmailBuilder::class);
-
+            $email_builder = ox_new(\Oxid_Esales\Eshop\Core\Online_Server_Email_Builder::class);
             /** @var \OxidEsales\Eshop\Core\SimpleXml $simpleXml */
-            $simpleXml = oxNew(\OxidEsales\Eshop\Core\SimpleXml::class);
-
+            $simple_xml = ox_new(\Oxid_Esales\Eshop\Core\Simple_Xml::class);
             /** @var \OxidEsales\Eshop\Core\OnlineLicenseCheckCaller $licenseCaller */
-            $licenseCaller = oxNew(\OxidEsales\Eshop\Core\OnlineLicenseCheckCaller::class, $curl, $emailBuilder, $simpleXml);
-
+            $license_caller = ox_new(\Oxid_Esales\Eshop\Core\Online_License_Check_Caller::class, $curl, $email_builder, $simple_xml);
             /** @var \OxidEsales\Eshop\Core\UserCounter $userCounter */
-            $userCounter = oxNew(\OxidEsales\Eshop\Core\UserCounter::class);
-
+            $user_counter = ox_new(\Oxid_Esales\Eshop\Core\User_Counter::class);
             /** @var ApplicationServerExporter $appServerExporter */
-            $appServerExporter = $this->getApplicationServerExporter();
-
+            $app_server_exporter = $this->get_application_server_exporter();
             /** @var \OxidEsales\Eshop\Core\OnlineLicenseCheck $OLC */
-            $OLC = oxNew(\OxidEsales\Eshop\Core\OnlineLicenseCheck::class, $licenseCaller);
-            $OLC->setAppServerExporter($appServerExporter);
-            $OLC->setUserCounter($userCounter);
-
-            $this->setOnlineLicenseCheck($OLC);
+            $OLC = ox_new(\Oxid_Esales\Eshop\Core\Online_License_Check::class, $license_caller);
+            $OLC->set_app_server_exporter($app_server_exporter);
+            $OLC->set_user_counter($user_counter);
+            $this->set_online_license_check($OLC);
         }
-
-        return $this->onlineLicenseCheck;
+        return $this->online_license_check;
     }
-
     /**
      * ApplicationServerExporter dependency setter
      *
      * @return \OxidEsales\Eshop\Core\Service\ApplicationServerExporterInterface
      */
-    protected function getApplicationServerExporter()
+    protected function get_application_server_exporter()
     {
-        $appServerService = $this->getAppServerService();
-        return oxNew(ApplicationServerExporter::class, $appServerService);
+        $app_server_service = $this->get_app_server_service();
+        return ox_new(Application_Server_Exporter::class, $app_server_service);
     }
-
     /**
      * OnlineModuleVersionNotifier dependency setter
      */
-    public function setOnlineModuleVersionNotifier(\OxidEsales\Eshop\Core\OnlineModuleVersionNotifier $onlineModuleVersionNotifier): void
+    public function set_online_module_version_notifier(\Oxid_Esales\Eshop\Core\Online_Module_Version_Notifier $online_module_version_notifier): void
     {
-        $this->onlineModuleVersionNotifier = $onlineModuleVersionNotifier;
+        $this->online_module_version_notifier = $online_module_version_notifier;
     }
-
     /**
      * OnlineModuleVersionNotifier dependency getter
      *
      * @return \OxidEsales\Eshop\Core\OnlineModuleVersionNotifier
      */
-    public function getOnlineModuleVersionNotifier()
+    public function get_online_module_version_notifier()
     {
-        if (!$this->onlineModuleVersionNotifier) {
+        if (!$this->online_module_version_notifier) {
             /** @var \OxidEsales\Eshop\Core\Curl $curl */
-            $curl = oxNew(\OxidEsales\Eshop\Core\Curl::class);
-
+            $curl = ox_new(\Oxid_Esales\Eshop\Core\Curl::class);
             /** @var \OxidEsales\Eshop\Core\OnlineServerEmailBuilder $mailBuilder */
-            $mailBuilder = oxNew(\OxidEsales\Eshop\Core\OnlineServerEmailBuilder::class);
-
+            $mail_builder = ox_new(\Oxid_Esales\Eshop\Core\Online_Server_Email_Builder::class);
             /** @var \OxidEsales\Eshop\Core\SimpleXml $simpleXml */
-            $simpleXml = oxNew(\OxidEsales\Eshop\Core\SimpleXml::class);
-
+            $simple_xml = ox_new(\Oxid_Esales\Eshop\Core\Simple_Xml::class);
             /** @var \OxidEsales\Eshop\Core\OnlineModuleVersionNotifierCaller $onlineModuleVersionNotifierCaller */
-            $onlineModuleVersionNotifierCaller = oxNew(
-                \OxidEsales\Eshop\Core\OnlineModuleVersionNotifierCaller::class,
-                $curl,
-                $mailBuilder,
-                $simpleXml
-            );
-
+            $online_module_version_notifier_caller = ox_new(\Oxid_Esales\Eshop\Core\Online_Module_Version_Notifier_Caller::class, $curl, $mail_builder, $simple_xml);
             /** @var \OxidEsales\Eshop\Core\OnlineModuleVersionNotifier $onlineModuleVersionNotifier */
-            $onlineModuleVersionNotifier = oxNew(
-                \OxidEsales\Eshop\Core\OnlineModuleVersionNotifier::class,
-                $onlineModuleVersionNotifierCaller,
-                oxNew(ModuleList::class)
-            );
-
-            $this->setOnlineModuleVersionNotifier($onlineModuleVersionNotifier);
+            $online_module_version_notifier = ox_new(\Oxid_Esales\Eshop\Core\Online_Module_Version_Notifier::class, $online_module_version_notifier_caller, ox_new(Module_List::class));
+            $this->set_online_module_version_notifier($online_module_version_notifier);
         }
-
-        return $this->onlineModuleVersionNotifier;
+        return $this->online_module_version_notifier;
     }
-
     /**
      * onAdminLogin() is called on every successful login to the backend
      */
-    public function onAdminLogin(): void
+    public function on_admin_login(): void
     {
         try {
-            $this->getOnlineModuleVersionNotifier()->versionNotify();
+            $this->get_online_module_version_notifier()->version_notify();
         } catch (Exception) {
         }
     }
-
     /**
      * Perform shop startup related actions, like license check.
      */
-    public function onShopStart(): void
+    public function on_shop_start(): void
     {
-        $this->validateOffline();
+        $this->validate_offline();
     }
-
     /**
      * Perform shop finishing up related actions, like updating app server data.
      */
-    public function onShopEnd(): void
+    public function on_shop_end(): void
     {
-        $this->validateOnline();
+        $this->validate_online();
     }
-
     /**
      * Check if shop is valid online.
      */
-    protected function validateOnline()
+    protected function validate_online()
     {
         try {
-            $appServerService = $this->getAppServerService();
-            if (Registry::getConfig()->isAdmin()) {
-                $appServerService->updateAppServerInformationInAdmin();
+            $app_server_service = $this->get_app_server_service();
+            if (Registry::get_config()->is_admin()) {
+                $app_server_service->update_app_server_information_in_admin();
             } else {
-                $appServerService->updateAppServerInformationInFrontend();
+                $app_server_service->update_app_server_information_in_frontend();
             }
-
-            if (!Registry::getUtils()->isSearchEngine()) {
-                $this->sendShopInformation();
+            if (!Registry::get_utils()->is_search_engine()) {
+                $this->send_shop_information();
             }
         } catch (Exception $exception) {
-            Registry::getLogger()->error($exception->getMessage(), [$exception]);
+            Registry::get_logger()->error($exception->get_message(), [$exception]);
         }
     }
-
     /**
      * Sends shop information to oxid servers.
      */
-    protected function sendShopInformation()
+    protected function send_shop_information()
     {
-        if ($this->needToSendShopInformation()) {
-            $this->updateNextCheckTime();
-            $onlineLicenseCheck = $this->getOnlineLicenseCheck();
-            $onlineLicenseCheck->validateShopSerials();
+        if ($this->need_to_send_shop_information()) {
+            $this->update_next_check_time();
+            $online_license_check = $this->get_online_license_check();
+            $online_license_check->validate_shop_serials();
         }
     }
-
     /**
      * Check if need to send information.
      * We will not send information on each request due to possible performance drop.
      */
-    private function needToSendShopInformation(): bool
+    private function need_to_send_shop_information(): bool
     {
-        return $this->getNextCheckTime() < $this->getCurrentTime();
+        return $this->get_next_check_time() < $this->get_current_time();
     }
-
     /**
      * Return time stamp when shop was checked last with white noise from config.
      */
-    private function getNextCheckTime(): int
+    private function get_next_check_time(): int
     {
-        return (int) Registry::getConfig()->getSystemConfigParameter('sOnlineLicenseNextCheckTime');
+        return (int) Registry::get_config()->get_system_config_parameter('sOnlineLicenseNextCheckTime');
     }
-
     /**
      * Update when shop was checked last time with white noise.
      * White noise is used to separate call time for different shop.
      */
-    private function updateNextCheckTime(): void
+    private function update_next_check_time(): void
     {
-        $hourToCheck = $this->getCheckTime();
-
+        $hour_to_check = $this->get_check_time();
         /** @var \OxidEsales\Eshop\Core\UtilsDate $utilsDate */
-        $utilsDate = Registry::getUtilsDate();
-        $nextCheckTime = $utilsDate->formTime('tomorrow', $hourToCheck);
-
-        Registry::getConfig()->saveSystemConfigParameter('str', 'sOnlineLicenseNextCheckTime', $nextCheckTime);
+        $utils_date = Registry::get_utils_date();
+        $next_check_time = $utils_date->form_time('tomorrow', $hour_to_check);
+        Registry::get_config()->save_system_config_parameter('str', 'sOnlineLicenseNextCheckTime', $next_check_time);
     }
-
     /**
      * Returns time (hour minutes seconds) when to perform license check.
      * Create if does not exist.
      *
      * @return string time formed as H:i:s
      */
-    private function getCheckTime()
+    private function get_check_time()
     {
-        $checkTime = Registry::getConfig()->getSystemConfigParameter('sOnlineLicenseCheckTime');
-        if (!$checkTime) {
-            $hourToCheck = random_int(8, 23);
-            $minuteToCheck = random_int(0, 59);
-            $secondToCheck = random_int(0, 59);
-
-            $checkTime = $hourToCheck . ':' . $minuteToCheck . ':' . $secondToCheck;
-            Registry::getConfig()->saveSystemConfigParameter('str', 'sOnlineLicenseCheckTime', $checkTime);
+        $check_time = Registry::get_config()->get_system_config_parameter('sOnlineLicenseCheckTime');
+        if (!$check_time) {
+            $hour_to_check = random_int(8, 23);
+            $minute_to_check = random_int(0, 59);
+            $second_to_check = random_int(0, 59);
+            $check_time = $hour_to_check . ':' . $minute_to_check . ':' . $second_to_check;
+            Registry::get_config()->save_system_config_parameter('str', 'sOnlineLicenseCheckTime', $check_time);
         }
-
-        return $checkTime;
+        return $check_time;
     }
-
     /**
      * Return current time - time stamp.
      *
      * @return int
      */
-    private function getCurrentTime()
+    private function get_current_time()
     {
         /** @var \OxidEsales\Eshop\Core\UtilsDate $utilsDate */
-        $utilsDate = Registry::getUtilsDate();
-
-        return $utilsDate->getTime();
+        $utils_date = Registry::get_utils_date();
+        return $utils_date->get_time();
     }
-
     /**
      * Check if shop valid and do related actions.
      */
-    protected function validateOffline()
+    protected function validate_offline()
     {
     }
-
     /**
      * Gets application server service.
      *
      * @return \OxidEsales\Eshop\Core\Service\ApplicationServerServiceInterface
      */
-    protected function getAppServerService()
+    protected function get_app_server_service()
     {
-        return oxNew(
-            ApplicationServerService::class,
-            oxNew(
-                ApplicationServerDao::class,
-                \OxidEsales\Eshop\Core\DatabaseProvider::getDb(),
-                Registry::getConfig()
-            ),
-            oxNew(\OxidEsales\Eshop\Core\UtilsServer::class),
-            Registry::get('oxUtilsDate')->getTime()
-        );
+        return ox_new(Application_Server_Service::class, ox_new(Application_Server_Dao::class, \Oxid_Esales\Eshop\Core\Database_Provider::get_db(), Registry::get_config()), ox_new(\Oxid_Esales\Eshop\Core\Utils_Server::class), Registry::get('oxUtilsDate')->get_time());
     }
 }

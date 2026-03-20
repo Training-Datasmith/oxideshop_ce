@@ -4,15 +4,13 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Validator;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Validator;
-
-interface FileValidatorInterface
+interface File_Validator_Interface
 {
     /**
      * @throws ImageValidationException
      */
-    public function validateImage(string $filePath): bool;
+    public function validate_image(string $file_path): bool;
 }

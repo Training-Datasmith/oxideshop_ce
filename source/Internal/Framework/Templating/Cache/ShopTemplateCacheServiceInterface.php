@@ -4,16 +4,12 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Cache;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating\Cache;
-
-interface ShopTemplateCacheServiceInterface
+interface Shop_Template_Cache_Service_Interface
 {
-    public function getCacheDirectory(int $shopId): string;
-
-    public function invalidateCache(int $shopId): void;
-
-    public function invalidateAllShopsCache(): void;
+    public function get_cache_directory(int $shop_id): string;
+    public function invalidate_cache(int $shop_id): void;
+    public function invalidate_all_shops_cache(): void;
 }

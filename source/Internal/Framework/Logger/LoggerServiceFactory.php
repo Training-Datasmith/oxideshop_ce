@@ -4,28 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Logger;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Logger;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\MonologLoggerFactory;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-use Psr\Log\LoggerInterface;
-
-readonly class LoggerServiceFactory
+use Oxid_Esales\Eshop_Community\Internal\Framework\Logger\Factory\Monolog_Logger_Factory;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface;
+use Psr\Log\Logger_Interface;
+readonly class Logger_Service_Factory
 {
-    public function __construct(private ContextInterface $context)
+    public function __construct(private Context_Interface $context)
     {
     }
-
-    public function getLogger(): LoggerInterface
+    public function get_logger(): Logger_Interface
     {
-        return (new MonologLoggerFactory(
-            'OXID Logger',
-            $this->context->getLogFilePath(),
-            $this->context->getLogLevel()
-        ))
-            ->create();
+        return (new Monolog_Logger_Factory('OXID Logger', $this->context->get_log_file_path(), $this->context->get_log_level()))->create();
     }
 }

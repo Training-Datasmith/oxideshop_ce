@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Online license check response class.
@@ -16,7 +14,7 @@ namespace OxidEsales\EshopCommunity\Core;
  *
  * @ignore   This class will not be included in documentation.
  */
-class OnlineLicenseCheckResponse
+class Online_License_Check_Response
 {
     /**
      * Serial keys.
@@ -24,7 +22,6 @@ class OnlineLicenseCheckResponse
      * @var string
      */
     public $code;
-
     /**
      * Build revision number.
      *

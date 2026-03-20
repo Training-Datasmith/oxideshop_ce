@@ -1,56 +1,48 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\Str;
-
+use Oxid_Esales\Eshop\Core\Str;
 /**
  * Select list manager
  */
-class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\ISelectList
+class Select_List extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model implements \Oxid_Esales\Eshop\Core\Contract\I_Select_List
 {
     /**
      * Select list fields array
      *
      * @var array
      */
-    protected $_aFieldList;
-
+    protected $_a_field_list;
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxselectlist';
-
+    protected $_s_class_name = 'oxselectlist';
     /**
      * Selections array
      *
      * @var array
      */
-    protected $_aList;
-
+    protected $_a_list;
     /**
      * Product VAT
      *
      * @var float
      */
-    protected $_dVat;
-
+    protected $_d_vat;
     /**
      * Active selection object
      *
      * @var \OxidEsales\Eshop\Application\Model\Selection
      */
-    protected $_oActiveSelection;
-
+    protected $_o_active_selection;
     /**
      * Calls parent constructor and initializes selection list
      */
@@ -59,7 +51,6 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
         parent::__construct();
         $this->init('oxselectlist');
     }
-
     /**
      * Returns select list value list.
      *
@@ -67,18 +58,16 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
      *
      * @return array
      */
-    public function getFieldList($dVat = null)
+    public function get_field_list($d_vat = null)
     {
-        if ($this->_aFieldList == null && $this->oxselectlist__oxvaldesc->value) {
-            $this->_aFieldList = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->value, $dVat);
-            foreach ($this->_aFieldList as $sKey => $oField) {
-                $this->_aFieldList[$sKey]->name = Str::getStr()->strip_tags($this->_aFieldList[$sKey]->name);
+        if ($this->_a_field_list == null && $this->oxselectlist__oxvaldesc->value) {
+            $this->_a_field_list = \Oxid_Esales\Eshop\Core\Registry::get_utils()->assign_values_from_text($this->oxselectlist__oxvaldesc->value, $d_vat);
+            foreach ($this->_a_field_list as $s_key => $o_field) {
+                $this->_a_field_list[$s_key]->name = Str::get_str()->strip_tags($this->_a_field_list[$s_key]->name);
             }
         }
-
-        return $this->_aFieldList;
+        return $this->_a_field_list;
     }
-
     /**
      * Removes selectlists from articles.
      *
@@ -86,108 +75,96 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
      *
      * @return bool
      */
-    public function delete($sOXID = null)
+    public function delete($s_oxid = null)
     {
-        if (!$sOXID) {
-            $sOXID = $this->getId();
+        if (!$s_oxid) {
+            $s_oxid = $this->get_id();
         }
-        if (!$sOXID) {
+        if (!$s_oxid) {
             return false;
         }
-
         // remove selectlists from articles also
-        if ($blRemove = parent::delete($sOXID)) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $oDb->execute('delete from oxobject2selectlist where oxselnid = :oxselnid', [
-                'oxselnid' => $sOXID,
-            ]);
+        if ($bl_remove = parent::delete($s_oxid)) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $o_db->execute('delete from oxobject2selectlist where oxselnid = :oxselnid', ['oxselnid' => $s_oxid]);
         }
-
-        return $blRemove;
+        return $bl_remove;
     }
-
     /**
      * VAT setter
      *
      * @param float $dVat product VAT
      */
-    public function setVat($dVat): void
+    public function set_vat($d_vat): void
     {
-        $this->_dVat = $dVat;
+        $this->_d_vat = $d_vat;
     }
-
     /**
      * Returns VAT set by oxSelectList::setVat()
      *
      * @return float
      */
-    public function getVat()
+    public function get_vat()
     {
-        return $this->_dVat;
+        return $this->_d_vat;
     }
-
     /**
      * Returns variant selection list label
      *
      * @return string
      */
-    public function getLabel()
+    public function get_label()
     {
         return $this->oxselectlist__oxtitle->value;
     }
-
     /**
      * Returns array of oxSelection's
      *
      * @return array
      */
-    public function getSelections()
+    public function get_selections()
     {
-        if ($this->_aList === null && $this->oxselectlist__oxvaldesc->value) {
-            $this->_aList = false;
-            $aList = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->getRawValue(), $this->getVat());
-            foreach ($aList as $sKey => $oField) {
-                if ($oField->name) {
-                    $this->_aList[$sKey] = oxNew(\OxidEsales\Eshop\Application\Model\Selection::class, Str::getStr()->strip_tags($oField->name), $sKey, false, $this->_aList === false ? true : false);
+        if ($this->_a_list === null && $this->oxselectlist__oxvaldesc->value) {
+            $this->_a_list = false;
+            $a_list = \Oxid_Esales\Eshop\Core\Registry::get_utils()->assign_values_from_text($this->oxselectlist__oxvaldesc->get_raw_value(), $this->get_vat());
+            foreach ($a_list as $s_key => $o_field) {
+                if ($o_field->name) {
+                    $this->_a_list[$s_key] = ox_new(\Oxid_Esales\Eshop\Application\Model\Selection::class, Str::get_str()->strip_tags($o_field->name), $s_key, false, $this->_a_list === false ? true : false);
                 }
             }
         }
-
-        return $this->_aList;
+        return $this->_a_list;
     }
-
     /**
      * Returns active selection object
      *
      * @return \OxidEsales\Eshop\Application\Model\Selection
      */
-    public function getActiveSelection()
+    public function get_active_selection()
     {
-        if ($this->_oActiveSelection === null) {
-            if (($aSelections = $this->getSelections())) {
+        if ($this->_o_active_selection === null) {
+            if ($a_selections = $this->get_selections()) {
                 // first is allways active
-                $this->_oActiveSelection = reset($aSelections);
+                $this->_o_active_selection = reset($a_selections);
             }
         }
-
-        return $this->_oActiveSelection;
+        return $this->_o_active_selection;
     }
-
     /**
      * Activates given by index selection
      *
      * @param int $iIdx selection index
      */
-    public function setActiveSelectionByIndex($iIdx): void
+    public function set_active_selection_by_index($i_idx): void
     {
-        if (($aSelections = $this->getSelections())) {
-            $iSelIdx = 0;
-            foreach ($aSelections as $oSelection) {
-                $oSelection->setActiveState($iSelIdx == $iIdx);
-                if ($iSelIdx == $iIdx) {
-                    $this->_oActiveSelection = $oSelection;
+        if ($a_selections = $this->get_selections()) {
+            $i_sel_idx = 0;
+            foreach ($a_selections as $o_selection) {
+                $o_selection->set_active_state($i_sel_idx == $i_idx);
+                if ($i_sel_idx == $i_idx) {
+                    $this->_o_active_selection = $o_selection;
                 }
-                $iSelIdx++;
+                $i_sel_idx++;
             }
         }
     }

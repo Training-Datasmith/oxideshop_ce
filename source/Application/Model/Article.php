@@ -1,32 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Contract\ArticleInterface;
-use OxidEsales\Eshop\Core\Contract\IUrl;
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
-use OxidEsales\Eshop\Core\Price;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Str;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use OxidEsales\EshopCommunity\Core\DatabaseProvider;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Dao\ProductMediaDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRole;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaView;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaViewServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
-use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;
-
+use Oxid_Esales\Eshop\Application\Model\Contract\Article_Interface;
+use Oxid_Esales\Eshop\Core\Contract\I_Url;
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Model\Multi_Language_Model;
+use Oxid_Esales\Eshop\Core\Price;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Str;
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
+use Oxid_Esales\Eshop_Community\Core\Database_Provider;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Dao\Product_Media_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_Role;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_View;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_View_Service_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Id;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Shop_Events\After_Model_Update_Event;
 // defining supported link types
 define('OXARTICLE_LINKTYPE_CATEGORY', 0);
 define('OXARTICLE_LINKTYPE_VENDOR', 1);
@@ -35,100 +32,87 @@ define('OXARTICLE_LINKTYPE_PRICECATEGORY', 3);
 // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
 define('OXARTICLE_LINKTYPE_RECOMM', 5);
 // END deprecated
-
 /**
  * Article manager.
  * Creates fully detailed article object, with such information as VAT,
  * discounts, etc.
  */
-class Article extends MultiLanguageModel implements ArticleInterface, IUrl
+class Article extends Multi_Language_Model implements Article_Interface, I_Url
 {
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxarticle';
-
+    protected $_s_class_name = 'oxarticle';
     /**
      * Set $_blUseLazyLoading to true if you want to load only actually used fields not full object, depending on views.
      *
      * @var bool
      */
-    protected $_blUseLazyLoading = true;
-
+    protected $_bl_use_lazy_loading = true;
     /**
      * item key the usage with oxuserbasketitem
      *
      * @var string (md5 hash)
      */
-    protected $_sItemKey;
-
+    protected $_s_item_key;
     /**
      * Variable controls price calculation type (set true, to calculate price
      * with taxes and etc, or false to return base article price).
      *
      * @var bool
      */
-    protected $_blCalcPrice = true;
-
+    protected $_bl_calc_price = true;
     /**
      * Article oxPrice object.
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice;
-
+    protected $_o_price;
     /**
      * cached article variant min price
      *
      * @var double|null
      */
-    protected $_dVarMinPrice;
-
+    protected $_d_var_min_price;
     /**
      * cached article variant max price
      *
      * @var double|null
      */
-    protected $_dVarMaxPrice;
-
+    protected $_d_var_max_price;
     /**
      * caches article vat
      *
      * @var double|null
      */
-    protected $_dArticleVat;
-
+    protected $_d_article_vat;
     /**
      * Status of article - buyable/not buyable.
      *
      * @var bool
      */
-    protected $_blNotBuyable = false;
-
+    protected $_bl_not_buyable = false;
     /**
      * Indicates if we should load variants for current article. When $_blLoadVariants is set to false then
      * neither simple nor full variants for this article are loaded.
      *
      * @var bool
      */
-    protected $_blLoadVariants = true;
-
+    protected $_bl_load_variants = true;
     /**
      * Article variants without empty stock, not orderable flagged variants
      *
      * @var array
      */
-    protected $_aVariants;
-
+    protected $_a_variants;
     /**
      * Article variants with empty stock, not orderable flagged variants
      *
      * @var array
      */
-    protected $_aVariantsWithNotOrderables;
-
+    protected $_a_variants_with_not_orderables;
     /**
      * $_blNotBuyableParent is set to true, when article has variants and is not buyable due to:
      *      a) config option
@@ -137,40 +121,34 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var bool
      */
-    protected $_blNotBuyableParent = false;
-
+    protected $_bl_not_buyable_parent = false;
     /**
      * $_blHasVariants is set to true if article has any variants.
      */
-    protected $_blHasVariants = false;
-
+    protected $_bl_has_variants = false;
     /**
      * $_blHasVariants is set to true if article has multidimensional variants.
      */
-    protected $_blHasMdVariants = false;
-
+    protected $_bl_has_md_variants = false;
     /**
      * If set true, then this object is on comparison list
      *
      * @var bool
      */
-    protected $_blIsOnComparisonList = false;
-
+    protected $_bl_is_on_comparison_list = false;
     /**
      * user object
      *
      * @var \OxidEsales\Eshop\Application\Model\User
      */
-    protected $_oUser;
-
+    protected $_o_user;
     /**
      * Performance issue. Sometimes you want to load articles without calculating
      * correct discounts and prices etc.
      *
      * @var bool
      */
-    protected $_blLoadPrice = true;
-
+    protected $_bl_load_price = true;
     /**
      * $_fPricePerUnit holds price per unit value in active shop currency.
      * $_fPricePerUnit is calculated from
@@ -179,91 +157,77 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * values is empty then $_fPricePerUnit is not calculated. Example: In case when product price is 10 EUR and
      * product quantity is 0.5 (liters) then $_fPricePerUnit would be 20,00
      */
-    protected $_fPricePerUnit;
-
+    protected $_f_price_per_unit;
     /**
      * Variable used to force load parent data in export
      */
-    protected $_blLoadParentData = false;
-
+    protected $_bl_load_parent_data = false;
     /**
      * Variable used to determine if setting parentId to empty value is allowed
      */
-    protected $_blAllowEmptyParentId = false;
-
+    protected $_bl_allow_empty_parent_id = false;
     /**
      * Variable used to force load parent data in export
      */
-    protected $_blSkipAssign = false;
-
+    protected $_bl_skip_assign = false;
     /**
      * Set $_blSkipDiscounts to true if you want to skip the discount.
      *
      * @var bool
      */
-    protected $_blSkipDiscounts;
-
+    protected $_bl_skip_discounts;
     /**
      * Object holding the list of attributes and attribute values associated with this article
      * @var \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    protected $_oAttributeList;
-
+    protected $_o_attribute_list;
     /**
      * Object holding the list of attributes and attribute values associated with this article and displayable in basket
      * @var \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    protected $basketAttributeList;
-
+    protected $basket_attribute_list;
     /**
      * Indicates whether the price is "From" price
      *
      * @var bool
      */
-    protected $_blIsRangePrice;
-
+    protected $_bl_is_range_price;
     /**
      * The list of article media URLs
      *
      * @var string
      */
-    protected $_aMediaUrls;
-
+    protected $_a_media_urls;
     /**
      * Array containing references to already loaded parent articles, in order for variant to skip parent data loading
      *
      * @var array
      */
-    protected static $_aLoadedParents;
-
+    protected static $_a_loaded_parents;
     /**
      * Cached select lists array
      *
      * @var array
      */
-    protected static $_aSelList;
-
+    protected static $_a_sel_list;
     /**
      * Select lists for tpl
      *
      * @var array
      */
-    protected $_aDispSelList;
-
+    protected $_a_disp_sel_list;
     /**
      * Marks that current object is managed by SEO
      *
      * @var bool
      */
-    protected $_blIsSeoObject = true;
-
+    protected $_bl_is_seo_object = true;
     /**
      * loaded amount prices
      *
      * @var \OxidEsales\Eshop\Application\Model\AmountPriceList
      */
-    protected $_oAmountPriceList;
-
+    protected $_o_amount_price_list;
     /**
      * Article details link type (default is 0):
      *     0 - category link
@@ -272,159 +236,127 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var int
      */
-    protected $_iLinkType = 0;
-
+    protected $_i_link_type = 0;
     /**
      * Standard/dynamic article urls for languages
      *
      * @var array
      */
-    protected $_aStdUrls = [];
-
+    protected $_a_std_urls = [];
     /**
      * Seo article urls for languages
      *
      * @var array
      */
-    protected $_aSeoUrls = [];
-
+    protected $_a_seo_urls = [];
     /**
      * Additional parameters to seo urls
      *
      * @var array
      */
-    protected $_aSeoAddParams = [];
-
+    protected $_a_seo_add_params = [];
     /**
      * Additional parameters to std urls
      *
      * @var array
      */
-    protected $_aStdAddParams = [];
-
+    protected $_a_std_add_params = [];
     /**
      * Image url
      *
      * @var string
      */
-    protected $_sDynImageDir;
-
+    protected $_s_dyn_image_dir;
     /**
      * More details link
      *
      * @var string
      */
-    protected $_sMoreDetailLink;
-
+    protected $_s_more_detail_link;
     /**
      * To basket link
      *
      * @var string
      */
-    protected $_sToBasketLink;
-
+    protected $_s_to_basket_link;
     /**
      * Article stock status when article is initially loaded.
      *
      * @var int
      */
-    protected $_iStockStatusOnLoad;
-
+    protected $_i_stock_status_on_load;
     /**
      * Article original parameters when loaded.
      *
      * @var array
      */
-    protected $_aSortingFieldsOnLoad = [];
-
+    protected $_a_sorting_fields_on_load = [];
     /**
      * Stock status
      *
      * @var integer
      */
-    protected $_iStockStatus;
-
+    protected $_i_stock_status;
     /**
      * T price
      *
      * @var object
      */
-    protected $_oTPrice;
-
+    protected $_o_t_price;
     /**
      * Amount price list info
      *
      * @var object
      */
-    protected $_oAmountPriceInfo;
-
+    protected $_o_amount_price_info;
     /**
      * Amount price
      *
      * @var double
      */
-    protected $_dAmountPrice;
-
+    protected $_d_amount_price;
     /**
      * Articles manufacturer ids cache
      *
      * @var array
      */
-    protected static $_aArticleManufacturers = [];
-
+    protected static $_a_article_manufacturers = [];
     /**
      * Articles vendor ids cache
      *
      * @var array
      */
-    protected static $_aArticleVendors = [];
-
+    protected static $_a_article_vendors = [];
     /**
      * Articles category ids cache
      *
      * @var array
      */
-    protected static $_aArticleCats = [];
-
+    protected static $_a_article_cats = [];
     /**
      * Do not copy certain parent fields to variant
      *
      * @var array
      */
-    protected $_aNonCopyParentFields = [
-        'oxarticles__oxinsert',
-        'oxarticles__oxtimestamp',
-        'oxarticles__oxnid',
-        'oxarticles__oxid',
-        'oxarticles__oxparentid',
-    ];
-
+    protected $_a_non_copy_parent_fields = ['oxarticles__oxinsert', 'oxarticles__oxtimestamp', 'oxarticles__oxnid', 'oxarticles__oxid', 'oxarticles__oxparentid'];
     /**
      * Override certain parent fields to variant
      *
      * @var array
      */
-    protected $_aCopyParentField = [
-        'oxarticles__oxnonmaterial',
-        'oxarticles__oxfreeshipping',
-        'oxarticles__oxisdownloadable',
-        'oxarticles__oxshowcustomagreement',
-    ];
-
+    protected $_a_copy_parent_field = ['oxarticles__oxnonmaterial', 'oxarticles__oxfreeshipping', 'oxarticles__oxisdownloadable', 'oxarticles__oxshowcustomagreement'];
     /**
      * Multidimensional variant tree structure
      *
      * @var \OxidEsales\Eshop\Application\Model\MdVariant
      */
-    protected $_oMdVariants;
-
+    protected $_o_md_variants;
     /**
      * Product long description field
      *
      * @var \OxidEsales\Eshop\Core\Field
      */
-    protected $_oLongDesc;
-
+    protected $_o_long_desc;
     /**
      * Variant selections array
      *
@@ -432,50 +364,43 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @var array
      */
-    protected $_aVariantSelections = [];
-
+    protected $_a_variant_selections = [];
     /**
      * Array of product selections
      *
      * @var array
      */
-    protected static $_aSelections = [];
-
+    protected static $_a_selections = [];
     /**
      * Category instance cache
      *
      * @var array
      */
-    protected static $_aCategoryCache = [];
-
+    protected static $_a_category_cache = [];
     /**
      * stores if are stored any amount price
      *
      * @var bool
      */
-    protected static $_blHasAmountPrice;
-
+    protected static $_bl_has_amount_price;
     /**
      * stores downloadable file list
      *
      * @var array|\OxidEsales\Eshop\Core\Model\ListModel
      */
-    protected $_aArticleFiles;
-
+    protected $_a_article_files;
     /**
      * If admin can edit any field.
      *
      * @var bool
      */
-    protected $_blCanUpdateAnyField;
-
+    protected $_bl_can_update_any_field;
     /**
      * Triggered action type
      *
      * @var integer
      */
-    protected $actionType = ACTION_NA;
-
+    protected $action_type = ACTION_NA;
     /**
      * Constructor, sets shop ID for article (\OxidEsales\Eshop\Core\Config::getShopId()),
      * initiates parent constructor (parent::oxI18n()).
@@ -483,17 +408,16 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param array $aParams The array of names and values of oxArticle instance properties to be set on object
      *                       instantiation
      */
-    public function __construct($aParams = null)
+    public function __construct($a_params = null)
     {
-        if ($aParams && is_array($aParams)) {
-            foreach ($aParams as $sParam => $mValue) {
-                $this->$sParam = $mValue;
+        if ($a_params && is_array($a_params)) {
+            foreach ($a_params as $s_param => $m_value) {
+                $this->{$s_param} = $m_value;
             }
         }
         parent::__construct();
         $this->init('oxarticles');
     }
-
     /**
      * Magic getter, deals with values which are loaded on demand.
      * Additionally it sets default value for unknown picture fields
@@ -502,44 +426,39 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return mixed
      */
-    public function __get($sName)
+    public function __get($s_name)
     {
-        $this->$sName = parent::__get($sName);
-        if ($this->$sName) {
+        $this->{$s_name} = parent::__get($s_name);
+        if ($this->{$s_name}) {
             // since the field could have been loaded via lazy loading
-            $this->assignParentFieldValue($sName);
+            $this->assign_parent_field_value($s_name);
         }
-
-        return $this->$sName;
+        return $this->{$s_name};
     }
-
     /**
      * @param \OxidEsales\Eshop\Application\Model\AmountPriceList $amountPriceList
      */
-    public function setAmountPriceList($amountPriceList): void
+    public function set_amount_price_list($amount_price_list): void
     {
-        $this->_oAmountPriceList = $amountPriceList;
+        $this->_o_amount_price_list = $amount_price_list;
     }
-
     /**
      * @return \OxidEsales\Eshop\Application\Model\AmountPriceList
      */
-    protected function getAmountPriceList()
+    protected function get_amount_price_list()
     {
-        return $this->_oAmountPriceList;
+        return $this->_o_amount_price_list;
     }
-
     /**
      * Checks whether object is in list or not
      * It's needed for oxArticle so that it can pass this to widgets
      *
      * @return bool
      */
-    public function isInList()
+    public function is_in_list()
     {
-        return parent::isInList();
+        return parent::is_in_list();
     }
-
     /**
      * Sets object ID, additionally sets $this->oxarticles__oxnid field value
      *
@@ -547,16 +466,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string|null
      */
-    public function setId($sId = null)
+    public function set_id($s_id = null)
     {
-        $sId = parent::setId($sId);
-
+        $s_id = parent::set_id($s_id);
         // TODO: in BaseModel::setId make it to check if exists and update, not recreate, then delete this overload
         $this->oxarticles__oxnid = $this->oxarticles__oxid;
-
-        return $sId;
+        return $s_id;
     }
-
     /**
      * Returns part of sql query used in active snippet. Query checks
      * if product "oxactive = 1". If config option "blUseTimeCheck" is TRUE
@@ -566,21 +482,16 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getActiveCheckQuery($blForceCoreTable = null)
+    public function get_active_check_query($bl_force_core_table = null)
     {
-        $viewName = $this->getViewName($blForceCoreTable);
-
-        $query = " $viewName.oxactive = 1 ";
-
-        $query .= " and $viewName.oxhidden = 0 ";
-
-        if (Registry::getConfig()->getConfigParam('blUseTimeCheck')) {
-            return $this->addSqlActiveRangeSnippet($query, $viewName);
+        $view_name = $this->get_view_name($bl_force_core_table);
+        $query = " {$view_name}.oxactive = 1 ";
+        $query .= " and {$view_name}.oxhidden = 0 ";
+        if (Registry::get_config()->get_config_param('blUseTimeCheck')) {
+            return $this->add_sql_active_range_snippet($query, $view_name);
         }
-
         return $query;
     }
-
     /**
      * Returns part of sql query used in active snippet. If config
      * option "blUseStock" is TRUE checks if "oxstockflag != 2 or
@@ -594,32 +505,26 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getStockCheckQuery($blForceCoreTable = null)
+    public function get_stock_check_query($bl_force_core_table = null)
     {
-        $myConfig = Registry::getConfig();
-        $sTable = $this->getViewName($blForceCoreTable);
-
-        $sQ = '';
-
+        $my_config = Registry::get_config();
+        $s_table = $this->get_view_name($bl_force_core_table);
+        $s_q = '';
         //do not check for variants
-        if ($myConfig->getConfigParam('blUseStock')) {
-            $sQ = " and ( $sTable.oxstockflag != 2 or ( $sTable.oxstock + $sTable.oxvarstock ) > 0  ) ";
+        if ($my_config->get_config_param('blUseStock')) {
+            $s_q = " and ( {$s_table}.oxstockflag != 2 or ( {$s_table}.oxstock + {$s_table}.oxvarstock ) > 0  ) ";
             //V #M513: When Parent article is not purchasable,
             // it's visibility should be displayed in shop only if any of Variants is available.
-            if (!$myConfig->getConfigParam('blVariantParentBuyable')) {
-                $activeCheck = 'art.oxactive = 1';
-                if ($myConfig->getConfigParam('blUseTimeCheck')) {
-                    $activeCheck = $this->addSqlActiveRangeSnippet($activeCheck, 'art');
+            if (!$my_config->get_config_param('blVariantParentBuyable')) {
+                $active_check = 'art.oxactive = 1';
+                if ($my_config->get_config_param('blUseTimeCheck')) {
+                    $active_check = $this->add_sql_active_range_snippet($active_check, 'art');
                 }
-                $sQ = " $sQ and IF( $sTable.oxvarcount = 0, 1, ( select 1 from $sTable as art"
-                    . " where art.oxparentid=$sTable.oxid and $activeCheck and"
-                    . ' ( art.oxstockflag != 2 or art.oxstock > 0 ) limit 1 ) ) ';
+                $s_q = " {$s_q} and IF( {$s_table}.oxvarcount = 0, 1, ( select 1 from {$s_table} as art" . " where art.oxparentid={$s_table}.oxid and {$active_check} and" . ' ( art.oxstockflag != 2 or art.oxstock > 0 ) limit 1 ) ) ';
             }
         }
-
-        return $sQ;
+        return $s_q;
     }
-
     /**
      * Returns part of query which checks if product is variant of current
      * object. Additionally if config option "blUseStock" is TRUE checks
@@ -631,55 +536,47 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getVariantsQuery($blRemoveNotOrderables, $blForceCoreTable = null)
+    public function get_variants_query($bl_remove_not_orderables, $bl_force_core_table = null)
     {
-        $sTable = $this->getViewName($blForceCoreTable);
-        $sQ = " and $sTable.oxparentid = '" . $this->getId() . "' ";
-
+        $s_table = $this->get_view_name($bl_force_core_table);
+        $s_q = " and {$s_table}.oxparentid = '" . $this->get_id() . "' ";
         //checking if variant is active and stock status
-        if (Registry::getConfig()->getConfigParam('blUseStock')) {
-            $sQ .= " and ( $sTable.oxstock > 0 or ( $sTable.oxstock <= 0 and $sTable.oxstockflag != 2 ";
-            if ($blRemoveNotOrderables) {
-                $sQ .= " and $sTable.oxstockflag != 3 ";
+        if (Registry::get_config()->get_config_param('blUseStock')) {
+            $s_q .= " and ( {$s_table}.oxstock > 0 or ( {$s_table}.oxstock <= 0 and {$s_table}.oxstockflag != 2 ";
+            if ($bl_remove_not_orderables) {
+                $s_q .= " and {$s_table}.oxstockflag != 3 ";
             }
-            $sQ .= ' ) ) ';
+            $s_q .= ' ) ) ';
         }
-
-        return $sQ;
+        return $s_q;
     }
-
     /**
      * Return unit quantity
      *
      * @return string
      */
-    public function getUnitQuantity()
+    public function get_unit_quantity()
     {
         return $this->oxarticles__oxunitquantity->value;
     }
-
     /**
      * Return Size of product: length*width*height
      *
      * @return double
      */
-    public function getSize()
+    public function get_size()
     {
-        return $this->oxarticles__oxlength->value *
-               $this->oxarticles__oxwidth->value *
-               $this->oxarticles__oxheight->value;
+        return $this->oxarticles__oxlength->value * $this->oxarticles__oxwidth->value * $this->oxarticles__oxheight->value;
     }
-
     /**
      * Return product weight
      *
      * @return double
      */
-    public function getWeight()
+    public function get_weight()
     {
         return $this->oxarticles__oxweight->value;
     }
-
     /**
      * Returns SQL select string with checks if items are available
      *
@@ -687,22 +584,20 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getSqlActiveSnippet($blForceCoreTable = null)
+    public function get_sql_active_snippet($bl_force_core_table = null)
     {
-        return "( {$this->createSqlActiveSnippet($blForceCoreTable)} ) ";
+        return "( {$this->create_sql_active_snippet($bl_force_core_table)} ) ";
     }
-
     /**
      *
      * Getter for action type.
      *
      * @return int
      */
-    public function getActionType()
+    public function get_action_type()
     {
-        return $this->actionType;
+        return $this->action_type;
     }
-
     /**
      * Returns SQL select string with checks if items are available
      *
@@ -710,141 +605,120 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    protected function createSqlActiveSnippet($forceCoreTable)
+    protected function create_sql_active_snippet($force_core_table)
     {
         // check if article is still active
-        $sQ = $this->getActiveCheckQuery($forceCoreTable);
-
+        $s_q = $this->get_active_check_query($force_core_table);
         // stock and variants check
-        $sQ .= $this->getStockCheckQuery($forceCoreTable);
-
-        return $sQ;
+        $s_q .= $this->get_stock_check_query($force_core_table);
+        return $s_q;
     }
-
     /**
      * Assign condition setter. In case article assignment is skipped ($_blSkipAssign = true), it does not perform
      * additional
      *
      * @param bool $blSkipAssign Whether to skip assign process for the article
      */
-    public function setSkipAssign($blSkipAssign): void
+    public function set_skip_assign($bl_skip_assign): void
     {
-        $this->_blSkipAssign = $blSkipAssign;
+        $this->_bl_skip_assign = $bl_skip_assign;
     }
-
     /**
      * Disables article price loading. Should be called before assign(), or load()
      */
-    public function disablePriceLoad(): void
+    public function disable_price_load(): void
     {
-        $this->_blLoadPrice = false;
+        $this->_bl_load_price = false;
     }
-
     /**
      * Enable article price loading, if disabled.
      */
-    public function enablePriceLoad(): void
+    public function enable_price_load(): void
     {
-        $this->_blLoadPrice = true;
+        $this->_bl_load_price = true;
     }
-
     /**
      * Returns item key used with oxuserbasket
      *
      * @return string
      */
-    public function getItemKey()
+    public function get_item_key()
     {
-        return $this->_sItemKey;
+        return $this->_s_item_key;
     }
-
     /**
      * Sets item key used with oxuserbasket
      *
      * @param string $sItemKey Item key
      */
-    public function setItemKey($sItemKey): void
+    public function set_item_key($s_item_key): void
     {
-        $this->_sItemKey = $sItemKey;
+        $this->_s_item_key = $s_item_key;
     }
-
     /**
      * Disables/enables variant loading
      *
      * @param bool $blLoadVariants skip variant loading or not
      */
-    public function setNoVariantLoading($blLoadVariants): void
+    public function set_no_variant_loading($bl_load_variants): void
     {
-        $this->_blLoadVariants = !$blLoadVariants;
+        $this->_bl_load_variants = !$bl_load_variants;
     }
-
     /**
      * Checks if article is buyable.
      *
      * @return bool
      */
-    public function isBuyable()
+    public function is_buyable()
     {
-        return !($this->_blNotBuyableParent || $this->_blNotBuyable);
+        return !($this->_bl_not_buyable_parent || $this->_bl_not_buyable);
     }
-
     /**
      * Checks if price alarm is enabled.
      *
      * @return bool
      */
-    public function isPriceAlarm()
+    public function is_price_alarm()
     {
         // #419 disabling price alarm if article has fixed price
-        return !(
-            (
-                $this->__isset('oxarticles__oxblfixedprice')
-                || $this->__get('oxarticles__oxblfixedprice')
-            )
-            && $this->__get('oxarticles__oxblfixedprice')->value
-        );
+        return !(($this->__isset('oxarticles__oxblfixedprice') || $this->__get('oxarticles__oxblfixedprice')) && $this->__get('oxarticles__oxblfixedprice')->value);
     }
-
     /**
      * Checks whether article is inluded in comparison list
      *
      * @return bool
      */
-    public function isOnComparisonList()
+    public function is_on_comparison_list()
     {
-        return $this->_blIsOnComparisonList;
+        return $this->_bl_is_on_comparison_list;
     }
-
     /**
      * Set if article is inluded in comparison list
      *
      * @param bool $blOnList Whether is article on the list
      */
-    public function setOnComparisonList($blOnList): void
+    public function set_on_comparison_list($bl_on_list): void
     {
-        $this->_blIsOnComparisonList = $blOnList;
+        $this->_bl_is_on_comparison_list = $bl_on_list;
     }
-
     /**
      * A setter for $_blLoadParentData (whether article parent info should be laoded fully) class variable
      *
      * @param bool $blLoadParentData Whether to load parent data
      */
-    public function setLoadParentData($blLoadParentData): void
+    public function set_load_parent_data($bl_load_parent_data): void
     {
-        $this->_blLoadParentData = $blLoadParentData;
+        $this->_bl_load_parent_data = $bl_load_parent_data;
     }
-
     /**
      * Getter for do we load parent data
      *
      * @return bool
      */
-    public function getLoadParentData()
+    public function get_load_parent_data()
     {
-        return $this->_blLoadParentData;
+        return $this->_bl_load_parent_data;
     }
-
     /**
      * Returns true if the field is multilanguage
      *
@@ -852,55 +726,48 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    public function isMultilingualField($sFieldName)
+    public function is_multilingual_field($s_field_name)
     {
-        if ('oxlongdesc' == $sFieldName) {
+        if ('oxlongdesc' == $s_field_name) {
             return true;
         }
-
-        return parent::isMultilingualField($sFieldName);
+        return parent::is_multilingual_field($s_field_name);
     }
-
     /**
      * Returns formatted price per unit
      *
      * @deprecated since v5.1 (2013-09-25); use oxPrice template engine plugin for formatting in templates
      * @return string
      */
-    public function getFUnitPrice()
+    public function get_f_unit_price()
     {
-        if ($this->_fPricePerUnit == null) {
-            if ($oPrice = $this->getUnitPrice()) {
-                if ($dPrice = $this->getPriceForView($oPrice)) {
-                    $this->_fPricePerUnit = Registry::getLang()->formatCurrency($dPrice);
+        if ($this->_f_price_per_unit == null) {
+            if ($o_price = $this->get_unit_price()) {
+                if ($d_price = $this->get_price_for_view($o_price)) {
+                    $this->_f_price_per_unit = Registry::get_lang()->format_currency($d_price);
                 }
             }
         }
-
-        return $this->_fPricePerUnit;
+        return $this->_f_price_per_unit;
     }
-
     /**
      * Returns price per unit
      *
      * @return \OxidEsales\Eshop\Core\Price|null
      */
-    public function getUnitPrice()
+    public function get_unit_price()
     {
         // Performance
-        if (!Registry::getConfig()->getConfigParam('bl_perfLoadPrice') || !$this->_blLoadPrice) {
+        if (!Registry::get_config()->get_config_param('bl_perfLoadPrice') || !$this->_bl_load_price) {
             return null;
         }
-
-        $oPrice = null;
-        if ((float) $this->getUnitQuantity() && $this->oxarticles__oxunitname->value) {
-            $oPrice = clone $this->getPrice();
-            $oPrice->divide((float) $this->getUnitQuantity());
+        $o_price = null;
+        if ((float) $this->get_unit_quantity() && $this->oxarticles__oxunitname->value) {
+            $o_price = clone $this->get_price();
+            $o_price->divide((float) $this->get_unit_quantity());
         }
-
-        return $oPrice;
+        return $o_price;
     }
-
     /**
      * Returns formatted article min price
      *
@@ -908,17 +775,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getFMinPrice()
+    public function get_f_min_price()
     {
-        $sPrice = '';
-        if ($oPrice = $this->getMinPrice()) {
-            $dPrice = $this->getPriceForView($oPrice);
-            $sPrice = Registry::getLang()->formatCurrency($dPrice);
+        $s_price = '';
+        if ($o_price = $this->get_min_price()) {
+            $d_price = $this->get_price_for_view($o_price);
+            $s_price = Registry::get_lang()->format_currency($d_price);
         }
-
-        return $sPrice;
+        return $s_price;
     }
-
     /**
      * Returns formatted min article variant price
      *
@@ -926,217 +791,176 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getFVarMinPrice()
+    public function get_f_var_min_price()
     {
-        $sPrice = '';
-        if ($oPrice = $this->getVarMinPrice()) {
-            $dPrice = $this->getPriceForView($oPrice);
-            $sPrice = Registry::getLang()->formatCurrency($dPrice);
+        $s_price = '';
+        if ($o_price = $this->get_var_min_price()) {
+            $d_price = $this->get_price_for_view($o_price);
+            $s_price = Registry::get_lang()->format_currency($d_price);
         }
-
-        return $sPrice;
+        return $s_price;
     }
-
     /**
      * Returns article min price of variants
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getVarMinPrice()
+    public function get_var_min_price()
     {
-        if (!Registry::getConfig()->getConfigParam('bl_perfLoadPrice') || !$this->_blLoadPrice) {
+        if (!Registry::get_config()->get_config_param('bl_perfLoadPrice') || !$this->_bl_load_price) {
             return null;
         }
-
-        $oPrice = null;
-        $dPrice = $this->calculateVarMinPrice();
-
-        $oPrice = $this->getPriceObject();
-        $oPrice->setPrice($dPrice);
-
-        $this->calculatePrice($oPrice);
-
-        return $oPrice;
+        $o_price = null;
+        $d_price = $this->calculate_var_min_price();
+        $o_price = $this->get_price_object();
+        $o_price->set_price($d_price);
+        $this->calculate_price($o_price);
+        return $o_price;
     }
-
     /**
      * Calculates lowest price of available article variants.
      *
      * @return double
      */
-    protected function calculateVarMinPrice()
+    protected function calculate_var_min_price()
     {
-        $dPrice = $this->getVarMinRawPrice();
-
-        return $this->preparePrice($dPrice, $this->getArticleVat());
+        $d_price = $this->get_var_min_raw_price();
+        return $this->prepare_price($d_price, $this->get_article_vat());
     }
-
     /**
      * Returns article min price in calculation included variants
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getMinPrice()
+    public function get_min_price()
     {
-        if (!Registry::getConfig()->getConfigParam('bl_perfLoadPrice') || !$this->_blLoadPrice) {
+        if (!Registry::get_config()->get_config_param('bl_perfLoadPrice') || !$this->_bl_load_price) {
             return;
         }
-
-        $oPrice = null;
-        $dPrice = $this->getRawPrice();
-        if ($this->getVarMinRawPrice() !== null && $dPrice > $this->getVarMinRawPrice()) {
-            $dPrice = $this->getVarMinRawPrice();
+        $o_price = null;
+        $d_price = $this->get_raw_price();
+        if ($this->get_var_min_raw_price() !== null && $d_price > $this->get_var_min_raw_price()) {
+            $d_price = $this->get_var_min_raw_price();
         }
-
-        $dPrice = $this->prepareModifiedPrice($dPrice);
-
-        $oPrice = $this->getPriceObject();
-        $oPrice->setPrice($dPrice);
-        $this->calculatePrice($oPrice);
-
-        return $oPrice;
+        $d_price = $this->prepare_modified_price($d_price);
+        $o_price = $this->get_price_object();
+        $o_price->set_price($d_price);
+        $this->calculate_price($o_price);
+        return $o_price;
     }
-
     /**
      * @param double $dPrice
      *
      * @return double
      */
-    protected function prepareModifiedPrice($dPrice)
+    protected function prepare_modified_price($d_price)
     {
-        return $this->preparePrice($dPrice, $this->getArticleVat());
+        return $this->prepare_price($d_price, $this->get_article_vat());
     }
-
     /**
      * Returns true if article has variant with different price
      *
      * @return bool
      */
-    public function isRangePrice()
+    public function is_range_price()
     {
-        if ($this->_blIsRangePrice === null) {
-            $this->setRangePrice(false);
-
-            if ($this->hasAnyVariant()) {
-                $dPrice = $this->getRawPrice();
-                $dMinPrice = $this->getVarMinRawPrice();
-                $dMaxPrice = $this->getVarMaxPrice();
-
-                if ($dMinPrice != $dMaxPrice) {
-                    $this->setRangePrice();
-                } elseif (!$this->isParentNotBuyable() && $dPrice != $dMinPrice) {
-                    $this->setRangePrice();
+        if ($this->_bl_is_range_price === null) {
+            $this->set_range_price(false);
+            if ($this->has_any_variant()) {
+                $d_price = $this->get_raw_price();
+                $d_min_price = $this->get_var_min_raw_price();
+                $d_max_price = $this->get_var_max_price();
+                if ($d_min_price != $d_max_price) {
+                    $this->set_range_price();
+                } elseif (!$this->is_parent_not_buyable() && $d_price != $d_min_price) {
+                    $this->set_range_price();
                 }
             }
         }
-
-        return $this->_blIsRangePrice;
+        return $this->_bl_is_range_price;
     }
-
     /**
      * Setter to set if article has range price
      *
      * @param bool $blIsRangePrice - true if range, else false
      */
-    public function setRangePrice($blIsRangePrice = true)
+    public function set_range_price($bl_is_range_price = true)
     {
-        return $this->_blIsRangePrice = $blIsRangePrice;
+        return $this->_bl_is_range_price = $bl_is_range_price;
     }
-
-    public function hasActiveTimeRange(): bool
+    public function has_active_time_range(): bool
     {
-        $activeFrom = $this->oxarticles__oxactivefrom->value;
-        $activeTo = $this->oxarticles__oxactiveto->value;
-        $now = Registry::getUtilsDate()->getTime();
-
-        if (!$this->hasProductValidTimeRange()) {
+        $active_from = $this->oxarticles__oxactivefrom->value;
+        $active_to = $this->oxarticles__oxactiveto->value;
+        $now = Registry::get_utils_date()->get_time();
+        if (!$this->has_product_valid_time_range()) {
             return false;
         }
-
-        return (Registry::getUtilsDate()->isEmptyDate($activeTo) || strtotime((string) $activeTo) >= $now)
-            && (Registry::getUtilsDate()->isEmptyDate($activeFrom) || strtotime((string) $activeFrom) <= $now);
+        return (Registry::get_utils_date()->is_empty_date($active_to) || strtotime((string) $active_to) >= $now) && (Registry::get_utils_date()->is_empty_date($active_from) || strtotime((string) $active_from) <= $now);
     }
-
     /**
      * Checks if article has visible status. Returns TRUE if its visible
      *
      * @return bool
      */
-    public function isVisible()
+    public function is_visible()
     {
         // admin preview mode
-        if (($blCanPreview = Registry::getUtils()->canPreview()) !== null) {
-            return $blCanPreview;
+        if (($bl_can_preview = Registry::get_utils()->can_preview()) !== null) {
+            return $bl_can_preview;
         }
-
-        $blUseTimeCheck = Registry::getConfig()->getConfigParam('blUseTimeCheck');
-        if (
-            !$this->oxarticles__oxactive->value
-            && (($blUseTimeCheck && !$this->hasActiveTimeRange()) || !$blUseTimeCheck)
-        ) {
+        $bl_use_time_check = Registry::get_config()->get_config_param('blUseTimeCheck');
+        if (!$this->oxarticles__oxactive->value && ($bl_use_time_check && !$this->has_active_time_range() || !$bl_use_time_check)) {
             return false;
         }
-
         // stock flags
-        if (Registry::getConfig()->getConfigParam('blUseStock') && $this->oxarticles__oxstockflag->value == 2) {
-            $iOnStock = $this->oxarticles__oxstock->value + $this->oxarticles__oxvarstock->value;
-            if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-                $session = Registry::getSession();
-                $iOnStock += $session->getBasketReservations()->getReservedAmount($this->getId());
+        if (Registry::get_config()->get_config_param('blUseStock') && $this->oxarticles__oxstockflag->value == 2) {
+            $i_on_stock = $this->oxarticles__oxstock->value + $this->oxarticles__oxvarstock->value;
+            if (Registry::get_config()->get_config_param('blPsBasketReservationEnabled')) {
+                $session = Registry::get_session();
+                $i_on_stock += $session->get_basket_reservations()->get_reserved_amount($this->get_id());
             }
-            if ($iOnStock <= 0) {
+            if ($i_on_stock <= 0) {
                 return false;
             }
         }
-
         return true;
     }
-
     /**
      * Assigns to oxarticle object some base parameters/values (such as
      * detaillink, moredetaillink, etc).
      *
      * @param array $aRecord Array representing current field values
      */
-    public function assign($aRecord): void
+    public function assign($a_record): void
     {
-        startProfile('articleAssign');
-
+        start_profile('articleAssign');
         // load object from database
-        parent::assign($aRecord);
-
+        parent::assign($a_record);
         //clear seo urls
-        $this->_aSeoUrls = [];
-
+        $this->_a_seo_urls = [];
         $this->oxarticles__oxnid = $this->oxarticles__oxid;
-
         // check for simple article.
-        if ($this->_blSkipAssign) {
+        if ($this->_bl_skip_assign) {
             return;
         }
-
-        $this->assignParentFieldValues();
-        $this->assignNotBuyableParent();
-
+        $this->assign_parent_field_values();
+        $this->assign_not_buyable_parent();
         // assign only for a first load time
-        if (!$this->isLoaded()) {
-            $this->setShopValues($this);
+        if (!$this->is_loaded()) {
+            $this->set_shop_values($this);
         }
-
-        $this->assignStock();
-        $this->assignDynImageDir();
-        $this->assignComparisonListFlag();
-
-        stopProfile('articleAssign');
+        $this->assign_stock();
+        $this->assign_dyn_image_dir();
+        $this->assign_comparison_list_flag();
+        stop_profile('articleAssign');
     }
-
     /**
      * @param \OxidEsales\Eshop\Application\Model\Article $article
      */
-    protected function setShopValues($article)
+    protected function set_shop_values($article)
     {
     }
-
     /**
      * Loads object data from DB (object data ID must be passed to method).
      * Converts dates (\OxidEsales\Eshop\Application\Model\Article::oxarticles__oxinsert)
@@ -1147,28 +971,20 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    public function load($sOXID)
+    public function load($s_oxid)
     {
         // A. #1325 resetting to avoid problems when reloading (details etc)
-        $this->_blNotBuyableParent = false;
-
-        $aData = $this->loadData($sOXID);
-
-        if ($aData) {
-            $this->assign($aData);
-
-            $this->saveSortingFieldValuesOnLoad();
-
-            $this->_iStockStatusOnLoad = $this->_iStockStatus;
-
-            $this->_isLoaded = true;
-
+        $this->_bl_not_buyable_parent = false;
+        $a_data = $this->load_data($s_oxid);
+        if ($a_data) {
+            $this->assign($a_data);
+            $this->save_sorting_field_values_on_load();
+            $this->_i_stock_status_on_load = $this->_i_stock_status;
+            $this->_is_loaded = true;
             return true;
         }
-
         return false;
     }
-
     /**
      * Loads data from database and returns it.
      *
@@ -1176,81 +992,71 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    protected function loadData($articleId)
+    protected function load_data($article_id)
     {
-        return $this->loadFromDb($articleId);
+        return $this->load_from_db($article_id);
     }
-
     /**
      * Checks whether sorting fields changed from last article loading.
      *
      * @return bool
      */
-    public function hasSortingFieldsChanged()
+    public function has_sorting_fields_changed()
     {
-        $aSortingFields = Registry::getConfig()->getConfigParam('aSortCols');
-        $aSortingFields = !empty($aSortingFields) ? (array) $aSortingFields : [];
-        $blChanged = false;
-        foreach ($aSortingFields as $sField) {
-            $sParameterName = 'oxarticles__' . $sField;
-            $currentValueOfField = $this->$sParameterName instanceof Field ? $this->$sParameterName->value : '';
-            $valueOfFieldOnLoad = $this->_aSortingFieldsOnLoad[$sParameterName] ?? null;
-            if ($valueOfFieldOnLoad !== $currentValueOfField) {
-                $blChanged = true;
+        $a_sorting_fields = Registry::get_config()->get_config_param('aSortCols');
+        $a_sorting_fields = !empty($a_sorting_fields) ? (array) $a_sorting_fields : [];
+        $bl_changed = false;
+        foreach ($a_sorting_fields as $s_field) {
+            $s_parameter_name = 'oxarticles__' . $s_field;
+            $current_value_of_field = $this->{$s_parameter_name} instanceof Field ? $this->{$s_parameter_name}->value : '';
+            $value_of_field_on_load = $this->_a_sorting_fields_on_load[$s_parameter_name] ?? null;
+            if ($value_of_field_on_load !== $current_value_of_field) {
+                $bl_changed = true;
                 break;
             }
         }
-
-        return $blChanged;
+        return $bl_changed;
     }
-
     /**
      * Calculates and saves product rating average
      *
      * @param integer $rating new rating value
      */
-    public function addToRatingAverage($rating): void
+    public function add_to_rating_average($rating): void
     {
-        $dOldRating = $this->oxarticles__oxrating->value;
-        $dOldCnt = $this->oxarticles__oxratingcnt->value;
-        $this->oxarticles__oxrating->setValue(($dOldRating * $dOldCnt + $rating) / ($dOldCnt + 1));
-        $this->oxarticles__oxratingcnt->setValue($dOldCnt + 1);
-        $dRating = ($dOldRating * $dOldCnt + $rating) / ($dOldCnt + 1);
-        $dRatingCnt = (int) ($dOldCnt + 1);
+        $d_old_rating = $this->oxarticles__oxrating->value;
+        $d_old_cnt = $this->oxarticles__oxratingcnt->value;
+        $this->oxarticles__oxrating->set_value(($d_old_rating * $d_old_cnt + $rating) / ($d_old_cnt + 1));
+        $this->oxarticles__oxratingcnt->set_value($d_old_cnt + 1);
+        $d_rating = ($d_old_rating * $d_old_cnt + $rating) / ($d_old_cnt + 1);
+        $d_rating_cnt = (int) ($d_old_cnt + 1);
         // oxarticles.oxtimestamp = oxarticles.oxtimestamp to keep old timestamp value
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         $query = 'update oxarticles
                   set oxarticles.oxrating = :oxrating,
                       oxarticles.oxratingcnt = :oxratingcnt,
                       oxarticles.oxtimestamp = oxarticles.oxtimestamp
                   where oxarticles.oxid = :oxid';
-        $oDb->execute($query, [
-            'oxrating' => $dRating,
-            'oxratingcnt' => $dRatingCnt,
-            'oxid' => $this->getId(),
-        ]);
+        $o_db->execute($query, ['oxrating' => $d_rating, 'oxratingcnt' => $d_rating_cnt, 'oxid' => $this->get_id()]);
     }
-
     /**
      * Set product rating average
      *
      * @param integer $iRating new rating value
      */
-    public function setRatingAverage($iRating): void
+    public function set_rating_average($i_rating): void
     {
-        $this->oxarticles__oxrating = new Field($iRating);
+        $this->oxarticles__oxrating = new Field($i_rating);
     }
-
     /**
      * Set product rating count
      *
      * @param integer $iRatingCnt new rating count
      */
-    public function setRatingCount($iRatingCnt): void
+    public function set_rating_count($i_rating_cnt): void
     {
-        $this->oxarticles__oxratingcnt = new Field($iRatingCnt);
+        $this->oxarticles__oxratingcnt = new Field($i_rating_cnt);
     }
-
     /**
      * Returns product rating average
      *
@@ -1258,15 +1064,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    public function getArticleRatingAverage($blIncludeVariants = false)
+    public function get_article_rating_average($bl_include_variants = false)
     {
-        if (!$blIncludeVariants) {
+        if (!$bl_include_variants) {
             return round($this->oxarticles__oxrating->value, 1);
         }
-        $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
-        return $oRating->getRatingAverage($this->getId(), 'oxarticle', $this->getVariantIds());
+        $o_rating = ox_new(\Oxid_Esales\Eshop\Application\Model\Rating::class);
+        return $o_rating->get_rating_average($this->get_id(), 'oxarticle', $this->get_variant_ids());
     }
-
     /**
      * Returns product rating count
      *
@@ -1274,182 +1079,146 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return int
      */
-    public function getArticleRatingCount($blIncludeVariants = false)
+    public function get_article_rating_count($bl_include_variants = false)
     {
-        if (!$blIncludeVariants) {
+        if (!$bl_include_variants) {
             return $this->oxarticles__oxratingcnt->value;
         }
-        $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
-        return $oRating->getRatingCount($this->getId(), 'oxarticle', $this->getVariantIds());
+        $o_rating = ox_new(\Oxid_Esales\Eshop\Application\Model\Rating::class);
+        return $o_rating->get_rating_count($this->get_id(), 'oxarticle', $this->get_variant_ids());
     }
-
     /**
      * Collects user written reviews about an article.
      *
      * @return \OxidEsales\Eshop\Core\Model\ListModel
      */
-    public function getReviews()
+    public function get_reviews()
     {
-        $aIds = [$this->getId()];
-
+        $a_ids = [$this->get_id()];
         if ($this->oxarticles__oxparentid->value) {
-            $aIds[] = $this->oxarticles__oxparentid->value;
+            $a_ids[] = $this->oxarticles__oxparentid->value;
         }
-
         // showing variant reviews ..
-        if (Registry::getConfig()->getConfigParam('blShowVariantReviews')) {
-            $aAdd = $this->getVariantIds();
-            if (is_array($aAdd)) {
-                $aIds = array_merge($aIds, $aAdd);
+        if (Registry::get_config()->get_config_param('blShowVariantReviews')) {
+            $a_add = $this->get_variant_ids();
+            if (is_array($a_add)) {
+                $a_ids = array_merge($a_ids, $a_add);
             }
         }
-
-        $oReview = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
-        $oRevs = $oReview->loadList('oxarticle', $aIds);
-
+        $o_review = ox_new(\Oxid_Esales\Eshop\Application\Model\Review::class);
+        $o_revs = $o_review->load_list('oxarticle', $a_ids);
         //if no review found, return null
-        if ($oRevs->count() < 1) {
+        if ($o_revs->count() < 1) {
             return null;
         }
-
-        return $oRevs;
+        return $o_revs;
     }
-
     /**
      * Loads and returns array with cross selling information.
      *
      * @return array
      */
-    public function getCrossSelling()
+    public function get_cross_selling()
     {
-        $oCrosslist = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oCrosslist->loadArticleCrossSell($this->oxarticles__oxid->value);
-        if ($oCrosslist->count()) {
-            return $oCrosslist;
+        $o_crosslist = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+        $o_crosslist->load_article_cross_sell($this->oxarticles__oxid->value);
+        if ($o_crosslist->count()) {
+            return $o_crosslist;
         }
     }
-
     /**
      * Loads and returns array with accessories information.
      *
      * @return array
      */
-    public function getAccessoires()
+    public function get_accessoires()
     {
-        $myConfig = Registry::getConfig();
-
+        $my_config = Registry::get_config();
         // Performance
-        if (!$myConfig->getConfigParam('bl_perfLoadAccessoires')) {
+        if (!$my_config->get_config_param('bl_perfLoadAccessoires')) {
             return;
         }
-
-        $oAcclist = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oAcclist->setSqlLimit(0, $myConfig->getConfigParam('iNrofCrossellArticles'));
-        $oAcclist->loadArticleAccessoires($this->oxarticles__oxid->value);
-
-        if ($oAcclist->count()) {
-            return $oAcclist;
+        $o_acclist = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+        $o_acclist->set_sql_limit(0, $my_config->get_config_param('iNrofCrossellArticles'));
+        $o_acclist->load_article_accessoires($this->oxarticles__oxid->value);
+        if ($o_acclist->count()) {
+            return $o_acclist;
         }
     }
-
     /**
      * Returns a list of similar products.
      *
      * @return array
      */
-    public function getSimilarProducts()
+    public function get_similar_products()
     {
         // Performance
-        $myConfig = Registry::getConfig();
-        if (!$myConfig->getConfigParam('bl_perfLoadSimilar')) {
+        $my_config = Registry::get_config();
+        if (!$my_config->get_config_param('bl_perfLoadSimilar')) {
             return;
         }
-
         // Check configured number of similar products (bug #6062)
-        if ($myConfig->getConfigParam('iNrofSimilarArticles') < 1) {
+        if ($my_config->get_config_param('iNrofSimilarArticles') < 1) {
             return;
         }
-
-        $sArticleTable = $this->getViewName();
-
-        $sAttribs = '';
-        $iCnt = 0;
-        $this->getAttribsString($sAttribs, $iCnt);
-
-        if (!$sAttribs) {
+        $s_article_table = $this->get_view_name();
+        $s_attribs = '';
+        $i_cnt = 0;
+        $this->get_attribs_string($s_attribs, $i_cnt);
+        if (!$s_attribs) {
             return null;
         }
-
-        $aList = $this->getSimList($sAttribs, $iCnt);
-
-        if (count($aList)) {
-            uasort(
-                $aList,
-                fn ($a, $b): int => $a <=> $b
-            );
-
-            $sSearch = $this->generateSimListSearchStr($sArticleTable, $aList);
-
-            $oSimilarlist = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-            $oSimilarlist->setSqlLimit(0, $myConfig->getConfigParam('iNrofSimilarArticles'));
-            $oSimilarlist->selectString($sSearch);
-
-            return $oSimilarlist;
+        $a_list = $this->get_sim_list($s_attribs, $i_cnt);
+        if (count($a_list)) {
+            uasort($a_list, fn($a, $b): int => $a <=> $b);
+            $s_search = $this->generate_sim_list_search_str($s_article_table, $a_list);
+            $o_similarlist = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+            $o_similarlist->set_sql_limit(0, $my_config->get_config_param('iNrofSimilarArticles'));
+            $o_similarlist->select_string($s_search);
+            return $o_similarlist;
         }
     }
-
     /**
      * Loads and returns articles list, bought by same customer.
      *
      * @return \OxidEsales\Eshop\Application\Model\ArticleList|null
      */
-    public function getCustomerAlsoBoughtThisProducts()
+    public function get_customer_also_bought_this_products()
     {
         // Performance
-        $myConfig = Registry::getConfig();
-        if (!$myConfig->getConfigParam('bl_perfLoadCustomerWhoBoughtThis')) {
+        $my_config = Registry::get_config();
+        if (!$my_config->get_config_param('bl_perfLoadCustomerWhoBoughtThis')) {
             return;
         }
-
         // selecting products that fits
-        $sQ = $this->generateSearchStrForCustomerBought();
-
-        $oArticles = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oArticles->setSqlLimit(0, $myConfig->getConfigParam('iNrofCustomerWhoArticles'));
-        $oArticles->selectString($sQ);
-        if ($oArticles->count()) {
-            return $oArticles;
+        $s_q = $this->generate_search_str_for_customer_bought();
+        $o_articles = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+        $o_articles->set_sql_limit(0, $my_config->get_config_param('iNrofCustomerWhoArticles'));
+        $o_articles->select_string($s_q);
+        if ($o_articles->count()) {
+            return $o_articles;
         }
     }
-
     /**
      * Returns list object with info about article price that depends on amount in basket.
      * Takes data from oxprice2article table. Returns false if such info is not set.
      *
      * @return mixed
      */
-    public function loadAmountPriceInfo()
+    public function load_amount_price_info()
     {
-        $myConfig = Registry::getConfig();
-        if (
-            !$myConfig->getConfigParam('bl_perfLoadPrice')
-            || !$this->_blLoadPrice
-            || !$this->_blCalcPrice
-            || !$this->hasAmountPrice()
-        ) {
+        $my_config = Registry::get_config();
+        if (!$my_config->get_config_param('bl_perfLoadPrice') || !$this->_bl_load_price || !$this->_bl_calc_price || !$this->has_amount_price()) {
             return [];
         }
-
-        if ($this->_oAmountPriceInfo === null) {
-            $this->_oAmountPriceInfo = [];
-            if (count(($aAmPriceList = $this->buildAmountPriceList()->getArray()))) {
-                $this->_oAmountPriceInfo = $this->fillAmountPriceList($aAmPriceList);
+        if ($this->_o_amount_price_info === null) {
+            $this->_o_amount_price_info = [];
+            if (count($a_am_price_list = $this->build_amount_price_list()->get_array())) {
+                $this->_o_amount_price_info = $this->fill_amount_price_list($a_am_price_list);
             }
         }
-
-        return $this->_oAmountPriceInfo;
+        return $this->_o_amount_price_info;
     }
-
     /**
      * Returns all selectlists this article has (used in oxbasket)
      *
@@ -1457,94 +1226,78 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    public function getSelectLists($sKeyPrefix = null)
+    public function get_select_lists($s_key_prefix = null)
     {
         //#1468C - more then one article in basket with different selectlist...
         //optionall function parameter $sKeyPrefix added, used only in basket.php
-        $sKey = $this->getId();
-        if (isset($sKeyPrefix)) {
-            $sKey = $sKeyPrefix . '__' . $sKey;
+        $s_key = $this->get_id();
+        if (isset($s_key_prefix)) {
+            $s_key = $s_key_prefix . '__' . $s_key;
         }
-
-        if (!isset(self::$_aSelList[$sKey])) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sSLViewName = $tableViewNameGenerator->getViewName('oxselectlist');
-
-            $sQ = "select {$sSLViewName}.* from oxobject2selectlist join {$sSLViewName}
-                    on $sSLViewName.oxid=oxobject2selectlist.oxselnid
-                    where oxobject2selectlist.oxobjectid = :oxobjectid order by oxobject2selectlist.oxsort";
-
+        if (!isset(self::$_a_sel_list[$s_key])) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+            $s_sl_view_name = $table_view_name_generator->get_view_name('oxselectlist');
+            $s_q = "select {$s_sl_view_name}.* from oxobject2selectlist join {$s_sl_view_name}\n                    on {$s_sl_view_name}.oxid=oxobject2selectlist.oxselnid\n                    where oxobject2selectlist.oxobjectid = :oxobjectid order by oxobject2selectlist.oxsort";
             // all selectlists this article has
-            $oLists = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $oLists->init('oxselectlist');
-            $oLists->selectString($sQ, ['oxobjectid' => $this->getId()]);
-
+            $o_lists = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+            $o_lists->init('oxselectlist');
+            $o_lists->select_string($s_q, ['oxobjectid' => $this->get_id()]);
             //#1104S if this is variant ant it has no selectlists, trying with parent
-            if ($oLists->count() == 0 && $this->getFieldData('oxparentid')) {
-                $oLists->selectString($sQ, ['oxobjectid' => $this->oxarticles__oxparentid->value]);
+            if ($o_lists->count() == 0 && $this->get_field_data('oxparentid')) {
+                $o_lists->select_string($s_q, ['oxobjectid' => $this->oxarticles__oxparentid->value]);
             }
-
             // We do not need to calculate price here as there are method to get current article vat
             /*if ( $this->getPrice() != null ) {
-                $dVat = $this->getPrice()->getVat();
-            }*/
-            $dVat = $this->getArticleVat();
-
-            $iCnt = 0;
-            self::$_aSelList[$sKey] = [];
-            foreach ($oLists as $oSelectlist) {
-                self::$_aSelList[$sKey][$iCnt] = $oSelectlist->getFieldList($dVat);
-                self::$_aSelList[$sKey][$iCnt]['name'] = $oSelectlist->oxselectlist__oxtitle->value;
-                $iCnt++;
+                  $dVat = $this->getPrice()->getVat();
+              }*/
+            $d_vat = $this->get_article_vat();
+            $i_cnt = 0;
+            self::$_a_sel_list[$s_key] = [];
+            foreach ($o_lists as $o_selectlist) {
+                self::$_a_sel_list[$s_key][$i_cnt] = $o_selectlist->get_field_list($d_vat);
+                self::$_a_sel_list[$s_key][$i_cnt]['name'] = $o_selectlist->oxselectlist__oxtitle->value;
+                $i_cnt++;
             }
         }
-
-        return self::$_aSelList[$sKey];
+        return self::$_a_sel_list[$s_key];
     }
-
     /**
      * Returns amount of variants article has
      *
      * @return mixed
      */
-    public function getVariantsCount()
+    public function get_variants_count()
     {
-        return $this->getFieldData('oxvarcount');
+        return $this->get_field_data('oxvarcount');
     }
-
     /**
      * Checks if article has multidimensional variants
      *
      * @return bool
      */
-    public function hasMdVariants()
+    public function has_md_variants()
     {
-        return $this->_blHasMdVariants;
+        return $this->_bl_has_md_variants;
     }
-
     /**
      * Returns if article has intangible agreement with which customer will have to agree.
      *
      * @return bool
      */
-    public function hasIntangibleAgreement()
+    public function has_intangible_agreement()
     {
-        return $this->oxarticles__oxshowcustomagreement->value
-            && $this->oxarticles__oxnonmaterial->value
-            && !$this->hasDownloadableAgreement();
+        return $this->oxarticles__oxshowcustomagreement->value && $this->oxarticles__oxnonmaterial->value && !$this->has_downloadable_agreement();
     }
-
     /**
      * Returns if article has downloadable agreement with which customer will have to agree.
      *
      * @return bool
      */
-    public function hasDownloadableAgreement()
+    public function has_downloadable_agreement()
     {
         return $this->oxarticles__oxshowcustomagreement->value && $this->oxarticles__oxisdownloadable->value;
     }
-
     /**
      * Returns variants selections lists array
      *
@@ -1555,32 +1308,22 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    public function getVariantSelections($aFilterIds = null, $sActVariantId = null, $iLimit = 0)
+    public function get_variant_selections($a_filter_ids = null, $s_act_variant_id = null, $i_limit = 0)
     {
-        $iLimit = (int) $iLimit;
-        if (!isset($this->_aVariantSelections[$iLimit])) {
-            $aVariantSelections = false;
+        $i_limit = (int) $i_limit;
+        if (!isset($this->_a_variant_selections[$i_limit])) {
+            $a_variant_selections = false;
             if ($this->oxarticles__oxvarcount->value) {
-                $oVariants = $this->getVariants(false);
-                $aVariantSelections = oxNew(\OxidEsales\Eshop\Application\Model\VariantHandler::class)
-                    ->buildVariantSelections(
-                        $this->oxarticles__oxvarname->getRawValue(),
-                        $oVariants,
-                        $aFilterIds,
-                        $sActVariantId,
-                        $iLimit
-                    );
-
-                if (!empty($oVariants) && empty($aVariantSelections['rawselections'])) {
-                    $aVariantSelections = false;
+                $o_variants = $this->get_variants(false);
+                $a_variant_selections = ox_new(\Oxid_Esales\Eshop\Application\Model\Variant_Handler::class)->build_variant_selections($this->oxarticles__oxvarname->get_raw_value(), $o_variants, $a_filter_ids, $s_act_variant_id, $i_limit);
+                if (!empty($o_variants) && empty($a_variant_selections['rawselections'])) {
+                    $a_variant_selections = false;
                 }
             }
-            $this->_aVariantSelections[$iLimit] = $aVariantSelections;
+            $this->_a_variant_selections[$i_limit] = $a_variant_selections;
         }
-
-        return $this->_aVariantSelections[$iLimit];
+        return $this->_a_variant_selections[$i_limit];
     }
-
     /**
      * Returns product selections lists array (used in azure theme)
      *
@@ -1589,58 +1332,47 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    public function getSelections($iLimit = null, $aFilter = null)
+    public function get_selections($i_limit = null, $a_filter = null)
     {
-        $sId = $this->getId() . ((int) $iLimit);
-        if (!array_key_exists($sId, self::$_aSelections)) {
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sSLViewName = $tableViewNameGenerator->getViewName('oxselectlist');
-
-            $sQ = "select {$sSLViewName}.* from oxobject2selectlist join {$sSLViewName}
-                    on $sSLViewName.oxid=oxobject2selectlist.oxselnid
-                    where oxobject2selectlist.oxobjectid = :oxobjectid order by oxobject2selectlist.oxsort";
-
-            if (($iLimit = (int) $iLimit)) {
-                $sQ .= " limit $iLimit ";
+        $s_id = $this->get_id() . (int) $i_limit;
+        if (!array_key_exists($s_id, self::$_a_selections)) {
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+            $s_sl_view_name = $table_view_name_generator->get_view_name('oxselectlist');
+            $s_q = "select {$s_sl_view_name}.* from oxobject2selectlist join {$s_sl_view_name}\n                    on {$s_sl_view_name}.oxid=oxobject2selectlist.oxselnid\n                    where oxobject2selectlist.oxobjectid = :oxobjectid order by oxobject2selectlist.oxsort";
+            if ($i_limit = (int) $i_limit) {
+                $s_q .= " limit {$i_limit} ";
             }
-
             // vat value for price
-            $dVat = 0;
-            if (($oPrice = $this->getPrice()) != null) {
-                $dVat = $oPrice->getVat();
+            $d_vat = 0;
+            if (($o_price = $this->get_price()) != null) {
+                $d_vat = $o_price->get_vat();
             }
-
             // all selectlists this article has
-            $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $oList->init('oxselectlist');
-            $oList->getBaseObject()->setVat($dVat);
-            $oList->selectString($sQ, ['oxobjectid' => $this->getId()]);
-
+            $o_list = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+            $o_list->init('oxselectlist');
+            $o_list->get_base_object()->set_vat($d_vat);
+            $o_list->select_string($s_q, ['oxobjectid' => $this->get_id()]);
             //#1104S if this is variant and it has no selectlists, trying with parent
-            if ($oList->count() == 0 && $this->oxarticles__oxparentid->value) {
-                $oList->selectString($sQ, ['oxobjectid' => $this->oxarticles__oxparentid->value]);
+            if ($o_list->count() == 0 && $this->oxarticles__oxparentid->value) {
+                $o_list->select_string($s_q, ['oxobjectid' => $this->oxarticles__oxparentid->value]);
             }
-
-            self::$_aSelections[$sId] = $oList->count() ? $oList : false;
+            self::$_a_selections[$s_id] = $o_list->count() ? $o_list : false;
         }
-
-        if (self::$_aSelections[$sId]) {
+        if (self::$_a_selections[$s_id]) {
             // marking active from filter
-            $aFilter ??= Registry::getRequest()->getRequestEscapedParameter('sel');
-            if ($aFilter) {
-                $iSelIdx = 0;
-                foreach (self::$_aSelections[$sId] as $oSelection) {
-                    if (isset($aFilter[$iSelIdx])) {
-                        $oSelection->setActiveSelectionByIndex($aFilter[$iSelIdx]);
+            $a_filter ??= Registry::get_request()->get_request_escaped_parameter('sel');
+            if ($a_filter) {
+                $i_sel_idx = 0;
+                foreach (self::$_a_selections[$s_id] as $o_selection) {
+                    if (isset($a_filter[$i_sel_idx])) {
+                        $o_selection->set_active_selection_by_index($a_filter[$i_sel_idx]);
                     }
-                    $iSelIdx++;
+                    $i_sel_idx++;
                 }
             }
         }
-
-        return self::$_aSelections[$sId];
+        return self::$_a_selections[$s_id];
     }
-
     /**
      * Returns variant list (list contains oxArticle objects)
      *
@@ -1650,11 +1382,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return \OxidEsales\Eshop\Application\Model\ArticleList
      */
-    public function getFullVariants($blRemoveNotOrderables = true, $blForceCoreTable = null)
+    public function get_full_variants($bl_remove_not_orderables = true, $bl_force_core_table = null)
     {
-        return $this->loadVariantList(false, $blRemoveNotOrderables, $blForceCoreTable);
+        return $this->load_variant_list(false, $bl_remove_not_orderables, $bl_force_core_table);
     }
-
     /**
      * Collects and returns article variants.
      * Note: Only active variants are returned by this method. If you need full variant list use
@@ -1665,21 +1396,19 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    public function getVariants($blRemoveNotOrderables = true, $blForceCoreTable = null)
+    public function get_variants($bl_remove_not_orderables = true, $bl_force_core_table = null)
     {
-        return $this->loadVariantList($this->isInList(), $blRemoveNotOrderables, $blForceCoreTable);
+        return $this->load_variant_list($this->is_in_list(), $bl_remove_not_orderables, $bl_force_core_table);
     }
-
     /**
      * Simple way to get variants without querying oxArticle table first. This is basically used for lists.
      */
-    public function getSimpleVariants()
+    public function get_simple_variants()
     {
         if ($this->oxarticles__oxvarcount->value) {
-            return $this->getVariants();
+            return $this->get_variants();
         }
     }
-
     /**
      * Loads article variants and returns variants list object. Article language may
      * be set by passing with parameter, or GET/POST/Session variable.
@@ -1688,33 +1417,28 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return object
      */
-    public function getAdminVariants($sLanguage = null)
+    public function get_admin_variants($s_language = null)
     {
-        $oVariants = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        if (($sId = $this->getId())) {
-            $oBaseObj = $oVariants->getBaseObject();
-
-            if (is_null($sLanguage)) {
-                $oBaseObj->setLanguage(Registry::getLang()->getBaseLanguage());
+        $o_variants = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+        if ($s_id = $this->get_id()) {
+            $o_base_obj = $o_variants->get_base_object();
+            if (is_null($s_language)) {
+                $o_base_obj->set_language(Registry::get_lang()->get_base_language());
             } else {
-                $oBaseObj->setLanguage($sLanguage);
+                $o_base_obj->set_language($s_language);
             }
-
-            $sSql = 'select * from ' . $oBaseObj->getViewName() . '
+            $s_sql = 'select * from ' . $o_base_obj->get_view_name() . '
                 where oxparentid = :oxparentid
                 order by oxsort ';
-            $oVariants->selectString($sSql, ['oxparentid' => $sId]);
-
+            $o_variants->select_string($s_sql, ['oxparentid' => $s_id]);
             //if we have variants then depending on config option the parent may be non buyable
-            if (!Registry::getConfig()->getConfigParam('blVariantParentBuyable') && ($oVariants->count() > 0)) {
+            if (!Registry::get_config()->get_config_param('blVariantParentBuyable') && $o_variants->count() > 0) {
                 //$this->blNotBuyable = true;
-                $this->_blNotBuyableParent = true;
+                $this->_bl_not_buyable_parent = true;
             }
         }
-
-        return $oVariants;
+        return $o_variants;
     }
-
     /**
      * Loads and returns article category object. First tries to load
      * assigned category and is such category does not exist, tries to
@@ -1722,65 +1446,50 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return \OxidEsales\Eshop\Application\Model\Category|null
      */
-    public function getCategory()
+    public function get_category()
     {
-        $shopId = Registry::getConfig()->getShopId();
-        $id = $this->getParentId();
+        $shop_id = Registry::get_config()->get_shop_id();
+        $id = $this->get_parent_id();
         if (!$id) {
-            $id = $this->getId();
+            $id = $this->get_id();
         }
-
-        $this->initializeShopArticleCategoryCache($shopId);
-        if (\array_key_exists($id, self::$_aCategoryCache[$shopId])) {
-            return self::$_aCategoryCache[$shopId][$id];
+        $this->initialize_shop_article_category_cache($shop_id);
+        if (\array_key_exists($id, self::$_a_category_cache[$shop_id])) {
+            return self::$_a_category_cache[$shop_id][$id];
         }
-
-        startProfile('getCategory');
-
-        $category = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $category->setLanguage($this->getLanguage());
-
-        $str = Str::getStr();
-        $where = $category->getSqlActiveSnippet();
-        $select = $this->generateSearchStr($id);
-        $select .= (
-            $str->strstr(
-                $select,
-                'where'
-            ) ? ' and ' : ' where '
-        ) . $where . ' order by oxobject2category.oxtime limit 1';
-
+        start_profile('getCategory');
+        $category = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+        $category->set_language($this->get_language());
+        $str = Str::get_str();
+        $where = $category->get_sql_active_snippet();
+        $select = $this->generate_search_str($id);
+        $select .= ($str->strstr($select, 'where') ? ' and ' : ' where ') . $where . ' order by oxobject2category.oxtime limit 1';
         // category not found ?
-        $record = DatabaseProvider::getDb()->select($select);
+        $record = Database_Provider::get_db()->select($select);
         if ($record && $record->count() > 0) {
             $category->assign($record->fields);
         } else {
-            $select = $this->generateSearchStr($id, true);
+            $select = $this->generate_search_str($id, true);
             $select .= ($str->strstr($select, 'where') ? ' and ' : ' where ') . $where . ' limit 1';
-
             // looking for price category
-            $record = DatabaseProvider::getDb()->select($select);
+            $record = Database_Provider::get_db()->select($select);
             if ($record && $record->count() > 0) {
                 $category->assign($record->fields);
             } else {
                 $category = null;
             }
         }
-
         // add the category instance to cache
-        self::$_aCategoryCache[$shopId][$id] = $category;
-        stopProfile('getCategory');
-
+        self::$_a_category_cache[$shop_id][$id] = $category;
+        stop_profile('getCategory');
         return $category;
     }
-
-    private function initializeShopArticleCategoryCache($shopId): void
+    private function initialize_shop_article_category_cache($shop_id): void
     {
-        if (!\array_key_exists($shopId, self::$_aCategoryCache)) {
-            self::$_aCategoryCache[$shopId] = [];
+        if (!\array_key_exists($shop_id, self::$_a_category_cache)) {
+            self::$_a_category_cache[$shop_id] = [];
         }
     }
-
     /**
      * Returns ID's of categories where this article is assigned
      *
@@ -1789,23 +1498,18 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    public function getCategoryIds($blActCats = false, $blSkipCache = false)
+    public function get_category_ids($bl_act_cats = false, $bl_skip_cache = false)
     {
-        $sArticleId = $this->getId();
-
-        if (!isset(self::$_aArticleCats[$sArticleId]) || $blSkipCache) {
-            $sSql = $this->getCategoryIdsSelect($blActCats);
-            $aCategoryIds = $this->selectCategoryIds($sSql, 'oxcatnid');
-
-            $sSql = $this->getSqlForPriceCategories();
-            $aPriceCategoryIds = $this->selectCategoryIds($sSql, 'oxid');
-
-            self::$_aArticleCats[$sArticleId] = array_unique(array_merge($aCategoryIds, $aPriceCategoryIds));
+        $s_article_id = $this->get_id();
+        if (!isset(self::$_a_article_cats[$s_article_id]) || $bl_skip_cache) {
+            $s_sql = $this->get_category_ids_select($bl_act_cats);
+            $a_category_ids = $this->select_category_ids($s_sql, 'oxcatnid');
+            $s_sql = $this->get_sql_for_price_categories();
+            $a_price_category_ids = $this->select_category_ids($s_sql, 'oxid');
+            self::$_a_article_cats[$s_article_id] = array_unique(array_merge($a_category_ids, $a_price_category_ids));
         }
-
-        return self::$_aArticleCats[$sArticleId];
+        return self::$_a_article_cats[$s_article_id];
     }
-
     /**
      * Returns current article vendor object. If $blShopCheck = false, then
      * vendor loading will fallback to oxI18n object and blReadOnly parameter
@@ -1815,58 +1519,51 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return object
      */
-    public function getVendor($blShopCheck = true)
+    public function get_vendor($bl_shop_check = true)
     {
-        $sVendorId = $this->getVendorId();
-        if ($sVendorId) {
-            $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-        } elseif (!$blShopCheck && $this->oxarticles__oxvendorid->value) {
-            $oVendor = $this->createMultilanguageVendorObject();
-            $sVendorId = $this->oxarticles__oxvendorid->value;
+        $s_vendor_id = $this->get_vendor_id();
+        if ($s_vendor_id) {
+            $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+        } elseif (!$bl_shop_check && $this->oxarticles__oxvendorid->value) {
+            $o_vendor = $this->create_multilanguage_vendor_object();
+            $s_vendor_id = $this->oxarticles__oxvendorid->value;
         }
-        if ($sVendorId && $oVendor && $oVendor->load($sVendorId) && $oVendor->oxvendor__oxactive->value) {
-            return $oVendor;
+        if ($s_vendor_id && $o_vendor && $o_vendor->load($s_vendor_id) && $o_vendor->oxvendor__oxactive->value) {
+            return $o_vendor;
         }
-
         return null;
     }
-
     /**
      * @return \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
-    protected function createMultilanguageVendorObject()
+    protected function create_multilanguage_vendor_object()
     {
-        $oVendor = oxNew(MultiLanguageModel::class);
-        $oVendor->init('oxvendor');
-        $oVendor->setReadOnly(true);
-
-        return $oVendor;
+        $o_vendor = ox_new(Multi_Language_Model::class);
+        $o_vendor->init('oxvendor');
+        $o_vendor->set_read_only(true);
+        return $o_vendor;
     }
-
     /**
      * Returns article object vendor ID. Result is cached into self::$_aArticleVendors
      *
      * @return string
      */
-    public function getVendorId()
+    public function get_vendor_id()
     {
         if ($this->oxarticles__oxvendorid->value) {
             return $this->oxarticles__oxvendorid->value;
         }
-
         return false;
     }
-
     /**
      * Returns article object Manufacturer ID. Result is cached into self::$_aArticleManufacturers
      *
      * @return string
      */
-    public function getManufacturerId()
+    public function get_manufacturer_id()
     {
         return $this->oxarticles__oxmanufacturerid->value ?: false;
     }
-
     /**
      * Returns current article Manufacturer object. If $blShopCheck = false, then
      * Manufacturer blReadOnly parameter will be set to true. If Manufacturer is
@@ -1876,27 +1573,21 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return \OxidEsales\Eshop\Application\Model\Manufacturer|null
      */
-    public function getManufacturer($blShopCheck = true)
+    public function get_manufacturer($bl_shop_check = true)
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
-        if (
-            !($sManufacturerId = $this->getManufacturerId()) &&
-            !$blShopCheck && $this->oxarticles__oxmanufacturerid->value
-        ) {
-            $this->updateManufacturerBeforeLoading($oManufacturer);
-            $sManufacturerId = $this->oxarticles__oxmanufacturerid->value;
+        $o_manufacturer = ox_new(\Oxid_Esales\Eshop\Application\Model\Manufacturer::class);
+        if (!($s_manufacturer_id = $this->get_manufacturer_id()) && !$bl_shop_check && $this->oxarticles__oxmanufacturerid->value) {
+            $this->update_manufacturer_before_loading($o_manufacturer);
+            $s_manufacturer_id = $this->oxarticles__oxmanufacturerid->value;
         }
-
-        if ($sManufacturerId && $oManufacturer->load($sManufacturerId)) {
-            if (!Registry::getConfig()->getConfigParam('bl_perfLoadManufacturerTree')) {
-                $oManufacturer->setReadOnly(true);
+        if ($s_manufacturer_id && $o_manufacturer->load($s_manufacturer_id)) {
+            if (!Registry::get_config()->get_config_param('bl_perfLoadManufacturerTree')) {
+                $o_manufacturer->set_read_only(true);
             }
-            return $oManufacturer->oxmanufacturers__oxactive->value ? $oManufacturer : null;
+            return $o_manufacturer->oxmanufacturers__oxactive->value ? $o_manufacturer : null;
         }
-
         return null;
     }
-
     /**
      * Checks if article is assigned to category $sCatNID.
      *
@@ -1904,11 +1595,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    public function inCategory($sCatNid)
+    public function in_category($s_cat_nid)
     {
-        return in_array($sCatNid, $this->getCategoryIds());
+        return in_array($s_cat_nid, $this->get_category_ids());
     }
-
     /**
      * Checks if article is assigned to passed category (even checks
      * if this category is "price category"). Returns true on success.
@@ -1917,130 +1607,103 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    public function isAssignedToCategory($sCatId)
+    public function is_assigned_to_category($s_cat_id)
     {
         // variant handling
-        $sOXID = $this->getId();
+        $s_oxid = $this->get_id();
         if (isset($this->oxarticles__oxparentid->value) && $this->oxarticles__oxparentid->value) {
-            $sOXID = $this->oxarticles__oxparentid->value;
+            $s_oxid = $this->oxarticles__oxparentid->value;
         }
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sSelect = $this->generateSelectCatStr($sOXID, $sCatId);
-        $sOXID = $oDb->getOne($sSelect);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_select = $this->generate_select_cat_str($s_oxid, $s_cat_id);
+        $s_oxid = $o_db->get_one($s_select);
         // article is assigned to passed category!
-        if (isset($sOXID) && $sOXID) {
+        if (isset($s_oxid) && $s_oxid) {
             return true;
         }
-
         // maybe this category is price category ?
-        if (Registry::getConfig()->getConfigParam('bl_perfLoadPrice') && $this->_blLoadPrice) {
-            $dPriceFromTo = $this->getPrice()->getBruttoPrice();
-            if ($dPriceFromTo > 0) {
-                $sSelect = $this->generateSelectCatStr($sOXID, $sCatId, $dPriceFromTo);
-                $sOXID = $oDb->getOne($sSelect);
+        if (Registry::get_config()->get_config_param('bl_perfLoadPrice') && $this->_bl_load_price) {
+            $d_price_from_to = $this->get_price()->get_brutto_price();
+            if ($d_price_from_to > 0) {
+                $s_select = $this->generate_select_cat_str($s_oxid, $s_cat_id, $d_price_from_to);
+                $s_oxid = $o_db->get_one($s_select);
                 // article is assigned to passed category!
-                if (isset($sOXID) && $sOXID) {
+                if (isset($s_oxid) && $s_oxid) {
                     return true;
                 }
             }
         }
-
         return false;
     }
-
     /**
      * Returns T price
      *
      * @return \OxidEsales\Eshop\Core\Price|null
      */
-    public function getTPrice()
+    public function get_t_price()
     {
-        if (!Registry::getConfig()->getConfigParam('bl_perfLoadPrice') || !$this->_blLoadPrice) {
+        if (!Registry::get_config()->get_config_param('bl_perfLoadPrice') || !$this->_bl_load_price) {
             return;
         }
-
         // return cached result, since oPrice is created ONLY in this function [or function of EQUAL level]
-        if ($this->_oTPrice !== null) {
-            return $this->_oTPrice;
+        if ($this->_o_t_price !== null) {
+            return $this->_o_t_price;
         }
-
-        $oPrice = $this->getPriceObject();
-
-        $dBasePrice = $this->oxarticles__oxtprice->value;
-        $dBasePrice = $this->preparePrice($dBasePrice, $this->getArticleVat());
-
-        $oPrice->setPrice($dBasePrice);
-
-        $this->applyVAT($oPrice, $this->getArticleVat());
-        $this->applyCurrency($oPrice);
-
-        if ($this->isParentNotBuyable()) {
+        $o_price = $this->get_price_object();
+        $d_base_price = $this->oxarticles__oxtprice->value;
+        $d_base_price = $this->prepare_price($d_base_price, $this->get_article_vat());
+        $o_price->set_price($d_base_price);
+        $this->apply_vat($o_price, $this->get_article_vat());
+        $this->apply_currency($o_price);
+        if ($this->is_parent_not_buyable()) {
             // if parent article is not buyable then compare agains min article variant price
-            $oPrice2 = $this->getVarMinPrice();
+            $o_price2 = $this->get_var_min_price();
         } else {
             // else compare against article price
-            $oPrice2 = $this->getPrice();
+            $o_price2 = $this->get_price();
         }
-
-        if ($oPrice->getPrice() <= $oPrice2->getPrice()) {
+        if ($o_price->get_price() <= $o_price2->get_price()) {
             // if RRP price is less or equal to comparable price then return
             return;
         }
-
-        $this->_oTPrice = $oPrice;
-
-        return $this->_oTPrice;
+        $this->_o_t_price = $o_price;
+        return $this->_o_t_price;
     }
-
     /**
      * Checks if discount should be skipped for this article in basket. Returns true if yes.
      *
      * @return bool
      */
-    public function skipDiscounts()
+    public function skip_discounts()
     {
         // already loaded skip discounts config
-        if ($this->_blSkipDiscounts !== null) {
-            return $this->_blSkipDiscounts;
+        if ($this->_bl_skip_discounts !== null) {
+            return $this->_bl_skip_discounts;
         }
-
         if ($this->oxarticles__oxskipdiscounts->value) {
             return true;
         }
-
-        $this->_blSkipDiscounts = false;
-        if (Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->hasSkipDiscountCategories()) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sO2CView = $tableViewNameGenerator->getViewName('oxobject2category', $this->getLanguage());
-            $sViewName = $tableViewNameGenerator->getViewName('oxcategories', $this->getLanguage());
-            $sSelect = "select 1 from $sO2CView as $sO2CView
-                left join {$sViewName} on {$sViewName}.oxid = $sO2CView.oxcatnid
-                where $sO2CView.oxobjectid = :oxobjectid
-                    and {$sViewName}.oxactive = :oxactive
-                    and {$sViewName}.oxskipdiscounts = :oxskipdiscounts ";
-            $params = [
-                'oxobjectid' => $this->getId(),
-                'oxactive' => 1,
-                'oxskipdiscounts' => 1,
-            ];
-            $this->_blSkipDiscounts = ($oDb->getOne($sSelect, $params) == 1);
+        $this->_bl_skip_discounts = false;
+        if (Registry::get(\Oxid_Esales\Eshop\Application\Model\Discount_List::class)->has_skip_discount_categories()) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+            $s_o2c_view = $table_view_name_generator->get_view_name('oxobject2category', $this->get_language());
+            $s_view_name = $table_view_name_generator->get_view_name('oxcategories', $this->get_language());
+            $s_select = "select 1 from {$s_o2c_view} as {$s_o2c_view}\n                left join {$s_view_name} on {$s_view_name}.oxid = {$s_o2c_view}.oxcatnid\n                where {$s_o2c_view}.oxobjectid = :oxobjectid\n                    and {$s_view_name}.oxactive = :oxactive\n                    and {$s_view_name}.oxskipdiscounts = :oxskipdiscounts ";
+            $params = ['oxobjectid' => $this->get_id(), 'oxactive' => 1, 'oxskipdiscounts' => 1];
+            $this->_bl_skip_discounts = $o_db->get_one($s_select, $params) == 1;
         }
-
-        return $this->_blSkipDiscounts;
+        return $this->_bl_skip_discounts;
     }
-
     /**
      * Sets the current oxPrice object
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice the new price object
      */
-    public function setPrice(Price $oPrice): void
+    public function set_price(Price $o_price): void
     {
-        $this->_oPrice = $oPrice;
+        $this->_o_price = $o_price;
     }
-
     /**
      * Returns base article price from database. Price may differ according to users group
      * Override this function if you want e.g. different prices for diff. usergroups.
@@ -2049,23 +1712,19 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    public function getBasePrice($dAmount = 1)
+    public function get_base_price($d_amount = 1)
     {
         // override this function if you want e.g. different prices
         // for diff. user groups.
-
         // Performance
-        $myConfig = Registry::getConfig();
-        if (!$myConfig->getConfigParam('bl_perfLoadPrice') || !$this->_blLoadPrice) {
+        $my_config = Registry::get_config();
+        if (!$my_config->get_config_param('bl_perfLoadPrice') || !$this->_bl_load_price) {
             return;
         }
-
         // GroupPrice or DB price ajusted by AmountPrice
-        $dPrice = $this->getModifiedAmountPrice($dAmount);
-
-        return $dPrice;
+        $d_price = $this->get_modified_amount_price($d_amount);
+        return $d_price;
     }
-
     /**
      * Modifies given amount price.
      *
@@ -2073,11 +1732,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    protected function getModifiedAmountPrice($amount)
+    protected function get_modified_amount_price($amount)
     {
-        return $this->getAmountPrice($amount);
+        return $this->get_amount_price($amount);
     }
-
     /**
      * Calculates and returns price of article (adds taxes and discounts).
      *
@@ -2085,62 +1743,51 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getPrice($dAmount = 1)
+    public function get_price($d_amount = 1)
     {
-        $myConfig = Registry::getConfig();
+        $my_config = Registry::get_config();
         // Performance
-        if (!$myConfig->getConfigParam('bl_perfLoadPrice') || !$this->_blLoadPrice) {
+        if (!$my_config->get_config_param('bl_perfLoadPrice') || !$this->_bl_load_price) {
             return;
         }
-
         // return cached result, since oPrice is created ONLY in this function [or function of EQUAL level]
-        if ($dAmount != 1 || $this->_oPrice === null) {
+        if ($d_amount != 1 || $this->_o_price === null) {
             // module
-            $dBasePrice = $this->getBasePrice($dAmount);
-            $dBasePrice = $this->preparePrice($dBasePrice, $this->getArticleVat());
-
-            $oPrice = $this->getPriceObject();
-
-            $oPrice->setPrice($dBasePrice);
-
+            $d_base_price = $this->get_base_price($d_amount);
+            $d_base_price = $this->prepare_price($d_base_price, $this->get_article_vat());
+            $o_price = $this->get_price_object();
+            $o_price->set_price($d_base_price);
             // price handling
-            if (!$this->_blCalcPrice && $dAmount == 1) {
-                return $this->_oPrice = $oPrice;
+            if (!$this->_bl_calc_price && $d_amount == 1) {
+                return $this->_o_price = $o_price;
             }
-
-            $this->calculatePrice($oPrice);
-            if ($dAmount != 1) {
-                return $oPrice;
+            $this->calculate_price($o_price);
+            if ($d_amount != 1) {
+                return $o_price;
             }
-
-            $this->_oPrice = $oPrice;
+            $this->_o_price = $o_price;
         }
-
-        return $this->_oPrice;
+        return $this->_o_price;
     }
-
     /**
      * sets article user
      *
      * @param \OxidEsales\Eshop\Application\Model\User $oUser user to set
      */
-    public function setArticleUser($oUser): void
+    public function set_article_user($o_user): void
     {
-        $this->_oUser = $oUser;
+        $this->_o_user = $o_user;
     }
-
     /**
      * @return \OxidEsales\Eshop\Application\Model\User article user.
      */
-    public function getArticleUser()
+    public function get_article_user()
     {
-        if ($this->_oUser) {
-            return $this->_oUser;
+        if ($this->_o_user) {
+            return $this->_o_user;
         }
-
-        return $this->getUser();
+        return $this->get_user();
     }
-
     /**
      * Creates, calculates and returns oxPrice object for basket product.
      *
@@ -2150,34 +1797,23 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getBasketPrice($dAmount, $aSelList, $oBasket)
+    public function get_basket_price($d_amount, $a_sel_list, $o_basket)
     {
-        $oUser = $oBasket->getBasketUser();
-        $this->setArticleUser($oUser);
-
-        $oBasketPrice = $this->getPriceObject($oBasket->isCalculationModeNetto());
-
+        $o_user = $o_basket->get_basket_user();
+        $this->set_article_user($o_user);
+        $o_basket_price = $this->get_price_object($o_basket->is_calculation_mode_netto());
         // get base price
-        $dBasePrice = $this->getBasePrice($dAmount);
-
-        $dBasePrice = $this->modifySelectListPrice($dBasePrice, $aSelList);
-        $dBasePrice = $this->preparePrice($dBasePrice, $this->getArticleVat(), $oBasket->isCalculationModeNetto());
-
+        $d_base_price = $this->get_base_price($d_amount);
+        $d_base_price = $this->modify_select_list_price($d_base_price, $a_sel_list);
+        $d_base_price = $this->prepare_price($d_base_price, $this->get_article_vat(), $o_basket->is_calculation_mode_netto());
         // applying select list price
-
         // setting price
-        $oBasketPrice->setPrice($dBasePrice);
-
-        $dVat = Registry::get(\OxidEsales\Eshop\Application\Model\VatSelector::class)->getBasketItemVat(
-            $this,
-            $oBasket
-        );
-        $this->calculatePrice($oBasketPrice, $dVat);
-
+        $o_basket_price->set_price($d_base_price);
+        $d_vat = Registry::get(\Oxid_Esales\Eshop\Application\Model\Vat_Selector::class)->get_basket_item_vat($this, $o_basket);
+        $this->calculate_price($o_basket_price, $d_vat);
         // returning final price object
-        return $oBasketPrice;
+        return $o_basket_price;
     }
-
     /**
      * Deletes record and other information related to this article such as images from DB,
      * also removes variants. Returns true if entry was deleted.
@@ -2188,47 +1824,34 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    public function delete($sOXID = null)
+    public function delete($s_oxid = null)
     {
-        if (!$sOXID) {
-            $sOXID = $this->getId();
+        if (!$s_oxid) {
+            $s_oxid = $this->get_id();
         }
-        if (!$sOXID) {
+        if (!$s_oxid) {
             return false;
         }
-
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $database->startTransaction();
+        $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $database->start_transaction();
         try {
             // #2339 delete first variants before deleting parent product
-            $this->deleteVariantRecords($sOXID);
-            $this->load($sOXID);
-            $this->deletePics();
-            $this->onChangeResetCounts(
-                $sOXID,
-                $this->oxarticles__oxvendorid->value,
-                $this->oxarticles__oxmanufacturerid->value
-            );
-
+            $this->delete_variant_records($s_oxid);
+            $this->load($s_oxid);
+            $this->delete_pics();
+            $this->on_change_reset_counts($s_oxid, $this->oxarticles__oxvendorid->value, $this->oxarticles__oxmanufacturerid->value);
             // delete self
-            $deleted = parent::delete($sOXID);
-
-            $this->deleteRecords($sOXID);
-
-            Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class)->onDeleteArticle($this);
-
-            $this->onChange(ACTION_DELETE, $sOXID, $this->getFieldData('oxparentid'));
-
-            $database->commitTransaction();
+            $deleted = parent::delete($s_oxid);
+            $this->delete_records($s_oxid);
+            Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Article::class)->on_delete_article($this);
+            $this->on_change(ACTION_DELETE, $s_oxid, $this->get_field_data('oxparentid'));
+            $database->commit_transaction();
         } catch (Exception $exception) {
-            $database->rollbackTransaction();
-
+            $database->rollback_transaction();
             throw $exception;
         }
-
         return $deleted;
     }
-
     /**
      * Reduce article stock. return the affected amount
      *
@@ -2237,36 +1860,26 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return float
      */
-    public function reduceStock($dAmount, $blAllowNegativeStock = false)
+    public function reduce_stock($d_amount, $bl_allow_negative_stock = false)
     {
-        $this->actionType = ACTION_UPDATE_STOCK;
-        $this->beforeUpdate();
-
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $this->action_type = ACTION_UPDATE_STOCK;
+        $this->before_update();
+        $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         $query = 'select oxstock
             from oxarticles
             where oxid = :oxid FOR UPDATE ';
-        $actualStock = $database->getOne($query, [
-            'oxid' => $this->getId(),
-        ]);
-
-        $iStockCount = $actualStock - $dAmount;
-        if (!$blAllowNegativeStock && ($iStockCount < 0)) {
-            $dAmount += $iStockCount;
-            $iStockCount = 0;
+        $actual_stock = $database->get_one($query, ['oxid' => $this->get_id()]);
+        $i_stock_count = $actual_stock - $d_amount;
+        if (!$bl_allow_negative_stock && $i_stock_count < 0) {
+            $d_amount += $i_stock_count;
+            $i_stock_count = 0;
         }
-        $this->oxarticles__oxstock = new Field($iStockCount);
-
+        $this->oxarticles__oxstock = new Field($i_stock_count);
         $query = 'update oxarticles set oxarticles.oxstock = :oxstock where oxarticles.oxid = :oxid';
-        $database->execute($query, [
-            'oxstock' => $iStockCount,
-            'oxid' => $this->getId(),
-        ]);
-        $this->onChange(ACTION_UPDATE_STOCK);
-
-        return $dAmount;
+        $database->execute($query, ['oxstock' => $i_stock_count, 'oxid' => $this->get_id()]);
+        $this->on_change(ACTION_UPDATE_STOCK);
+        return $d_amount;
     }
-
     /**
      * Recursive function. Updates quantity of sold articles.
      * Return true if amount was changed in database.
@@ -2275,51 +1888,44 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return mixed
      */
-    public function updateSoldAmount($dAmount = 0)
+    public function update_sold_amount($d_amount = 0)
     {
-        if (!$dAmount) {
+        if (!$d_amount) {
             return;
         }
         $rs = false;
         // article is not variant - should be updated current amount
         if (!$this->oxarticles__oxparentid->value) {
             //updating by SQL query, due to wrong behaviour if saving article using not admin mode
-            $dAmount = (float) $dAmount;
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $d_amount = (float) $d_amount;
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
             $query = 'update oxarticles
                       set oxarticles.oxsoldamount = (oxarticles.oxsoldamount + :amount)
                       where oxarticles.oxid = :oxid';
-            $rs = $oDb->execute($query, [
-                'oxid' => $this->oxarticles__oxid->value,
-                'amount' => $dAmount,
-            ]);
+            $rs = $o_db->execute($query, ['oxid' => $this->oxarticles__oxid->value, 'amount' => $d_amount]);
             return (bool) $rs;
         }
         // article is not variant - should be updated current amount
         if ($this->oxarticles__oxparentid->value) {
             // article is variant - should be updated this article parent amount
-            $oUpdateArticle = $this->getParentArticle();
-            if ($oUpdateArticle) {
-                $oUpdateArticle->updateSoldAmount($dAmount);
+            $o_update_article = $this->get_parent_article();
+            if ($o_update_article) {
+                $o_update_article->update_sold_amount($d_amount);
             }
         }
-
         return $rs;
     }
-
     /**
      * Disables reminder functionality for article
      *
      * @return bool
      */
-    public function disableReminder()
+    public function disable_reminder()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         $query = 'update oxarticles set oxarticles.oxremindactive = 2 where oxarticles.oxid = :oxid';
-
-        return (bool) $oDb->execute($query, ['oxid' => $this->oxarticles__oxid->value]);
+        return (bool) $o_db->execute($query, ['oxid' => $this->oxarticles__oxid->value]);
     }
-
     /**
      * (\OxidEsales\Eshop\Application\Model\Article::_saveArtLongDesc()) save the object using parent::save() method.
      *
@@ -2327,66 +1933,49 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function save()
     {
-        $this->assignParentDependFields();
-        $blRet = parent::save();
+        $this->assign_parent_depend_fields();
+        $bl_ret = parent::save();
         // saving long description
-        $this->saveArtLongDesc();
-
-        return $blRet;
+        $this->save_art_long_desc();
+        return $bl_ret;
     }
-
     /**
      * Changes article variant to parent article
      */
-    public function resetParent(): void
+    public function reset_parent(): void
     {
-        $sParentId = $this->oxarticles__oxparentid->value;
+        $s_parent_id = $this->oxarticles__oxparentid->value;
         $this->oxarticles__oxparentid = new Field('', Field::T_RAW);
-        $this->_blAllowEmptyParentId = true;
+        $this->_bl_allow_empty_parent_id = true;
         $this->save();
-        $this->_blAllowEmptyParentId = false;
-
-        if ($sParentId !== '') {
-            $this->onChange(ACTION_UPDATE, null, $sParentId);
+        $this->_bl_allow_empty_parent_id = false;
+        if ($s_parent_id !== '') {
+            $this->on_change(ACTION_UPDATE, null, $s_parent_id);
         }
     }
-
     /**
      * collect article pics, icons, zoompic and puts it all in an array
      * structure of array (ActPicID, ActPic, MorePics, Pics, Icons, ZoomPic)
      *
      * @return array
      */
-    public function getPictureGallery()
+    public function get_picture_gallery()
     {
-        $mediaItems = ContainerFacade::get(ProductMediaViewServiceInterface::class)->getAllByRole(
-            Id::fromString($this->getId()),
-            ProductMediaRole::from(ProductMediaRole::DETAIL)
-        );
-        $activeMedia = $this->determineActiveMedia($mediaItems);
-
-        return [
-            'activeMedia' => $activeMedia,
-            'mediaItems' => $mediaItems,
-            'hasMultipleImages' => count($mediaItems) > 1,
-        ];
+        $media_items = Container_Facade::get(Product_Media_View_Service_Interface::class)->get_all_by_role(Id::from_string($this->get_id()), Product_Media_Role::from(Product_Media_Role::DETAIL));
+        $active_media = $this->determine_active_media($media_items);
+        return ['activeMedia' => $active_media, 'mediaItems' => $media_items, 'hasMultipleImages' => count($media_items) > 1];
     }
-
-    private function determineActiveMedia(array $mediaItems): ?ProductMediaView
+    private function determine_active_media(array $media_items): ?Product_Media_View
     {
-        if (empty($mediaItems)) {
+        if (empty($media_items)) {
             return null;
         }
-
-        $requestedMediaId = Registry::getRequest()->getRequestEscapedParameter('actmediaid');
-
-        if ($requestedMediaId && isset($mediaItems[$requestedMediaId])) {
-            return $mediaItems[$requestedMediaId];
+        $requested_media_id = Registry::get_request()->get_request_escaped_parameter('actmediaid');
+        if ($requested_media_id && isset($media_items[$requested_media_id])) {
+            return $media_items[$requested_media_id];
         }
-
-        return reset($mediaItems);
+        return reset($media_items);
     }
-
     /**
      * This function is triggered whenever article is saved or deleted or after the stock is changed.
      * Originally we need to update the oxstock for possible article parent in case parent is not buyable
@@ -2399,76 +1988,66 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $articleId       Article ID
      * @param string $parentArticleId Parent ID
      */
-    public function onChange($action = null, $articleId = null, $parentArticleId = null): void
+    public function on_change($action = null, $article_id = null, $parent_article_id = null): void
     {
-        $this->actionType = !is_null($action) ? $action : $this->actionType;
-        $myConfig = Registry::getConfig();
-
-        if (!isset($articleId)) {
-            if ($this->getId()) {
-                $articleId = $this->getId();
+        $this->action_type = !is_null($action) ? $action : $this->action_type;
+        $my_config = Registry::get_config();
+        if (!isset($article_id)) {
+            if ($this->get_id()) {
+                $article_id = $this->get_id();
             }
-            if (!isset($articleId)) {
-                $articleId = $this->oxarticles__oxid->value;
+            if (!isset($article_id)) {
+                $article_id = $this->oxarticles__oxid->value;
             }
             if ($this->oxarticles__oxparentid && $this->oxarticles__oxparentid->value) {
-                $parentArticleId = $this->oxarticles__oxparentid->value;
+                $parent_article_id = $this->oxarticles__oxparentid->value;
             }
         }
-        if (!isset($articleId)) {
+        if (!isset($article_id)) {
             return;
         }
-
         //if (isset($sOXID) && !$myConfig->blVariantParentBuyable && $myConfig->blUseStock)
-        if ($myConfig->getConfigParam('blUseStock')) {
+        if ($my_config->get_config_param('blUseStock')) {
             //if article has variants then updating oxvarstock field
             //getting parent id
-            if (!isset($parentArticleId)) {
-                $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-                $sQ = 'select oxparentid from oxarticles where oxid = :oxid';
-                $parentArticleId = $oDb->getOne($sQ, [
-                    'oxid' => $articleId,
-                ]);
+            if (!isset($parent_article_id)) {
+                $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+                $s_q = 'select oxparentid from oxarticles where oxid = :oxid';
+                $parent_article_id = $o_db->get_one($s_q, ['oxid' => $article_id]);
             }
             //if we have parent id then update stock
-            if ($parentArticleId) {
-                $this->onChangeUpdateStock($parentArticleId);
+            if ($parent_article_id) {
+                $this->on_change_update_stock($parent_article_id);
             }
         }
         //if we have parent id then update count
         //update count even if blUseStock is not active
-        if ($parentArticleId) {
-            $this->onChangeUpdateVarCount($parentArticleId);
+        if ($parent_article_id) {
+            $this->on_change_update_var_count($parent_article_id);
         }
-
-        $sId = $parentArticleId ?: $articleId;
-        $this->setVarMinMaxPrice($sId);
-
-        $this->updateParentDependFields();
-
+        $s_id = $parent_article_id ?: $article_id;
+        $this->set_var_min_max_price($s_id);
+        $this->update_parent_depend_fields();
         // resetting articles count cache if stock has changed and some
         // articles goes offline (M:1448)
         if ($action === ACTION_UPDATE_STOCK) {
-            $this->assignStock();
-            $this->onChangeStockResetCount($articleId);
+            $this->assign_stock();
+            $this->on_change_stock_reset_count($article_id);
         }
-
-        ContainerFacade::dispatch(new AfterModelUpdateEvent($this));
+        Container_Facade::dispatch(new After_Model_Update_Event($this));
     }
-
     /**
      * Returns custom article VAT value if possible
      * By default value is taken from oxarticle__oxvat field
      *
      * @return double
      */
-    public function getCustomVAT()
+    public function get_custom_vat()
     {
         if ($this->__isset('oxarticles__oxvat') || $this->__get('oxarticles__oxvat')) {
             return $this->oxarticles__oxvat->value;
         }
     }
-
     /**
      * Checks if stock configuration allows to buy user chosen amount $dAmount
      *
@@ -2478,169 +2057,142 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return mixed
      */
-    public function checkForStock($dAmount, $dArtStockAmount = 0, $selectForUpdate = false)
+    public function check_for_stock($d_amount, $d_art_stock_amount = 0, $select_for_update = false)
     {
-        $myConfig = Registry::getConfig();
-        if (!$myConfig->getConfigParam('blUseStock')) {
+        $my_config = Registry::get_config();
+        if (!$my_config->get_config_param('blUseStock')) {
             return true;
         }
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         // fetching DB info as its up-to-date
-        $sQ = 'select oxstock, oxstockflag from oxarticles
+        $s_q = 'select oxstock, oxstockflag from oxarticles
             where oxid = :oxid';
-        $sQ .= $selectForUpdate ? ' FOR UPDATE ' : '';
-        $rs = $oDb->select($sQ, [
-            'oxid' => $this->getId(),
-        ]);
-
-        $iOnStock = 0;
+        $s_q .= $select_for_update ? ' FOR UPDATE ' : '';
+        $rs = $o_db->select($s_q, ['oxid' => $this->get_id()]);
+        $i_on_stock = 0;
         if ($rs !== false && $rs->count() > 0) {
-            $iOnStock = $rs->fields['oxstock'] - $dArtStockAmount;
-            $iStockFlag = $rs->fields['oxstockflag'];
-
+            $i_on_stock = $rs->fields['oxstock'] - $d_art_stock_amount;
+            $i_stock_flag = $rs->fields['oxstockflag'];
             //When using stockflag 1 and 4 with basket reservations enabled but disallowing
             //negative stock values we would allow to reserve more items than are initially available
             //by keeping the stock level not lower than zero. When discarding reservations
             //stock level might differ from original value.
-            if (
-                !$myConfig->getConfigParam('blPsBasketReservationEnabled')
-                || ($myConfig->getConfigParam('blPsBasketReservationEnabled')
-                    && $myConfig->getConfigParam('blAllowNegativeStock'))
-            ) {
+            if (!$my_config->get_config_param('blPsBasketReservationEnabled') || $my_config->get_config_param('blPsBasketReservationEnabled') && $my_config->get_config_param('blAllowNegativeStock')) {
                 // foreign stock is also always considered as on stock
-                if ($iStockFlag == 1 || $iStockFlag == 4) {
+                if ($i_stock_flag == 1 || $i_stock_flag == 4) {
                     return true;
                 }
             }
-            if (!$myConfig->getConfigParam('blAllowUnevenAmounts')) {
-                $iOnStock = floor($iOnStock);
+            if (!$my_config->get_config_param('blAllowUnevenAmounts')) {
+                $i_on_stock = floor($i_on_stock);
             }
         }
-        if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-            $session = Registry::getSession();
-            $iOnStock += $session->getBasketReservations()->getReservedAmount($this->getId());
+        if (Registry::get_config()->get_config_param('blPsBasketReservationEnabled')) {
+            $session = Registry::get_session();
+            $i_on_stock += $session->get_basket_reservations()->get_reserved_amount($this->get_id());
         }
-        if ($iOnStock >= $dAmount) {
+        if ($i_on_stock >= $d_amount) {
             return true;
         }
-        if ($iOnStock > 0) {
-            return $iOnStock;
+        if ($i_on_stock > 0) {
+            return $i_on_stock;
         }
-        $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ArticleInputException::class);
-        $oEx->setMessage('ERROR_MESSAGE_ARTICLE_ARTICLE_NOT_BUYABLE');
-        Registry::getUtilsView()->addErrorToDisplay($oEx);
+        $o_ex = ox_new(\Oxid_Esales\Eshop\Core\Exception\Article_Input_Exception::class);
+        $o_ex->set_message('ERROR_MESSAGE_ARTICLE_ARTICLE_NOT_BUYABLE');
+        Registry::get_utils_view()->add_error_to_display($o_ex);
         return false;
     }
-
     /**
      * Get article long description
      *
      * @return object $oField field object
      */
-    public function getLongDescription()
+    public function get_long_description()
     {
-        if ($this->_oLongDesc === null) {
+        if ($this->_o_long_desc === null) {
             // initializing
-            $this->_oLongDesc = new Field();
-
+            $this->_o_long_desc = new Field();
             // choosing which to get..
-            $sOxid = $this->getId();
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sViewName = $tableViewNameGenerator->getViewName('oxartextends', $this->getLanguage());
-
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sDbValue = $oDb->getOne("select oxlongdesc from {$sViewName} where oxid = :oxid", [
-                'oxid' => $sOxid,
-            ]);
-
-            if ($sDbValue != false) {
-                $this->_oLongDesc->setValue($sDbValue, Field::T_RAW);
+            $s_oxid = $this->get_id();
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+            $s_view_name = $table_view_name_generator->get_view_name('oxartextends', $this->get_language());
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $s_db_value = $o_db->get_one("select oxlongdesc from {$s_view_name} where oxid = :oxid", ['oxid' => $s_oxid]);
+            if ($s_db_value != false) {
+                $this->_o_long_desc->set_value($s_db_value, Field::T_RAW);
             } elseif ($this->oxarticles__oxparentid && $this->oxarticles__oxparentid->value) {
-                if (!$this->isAdmin() || $this->_blLoadParentData) {
-                    $oParent = $this->getParentArticle();
-                    if ($oParent) {
-                        $this->_oLongDesc->setValue($oParent->getLongDescription()->getRawValue(), Field::T_RAW);
+                if (!$this->is_admin() || $this->_bl_load_parent_data) {
+                    $o_parent = $this->get_parent_article();
+                    if ($o_parent) {
+                        $this->_o_long_desc->set_value($o_parent->get_long_description()->get_raw_value(), Field::T_RAW);
                     }
                 }
             }
         }
-
-        return $this->_oLongDesc;
+        return $this->_o_long_desc;
     }
-
     /**
      * Save article long description to oxartext table
      *
      * @param string $longDescription description to set
      */
-    public function setArticleLongDesc($longDescription): void
+    public function set_article_long_desc($long_description): void
     {
         // setting current value
-        $this->_oLongDesc = new Field($longDescription, Field::T_RAW);
-        $this->oxarticles__oxlongdesc = new Field($longDescription, Field::T_RAW);
+        $this->_o_long_desc = new Field($long_description, Field::T_RAW);
+        $this->oxarticles__oxlongdesc = new Field($long_description, Field::T_RAW);
     }
-
     /**
      * the uninitilized list of attributes
      * use getAttributes
      * @return \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    protected function newAttributeList()
+    protected function new_attribute_list()
     {
-        return oxNew(\OxidEsales\Eshop\Application\Model\AttributeList::class);
+        return ox_new(\Oxid_Esales\Eshop\Application\Model\Attribute_List::class);
     }
-
     /**
      * Loads and returns attribute list associated with this article
      *
      * @return \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    public function getAttributes()
+    public function get_attributes()
     {
-        if ($this->_oAttributeList === null) {
-            $this->_oAttributeList = $this->newAttributelist();
-            $this->_oAttributeList->loadAttributes($this->getId(), $this->getParentId());
+        if ($this->_o_attribute_list === null) {
+            $this->_o_attribute_list = $this->new_attributelist();
+            $this->_o_attribute_list->load_attributes($this->get_id(), $this->get_parent_id());
         }
-
-        return $this->_oAttributeList;
+        return $this->_o_attribute_list;
     }
-
     /**
      * Loads and returns attribute list for display in basket
      *
      * @return \OxidEsales\Eshop\Application\Model\AttributeList
      */
-    public function getAttributesDisplayableInBasket()
+    public function get_attributes_displayable_in_basket()
     {
-        if ($this->basketAttributeList === null) {
-            $this->basketAttributeList = $this->newAttributelist();
-            $this->basketAttributeList->loadAttributesDisplayableInBasket($this->getId(), $this->getParentId());
+        if ($this->basket_attribute_list === null) {
+            $this->basket_attribute_list = $this->new_attributelist();
+            $this->basket_attribute_list->load_attributes_displayable_in_basket($this->get_id(), $this->get_parent_id());
         }
-
-        return $this->basketAttributeList;
+        return $this->basket_attribute_list;
     }
-
     /**
      * Appends article seo url with additional request parameters
      *
      * @param string $sAddParams additional parameters which needs to be added to product url
      * @param int    $iLang      language id
      */
-    public function appendLink($sAddParams, $iLang = null): void
+    public function append_link($s_add_params, $i_lang = null): void
     {
-        if ($sAddParams) {
-            if ($iLang === null) {
-                $iLang = $this->getLanguage();
+        if ($s_add_params) {
+            if ($i_lang === null) {
+                $i_lang = $this->get_language();
             }
-
-            $this->_aSeoAddParams[$iLang] = isset($this->_aSeoAddParams[$iLang])
-                ? $this->_aSeoAddParams[$iLang] . '&amp;'
-                : '';
-            $this->_aSeoAddParams[$iLang] .= $sAddParams;
+            $this->_a_seo_add_params[$i_lang] = isset($this->_a_seo_add_params[$i_lang]) ? $this->_a_seo_add_params[$i_lang] . '&amp;' : '';
+            $this->_a_seo_add_params[$i_lang] .= $s_add_params;
         }
     }
-
     /**
      * Returns raw article seo url
      *
@@ -2649,17 +2201,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getBaseSeoLink($iLang, $blMain = false)
+    public function get_base_seo_link($i_lang, $bl_main = false)
     {
         /** @var \OxidEsales\Eshop\Application\Model\SeoEncoderArticle $oEncoder */
-        $oEncoder = Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class);
-        if (!$blMain) {
-            return $oEncoder->getArticleUrl($this, $iLang, $this->getLinkType());
+        $o_encoder = Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Article::class);
+        if (!$bl_main) {
+            return $o_encoder->get_article_url($this, $i_lang, $this->get_link_type());
         }
-
-        return $oEncoder->getArticleMainUrl($this, $iLang);
+        return $o_encoder->get_article_main_url($this, $i_lang);
     }
-
     /**
      * Gets article link
      *
@@ -2668,30 +2218,24 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getLink($iLang = null, $blMain = false)
+    public function get_link($i_lang = null, $bl_main = false)
     {
-        if (!Registry::getUtils()->seoIsActive()) {
-            return $this->getStdLink($iLang);
+        if (!Registry::get_utils()->seo_is_active()) {
+            return $this->get_std_link($i_lang);
         }
-
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        $iLinkType = $this->getLinkType();
-        if (!isset($this->_aSeoUrls[$iLang][$iLinkType])) {
-            $this->_aSeoUrls[$iLang][$iLinkType] = $this->getBaseSeoLink($iLang, $blMain);
+        $i_link_type = $this->get_link_type();
+        if (!isset($this->_a_seo_urls[$i_lang][$i_link_type])) {
+            $this->_a_seo_urls[$i_lang][$i_link_type] = $this->get_base_seo_link($i_lang, $bl_main);
         }
-
-        $sUrl = $this->_aSeoUrls[$iLang][$iLinkType];
-        if (isset($this->_aSeoAddParams[$iLang])) {
-            $sUrl .= ((!str_contains($sUrl . $this->_aSeoAddParams[$iLang], '?')) ? '?' : '&amp;')
-                . $this->_aSeoAddParams[$iLang];
+        $s_url = $this->_a_seo_urls[$i_lang][$i_link_type];
+        if (isset($this->_a_seo_add_params[$i_lang])) {
+            $s_url .= (!str_contains($s_url . $this->_a_seo_add_params[$i_lang], '?') ? '?' : '&amp;') . $this->_a_seo_add_params[$i_lang];
         }
-
-        return $sUrl;
+        return $s_url;
     }
-
     /**
      * Returns main object URL. If SEO is ON returned link will be in SEO form,
      * else URL will have dynamic form
@@ -2700,55 +2244,47 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getMainLink($iLang = null)
+    public function get_main_link($i_lang = null)
     {
-        return $this->getLink($iLang, true);
+        return $this->get_link($i_lang, true);
     }
-
     /**
      * Resets details link
      *
      * @param int $iType type of link to load
      */
-    public function setLinkType($iType): void
+    public function set_link_type($i_type): void
     {
         // resetting details link, to force new
-        $this->_sDetailLink = null;
-
+        $this->_s_detail_link = null;
         // setting link type
-        $this->_iLinkType = (int) $iType;
+        $this->_i_link_type = (int) $i_type;
     }
-
     /**
      * Get link type
      *
      * @return int
      */
-    public function getLinkType()
+    public function get_link_type()
     {
-        return $this->_iLinkType;
+        return $this->_i_link_type;
     }
-
     /**
      * Appends article dynamic url with additional request parameters
      *
      * @param string $sAddParams additional parameters which needs to be added to product url
      * @param int    $iLang      language id
      */
-    public function appendStdLink($sAddParams, $iLang = null): void
+    public function append_std_link($s_add_params, $i_lang = null): void
     {
-        if ($sAddParams) {
-            if ($iLang === null) {
-                $iLang = $this->getLanguage();
+        if ($s_add_params) {
+            if ($i_lang === null) {
+                $i_lang = $this->get_language();
             }
-
-            $this->_aStdAddParams[$iLang] = isset($this->_aStdAddParams[$iLang])
-                ? $this->_aStdAddParams[$iLang] . '&amp;'
-                : '';
-            $this->_aStdAddParams[$iLang] .= $sAddParams;
+            $this->_a_std_add_params[$i_lang] = isset($this->_a_std_add_params[$i_lang]) ? $this->_a_std_add_params[$i_lang] . '&amp;' : '';
+            $this->_a_std_add_params[$i_lang] .= $s_add_params;
         }
     }
-
     /**
      * Returns base dynamic url: shopurl/index.php?cl=details
      *
@@ -2758,19 +2294,16 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getBaseStdLink($iLang, $blAddId = true, $blFull = true)
+    public function get_base_std_link($i_lang, $bl_add_id = true, $bl_full = true)
     {
-        $sUrl = '';
-        if ($blFull) {
+        $s_url = '';
+        if ($bl_full) {
             //always returns shop url, not admin
-            $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
+            $s_url = Registry::get_config()->get_shop_url($i_lang, false);
         }
-
-        $sUrl .= 'index.php?cl=details' . ($blAddId ? '&amp;anid=' . $this->getId() : '');
-
-        return $sUrl . (isset($this->_aStdAddParams[$iLang]) ? '&amp;' . $this->_aStdAddParams[$iLang] : '');
+        $s_url .= 'index.php?cl=details' . ($bl_add_id ? '&amp;anid=' . $this->get_id() : '');
+        return $s_url . (isset($this->_a_std_add_params[$i_lang]) ? '&amp;' . $this->_a_std_add_params[$i_lang] : '');
     }
-
     /**
      * Returns standard URL to product
      *
@@ -2779,187 +2312,157 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getStdLink($iLang = null, $aParams = [])
+    public function get_std_link($i_lang = null, $a_params = [])
     {
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        if (!isset($this->_aStdUrls[$iLang])) {
-            $this->_aStdUrls[$iLang] = $this->getBaseStdLink($iLang);
+        if (!isset($this->_a_std_urls[$i_lang])) {
+            $this->_a_std_urls[$i_lang] = $this->get_base_std_link($i_lang);
         }
-
-        return Registry::getUtilsUrl()->processUrl($this->_aStdUrls[$iLang], true, $aParams, $iLang);
+        return Registry::get_utils_url()->process_url($this->_a_std_urls[$i_lang], true, $a_params, $i_lang);
     }
-
     /**
      * Return article media URL
      *
      * @return array
      */
-    public function getMediaUrls()
+    public function get_media_urls()
     {
-        if ($this->_aMediaUrls === null) {
-            $this->_aMediaUrls = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $this->_aMediaUrls->init('oxmediaurl');
-            $this->_aMediaUrls->getBaseObject()->setLanguage($this->getLanguage());
-
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sViewName = $tableViewNameGenerator->getViewName('oxmediaurls', $this->getLanguage());
-            $sQ = "select * from {$sViewName} where oxobjectid = :oxobjectid";
-            $this->_aMediaUrls->selectString($sQ, [
-                'oxobjectid' => $this->getId(),
-            ]);
+        if ($this->_a_media_urls === null) {
+            $this->_a_media_urls = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+            $this->_a_media_urls->init('oxmediaurl');
+            $this->_a_media_urls->get_base_object()->set_language($this->get_language());
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+            $s_view_name = $table_view_name_generator->get_view_name('oxmediaurls', $this->get_language());
+            $s_q = "select * from {$s_view_name} where oxobjectid = :oxobjectid";
+            $this->_a_media_urls->select_string($s_q, ['oxobjectid' => $this->get_id()]);
         }
-
-        return $this->_aMediaUrls;
+        return $this->_a_media_urls;
     }
-
     /**
      * Get image url
      *
      * @return array
      */
-    public function getDynImageDir()
+    public function get_dyn_image_dir()
     {
-        return $this->_sDynImageDir;
+        return $this->_s_dyn_image_dir;
     }
-
     /**
      * Returns select lists to display
      *
      * @return array
      */
-    public function getDispSelList()
+    public function get_disp_sel_list()
     {
-        if ($this->_aDispSelList === null) {
-            if (
-                Registry::getConfig()->getConfigParam('bl_perfLoadSelectLists')
-                && Registry::getConfig()->getConfigParam('bl_perfLoadSelectListsInAList')
-            ) {
-                $this->_aDispSelList = $this->getSelectLists();
+        if ($this->_a_disp_sel_list === null) {
+            if (Registry::get_config()->get_config_param('bl_perfLoadSelectLists') && Registry::get_config()->get_config_param('bl_perfLoadSelectListsInAList')) {
+                $this->_a_disp_sel_list = $this->get_select_lists();
             }
         }
-
-        return $this->_aDispSelList;
+        return $this->_a_disp_sel_list;
     }
-
     /**
      * Get more details link
      *
      * @return string
      */
-    public function getMoreDetailLink()
+    public function get_more_detail_link()
     {
-        if ($this->_sMoreDetailLink == null) {
+        if ($this->_s_more_detail_link == null) {
             // and assign special article values
-            $this->_sMoreDetailLink = Registry::getConfig()->getShopHomeUrl() . 'cl=moredetails';
-
+            $this->_s_more_detail_link = Registry::get_config()->get_shop_home_url() . 'cl=moredetails';
             // not always it is okey, as not all the time active category is the same as primary article cat.
-            if ($sActCat = Registry::getRequest()->getRequestEscapedParameter('cnid')) {
-                $this->_sMoreDetailLink .= '&amp;cnid=' . $sActCat;
+            if ($s_act_cat = Registry::get_request()->get_request_escaped_parameter('cnid')) {
+                $this->_s_more_detail_link .= '&amp;cnid=' . $s_act_cat;
             }
-            $this->_sMoreDetailLink .= '&amp;anid=' . $this->getId();
+            $this->_s_more_detail_link .= '&amp;anid=' . $this->get_id();
         }
-
-        return $this->_sMoreDetailLink;
+        return $this->_s_more_detail_link;
     }
-
     /**
      * Get to basket link
      *
      * @return string
      */
-    public function getToBasketLink()
+    public function get_to_basket_link()
     {
-        if ($this->_sToBasketLink == null) {
-            $myConfig = Registry::getConfig();
-
-            if (Registry::getUtils()->isSearchEngine()) {
-                $this->_sToBasketLink = $this->getLink();
+        if ($this->_s_to_basket_link == null) {
+            $my_config = Registry::get_config();
+            if (Registry::get_utils()->is_search_engine()) {
+                $this->_s_to_basket_link = $this->get_link();
             } else {
                 // and assign special article values
-                $this->_sToBasketLink = $myConfig->getShopHomeUrl();
-
+                $this->_s_to_basket_link = $my_config->get_shop_home_url();
                 // override some classes as these should never showup
-                $actControllerId = Registry::getConfig()->getRequestControllerId();
-                if ($actControllerId == 'thankyou') {
-                    $actControllerId = 'basket';
+                $act_controller_id = Registry::get_config()->get_request_controller_id();
+                if ($act_controller_id == 'thankyou') {
+                    $act_controller_id = 'basket';
                 }
-                $this->_sToBasketLink .= 'cl=' . $actControllerId;
-
+                $this->_s_to_basket_link .= 'cl=' . $act_controller_id;
                 // this is not very correct
-                if ($sActCat = Registry::getRequest()->getRequestEscapedParameter('cnid')) {
-                    $this->_sToBasketLink .= '&amp;cnid=' . $sActCat;
+                if ($s_act_cat = Registry::get_request()->get_request_escaped_parameter('cnid')) {
+                    $this->_s_to_basket_link .= '&amp;cnid=' . $s_act_cat;
                 }
-
-                $this->_sToBasketLink .= '&amp;fnc=tobasket&amp;aid=' . $this->getId() . '&amp;anid=' . $this->getId();
-
-                if ($sTpl = basename((string) Registry::getRequest()->getRequestEscapedParameter('tpl'))) {
-                    $this->_sToBasketLink .= '&amp;tpl=' . $sTpl;
+                $this->_s_to_basket_link .= '&amp;fnc=tobasket&amp;aid=' . $this->get_id() . '&amp;anid=' . $this->get_id();
+                if ($s_tpl = basename((string) Registry::get_request()->get_request_escaped_parameter('tpl'))) {
+                    $this->_s_to_basket_link .= '&amp;tpl=' . $s_tpl;
                 }
             }
         }
-
-        return $this->_sToBasketLink;
+        return $this->_s_to_basket_link;
     }
-
     /**
      * Get stock status
      *
      * @return integer
      */
-    public function getStockStatus()
+    public function get_stock_status()
     {
-        return $this->_iStockStatus;
+        return $this->_i_stock_status;
     }
-
     /**
      * Get stock status as it was on loading this object.
      *
      * @return integer
      */
-    public function getStockStatusOnLoad()
+    public function get_stock_status_on_load()
     {
-        return $this->_iStockStatusOnLoad;
+        return $this->_i_stock_status_on_load;
     }
-
     /**
      * Get stock
      *
      * @return float
      */
-    public function getStock()
+    public function get_stock()
     {
         return $this->oxarticles__oxstock->value;
     }
-
     /**
      * Returns formatted delivery date. If the date is past or not set ('0000-00-00') returns false.
      *
      * @deprecated since v6.2 (2020-02-26); use getRestockDate();
      * @return string|bool
      */
-    public function getDeliveryDate()
+    public function get_delivery_date()
     {
-        return $this->getRestockDate();
+        return $this->get_restock_date();
     }
-
     /**
      * Returns formatted delivery date. If the date is past or not set ('0000-00-00') returns false.
      *
      * @return string|bool
      */
-    public function getRestockDate()
+    public function get_restock_date()
     {
-        $restockDate = $this->getFieldData('oxdelivery');
-        if ($restockDate >= date('Y-m-d')) {
-            return Registry::getUtilsDate()->formatDBDate($restockDate);
+        $restock_date = $this->get_field_data('oxdelivery');
+        if ($restock_date >= date('Y-m-d')) {
+            return Registry::get_utils_date()->format_db_date($restock_date);
         }
-
         return false;
     }
-
     /**
      * Returns rounded T price.
      *
@@ -2967,16 +2470,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double|bool
      */
-    public function getFTPrice()
+    public function get_ft_price()
     {
         // module
-        if ($oPrice = $this->getTPrice()) {
-            if ($dPrice = $this->getPriceForView($oPrice)) {
-                return Registry::getLang()->formatCurrency($dPrice);
+        if ($o_price = $this->get_t_price()) {
+            if ($d_price = $this->get_price_for_view($o_price)) {
+                return Registry::get_lang()->format_currency($d_price);
             }
         }
     }
-
     /**
      * Returns formatted product's price.
      *
@@ -2984,29 +2486,23 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    public function getFPrice()
+    public function get_f_price()
     {
-        if ($oPrice = $this->getPrice()) {
-            $dPrice = $this->getPriceForView($oPrice);
-
-            return Registry::getLang()->formatCurrency($dPrice);
+        if ($o_price = $this->get_price()) {
+            $d_price = $this->get_price_for_view($o_price);
+            return Registry::get_lang()->format_currency($d_price);
         }
     }
-
     /**
      * Resets oxremindactive status.
      * If remindActive status is 2, reminder is already sent.
      */
-    public function resetRemindStatus(): void
+    public function reset_remind_status(): void
     {
-        if (
-            $this->oxarticles__oxremindactive->value == 2 &&
-            $this->oxarticles__oxremindamount->value <= $this->oxarticles__oxstock->value
-        ) {
+        if ($this->oxarticles__oxremindactive->value == 2 && $this->oxarticles__oxremindamount->value <= $this->oxarticles__oxstock->value) {
             $this->oxarticles__oxremindactive->value = 1;
         }
     }
-
     /**
      * Returns formatted product's NETTO price.
      *
@@ -3014,204 +2510,171 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    public function getFNetPrice()
+    public function get_f_net_price()
     {
-        if ($oPrice = $this->getPrice()) {
-            return Registry::getLang()->formatCurrency($oPrice->getNettoPrice());
+        if ($o_price = $this->get_price()) {
+            return Registry::get_lang()->format_currency($o_price->get_netto_price());
         }
     }
-
     /**
      * Returns true if parent is not buyable
      *
      * @return bool
      */
-    public function isParentNotBuyable()
+    public function is_parent_not_buyable()
     {
-        return $this->_blNotBuyableParent;
+        return $this->_bl_not_buyable_parent;
     }
-
     /**
      * Returns true if article is not buyable
      *
      * @return bool
      */
-    public function isNotBuyable()
+    public function is_not_buyable()
     {
-        return $this->_blNotBuyable;
+        return $this->_bl_not_buyable;
     }
-
     /**
      * Sets product state - buyable or not
      *
      * @param bool $blBuyable state - buyable or not (default false)
      */
-    public function setBuyableState($blBuyable = false): void
+    public function set_buyable_state($bl_buyable = false): void
     {
-        $this->_blNotBuyable = !$blBuyable;
+        $this->_bl_not_buyable = !$bl_buyable;
     }
-
     /**
      * Sets selectlists of current product
      *
      * @param array $aSelList selectlist
      */
-    public function setSelectlist($aSelList): void
+    public function set_selectlist($a_sel_list): void
     {
-        $this->_aDispSelList = $aSelList;
+        $this->_a_disp_sel_list = $a_sel_list;
     }
-
-    public function getMedia(int $position): ProductMediaView
+    public function get_media(int $position): Product_Media_View
     {
-        return ContainerFacade::get(ProductMediaViewServiceInterface::class)
-            ->getByPosition(Id::fromString($this->getId()), $position);
+        return Container_Facade::get(Product_Media_View_Service_Interface::class)->get_by_position(Id::from_string($this->get_id()), $position);
     }
-
-    public function getIcon(): ProductMediaView
+    public function get_icon(): Product_Media_View
     {
-        return ContainerFacade::get(ProductMediaViewServiceInterface::class)->getByRole(
-            Id::fromString($this->getId()),
-            ProductMediaRole::from(ProductMediaRole::ICON)
-        );
+        return Container_Facade::get(Product_Media_View_Service_Interface::class)->get_by_role(Id::from_string($this->get_id()), Product_Media_Role::from(Product_Media_Role::ICON));
     }
-
-    public function getThumbnail(): ProductMediaView
+    public function get_thumbnail(): Product_Media_View
     {
-        return ContainerFacade::get(ProductMediaViewServiceInterface::class)->getByRole(
-            Id::fromString($this->getId()),
-            ProductMediaRole::from(ProductMediaRole::THUMBNAIL)
-        );
+        return Container_Facade::get(Product_Media_View_Service_Interface::class)->get_by_role(Id::from_string($this->get_id()), Product_Media_Role::from(Product_Media_Role::THUMBNAIL));
     }
-
     /**
      * apply article and article use
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice target price
      */
-    public function applyVats(Price $oPrice): void
+    public function apply_vats(Price $o_price): void
     {
-        $this->applyVAT($oPrice, $this->getArticleVat());
+        $this->apply_vat($o_price, $this->get_article_vat());
     }
-
     /**
      * Applies discounts which should be applied in general case (for 0 amount)
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
      */
-    public function applyDiscountsForVariant($oPrice): void
+    public function apply_discounts_for_variant($o_price): void
     {
         // apply discounts
-        if (!$this->skipDiscounts()) {
-            $oDiscountList = Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class);
-            $aDiscounts = $oDiscountList->getArticleDiscounts($this, $this->getArticleUser());
-
-            reset($aDiscounts);
-            foreach ($aDiscounts as $oDiscount) {
-                $oPrice->setDiscount($oDiscount->getAddSum(), $oDiscount->getAddSumType());
+        if (!$this->skip_discounts()) {
+            $o_discount_list = Registry::get(\Oxid_Esales\Eshop\Application\Model\Discount_List::class);
+            $a_discounts = $o_discount_list->get_article_discounts($this, $this->get_article_user());
+            reset($a_discounts);
+            foreach ($a_discounts as $o_discount) {
+                $o_price->set_discount($o_discount->get_add_sum(), $o_discount->get_add_sum_type());
             }
-            $oPrice->calculateDiscount();
+            $o_price->calculate_discount();
         }
     }
-
     /**
      * Get parent article
      *
      * @return Article
      */
-    public function getParentArticle()
+    public function get_parent_article()
     {
-        if ($this->oxarticles__oxparentid && ($sParentId = $this->oxarticles__oxparentid->value)) {
-            $sIndex = $sParentId . '_' . $this->getLanguage();
-            if (!isset(self::$_aLoadedParents[$sIndex])) {
-                self::$_aLoadedParents[$sIndex] = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-                self::$_aLoadedParents[$sIndex]->_blLoadPrice = false;
-                self::$_aLoadedParents[$sIndex]->_blLoadVariants = false;
-
-                if (!self::$_aLoadedParents[$sIndex]->loadInLang($this->getLanguage(), $sParentId)) {
+        if ($this->oxarticles__oxparentid && $s_parent_id = $this->oxarticles__oxparentid->value) {
+            $s_index = $s_parent_id . '_' . $this->get_language();
+            if (!isset(self::$_a_loaded_parents[$s_index])) {
+                self::$_a_loaded_parents[$s_index] = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+                self::$_a_loaded_parents[$s_index]->_bl_load_price = false;
+                self::$_a_loaded_parents[$s_index]->_bl_load_variants = false;
+                if (!self::$_a_loaded_parents[$s_index]->load_in_lang($this->get_language(), $s_parent_id)) {
                     //return false in case parent product failed to load
-                    self::$_aLoadedParents[$sIndex] = false;
+                    self::$_a_loaded_parents[$s_index] = false;
                 }
             }
-
-            return self::$_aLoadedParents[$sIndex];
+            return self::$_a_loaded_parents[$s_index];
         }
     }
-
     /**
      * Updates article variants oxremindactive field, as variants inherit this setting from parent
      */
-    public function updateVariantsRemind(): void
+    public function update_variants_remind(): void
     {
         // check if it is parent article
-        if (!$this->isVariant() && $this->hasAnyVariant()) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sUpdate = 'update oxarticles
+        if (!$this->is_variant() && $this->has_any_variant()) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $s_update = 'update oxarticles
                         set oxremindactive = :oxremindactive
                         where oxparentid = :oxparentid and
                               oxshopid = :oxshopid';
-            $oDb->execute($sUpdate, [
-                'oxremindactive' => $this->oxarticles__oxremindactive->value,
-                'oxparentid' => $this->getId(),
-                'oxshopid' => $this->getShopId(),
-            ]);
+            $o_db->execute($s_update, ['oxremindactive' => $this->oxarticles__oxremindactive->value, 'oxparentid' => $this->get_id(), 'oxshopid' => $this->get_shop_id()]);
         }
     }
-
     /**
      * Returns product id (oxid)
      * (required for interface oxIArticle)
      *
      * @return string
      */
-    public function getProductId()
+    public function get_product_id()
     {
-        return $this->getId();
+        return $this->get_id();
     }
-
     /**
      * Returns product parent id (oxparentid)
      *
      * @return string
      */
-    public function getParentId()
+    public function get_parent_id()
     {
         return $this->oxarticles__oxparentid instanceof Field ? $this->oxarticles__oxparentid->value : '';
     }
-
     /**
      * Returns false if object is not derived from oxorderarticle class
      *
      * @return bool
      */
-    public function isOrderArticle()
+    public function is_order_article()
     {
         return false;
     }
-
     /**
      * Returns TRUE if product is variant, and false if not
      */
-    public function isVariant(): bool
+    public function is_variant(): bool
     {
         if (isset($this->oxarticles__oxparentid) && false !== $this->oxarticles__oxparentid) {
             return (bool) $this->oxarticles__oxparentid->value;
         }
-
         return false;
     }
-
     /**
      * Returns TRUE if product is multidimensional variant, and false if not
      *
      * @return bool
      */
-    public function isMdVariant()
+    public function is_md_variant()
     {
-        $oMdVariant = oxNew(\OxidEsales\Eshop\Application\Model\VariantHandler::class);
-
-        return $oMdVariant->isMdVariant($this);
+        $o_md_variant = ox_new(\Oxid_Esales\Eshop\Application\Model\Variant_Handler::class);
+        return $o_md_variant->is_md_variant($this);
     }
-
     /**
      * get Sql for loading price categories which include this article
      *
@@ -3219,22 +2682,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getSqlForPriceCategories($sFields = '')
+    public function get_sql_for_price_categories($s_fields = '')
     {
-        if (!$sFields) {
-            $sFields = 'oxid';
+        if (!$s_fields) {
+            $s_fields = 'oxid';
         }
-        $sSelectWhere = "select $sFields from " . $this->getObjectViewName('oxcategories') . ' where';
-        $sQuotedPrice = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote(
-            $this->getFieldData('oxprice') ?? ''
-        );
-
-        return "$sSelectWhere oxpricefrom != 0 and oxpriceto != 0"
-                . " and oxpricefrom <= $sQuotedPrice and oxpriceto >= $sQuotedPrice"
-               . " union $sSelectWhere oxpricefrom != 0 and oxpriceto = 0 and oxpricefrom <= $sQuotedPrice"
-               . " union $sSelectWhere oxpricefrom = 0 and oxpriceto != 0 and oxpriceto >= $sQuotedPrice";
+        $s_select_where = "select {$s_fields} from " . $this->get_object_view_name('oxcategories') . ' where';
+        $s_quoted_price = \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote($this->get_field_data('oxprice') ?? '');
+        return "{$s_select_where} oxpricefrom != 0 and oxpriceto != 0" . " and oxpricefrom <= {$s_quoted_price} and oxpriceto >= {$s_quoted_price}" . " union {$s_select_where} oxpricefrom != 0 and oxpriceto = 0 and oxpricefrom <= {$s_quoted_price}" . " union {$s_select_where} oxpricefrom = 0 and oxpriceto != 0 and oxpriceto >= {$s_quoted_price}";
     }
-
     /**
      * Checks if article is assigned to price category $sCatNID.
      *
@@ -3242,11 +2698,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    public function inPriceCategory($categoryPriceId)
+    public function in_price_category($category_price_id)
     {
-        return (bool) $this->fetchFirstInPriceCategory($categoryPriceId);
+        return (bool) $this->fetch_first_in_price_category($category_price_id);
     }
-
     /**
      * Fetch the article corresponding to this object in the price category with the given id.
      *
@@ -3254,15 +2709,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string One, if the given article is in the given price category, else empty string.
      */
-    protected function fetchFirstInPriceCategory($categoryPriceId)
+    protected function fetch_first_in_price_category($category_price_id)
     {
-        $database = $this->getDatabase();
-
-        $query = $this->createFetchFirstInPriceCategorySql($categoryPriceId);
-
-        return $database->getOne($query);
+        $database = $this->get_database();
+        $query = $this->create_fetch_first_in_price_category_sql($category_price_id);
+        return $database->get_one($query);
     }
-
     /**
      * Create the sql for the fetchFirstInPriceCategory method.
      *
@@ -3270,66 +2722,52 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string The wished sql.
      */
-    protected function createFetchFirstInPriceCategorySql($categoryPriceId)
+    protected function create_fetch_first_in_price_category_sql($category_price_id)
     {
-        $database = $this->getDatabase();
-
-        $quotedPrice = $database->quote($this->oxarticles__oxprice->value);
-        $quotedCategoryId = $database->quote($categoryPriceId);
-
-        return 'select 1 from ' . $this->getObjectViewName('oxcategories')
-            . " where oxid=$quotedCategoryId and"
-            . "(   (oxpricefrom != 0 and oxpriceto != 0 and oxpricefrom <= $quotedPrice and oxpriceto >= $quotedPrice)"
-            . " or (oxpricefrom != 0 and oxpriceto = 0 and oxpricefrom <= $quotedPrice)"
-            . " or (oxpricefrom = 0 and oxpriceto != 0 and oxpriceto >= $quotedPrice)"
-            . ')';
+        $database = $this->get_database();
+        $quoted_price = $database->quote($this->oxarticles__oxprice->value);
+        $quoted_category_id = $database->quote($category_price_id);
+        return 'select 1 from ' . $this->get_object_view_name('oxcategories') . " where oxid={$quoted_category_id} and" . "(   (oxpricefrom != 0 and oxpriceto != 0 and oxpricefrom <= {$quoted_price} and oxpriceto >= {$quoted_price})" . " or (oxpricefrom != 0 and oxpriceto = 0 and oxpricefrom <= {$quoted_price})" . " or (oxpricefrom = 0 and oxpriceto != 0 and oxpriceto >= {$quoted_price})" . ')';
     }
-
     /**
      * Get the database object.
      *
      * @return \OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface
      */
-    protected function getDatabase()
+    protected function get_database()
     {
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        return \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
     }
-
     /**
      * Returns multidimensional variant structure
      *
      * @return \OxidEsales\Eshop\Application\Model\MdVariant
      */
-    public function getMdVariants()
+    public function get_md_variants()
     {
-        if ($this->_oMdVariants) {
-            return $this->_oMdVariants;
+        if ($this->_o_md_variants) {
+            return $this->_o_md_variants;
         }
-
-        $oParentArticle = $this->getParentArticle();
-        if ($oParentArticle) {
-            $oVariants = $oParentArticle->getVariants();
+        $o_parent_article = $this->get_parent_article();
+        if ($o_parent_article) {
+            $o_variants = $o_parent_article->get_variants();
         } else {
-            $oVariants = $this->getVariants();
+            $o_variants = $this->get_variants();
         }
-
         /** @var \OxidEsales\Eshop\Application\Model\VariantHandler $oVariantHandler */
-        $oVariantHandler = oxNew(\OxidEsales\Eshop\Application\Model\VariantHandler::class);
-        $this->_oMdVariants = $oVariantHandler->buildMdVariants($oVariants, $this->getId());
-
-        return $this->_oMdVariants;
+        $o_variant_handler = ox_new(\Oxid_Esales\Eshop\Application\Model\Variant_Handler::class);
+        $this->_o_md_variants = $o_variant_handler->build_md_variants($o_variants, $this->get_id());
+        return $this->_o_md_variants;
     }
-
     /**
      * Returns first level variants from multidimensional variants list
      *
      * @return \OxidEsales\Eshop\Application\Model\MdVariant
      */
-    public function getMdSubvariants()
+    public function get_md_subvariants()
     {
-        return $this->getMdVariants()->getMdSubvariants();
+        return $this->get_md_variants()->get_md_subvariants();
     }
-
     /**
      * Return article picture file name
      *
@@ -3338,89 +2776,74 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    public function getPictureFieldValue($sFieldName, $iIndex = null)
+    public function get_picture_field_value($s_field_name, $i_index = null)
     {
-        if ($sFieldName) {
-            $sFieldName = 'oxarticles__' . $sFieldName . $iIndex;
-
-            if ($this->$sFieldName && $this->$sFieldName->value) {
-                return $this->$sFieldName->value;
+        if ($s_field_name) {
+            $s_field_name = 'oxarticles__' . $s_field_name . $i_index;
+            if ($this->{$s_field_name} && $this->{$s_field_name}->value) {
+                return $this->{$s_field_name}->value;
             }
         }
-
         return '';
     }
-
-    public function getMasterPicturePath(string $file): string
+    public function get_master_picture_path(string $file): string
     {
-        return Registry::getConfig()->getMasterPicturePath($file);
+        return Registry::get_config()->get_master_picture_path($file);
     }
-
     /**
      * Returns oxarticles__oxunitname value processed by \OxidEsales\Eshop\Core\Language::translateString()
      *
      * @return string
      */
-    public function getUnitName()
+    public function get_unit_name()
     {
         if ($this->oxarticles__oxunitname->value) {
-            return Registry::getLang()->translateString($this->oxarticles__oxunitname->value);
+            return Registry::get_lang()->translate_string($this->oxarticles__oxunitname->value);
         }
     }
-
-    public function getArticleFiles($addFromParent = false)
+    public function get_article_files($add_from_parent = false)
     {
-        if ($this->_aArticleFiles === null) {
-            $this->_aArticleFiles = false;
-
-            $filesQuery = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
-            $filesQueryParameters = ['oxartid' => $this->getId()];
-
-            if (!Registry::getConfig()->getConfigParam('blVariantParentBuyable') && $addFromParent) {
-                $filesQuery .= ' OR `oxartId` = :oxparentid';
-                $filesQueryParameters['oxparentid'] = $this->oxarticles__oxparentid->value;
+        if ($this->_a_article_files === null) {
+            $this->_a_article_files = false;
+            $files_query = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
+            $files_query_parameters = ['oxartid' => $this->get_id()];
+            if (!Registry::get_config()->get_config_param('blVariantParentBuyable') && $add_from_parent) {
+                $files_query .= ' OR `oxartId` = :oxparentid';
+                $files_query_parameters['oxparentid'] = $this->oxarticles__oxparentid->value;
             }
-
-            $articleFiles = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-            $articleFiles->init('oxfile');
-            $articleFiles->selectString($filesQuery, $filesQueryParameters);
-            $this->_aArticleFiles = $articleFiles;
+            $article_files = ox_new(\Oxid_Esales\Eshop\Core\Model\List_Model::class);
+            $article_files->init('oxfile');
+            $article_files->select_string($files_query, $files_query_parameters);
+            $this->_a_article_files = $article_files;
         }
-
-        return $this->_aArticleFiles;
+        return $this->_a_article_files;
     }
-
     /**
      * Returns oxarticles__oxisdownloadable value
      *
      * @return bool
      */
-    public function isDownloadable()
+    public function is_downloadable()
     {
         return $this->oxarticles__oxisdownloadable->value;
     }
-
     /**
      * Checks if articles has amount price
      *
      * @return bool
      */
-    public function hasAmountPrice()
+    public function has_amount_price()
     {
-        if (self::$_blHasAmountPrice === null) {
-            self::$_blHasAmountPrice = false;
-
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sQ = 'SELECT 1 FROM `oxprice2article` LIMIT 1';
-
-            if ($oDb->getOne($sQ)) {
-                self::$_blHasAmountPrice = true;
+        if (self::$_bl_has_amount_price === null) {
+            self::$_bl_has_amount_price = false;
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $s_q = 'SELECT 1 FROM `oxprice2article` LIMIT 1';
+            if ($o_db->get_one($s_q)) {
+                self::$_bl_has_amount_price = true;
             }
         }
-
-        return self::$_blHasAmountPrice;
+        return self::$_bl_has_amount_price;
     }
-
     /**
      * Loads and returns variants list.
      *
@@ -3432,90 +2855,64 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array|\OxidEsales\Eshop\Application\Model\SimpleVariantList|\OxidEsales\Eshop\Application\Model\ArticleList
      */
-    protected function loadVariantList($loadSimpleVariants, $blRemoveNotOrderables = true, $forceCoreTableUsage = null)
+    protected function load_variant_list($load_simple_variants, $bl_remove_not_orderables = true, $force_core_table_usage = null)
     {
         $variants = [];
-        if (($articleId = $this->getId())) {
+        if ($article_id = $this->get_id()) {
             //do not load me as a parent later
-            self::$_aLoadedParents[$articleId . '_' . $this->getLanguage()] = $this;
-
-            $config = Registry::getConfig();
-
-            if (
-                !$this->_blLoadVariants ||
-                (!$this->isAdmin() && !$config->getConfigParam('blLoadVariants')) ||
-                (!$this->isAdmin() && !$this->oxarticles__oxvarcount->value)
-            ) {
+            self::$_a_loaded_parents[$article_id . '_' . $this->get_language()] = $this;
+            $config = Registry::get_config();
+            if (!$this->_bl_load_variants || !$this->is_admin() && !$config->get_config_param('blLoadVariants') || !$this->is_admin() && !$this->oxarticles__oxvarcount->value) {
                 return $variants;
             }
-
             // cache
-            $cacheKey = $loadSimpleVariants ? 'simple' : 'full';
-            if ($blRemoveNotOrderables) {
-                if (isset($this->_aVariants[$cacheKey])) {
-                    return $this->_aVariants[$cacheKey];
+            $cache_key = $load_simple_variants ? 'simple' : 'full';
+            if ($bl_remove_not_orderables) {
+                if (isset($this->_a_variants[$cache_key])) {
+                    return $this->_a_variants[$cache_key];
                 }
-                $this->_aVariants[$cacheKey] = &$variants;
-            } elseif (!$blRemoveNotOrderables) {
-                if (isset($this->_aVariantsWithNotOrderables[$cacheKey])) {
-                    return $this->_aVariantsWithNotOrderables[$cacheKey];
+                $this->_a_variants[$cache_key] =& $variants;
+            } elseif (!$bl_remove_not_orderables) {
+                if (isset($this->_a_variants_with_not_orderables[$cache_key])) {
+                    return $this->_a_variants_with_not_orderables[$cache_key];
                 }
-                $this->_aVariantsWithNotOrderables[$cacheKey] = &$variants;
+                $this->_a_variants_with_not_orderables[$cache_key] =& $variants;
             }
-
-            if (($this->_blHasVariants = $this->hasAnyVariant($forceCoreTableUsage))) {
+            if ($this->_bl_has_variants = $this->has_any_variant($force_core_table_usage)) {
                 //load simple variants for lists
-                if ($loadSimpleVariants) {
-                    $variants = oxNew(\OxidEsales\Eshop\Application\Model\SimpleVariantList::class);
-                    $variants->setParent($this);
+                if ($load_simple_variants) {
+                    $variants = ox_new(\Oxid_Esales\Eshop\Application\Model\Simple_Variant_List::class);
+                    $variants->set_parent($this);
                 } else {
                     //loading variants
-                    $variants = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-                    $variants->getBaseObject()->modifyCacheKey('_variants');
+                    $variants = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+                    $variants->get_base_object()->modify_cache_key('_variants');
                 }
-
-                startProfile('selectVariants');
-                $forceCoreTableUsage = (bool) $forceCoreTableUsage;
-
-                $baseObject = $variants->getBaseObject();
-                $this->updateVariantsBaseObject($baseObject, $forceCoreTableUsage);
-
-                $sArticleTable = $this->getViewName($forceCoreTableUsage);
-
-                $query = $this->getLoadVariantsQuery(
-                    $blRemoveNotOrderables,
-                    $forceCoreTableUsage,
-                    $baseObject,
-                    $sArticleTable
-                );
-                $variants->selectString($query);
-
+                start_profile('selectVariants');
+                $force_core_table_usage = (bool) $force_core_table_usage;
+                $base_object = $variants->get_base_object();
+                $this->update_variants_base_object($base_object, $force_core_table_usage);
+                $s_article_table = $this->get_view_name($force_core_table_usage);
+                $query = $this->get_load_variants_query($bl_remove_not_orderables, $force_core_table_usage, $base_object, $s_article_table);
+                $variants->select_string($query);
                 //if this is multidimensional variants, make additional processing
-                if ($config->getConfigParam('blUseMultidimensionVariants')) {
-                    $oMdVariants = oxNew(\OxidEsales\Eshop\Application\Model\VariantHandler::class);
-                    $this->_blHasMdVariants = $oMdVariants->isMdVariant($variants->current());
+                if ($config->get_config_param('blUseMultidimensionVariants')) {
+                    $o_md_variants = ox_new(\Oxid_Esales\Eshop\Application\Model\Variant_Handler::class);
+                    $this->_bl_has_md_variants = $o_md_variants->is_md_variant($variants->current());
                 }
-                stopProfile('selectVariants');
+                stop_profile('selectVariants');
             }
-
             //if we have variants then depending on config option the parent may be non buyable
-            if (!$config->getConfigParam('blVariantParentBuyable') && $this->_blHasVariants) {
-                $this->_blNotBuyableParent = true;
+            if (!$config->get_config_param('blVariantParentBuyable') && $this->_bl_has_variants) {
+                $this->_bl_not_buyable_parent = true;
             }
-
             // If all variants are inactive, the article may be non-buyable (config-dependent)
-            if (
-                !$config->getConfigParam('blVariantParentBuyable')
-                && count($variants) == 0
-                && $this->_blHasVariants
-            ) {
-                $this->_blNotBuyable = true;
+            if (!$config->get_config_param('blVariantParentBuyable') && count($variants) == 0 && $this->_bl_has_variants) {
+                $this->_bl_not_buyable = true;
             }
         }
-
         return $variants;
     }
-
     /**
      * Selects category IDs from given SQL statement and ID field name
      *
@@ -3524,21 +2921,17 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    protected function selectCategoryIds($query, $field)
+    protected function select_category_ids($query, $field)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $aResult = $oDb->getAll($query);
-        $aReturn = [];
-
-        foreach ($aResult as $aValue) {
-            $aValue = array_change_key_case($aValue, CASE_LOWER);
-
-            $aReturn[] = $aValue[$field];
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $a_result = $o_db->get_all($query);
+        $a_return = [];
+        foreach ($a_result as $a_value) {
+            $a_value = array_change_key_case($a_value, CASE_LOWER);
+            $a_return[] = $a_value[$field];
         }
-
-        return $aReturn;
+        return $a_return;
     }
-
     /**
      * Returns query for article categories select
      *
@@ -3546,42 +2939,27 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    protected function getCategoryIdsSelect($blActCats = false)
+    protected function get_category_ids_select($bl_act_cats = false)
     {
-        $sO2CView = $this->getObjectViewName('oxobject2category');
-        $sCatView = $this->getObjectViewName('oxcategories');
-
-        $sArticleIdSql = 'oxobject2category.oxobjectid='
-            . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($this->getId());
-        if ($this->getParentId()) {
-            $sArticleIdSql = '(' . $sArticleIdSql . ' or oxobject2category.oxobjectid='
-                . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($this->getParentId()) . ')';
+        $s_o2c_view = $this->get_object_view_name('oxobject2category');
+        $s_cat_view = $this->get_object_view_name('oxcategories');
+        $s_article_id_sql = 'oxobject2category.oxobjectid=' . \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote($this->get_id());
+        if ($this->get_parent_id()) {
+            $s_article_id_sql = '(' . $s_article_id_sql . ' or oxobject2category.oxobjectid=' . \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote($this->get_parent_id()) . ')';
         }
-        $sActiveCategorySql = $blActCats ? $this->getActiveCategorySelectSnippet() : '';
-
-        return "select
-                        oxobject2category.oxcatnid as oxcatnid
-                     from $sO2CView as oxobject2category
-                        left join $sCatView as oxcategories on oxcategories.oxid = oxobject2category.oxcatnid
-                    where $sArticleIdSql and oxcategories.oxid is not null
-                    and oxcategories.oxactive = 1 $sActiveCategorySql
-                    order by oxobject2category.oxtime";
+        $s_active_category_sql = $bl_act_cats ? $this->get_active_category_select_snippet() : '';
+        return "select\n                        oxobject2category.oxcatnid as oxcatnid\n                     from {$s_o2c_view} as oxobject2category\n                        left join {$s_cat_view} as oxcategories on oxcategories.oxid = oxobject2category.oxcatnid\n                    where {$s_article_id_sql} and oxcategories.oxid is not null\n                    and oxcategories.oxactive = 1 {$s_active_category_sql}\n                    order by oxobject2category.oxtime";
     }
-
     /**
      * Returns active category select snippet
      *
      * @return string
      */
-    protected function getActiveCategorySelectSnippet()
+    protected function get_active_category_select_snippet()
     {
-        $sCatView = $this->getObjectViewName('oxcategories');
-
-        return "and oxcategories.oxhidden = 0 and (select count(cats.oxid) from $sCatView as cats"
-            . ' where cats.oxrootid = oxcategories.oxrootid and cats.oxleft < oxcategories.oxleft '
-            . 'and cats.oxright > oxcategories.oxright and ( cats.oxhidden = 1 or cats.oxactive = 0 ) ) = 0 ';
+        $s_cat_view = $this->get_object_view_name('oxcategories');
+        return "and oxcategories.oxhidden = 0 and (select count(cats.oxid) from {$s_cat_view} as cats" . ' where cats.oxrootid = oxcategories.oxrootid and cats.oxleft < oxcategories.oxleft ' . 'and cats.oxright > oxcategories.oxright and ( cats.oxhidden = 1 or cats.oxactive = 0 ) ) = 0 ';
     }
-
     /**
      * Calculates price of article (adds taxes, currency and discounts).
      *
@@ -3591,30 +2969,26 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    protected function calculatePrice($oPrice, $dVat = null)
+    protected function calculate_price($o_price, $d_vat = null)
     {
         // apply VAT only if configuration requires it
-        if (isset($dVat) || !Registry::getConfig()->getConfigParam('bl_perfCalcVatOnlyForBasketOrder')) {
-            $this->applyVAT($oPrice, $dVat ?? $this->getArticleVat());
+        if (isset($d_vat) || !Registry::get_config()->get_config_param('bl_perfCalcVatOnlyForBasketOrder')) {
+            $this->apply_vat($o_price, $d_vat ?? $this->get_article_vat());
         }
-
         // apply currency
-        $this->applyCurrency($oPrice);
+        $this->apply_currency($o_price);
         // apply discounts
-        if (!$this->skipDiscounts()) {
-            $oDiscountList = Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class);
-            $aDiscounts = $oDiscountList->getArticleDiscounts($this, $this->getArticleUser());
-
-            reset($aDiscounts);
-            foreach ($aDiscounts as $oDiscount) {
-                $oPrice->setDiscount($oDiscount->getAddSum(), $oDiscount->getAddSumType());
+        if (!$this->skip_discounts()) {
+            $o_discount_list = Registry::get(\Oxid_Esales\Eshop\Application\Model\Discount_List::class);
+            $a_discounts = $o_discount_list->get_article_discounts($this, $this->get_article_user());
+            reset($a_discounts);
+            foreach ($a_discounts as $o_discount) {
+                $o_price->set_discount($o_discount->get_add_sum(), $o_discount->get_add_sum_type());
             }
-            $oPrice->calculateDiscount();
+            $o_price->calculate_discount();
         }
-
-        return $oPrice;
+        return $o_price;
     }
-
     /**
      * Checks if parent has ANY variant assigned
      *
@@ -3622,118 +2996,98 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    protected function hasAnyVariant($blForceCoreTable = null)
+    protected function has_any_variant($bl_force_core_table = null)
     {
-        if (($sId = $this->getId())) {
-            if ($this->oxarticles__oxshopid->value == Registry::getConfig()->getShopId()) {
+        if ($s_id = $this->get_id()) {
+            if ($this->oxarticles__oxshopid->value == Registry::get_config()->get_shop_id()) {
                 return (bool) $this->oxarticles__oxvarcount->value;
             }
-            $sArticleTable = $this->getViewName($blForceCoreTable);
-
-            $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            return (bool)$db->getOne("select 1 from $sArticleTable where oxparentid = :oxparentid", [
-                'oxparentid' => $sId,
-            ]);
+            $s_article_table = $this->get_view_name($bl_force_core_table);
+            $db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            return (bool) $db->get_one("select 1 from {$s_article_table} where oxparentid = :oxparentid", ['oxparentid' => $s_id]);
         }
-
         return false;
     }
-
     /**
      * Check if stock status has changed since loading the article
      *
      * @return bool
      */
-    protected function isStockStatusChanged()
+    protected function is_stock_status_changed()
     {
-        return $this->_iStockStatus != $this->_iStockStatusOnLoad;
+        return $this->_i_stock_status != $this->_i_stock_status_on_load;
     }
-
     /**
      * Check if visibility has changed since loading the article
      *
      * @return bool
      */
-    protected function isVisibilityChanged()
+    protected function is_visibility_changed()
     {
-        return $this->isStockStatusChanged() && ($this->_iStockStatus == -1 || $this->_iStockStatusOnLoad == -1);
+        return $this->is_stock_status_changed() && ($this->_i_stock_status == -1 || $this->_i_stock_status_on_load == -1);
     }
-
     /**
      * inserts article long description to artextends table
      */
-    protected function saveArtLongDesc()
+    protected function save_art_long_desc()
     {
-        if (in_array('oxlongdesc', $this->_aSkipSaveFields)) {
+        if (in_array('oxlongdesc', $this->_a_skip_save_fields)) {
             return;
         }
-
-        if ($this->_blEmployMultilanguage) {
-            $sValue = $this->getLongDescription()->getRawValue();
-            if ($sValue !== null) {
-                $oArtExt = oxNew(MultiLanguageModel::class);
-                $oArtExt->init('oxartextends');
-                $oArtExt->setLanguage((int) $this->getLanguage());
-                if (!$oArtExt->load($this->getId())) {
-                    $oArtExt->setId($this->getId());
+        if ($this->_bl_employ_multilanguage) {
+            $s_value = $this->get_long_description()->get_raw_value();
+            if ($s_value !== null) {
+                $o_art_ext = ox_new(Multi_Language_Model::class);
+                $o_art_ext->init('oxartextends');
+                $o_art_ext->set_language((int) $this->get_language());
+                if (!$o_art_ext->load($this->get_id())) {
+                    $o_art_ext->set_id($this->get_id());
                 }
-                $oArtExt->oxartextends__oxlongdesc = new Field($sValue, Field::T_RAW);
-                $oArtExt->save();
+                $o_art_ext->oxartextends__oxlongdesc = new Field($s_value, Field::T_RAW);
+                $o_art_ext->save();
             }
         } else {
-            $oArtExt = oxNew(MultiLanguageModel::class);
-            $oArtExt->setEnableMultilang(false);
-            $oArtExt->init('oxartextends');
-            $aObjFields = $oArtExt->getAllFields(true);
-            if (!$oArtExt->load($this->getId())) {
-                $oArtExt->setId($this->getId());
+            $o_art_ext = ox_new(Multi_Language_Model::class);
+            $o_art_ext->set_enable_multilang(false);
+            $o_art_ext->init('oxartextends');
+            $a_obj_fields = $o_art_ext->get_all_fields(true);
+            if (!$o_art_ext->load($this->get_id())) {
+                $o_art_ext->set_id($this->get_id());
             }
-
-            foreach ($aObjFields as $sKey => $sValue) {
-                if (preg_match('/^oxlongdesc(_(\d{1,2}))?$/', (string) $sKey)) {
-                    $sField = $this->getFieldLongName($sKey);
-
-                    if (isset($this->$sField)) {
-                        $sLongDesc = null;
-                        if ($this->$sField instanceof Field) {
-                            $sLongDesc = $this->$sField->getRawValue();
-                        } elseif (is_object($this->$sField)) {
-                            $sLongDesc = $this->$sField->value;
+            foreach ($a_obj_fields as $s_key => $s_value) {
+                if (preg_match('/^oxlongdesc(_(\d{1,2}))?$/', (string) $s_key)) {
+                    $s_field = $this->get_field_long_name($s_key);
+                    if (isset($this->{$s_field})) {
+                        $s_long_desc = null;
+                        if ($this->{$s_field} instanceof Field) {
+                            $s_long_desc = $this->{$s_field}->get_raw_value();
+                        } elseif (is_object($this->{$s_field})) {
+                            $s_long_desc = $this->{$s_field}->value;
                         }
-                        if (isset($sLongDesc)) {
-                            $sAEField = $oArtExt->getFieldLongName($sKey);
-                            $oArtExt->$sAEField = new Field($sLongDesc, Field::T_RAW);
+                        if (isset($s_long_desc)) {
+                            $s_ae_field = $o_art_ext->get_field_long_name($s_key);
+                            $o_art_ext->{$s_ae_field} = new Field($s_long_desc, Field::T_RAW);
                         }
                     }
                 }
             }
-            $oArtExt->save();
+            $o_art_ext->save();
         }
     }
-
     /**
      * Removes object data fields (oxarticles__oxtimestamp, oxarticles__oxparentid, oxarticles__oxinsert).
      */
-    protected function skipSaveFields()
+    protected function skip_save_fields()
     {
-        $this->_aSkipSaveFields = [];
-
-        $this->_aSkipSaveFields[] = 'oxtimestamp';
+        $this->_a_skip_save_fields = [];
+        $this->_a_skip_save_fields[] = 'oxtimestamp';
         // $this->_aSkipSaveFields[] = 'oxlongdesc';
-        $this->_aSkipSaveFields[] = 'oxinsert';
-        $this->addSkippedSaveFieldsForMapping();
-
-        if (
-            !$this->_blAllowEmptyParentId
-            && (
-                !isset($this->oxarticles__oxparentid->value)
-                || $this->oxarticles__oxparentid->value == ''
-            )
-        ) {
-            $this->_aSkipSaveFields[] = 'oxparentid';
+        $this->_a_skip_save_fields[] = 'oxinsert';
+        $this->add_skipped_save_fields_for_mapping();
+        if (!$this->_bl_allow_empty_parent_id && (!isset($this->oxarticles__oxparentid->value) || $this->oxarticles__oxparentid->value == '')) {
+            $this->_a_skip_save_fields[] = 'oxparentid';
         }
     }
-
     /**
      * Merges two discount arrays. If there are two the same
      * discounts, discount values will be added.
@@ -3743,39 +3097,34 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array $aDiscounts
      */
-    protected function mergeDiscounts($aDiscounts, $aItemDiscounts)
+    protected function merge_discounts($a_discounts, $a_item_discounts)
     {
-        foreach ($aItemDiscounts as $sKey => $oDiscount) {
+        foreach ($a_item_discounts as $s_key => $o_discount) {
             // add prices of the same discounts
-            if (array_key_exists($sKey, $aDiscounts)) {
-                $aDiscounts[$sKey]->dDiscount += $oDiscount->dDiscount;
+            if (array_key_exists($s_key, $a_discounts)) {
+                $a_discounts[$s_key]->d_discount += $o_discount->d_discount;
             } else {
-                $aDiscounts[$sKey] = $oDiscount;
+                $a_discounts[$s_key] = $o_discount;
             }
         }
-
-        return $aDiscounts;
+        return $a_discounts;
     }
-
     /**
      * get user Group A, B or C price, returns db price if user is not in groups
      *
      * @return double
      */
-    protected function getGroupPrice()
+    protected function get_group_price()
     {
-        $sPriceSufix = $this->getUserPriceSufix();
-        $sVarName = "oxarticles__oxprice{$sPriceSufix}";
-        $dPrice = $this->$sVarName->value;
-
+        $s_price_sufix = $this->get_user_price_sufix();
+        $s_var_name = "oxarticles__oxprice{$s_price_sufix}";
+        $d_price = $this->{$s_var_name}->value;
         // #1437/1436C - added config option, and check for zero A,B,C price values
-        if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices') && (float) $dPrice == 0) {
+        if (Registry::get_config()->get_config_param('blOverrideZeroABCPrices') && (float) $d_price == 0) {
             return $this->oxarticles__oxprice->value;
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Modifies article price depending on given amount.
      * Takes data from oxprice2article table.
@@ -3784,27 +3133,19 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    protected function getAmountPrice($amount = 1)
+    protected function get_amount_price($amount = 1)
     {
-        startProfile('_getAmountPrice');
-
-        $dPrice = $this->getGroupPrice();
-        $oAmtPrices = $this->buildAmountPriceList();
-        foreach ($oAmtPrices as $oAmPrice) {
-            if (
-                $oAmPrice->oxprice2article__oxamount->value <= $amount
-                && $amount <= $oAmPrice->oxprice2article__oxamountto->value
-                && $dPrice > $oAmPrice->oxprice2article__oxaddabs->value
-            ) {
-                $dPrice = $oAmPrice->oxprice2article__oxaddabs->value;
+        start_profile('_getAmountPrice');
+        $d_price = $this->get_group_price();
+        $o_amt_prices = $this->build_amount_price_list();
+        foreach ($o_amt_prices as $o_am_price) {
+            if ($o_am_price->oxprice2article__oxamount->value <= $amount && $amount <= $o_am_price->oxprice2article__oxamountto->value && $d_price > $o_am_price->oxprice2article__oxaddabs->value) {
+                $d_price = $o_am_price->oxprice2article__oxaddabs->value;
             }
         }
-
-        stopProfile('_getAmountPrice');
-
-        return $dPrice;
+        stop_profile('_getAmountPrice');
+        return $d_price;
     }
-
     /**
      * Modifies article price according to selected select list value
      *
@@ -3813,31 +3154,25 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    protected function modifySelectListPrice($dPrice, $aChosenList = null)
+    protected function modify_select_list_price($d_price, $a_chosen_list = null)
     {
-        $myConfig = Registry::getConfig();
+        $my_config = Registry::get_config();
         // #690
-        if (
-            $myConfig->getConfigParam('bl_perfLoadSelectLists')
-            && $myConfig->getConfigParam('bl_perfUseSelectlistPrice')
-        ) {
-            $aSelLists = $this->getSelectLists();
-
-            foreach ($aSelLists as $key => $aSel) {
-                if (isset($aChosenList[$key]) && isset($aSel[$aChosenList[$key]])) {
-                    $oSel = $aSel[$aChosenList[$key]];
-                    if ($oSel->priceUnit == 'abs') {
-                        $dPrice += $oSel->price;
-                    } elseif ($oSel->priceUnit == '%') {
-                        $dPrice += Price::percent($dPrice, $oSel->price);
+        if ($my_config->get_config_param('bl_perfLoadSelectLists') && $my_config->get_config_param('bl_perfUseSelectlistPrice')) {
+            $a_sel_lists = $this->get_select_lists();
+            foreach ($a_sel_lists as $key => $a_sel) {
+                if (isset($a_chosen_list[$key]) && isset($a_sel[$a_chosen_list[$key]])) {
+                    $o_sel = $a_sel[$a_chosen_list[$key]];
+                    if ($o_sel->price_unit == 'abs') {
+                        $d_price += $o_sel->price;
+                    } elseif ($o_sel->price_unit == '%') {
+                        $d_price += Price::percent($d_price, $o_sel->price);
                     }
                 }
             }
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Fills amount price list object and sets amount price for article object
      *
@@ -3845,43 +3180,33 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    protected function fillAmountPriceList($aAmPriceList)
+    protected function fill_amount_price_list($a_am_price_list)
     {
-        $oLang = Registry::getLang();
-
+        $o_lang = Registry::get_lang();
         // trying to find lowest price value
-        foreach ($aAmPriceList as $sId => $oItem) {
+        foreach ($a_am_price_list as $s_id => $o_item) {
             /** @var \OxidEsales\Eshop\Core\Price $oItemPrice */
-            $oItemPrice = $this->getPriceObject();
-            if ($oItem->oxprice2article__oxaddabs->value) {
-                $dBasePrice = $oItem->oxprice2article__oxaddabs->value;
-                $dBasePrice = $this->prepareModifiedPrice($dBasePrice);
-
-                $oItemPrice->setPrice($dBasePrice);
-                $this->calculatePrice($oItemPrice);
+            $o_item_price = $this->get_price_object();
+            if ($o_item->oxprice2article__oxaddabs->value) {
+                $d_base_price = $o_item->oxprice2article__oxaddabs->value;
+                $d_base_price = $this->prepare_modified_price($d_base_price);
+                $o_item_price->set_price($d_base_price);
+                $this->calculate_price($o_item_price);
             } else {
-                $dBasePrice = $this->getGroupPrice();
-
-                $dBasePrice = $this->prepareModifiedPrice($dBasePrice);
-
-                $oItemPrice->setPrice($dBasePrice);
-                $oItemPrice->subtractPercent($oItem->oxprice2article__oxaddperc->value);
+                $d_base_price = $this->get_group_price();
+                $d_base_price = $this->prepare_modified_price($d_base_price);
+                $o_item_price->set_price($d_base_price);
+                $o_item_price->subtract_percent($o_item->oxprice2article__oxaddperc->value);
             }
-
-            $aAmPriceList[$sId]->fbrutprice = $oLang->formatCurrency($oItemPrice->getBruttoPrice());
-            $aAmPriceList[$sId]->fnetprice = $oLang->formatCurrency($oItemPrice->getNettoPrice());
-
-            if ($quantity = $this->getUnitQuantity()) {
-                $aAmPriceList[$sId]->fbrutamountprice = $oLang->formatCurrency(
-                    $oItemPrice->getBruttoPrice() / $quantity
-                );
-                $aAmPriceList[$sId]->fnetamountprice = $oLang->formatCurrency($oItemPrice->getNettoPrice() / $quantity);
+            $a_am_price_list[$s_id]->fbrutprice = $o_lang->format_currency($o_item_price->get_brutto_price());
+            $a_am_price_list[$s_id]->fnetprice = $o_lang->format_currency($o_item_price->get_netto_price());
+            if ($quantity = $this->get_unit_quantity()) {
+                $a_am_price_list[$s_id]->fbrutamountprice = $o_lang->format_currency($o_item_price->get_brutto_price() / $quantity);
+                $a_am_price_list[$s_id]->fnetamountprice = $o_lang->format_currency($o_item_price->get_netto_price() / $quantity);
             }
         }
-
-        return $aAmPriceList;
+        return $a_am_price_list;
     }
-
     /**
      * Collects and returns active/all variant ids of article.
      *
@@ -3889,119 +3214,95 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    public function getVariantIds($activeVariants = true)
+    public function get_variant_ids($active_variants = true)
     {
-        $sId = $this->getId();
-        if (!$sId) {
+        $s_id = $this->get_id();
+        if (!$s_id) {
             return [];
         }
-
-        $activeSqlSnippet = '';
-        if ($activeVariants) {
-            $activeSqlSnippet = ' and ' . $this->getSqlActiveSnippet(true);
+        $active_sql_snippet = '';
+        if ($active_variants) {
+            $active_sql_snippet = ' and ' . $this->get_sql_active_snippet(true);
         }
-        $variantsQuery = sprintf(
-            'select oxid from %s where oxparentid = :oxparentid %s order by oxsort',
-            $this->getViewName(true),
-            $activeSqlSnippet
-        );
-        return DatabaseProvider::getDb()->getCol(
-            $variantsQuery,
-            [
-                'oxparentid' => $sId,
-            ]
-        );
+        $variants_query = sprintf('select oxid from %s where oxparentid = :oxparentid %s order by oxsort', $this->get_view_name(true), $active_sql_snippet);
+        return Database_Provider::get_db()->get_col($variants_query, ['oxparentid' => $s_id]);
     }
-
     /**
      * retrieve article VAT (cached)
      *
      * @return double
      */
-    public function getArticleVat()
+    public function get_article_vat()
     {
-        if (!isset($this->_dArticleVat)) {
-            $this->_dArticleVat = Registry::get(
-                \OxidEsales\Eshop\Application\Model\VatSelector::class
-            )->getArticleVat($this);
+        if (!isset($this->_d_article_vat)) {
+            $this->_d_article_vat = Registry::get(\Oxid_Esales\Eshop\Application\Model\Vat_Selector::class)->get_article_vat($this);
         }
-
-        return $this->_dArticleVat;
+        return $this->_d_article_vat;
     }
-
-    public function hasProductValidTimeRange(): bool
+    public function has_product_valid_time_range(): bool
     {
-        if (!Registry::getUtilsDate()->isEmptyDate($this->oxarticles__oxactivefrom->value)) {
+        if (!Registry::get_utils_date()->is_empty_date($this->oxarticles__oxactivefrom->value)) {
             return true;
         }
-        return !Registry::getUtilsDate()->isEmptyDate($this->oxarticles__oxactiveto->value);
+        return !Registry::get_utils_date()->is_empty_date($this->oxarticles__oxactiveto->value);
     }
-
-    public function isProductAlwaysActive(): bool
+    public function is_product_always_active(): bool
     {
         return !empty($this->oxarticles__oxactive->value);
     }
-
     /**
      * Applies VAT to article
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
      * @param double                       $dVat   VAT percent
      */
-    protected function applyVAT(Price $oPrice, $dVat)
+    protected function apply_vat(Price $o_price, $d_vat)
     {
-        startProfile(__FUNCTION__);
-        $oPrice->setVAT($dVat);
+        start_profile(__FUNCTION__);
+        $o_price->set_vat($d_vat);
         /** @var \OxidEsales\Eshop\Application\Model\VatSelector $oVatSelector */
-        $oVatSelector = Registry::get(\OxidEsales\Eshop\Application\Model\VatSelector::class);
-        if (($dVat = $oVatSelector->getArticleUserVat($this)) !== false) {
-            $oPrice->setUserVat($dVat);
+        $o_vat_selector = Registry::get(\Oxid_Esales\Eshop\Application\Model\Vat_Selector::class);
+        if (($d_vat = $o_vat_selector->get_article_user_vat($this)) !== false) {
+            $o_price->set_user_vat($d_vat);
         }
-        stopProfile(__FUNCTION__);
+        stop_profile(__FUNCTION__);
     }
-
     /**
      * Applies currency factor
      *
      * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
      * @param object                       $oCur   Currency object
      */
-    protected function applyCurrency(Price $oPrice, $oCur = null)
+    protected function apply_currency(Price $o_price, $o_cur = null)
     {
-        if (!$oCur) {
-            $oCur = Registry::getConfig()->getActShopCurrencyObject();
+        if (!$o_cur) {
+            $o_cur = Registry::get_config()->get_act_shop_currency_object();
         }
-
-        $oPrice->multiply($oCur->rate);
+        $o_price->multiply($o_cur->rate);
     }
-
     /**
      * gets attribs string
      *
      * @param string $sAttributeSql Attribute selection snippet
      * @param int    $iCnt          The number of selected attributes
      */
-    protected function getAttribsString(&$sAttributeSql, &$iCnt)
+    protected function get_attribs_string(&$s_attribute_sql, &$i_cnt)
     {
         // we do not use lists here as we don't need this overhead right now
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sSelect = 'select oxattrid from oxobject2attribute
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_select = 'select oxattrid from oxobject2attribute
             where oxobject2attribute.oxobjectid = :oxobjectid';
-        if ($this->getParentId()) {
-            $sSelect .= ' OR oxobject2attribute.oxobjectid = :oxparentid';
+        if ($this->get_parent_id()) {
+            $s_select .= ' OR oxobject2attribute.oxobjectid = :oxparentid';
         }
-        $sAttributeSql = '';
-        $aAttributeIds = $oDb->getCol($sSelect, [
-            'oxobjectid' => $this->getId(),
-            'oxparentid' => $this->getParentId(),
-        ]);
-        if (is_array($aAttributeIds) && count($aAttributeIds)) {
-            $aAttributeIds = array_unique($aAttributeIds);
-            $iCnt = count($aAttributeIds);
-            $sAttributeSql .= 't1.oxattrid IN ( ' . implode(',', $oDb->quoteArray($aAttributeIds)) . ') ';
+        $s_attribute_sql = '';
+        $a_attribute_ids = $o_db->get_col($s_select, ['oxobjectid' => $this->get_id(), 'oxparentid' => $this->get_parent_id()]);
+        if (is_array($a_attribute_ids) && count($a_attribute_ids)) {
+            $a_attribute_ids = array_unique($a_attribute_ids);
+            $i_cnt = count($a_attribute_ids);
+            $s_attribute_sql .= 't1.oxattrid IN ( ' . implode(',', $o_db->quote_array($a_attribute_ids)) . ') ';
         }
     }
-
     /**
      * Gets similar list.
      *
@@ -4010,33 +3311,25 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    protected function getSimList($sAttributeSql, $iCnt)
+    protected function get_sim_list($s_attribute_sql, $i_cnt)
     {
         // #523A
-        $iAttrPercent = Registry::getConfig()->getConfigParam('iAttributesPercent') / 100;
+        $i_attr_percent = Registry::get_config()->get_config_param('iAttributesPercent') / 100;
         // 70% same attributes
-        if (!$iAttrPercent || $iAttrPercent < 0 || $iAttrPercent > 1) {
-            $iAttrPercent = 0.70;
+        if (!$i_attr_percent || $i_attr_percent < 0 || $i_attr_percent > 1) {
+            $i_attr_percent = 0.7;
         }
         // #1137V iAttributesPercent = 100 doesn't work
-        $iHitMin = ceil($iCnt * $iAttrPercent);
-
-        $aExcludeIds = [];
-        $aExcludeIds[] = $this->getId();
-        if ($this->getParentId()) {
-            $aExcludeIds[] = $this->getParentId();
+        $i_hit_min = ceil($i_cnt * $i_attr_percent);
+        $a_exclude_ids = [];
+        $a_exclude_ids[] = $this->get_id();
+        if ($this->get_parent_id()) {
+            $a_exclude_ids[] = $this->get_parent_id();
         }
-
         // we do not use lists here as we don't need this overhead right now
-        $sSelect = "select oxobjectid from oxobject2attribute as t1 where ( $sAttributeSql ) and t1.oxobjectid NOT IN ("
-            . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aExcludeIds))
-            . ') group by t1.oxobjectid having count(*) >= :minhit LIMIT 0, 20';
-
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol($sSelect, [
-            'minhit' => $iHitMin,
-        ]);
+        $s_select = "select oxobjectid from oxobject2attribute as t1 where ( {$s_attribute_sql} ) and t1.oxobjectid NOT IN (" . implode(', ', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_exclude_ids)) . ') group by t1.oxobjectid having count(*) >= :minhit LIMIT 0, 20';
+        return \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_col($s_select, ['minhit' => $i_hit_min]);
     }
-
     /**
      * Generates search string for similar list.
      *
@@ -4045,22 +3338,16 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    protected function generateSimListSearchStr($sArticleTable, $aList)
+    protected function generate_sim_list_search_str($s_article_table, $a_list)
     {
-        $sFieldList = $this->getSelectFields();
-        $aList = array_slice($aList, 0, Registry::getConfig()->getConfigParam('iNrofSimilarArticles'));
-
-        $sSearch = "select $sFieldList from $sArticleTable where " . $this->getSqlActiveSnippet()
-            . "  and $sArticleTable.oxissearch = 1 and $sArticleTable.oxid in ( ";
-
-        $sSearch .= implode(',', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aList)) . ')';
-
+        $s_field_list = $this->get_select_fields();
+        $a_list = array_slice($a_list, 0, Registry::get_config()->get_config_param('iNrofSimilarArticles'));
+        $s_search = "select {$s_field_list} from {$s_article_table} where " . $this->get_sql_active_snippet() . "  and {$s_article_table}.oxissearch = 1 and {$s_article_table}.oxid in ( ";
+        $s_search .= implode(',', \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote_array($a_list)) . ')';
         // #524A -- randomizing articles in attribute list
-        $sSearch .= ' order by rand() ';
-
-        return $sSearch;
+        $s_search .= ' order by rand() ';
+        return $s_search;
     }
-
     /**
      * Generates SearchString for getCategory()
      *
@@ -4069,73 +3356,45 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    protected function generateSearchStr($sOXID, $blSearchPriceCat = false)
+    protected function generate_search_str($s_oxid, $bl_search_price_cat = false)
     {
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sCatView = $tableViewNameGenerator->getViewName('oxcategories', $this->getLanguage());
-        $sO2CView = $tableViewNameGenerator->getViewName('oxobject2category');
-
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_cat_view = $table_view_name_generator->get_view_name('oxcategories', $this->get_language());
+        $s_o2c_view = $table_view_name_generator->get_view_name('oxobject2category');
         // we do not use lists here as we don't need this overhead right now
-        if (!$blSearchPriceCat) {
-            return "select {$sCatView}.* from {$sO2CView} as oxobject2category left join {$sCatView} on
-                  {$sCatView}.oxid = oxobject2category.oxcatnid where oxobject2category.oxobjectid="
-                . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sOXID)
-                . " and {$sCatView}.oxid is not null ";
+        if (!$bl_search_price_cat) {
+            return "select {$s_cat_view}.* from {$s_o2c_view} as oxobject2category left join {$s_cat_view} on\n                  {$s_cat_view}.oxid = oxobject2category.oxcatnid where oxobject2category.oxobjectid=" . \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->quote($s_oxid) . " and {$s_cat_view}.oxid is not null ";
         }
-        return "select {$sCatView}.* from {$sCatView} where
-                      '{$this->oxarticles__oxprice->value}' >= {$sCatView}.oxpricefrom and
-                      '{$this->oxarticles__oxprice->value}' <= {$sCatView}.oxpriceto ";
+        return "select {$s_cat_view}.* from {$s_cat_view} where\n                      '{$this->oxarticles__oxprice->value}' >= {$s_cat_view}.oxpricefrom and\n                      '{$this->oxarticles__oxprice->value}' <= {$s_cat_view}.oxpriceto ";
     }
-
     /**
      * Generates SQL select string for getCustomerAlsoBoughtThisProduct
      *
      * @return string
      */
-    protected function generateSearchStrForCustomerBought()
+    protected function generate_search_str_for_customer_bought()
     {
-        $sArtTable = $this->getViewName();
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sOrderArtTable = $tableViewNameGenerator->getViewName('oxorderarticles');
-
+        $s_art_table = $this->get_view_name();
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_order_art_table = $table_view_name_generator->get_view_name('oxorderarticles');
         // fetching filter params
-        $articlesIn = " '{$this->oxarticles__oxid->value}' ";
+        $articles_in = " '{$this->oxarticles__oxid->value}' ";
         if ($this->oxarticles__oxparentid->value) {
             // adding article parent
-            $articlesIn .= ", '{$this->oxarticles__oxparentid->value}' ";
-            $sParentIdForVariants = $this->oxarticles__oxparentid->value;
+            $articles_in .= ", '{$this->oxarticles__oxparentid->value}' ";
+            $s_parent_id_for_variants = $this->oxarticles__oxparentid->value;
         } else {
-            $sParentIdForVariants = $this->getId();
+            $s_parent_id_for_variants = $this->get_id();
         }
-
-        $database = DatabaseProvider::getDb();
-
-        $articlesIds = $database->getCol(
-            "select oxid from {$sArtTable} where oxparentid = :oxparentid and oxid != :oxid ",
-            [
-                'oxparentid' => $sParentIdForVariants,
-                'oxid' => $this->oxarticles__oxid->value,
-            ]
-        );
-        foreach ($articlesIds as $articlesId) {
-            $articlesIn .= ', ' . $database->quote($articlesId) . ' ';
+        $database = Database_Provider::get_db();
+        $articles_ids = $database->get_col("select oxid from {$s_art_table} where oxparentid = :oxparentid and oxid != :oxid ", ['oxparentid' => $s_parent_id_for_variants, 'oxid' => $this->oxarticles__oxid->value]);
+        foreach ($articles_ids as $articles_id) {
+            $articles_in .= ', ' . $database->quote($articles_id) . ' ';
         }
-
-        $iLimit = (int) Registry::getConfig()->getConfigParam('iNrofCustomerWhoArticles');
-        $iLimit = $iLimit ? ($iLimit * 10) : 50;
-
-        return "select distinct {$sArtTable}.* from ("
-                   . " select d.oxorderid as suborderid from {$sOrderArtTable} as d use index"
-                   . " ( oxartid ) where d.oxartid in ( {$articlesIn} ) limit {$iLimit}"
-               . ' ) as suborder'
-               . " left join {$sOrderArtTable} force index ( oxorderid )"
-                        . " on suborder.suborderid = {$sOrderArtTable}.oxorderid"
-               . " left join {$sArtTable} on {$sArtTable}.oxid = {$sOrderArtTable}.oxartid"
-               . " where {$sArtTable}.oxid not in ( {$articlesIn} )"
-                . " and ( {$sArtTable}.oxissearch = 1 or {$sArtTable}.oxparentid <> '' )"
-                . ' and ' . $this->getSqlActiveSnippet();
+        $i_limit = (int) Registry::get_config()->get_config_param('iNrofCustomerWhoArticles');
+        $i_limit = $i_limit ? $i_limit * 10 : 50;
+        return "select distinct {$s_art_table}.* from (" . " select d.oxorderid as suborderid from {$s_order_art_table} as d use index" . " ( oxartid ) where d.oxartid in ( {$articles_in} ) limit {$i_limit}" . ' ) as suborder' . " left join {$s_order_art_table} force index ( oxorderid )" . " on suborder.suborderid = {$s_order_art_table}.oxorderid" . " left join {$s_art_table} on {$s_art_table}.oxid = {$s_order_art_table}.oxartid" . " where {$s_art_table}.oxid not in ( {$articles_in} )" . " and ( {$s_art_table}.oxissearch = 1 or {$s_art_table}.oxparentid <> '' )" . ' and ' . $this->get_sql_active_snippet();
     }
-
     /**
      * Generates select string for isAssignedToCategory()
      *
@@ -4145,65 +3404,53 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    protected function generateSelectCatStr($sOXID, $sCatId, $dPriceFromTo = false)
+    protected function generate_select_cat_str($s_oxid, $s_cat_id, $d_price_from_to = false)
     {
-        $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-        $sCategoryView = $tableViewNameGenerator->getViewName('oxcategories');
-        $sO2CView = $tableViewNameGenerator->getViewName('oxobject2category');
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sOXID = $oDb->quote($sOXID);
-        $sCatId = $oDb->quote($sCatId);
-
-        if (!$dPriceFromTo) {
-            $sSelect = "select oxobject2category.oxcatnid from $sO2CView as oxobject2category ";
-            $sSelect .= "left join $sCategoryView as oxcategories on oxcategories.oxid = oxobject2category.oxcatnid ";
-            $sSelect .= "where oxobject2category.oxcatnid=$sCatId and oxobject2category.oxobjectid=$sOXID ";
-            $sSelect .= 'and oxcategories.oxactive = 1 order by oxobject2category.oxtime ';
+        $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+        $s_category_view = $table_view_name_generator->get_view_name('oxcategories');
+        $s_o2c_view = $table_view_name_generator->get_view_name('oxobject2category');
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_oxid = $o_db->quote($s_oxid);
+        $s_cat_id = $o_db->quote($s_cat_id);
+        if (!$d_price_from_to) {
+            $s_select = "select oxobject2category.oxcatnid from {$s_o2c_view} as oxobject2category ";
+            $s_select .= "left join {$s_category_view} as oxcategories on oxcategories.oxid = oxobject2category.oxcatnid ";
+            $s_select .= "where oxobject2category.oxcatnid={$s_cat_id} and oxobject2category.oxobjectid={$s_oxid} ";
+            $s_select .= 'and oxcategories.oxactive = 1 order by oxobject2category.oxtime ';
         } else {
-            $dPriceFromTo = $oDb->quote($dPriceFromTo);
-            $sSelect = "select oxcategories.oxid from $sCategoryView as oxcategories where ";
-            $sSelect .= "oxcategories.oxid=$sCatId and $dPriceFromTo >= oxcategories.oxpricefrom and ";
-            $sSelect .= "$dPriceFromTo <= oxcategories.oxpriceto ";
+            $d_price_from_to = $o_db->quote($d_price_from_to);
+            $s_select = "select oxcategories.oxid from {$s_category_view} as oxcategories where ";
+            $s_select .= "oxcategories.oxid={$s_cat_id} and {$d_price_from_to} >= oxcategories.oxpricefrom and ";
+            $s_select .= "{$d_price_from_to} <= oxcategories.oxpriceto ";
         }
-
-        return $sSelect;
+        return $s_select;
     }
-
     /**
      * Collecting assigned to article amount-price list.
      *
      * @return \OxidEsales\Eshop\Application\Model\AmountPriceList
      */
-    protected function buildAmountPriceList()
+    protected function build_amount_price_list()
     {
-        if ($this->getAmountPriceList() === null) {
+        if ($this->get_amount_price_list() === null) {
             /** @var \OxidEsales\Eshop\Application\Model\AmountPriceList $oAmPriceList */
-            $oAmPriceList = oxNew(\OxidEsales\Eshop\Application\Model\AmountPriceList::class);
-            $this->setAmountPriceList($oAmPriceList);
-
-            if (!$this->skipDiscounts()) {
+            $o_am_price_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Amount_Price_List::class);
+            $this->set_amount_price_list($o_am_price_list);
+            if (!$this->skip_discounts()) {
                 //collecting assigned to article amount-price list
-                $oAmPriceList->load($this);
-
+                $o_am_price_list->load($this);
                 // prepare abs prices if currently having percentages
-                $oBasePrice = $this->getGroupPrice();
-                foreach ($oAmPriceList as $oAmPrice) {
-                    if ($oAmPrice->oxprice2article__oxaddperc->value) {
-                        $oAmPrice->oxprice2article__oxaddabs = new Field(
-                            Price::percent($oBasePrice, 100 - $oAmPrice->oxprice2article__oxaddperc->value),
-                            Field::T_RAW
-                        );
+                $o_base_price = $this->get_group_price();
+                foreach ($o_am_price_list as $o_am_price) {
+                    if ($o_am_price->oxprice2article__oxaddperc->value) {
+                        $o_am_price->oxprice2article__oxaddabs = new Field(Price::percent($o_base_price, 100 - $o_am_price->oxprice2article__oxaddperc->value), Field::T_RAW);
                     }
                 }
             }
-
-            $this->setAmountPriceList($oAmPriceList);
+            $this->set_amount_price_list($o_am_price_list);
         }
-
-        return $this->_oAmountPriceList;
+        return $this->_o_amount_price_list;
     }
-
     /**
      * Detects if field is empty.
      *
@@ -4211,90 +3458,63 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    protected function isFieldEmpty($sFieldName)
+    protected function is_field_empty($s_field_name)
     {
-        $mValue = $this->$sFieldName->value;
-
-        if (is_null($mValue)) {
+        $m_value = $this->{$s_field_name}->value;
+        if (is_null($m_value)) {
             return true;
         }
-
-        if ($mValue === '') {
+        if ($m_value === '') {
             return true;
         }
-
         // certain fields with zero value treat as empty
-        $aZeroValueFields = ['oxarticles__oxprice', 'oxarticles__oxvat', 'oxarticles__oxunitquantity'];
-
-        if (!$mValue && in_array($sFieldName, $aZeroValueFields)) {
+        $a_zero_value_fields = ['oxarticles__oxprice', 'oxarticles__oxvat', 'oxarticles__oxunitquantity'];
+        if (!$m_value && in_array($s_field_name, $a_zero_value_fields)) {
             return true;
         }
-
-        if (!strcmp((string) $mValue, '0000-00-00 00:00:00') || !strcmp((string) $mValue, '0000-00-00')) {
+        if (!strcmp((string) $m_value, '0000-00-00 00:00:00') || !strcmp((string) $m_value, '0000-00-00')) {
             return true;
         }
-
-        $sFieldName = strtolower($sFieldName);
-
-        if (
-            $sFieldName == 'oxarticles__oxicon' && (str_contains((string) $mValue, 'nopic_ico.jpg') || str_contains(
-                (string) $mValue,
-                'nopic.jpg'
-            ))
-        ) {
+        $s_field_name = strtolower($s_field_name);
+        if ($s_field_name == 'oxarticles__oxicon' && (str_contains((string) $m_value, 'nopic_ico.jpg') || str_contains((string) $m_value, 'nopic.jpg'))) {
             return true;
         }
-
-        if (
-            str_contains((string) $mValue, 'nopic.jpg') && ($sFieldName == 'oxarticles__oxthumb' || str_starts_with($sFieldName, 'oxarticles__oxpic') || str_starts_with($sFieldName, 'oxarticles__oxzoom'))
-        ) {
+        if (str_contains((string) $m_value, 'nopic.jpg') && ($s_field_name == 'oxarticles__oxthumb' || str_starts_with($s_field_name, 'oxarticles__oxpic') || str_starts_with($s_field_name, 'oxarticles__oxzoom'))) {
             return true;
         }
-
         return false;
     }
-
     /**
      * Assigns parent field values to article
      *
      * @param string $sFieldName field name
      */
-    protected function assignParentFieldValue($sFieldName)
+    protected function assign_parent_field_value($s_field_name)
     {
-        if (!($oParentArticle = $this->getParentArticle())) {
+        if (!$o_parent_article = $this->get_parent_article()) {
             return;
         }
-
-        $sCopyFieldName = $this->getFieldLongName($sFieldName);
-
+        $s_copy_field_name = $this->get_field_long_name($s_field_name);
         // assigning only these which parent article has
-        if ($oParentArticle->$sCopyFieldName != null) {
+        if ($o_parent_article->{$s_copy_field_name} != null) {
             // only overwrite database values
-            if (!str_starts_with($sCopyFieldName, 'oxarticles__')) {
+            if (!str_starts_with($s_copy_field_name, 'oxarticles__')) {
                 return;
             }
-
             //do not copy certain fields
-            if (in_array($sCopyFieldName, $this->_aNonCopyParentFields)) {
+            if (in_array($s_copy_field_name, $this->_a_non_copy_parent_fields)) {
                 return;
             }
-
             //skip picture parent value assignment in case master image is set for variant
-            if (
-                $this->isFieldEmpty($sCopyFieldName)
-                && $this->isImageField($sCopyFieldName)
-                && $this->hasMasterImage(1)
-            ) {
+            if ($this->is_field_empty($s_copy_field_name) && $this->is_image_field($s_copy_field_name) && $this->has_master_image(1)) {
                 return;
             }
-
             //COPY THE VALUE
-            if ($this->isFieldEmpty($sCopyFieldName)) {
-                $this->$sCopyFieldName = clone $oParentArticle->$sCopyFieldName;
+            if ($this->is_field_empty($s_copy_field_name)) {
+                $this->{$s_copy_field_name} = clone $o_parent_article->{$s_copy_field_name};
             }
         }
     }
-
     /**
      * Detects if field is an image field by field name
      *
@@ -4302,150 +3522,122 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    protected function isImageField($sFieldName)
+    protected function is_image_field($s_field_name)
     {
-        return (stristr($sFieldName, '_oxthumb') || stristr($sFieldName, '_oxicon') || stristr(
-            $sFieldName,
-            '_oxzoom'
-        ) || stristr($sFieldName, '_oxpic'));
+        return stristr($s_field_name, '_oxthumb') || stristr($s_field_name, '_oxicon') || stristr($s_field_name, '_oxzoom') || stristr($s_field_name, '_oxpic');
     }
-
     /**
      * Assigns parent field values to article
      */
-    protected function assignParentFieldValues()
+    protected function assign_parent_field_values()
     {
-        startProfile('articleAssignParentInternal');
-        if ($this->getFieldData('oxparentid')) {
+        start_profile('articleAssignParentInternal');
+        if ($this->get_field_data('oxparentid')) {
             // yes, we are in fact a variant
-            if (!$this->isAdmin() || ($this->_blLoadParentData && $this->isAdmin())) {
-                foreach ($this->_aFieldNames as $sFieldName => $sVal) {
-                    $this->assignParentFieldValue($sFieldName);
+            if (!$this->is_admin() || $this->_bl_load_parent_data && $this->is_admin()) {
+                foreach ($this->_a_field_names as $s_field_name => $s_val) {
+                    $this->assign_parent_field_value($s_field_name);
                 }
             }
         }
-        stopProfile('articleAssignParentInternal');
+        stop_profile('articleAssignParentInternal');
     }
-
     /**
      * if we have variants then depending on config option the parent may be non buyable
      */
-    protected function assignNotBuyableParent()
+    protected function assign_not_buyable_parent()
     {
-        if (
-            !Registry::getConfig()->getConfigParam('blVariantParentBuyable') &&
-            (
-                $this->_blHasVariants ||
-                $this->getFieldData('oxvarstock') ||
-                $this->getFieldData('oxvarcount')
-            )
-        ) {
-            $this->_blNotBuyableParent = true;
+        if (!Registry::get_config()->get_config_param('blVariantParentBuyable') && ($this->_bl_has_variants || $this->get_field_data('oxvarstock') || $this->get_field_data('oxvarcount'))) {
+            $this->_bl_not_buyable_parent = true;
         }
     }
-
     /**
      * Assigns stock status to article
      */
-    protected function assignStock()
+    protected function assign_stock()
     {
-        $myConfig = Registry::getConfig();
+        $my_config = Registry::get_config();
         // -----------------------------------
         // stock
         // -----------------------------------
-
         // #1125 A. must round (using floor()) value taken from database and cast to int
-        if (!$myConfig->getConfigParam('blAllowUnevenAmounts') && !$this->isAdmin()) {
-            $stock = $this->getFieldData('oxstock') ?? 0;
+        if (!$my_config->get_config_param('blAllowUnevenAmounts') && !$this->is_admin()) {
+            $stock = $this->get_field_data('oxstock') ?? 0;
             $this->oxarticles__oxstock = new Field((int) floor($stock));
         }
         //GREEN light
-        $this->_iStockStatus = 0;
-
+        $this->_i_stock_status = 0;
         // if we have flag /*1 or*/ 4 - we show always green light
-        $stockFlag = $this->getFieldData('oxstockflag');
-        if ($myConfig->getConfigParam('blUseStock') && $stockFlag != 4) {
+        $stock_flag = $this->get_field_data('oxstockflag');
+        if ($my_config->get_config_param('blUseStock') && $stock_flag != 4) {
             //ORANGE light
-            $stock = $this->getAvailableStock();
-
-            if ($stock > 0 && $this->isLowStock()) {
-                $this->_iStockStatus = 1;
+            $stock = $this->get_available_stock();
+            if ($stock > 0 && $this->is_low_stock()) {
+                $this->_i_stock_status = 1;
             }
-
             //RED light
             if ($stock <= 0) {
-                $this->_iStockStatus = -1;
+                $this->_i_stock_status = -1;
             }
         }
-
         // stock
-        $stockFlag = $this->getFieldData('oxstockflag');
-        if ($myConfig->getConfigParam('blUseStock') && ($stockFlag == 3 || $stockFlag == 2)) {
-            $iOnStock = $this->oxarticles__oxstock->value;
-            if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-                $session = Registry::getSession();
-                if ($reservations = $session->getBasketReservations()) {
-                    $iOnStock += $reservations->getReservedAmount($this->getId());
+        $stock_flag = $this->get_field_data('oxstockflag');
+        if ($my_config->get_config_param('blUseStock') && ($stock_flag == 3 || $stock_flag == 2)) {
+            $i_on_stock = $this->oxarticles__oxstock->value;
+            if (Registry::get_config()->get_config_param('blPsBasketReservationEnabled')) {
+                $session = Registry::get_session();
+                if ($reservations = $session->get_basket_reservations()) {
+                    $i_on_stock += $reservations->get_reserved_amount($this->get_id());
                 }
             }
-            if ($iOnStock <= 0) {
-                $this->setBuyableState(false);
+            if ($i_on_stock <= 0) {
+                $this->set_buyable_state(false);
             }
         }
-
         //exceptional handling for variant parent stock:
-        if ($this->_blNotBuyable && $this->oxarticles__oxvarstock->value) {
-            $this->setBuyableState(true);
+        if ($this->_bl_not_buyable && $this->oxarticles__oxvarstock->value) {
+            $this->set_buyable_state(true);
             //but then at least setting notBuaybleParent to true
-            $this->_blNotBuyableParent = true;
+            $this->_bl_not_buyable_parent = true;
         }
-
         //special treatment for lists when blVariantParentBuyable config option is set to false
         //then we just hide "to basket" button.
         //If variants are not loaded in the list and this article has variants and parent is not buyable
         //then this article is not buyable
-        if (
-            !$myConfig->getConfigParam('blVariantParentBuyable')
-            && !$myConfig->getConfigParam('blLoadVariants')
-            && $this->oxarticles__oxvarstock->value
-        ) {
-            $this->setBuyableState(false);
+        if (!$my_config->get_config_param('blVariantParentBuyable') && !$my_config->get_config_param('blLoadVariants') && $this->oxarticles__oxvarstock->value) {
+            $this->set_buyable_state(false);
         }
-
         // Set non-buyable if no variants (e.g. not loaded/inactive) and $this is a non-buyable parent
-        if (!$this->_blNotBuyable && $this->_blNotBuyableParent && $this->oxarticles__oxvarcount->value == 0) {
-            $this->setBuyableState(false);
+        if (!$this->_bl_not_buyable && $this->_bl_not_buyable_parent && $this->oxarticles__oxvarcount->value == 0) {
+            $this->set_buyable_state(false);
         }
     }
-
     /**
      * assigns dynimagedir to article
      */
-    protected function assignDynImageDir()
+    protected function assign_dyn_image_dir()
     {
-        $myConfig = Registry::getConfig();
-
-        $sThisShop = $this->oxarticles__oxshopid->value;
-
-        $this->_sDynImageDir = $myConfig->getPictureUrl(null, false);
-        $this->dabsimagedir = $myConfig->getPictureDir(false); //$sThisShop
-        $this->nossl_dimagedir = $myConfig->getPictureUrl(null, false, false, null, $sThisShop); //$sThisShop
-        $this->ssl_dimagedir = $myConfig->getPictureUrl(null, false, true, null, $sThisShop); //$sThisShop
+        $my_config = Registry::get_config();
+        $s_this_shop = $this->oxarticles__oxshopid->value;
+        $this->_s_dyn_image_dir = $my_config->get_picture_url(null, false);
+        $this->dabsimagedir = $my_config->get_picture_dir(false);
+        //$sThisShop
+        $this->nossl_dimagedir = $my_config->get_picture_url(null, false, false, null, $s_this_shop);
+        //$sThisShop
+        $this->ssl_dimagedir = $my_config->get_picture_url(null, false, true, null, $s_this_shop);
+        //$sThisShop
     }
-
     /**
      * Adds a flag if article is on comparisonlist.
      */
-    protected function assignComparisonListFlag()
+    protected function assign_comparison_list_flag()
     {
         // #657 add a flag if article is on comparisonlist
-
-        $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
-        if (isset($aItems[$this->getId()])) {
-            $this->_blIsOnComparisonList = true;
+        $a_items = Registry::get_session()->get_variable('aFiltcompproducts');
+        if (isset($a_items[$this->get_id()])) {
+            $this->_bl_is_on_comparison_list = true;
         }
     }
-
     /**
      * Sets article creation date
      * (\OxidEsales\Eshop\Application\Model\Article::oxarticles__oxinsert). Then executes parent method
@@ -4456,15 +3648,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     protected function insert()
     {
         // set oxinsert
-        $sNow = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
-        $this->oxarticles__oxinsert = new Field($sNow);
+        $s_now = date('Y-m-d H:i:s', Registry::get_utils_date()->get_time());
+        $this->oxarticles__oxinsert = new Field($s_now);
         if (!is_object($this->oxarticles__oxsubclass) || $this->oxarticles__oxsubclass->value == '') {
             $this->oxarticles__oxsubclass = new Field('oxarticle');
         }
-
         return parent::insert();
     }
-
     /**
      * Executes \OxidEsales\Eshop\Application\Model\Article::_skipSaveFields() and updates article information
      *
@@ -4472,14 +3662,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected function update()
     {
-        $this->setUpdateSeo(true);
-        $this->setUpdateSeoOnFieldChange('oxtitle');
-
-        $this->skipSaveFields();
-
+        $this->set_update_seo(true);
+        $this->set_update_seo_on_field_change('oxtitle');
+        $this->skip_save_fields();
         return parent::update();
     }
-
     /**
      * Deletes records in database
      *
@@ -4487,117 +3674,70 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return int
      */
-    protected function deleteRecords($articleId)
+    protected function delete_records($article_id)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         //remove other records
-        $sDelete = 'delete from oxobject2article where oxarticlenid = :articleId or oxobjectid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxobject2attribute where oxobjectid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxobject2category where oxobjectid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxobject2selectlist where oxobjectid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxprice2article where oxartid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxreviews where oxtype="oxarticle" and oxobjectid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxratings where oxobjectid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxaccessoire2article where oxobjectid = :articleId or oxarticlenid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
+        $s_delete = 'delete from oxobject2article where oxarticlenid = :articleId or oxobjectid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxobject2attribute where oxobjectid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxobject2category where oxobjectid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxobject2selectlist where oxobjectid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxprice2article where oxartid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxreviews where oxtype="oxarticle" and oxobjectid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxratings where oxobjectid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxaccessoire2article where oxobjectid = :articleId or oxarticlenid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
         //#1508C - deleting oxobject2delivery entries added
-        $sDelete = 'delete from oxobject2delivery where oxobjectid = :articleId and oxtype=\'oxarticles\' ';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxartextends where oxid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
+        $s_delete = 'delete from oxobject2delivery where oxobjectid = :articleId and oxtype=\'oxarticles\' ';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxartextends where oxid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
         //delete the record
-        foreach ($this->getLanguageSetTables('oxartextends') as $sSetTbl) {
-            $oDb->execute("delete from $sSetTbl where oxid = :articleId", [
-                'articleId' => $articleId,
-            ]);
+        foreach ($this->get_language_set_tables('oxartextends') as $s_set_tbl) {
+            $o_db->execute("delete from {$s_set_tbl} where oxid = :articleId", ['articleId' => $article_id]);
         }
-
-        $sDelete = 'delete from oxactions2article where oxartid = :articleId';
-        $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
-
-        $sDelete = 'delete from oxobject2list where oxobjectid = :articleId';
-
-        return $oDb->execute($sDelete, [
-            'articleId' => $articleId,
-        ]);
+        $s_delete = 'delete from oxactions2article where oxartid = :articleId';
+        $o_db->execute($s_delete, ['articleId' => $article_id]);
+        $s_delete = 'delete from oxobject2list where oxobjectid = :articleId';
+        return $o_db->execute($s_delete, ['articleId' => $article_id]);
     }
-
     /**
      * Deletes variant records
      *
      * @param string $sOXID Article ID
      */
-    protected function deleteVariantRecords($sOXID)
+    protected function delete_variant_records($s_oxid)
     {
-        if ($sOXID) {
+        if ($s_oxid) {
             //collect variants to remove recursively
-            $query = 'select oxid from ' . $this->getViewName() . ' where oxparentid = :oxparentid';
-            $products = DatabaseProvider::getDb()->getCol($query, [
-                'oxparentid' => $sOXID,
-            ]);
-            $product = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            foreach ($products as $productId) {
-                $product->setId($productId);
+            $query = 'select oxid from ' . $this->get_view_name() . ' where oxparentid = :oxparentid';
+            $products = Database_Provider::get_db()->get_col($query, ['oxparentid' => $s_oxid]);
+            $product = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            foreach ($products as $product_id) {
+                $product->set_id($product_id);
                 $product->delete();
             }
         }
     }
-
     /**
      * Delete pics
      */
-    protected function deletePics()
+    protected function delete_pics()
     {
-        $productMediaDao = ContainerFacade::get(ProductMediaDaoInterface::class);
-        $productId = Id::fromString($this->getId());
-
-        $mediaCollection = $productMediaDao->getAll($productId);
-
-        foreach ($mediaCollection as $productMedia) {
-            $productMediaDao->delete($productMedia->getId());
+        $product_media_dao = Container_Facade::get(Product_Media_Dao_Interface::class);
+        $product_id = Id::from_string($this->get_id());
+        $media_collection = $product_media_dao->get_all($product_id);
+        foreach ($media_collection as $product_media) {
+            $product_media_dao->delete($product_media->get_id());
         }
     }
-
     /**
      * Resets category and vendor counts. This method is supposed to be called on article change trigger.
      *
@@ -4605,166 +3745,123 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $sVendorId       Vendor ID
      * @param string $sManufacturerId Manufacturer ID
      */
-    protected function onChangeResetCounts($sOxid, $sVendorId = null, $sManufacturerId = null)
+    protected function on_change_reset_counts($s_oxid, $s_vendor_id = null, $s_manufacturer_id = null)
     {
-        $myUtilsCount = Registry::getUtilsCount();
-
-        if ($sVendorId) {
-            $myUtilsCount->resetVendorArticleCount($sVendorId);
+        $my_utils_count = Registry::get_utils_count();
+        if ($s_vendor_id) {
+            $my_utils_count->reset_vendor_article_count($s_vendor_id);
         }
-
-        if ($sManufacturerId) {
-            $myUtilsCount->resetManufacturerArticleCount($sManufacturerId);
+        if ($s_manufacturer_id) {
+            $my_utils_count->reset_manufacturer_article_count($s_manufacturer_id);
         }
-
-        $aCategoryIds = $this->getCategoryIds();
+        $a_category_ids = $this->get_category_ids();
         //also reseting category counts
-        foreach ($aCategoryIds as $sCatId) {
-            $myUtilsCount->resetCatArticleCount($sCatId);
+        foreach ($a_category_ids as $s_cat_id) {
+            $my_utils_count->reset_cat_article_count($s_cat_id);
         }
     }
-
     /**
      * Updates article stock. This method is supposed to be called on article change trigger.
      *
      * @param string $parentId product parent id
      */
-    protected function onChangeUpdateStock($parentId)
+    protected function on_change_update_stock($parent_id)
     {
-        if ($parentId) {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        if ($parent_id) {
+            $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
             $query = 'SELECT oxstock, oxvendorid, oxmanufacturerid FROM oxarticles WHERE oxid = :oxid';
-            $rs = $database->select($query, [
-                'oxid' => $parentId,
-            ]);
-
-            $query = 'SELECT SUM(oxstock) FROM ' . $this->getViewName(true) . '
+            $rs = $database->select($query, ['oxid' => $parent_id]);
+            $query = 'SELECT SUM(oxstock) FROM ' . $this->get_view_name(true) . '
                 WHERE oxparentid = :oxparentid
-                AND ' . $this->getSqlActiveSnippet(true) . '
+                AND ' . $this->get_sql_active_snippet(true) . '
                 AND oxstock > 0 ';
-            $stock = (float) $database->getOne($query, [
-                'oxparentid' => $parentId,
-            ]);
-
+            $stock = (float) $database->get_one($query, ['oxparentid' => $parent_id]);
             $query = 'UPDATE oxarticles SET oxvarstock = :oxvarstock WHERE oxid = :oxid';
-            $database->execute($query, [
-                'oxvarstock' => $stock,
-                'oxid' => $parentId,
-            ]);
-
+            $database->execute($query, ['oxvarstock' => $stock, 'oxid' => $parent_id]);
             //now lets update category counts
             //first detect stock status change for this article (to or from 0)
             if ($stock < 0) {
                 $stock = 0;
             }
-            $oldStock = $rs->fields['oxstock'] ?? null;
-            if ($oldStock < 0) {
-                $oldStock = 0;
+            $old_stock = $rs->fields['oxstock'] ?? null;
+            if ($old_stock < 0) {
+                $old_stock = 0;
             }
-            if ($this->getFieldData('oxstockflag') == 2 && $oldStock xor $stock) {
+            if ($this->get_field_data('oxstockflag') == 2 && $old_stock xor $stock) {
                 //means the stock status could be changed (oxstock turns from 0 to 1 or from 1 to 0)
                 // so far we leave it like this but later we could move all count resets to one or two functions
-                $this->onChangeResetCounts(
-                    $parentId,
-                    $rs->fields['oxvendorid'] ?? null,
-                    $rs->fields['oxmanufacturerid'] ?? null
-                );
+                $this->on_change_reset_counts($parent_id, $rs->fields['oxvendorid'] ?? null, $rs->fields['oxmanufacturerid'] ?? null);
             }
         }
     }
-
     /**
      * Resets article count cache when stock value is zero and article goes offline.
      *
      * @param string $sOxid product id
      */
-    protected function onChangeStockResetCount($sOxid)
+    protected function on_change_stock_reset_count($s_oxid)
     {
-        $myConfig = Registry::getConfig();
-
-        if (
-            $myConfig->getConfigParam('blUseStock') && $this->oxarticles__oxstockflag->value == 2 &&
-            ($this->oxarticles__oxstock->value + $this->oxarticles__oxvarstock->value) <= 0
-        ) {
-            $this->onChangeResetCounts(
-                $sOxid,
-                $this->oxarticles__oxvendorid->value,
-                $this->oxarticles__oxmanufacturerid->value
-            );
+        $my_config = Registry::get_config();
+        if ($my_config->get_config_param('blUseStock') && $this->oxarticles__oxstockflag->value == 2 && $this->oxarticles__oxstock->value + $this->oxarticles__oxvarstock->value <= 0) {
+            $this->on_change_reset_counts($s_oxid, $this->oxarticles__oxvendorid->value, $this->oxarticles__oxmanufacturerid->value);
         }
     }
-
     /**
      * Updates variant count. This method is supposed to be called on article change trigger.
      *
      * @param string $parentId Parent ID
      */
-    protected function onChangeUpdateVarCount($parentId)
+    protected function on_change_update_var_count($parent_id)
     {
-        if ($parentId) {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        if ($parent_id) {
+            $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
             $query = 'SELECT COUNT(*) AS varcount FROM oxarticles WHERE oxparentid = :oxparentid';
-            $varCount = (int) $database->getOne($query, [
-                'oxparentid' => $parentId,
-            ]);
-
+            $var_count = (int) $database->get_one($query, ['oxparentid' => $parent_id]);
             $query = 'UPDATE oxarticles SET oxvarcount = :oxvarcount WHERE oxid = :oxid';
-            $database->execute($query, [
-                'oxvarcount' => $varCount,
-                'oxid' => $parentId,
-            ]);
+            $database->execute($query, ['oxvarcount' => $var_count, 'oxid' => $parent_id]);
         }
     }
-
     /**
      * Updates variant min price. This method is supposed to be called on article change trigger.
      *
      * @param string $sParentId Parent ID
      */
-    protected function setVarMinMaxPrice($sParentId)
+    protected function set_var_min_max_price($s_parent_id)
     {
-        if ($sParentId) {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sQ = '
+        if ($s_parent_id) {
+            $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $s_q = '
                 SELECT
                     MIN( IF( `oxarticles`.`oxprice` > 0, `oxarticles`.`oxprice`, `p`.`oxprice` ) ) AS `varminprice`,
                     MAX( IF( `oxarticles`.`oxprice` > 0, `oxarticles`.`oxprice`, `p`.`oxprice` ) ) AS `varmaxprice`
-                FROM ' . $this->getViewName(true) . ' AS `oxarticles`
-                    LEFT JOIN ' . $this->getViewName(true) . ' AS `p`
+                FROM ' . $this->get_view_name(true) . ' AS `oxarticles`
+                    LEFT JOIN ' . $this->get_view_name(true) . ' AS `p`
                      ON ( `p`.`oxid` = `oxarticles`.`oxparentid` AND `p`.`oxprice` > 0 )
-                WHERE ' . $this->getSqlActiveSnippet(true) . '
+                WHERE ' . $this->get_sql_active_snippet(true) . '
                     AND ( `oxarticles`.`oxparentid` = :oxparentid )';
-            $aPrices = $database->getRow($sQ, [
-                'oxparentid' => $sParentId,
-            ]);
-            if (isset($aPrices['varminprice'], $aPrices['varmaxprice'])) {
-                $sQ = '
+            $a_prices = $database->get_row($s_q, ['oxparentid' => $s_parent_id]);
+            if (isset($a_prices['varminprice'], $a_prices['varmaxprice'])) {
+                $s_q = '
                     UPDATE `oxarticles`
                     SET
                         `oxvarminprice` = :oxvarminprice,
                         `oxvarmaxprice` = :oxvarmaxprice
                     WHERE
                         `oxid` = :oxid';
-                $params = [
-                    'oxvarminprice' => $aPrices['varminprice'],
-                    'oxvarmaxprice' => $aPrices['varmaxprice'],
-                    'oxid' => $sParentId,
-                ];
+                $params = ['oxvarminprice' => $a_prices['varminprice'], 'oxvarmaxprice' => $a_prices['varmaxprice'], 'oxid' => $s_parent_id];
             } else {
-                $sQ = '
+                $s_q = '
                     UPDATE `oxarticles`
                     SET
                         `oxvarminprice` = `oxprice`,
                         `oxvarmaxprice` = `oxprice`
                     WHERE
                         `oxid` = :oxid';
-                $params = ['oxid' => $sParentId];
+                $params = ['oxid' => $s_parent_id];
             }
-            $database->execute($sQ, $params);
+            $database->execute($s_q, $params);
         }
     }
-
     /**
      * Checks if article has uploaded master image for selected picture
      *
@@ -4772,47 +3869,35 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return bool
      */
-    protected function hasMasterImage($iIndex)
+    protected function has_master_image($i_index)
     {
-        $sPicName = basename((string) $this->{'oxarticles__oxpic' . $iIndex}->value);
-
-        if ($sPicName == 'nopic.jpg' || $sPicName == '') {
+        $s_pic_name = basename((string) $this->{'oxarticles__oxpic' . $i_index}->value);
+        if ($s_pic_name == 'nopic.jpg' || $s_pic_name == '') {
             return false;
         }
-        if (
-            $this->isVariant() &&
-            $this->getParentArticle() &&
-            $this->getParentArticle()->{'oxarticles__oxpic' . $iIndex}->value
-                == $this->{'oxarticles__oxpic' . $iIndex}->value
-        ) {
+        if ($this->is_variant() && $this->get_parent_article() && $this->get_parent_article()->{'oxarticles__oxpic' . $i_index}->value == $this->{'oxarticles__oxpic' . $i_index}->value) {
             return false;
         }
-
-        $sMasterPic = 'product/' . $iIndex . '/' . $sPicName;
-
-        if (Registry::getConfig()->getMasterPicturePath($sMasterPic)) {
+        $s_master_pic = 'product/' . $i_index . '/' . $s_pic_name;
+        if (Registry::get_config()->get_master_picture_path($s_master_pic)) {
             return true;
         }
-
         return false;
     }
-
     /**
      * Checks and return true if price view mode is netto
      *
      * @return bool
      */
-    protected function isPriceViewModeNetto()
+    protected function is_price_view_mode_netto()
     {
-        $blResult = (bool) Registry::getConfig()->getConfigParam('blShowNetPrice');
-        $oUser = $this->getArticleUser();
-        if ($oUser) {
-            return $oUser->isPriceViewModeNetto();
+        $bl_result = (bool) Registry::get_config()->get_config_param('blShowNetPrice');
+        $o_user = $this->get_article_user();
+        if ($o_user) {
+            return $o_user->is_price_view_mode_netto();
         }
-
-        return $blResult;
+        return $bl_result;
     }
-
     /**
      * Depending on view mode prepare oxPrice object
      *
@@ -4820,24 +3905,20 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    protected function getPriceObject($blCalculationModeNetto = null)
+    protected function get_price_object($bl_calculation_mode_netto = null)
     {
         /** @var \OxidEsales\Eshop\Core\Price $oPrice */
-        $oPrice = oxNew(Price::class);
-
-        if ($blCalculationModeNetto === null) {
-            $blCalculationModeNetto = $this->isPriceViewModeNetto();
+        $o_price = ox_new(Price::class);
+        if ($bl_calculation_mode_netto === null) {
+            $bl_calculation_mode_netto = $this->is_price_view_mode_netto();
         }
-
-        if ($blCalculationModeNetto) {
-            $oPrice->setNettoPriceMode();
+        if ($bl_calculation_mode_netto) {
+            $o_price->set_netto_price_mode();
         } else {
-            $oPrice->setBruttoPriceMode();
+            $o_price->set_brutto_price_mode();
         }
-
-        return $oPrice;
+        return $o_price;
     }
-
     /**
      * Depending on view mode prepare price for viewing
      *
@@ -4845,15 +3926,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    protected function getPriceForView($oPrice)
+    protected function get_price_for_view($o_price)
     {
-        if ($this->isPriceViewModeNetto()) {
-            return $oPrice->getNettoPrice();
+        if ($this->is_price_view_mode_netto()) {
+            return $o_price->get_netto_price();
         }
-
-        return $oPrice->getBruttoPrice();
+        return $o_price->get_brutto_price();
     }
-
     /**
      * Depending on view mode prepare price before calculation
      *
@@ -4863,162 +3942,129 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return double
      */
-    protected function preparePrice($dPrice, $dVat, $blCalculationModeNetto = null)
+    protected function prepare_price($d_price, $d_vat, $bl_calculation_mode_netto = null)
     {
-        if ($blCalculationModeNetto === null) {
-            $blCalculationModeNetto = $this->isPriceViewModeNetto();
+        if ($bl_calculation_mode_netto === null) {
+            $bl_calculation_mode_netto = $this->is_price_view_mode_netto();
         }
-
-        $oCurrency = Registry::getConfig()->getActShopCurrencyObject();
-
-        $blEnterNetPrice = Registry::getConfig()->getConfigParam('blEnterNetPrice');
-        if ($blCalculationModeNetto && !$blEnterNetPrice) {
-            $dPrice = round(Price::brutto2Netto($dPrice, $dVat), $oCurrency->decimal);
-        } elseif (!$blCalculationModeNetto && $blEnterNetPrice) {
-            $dPrice = round(Price::netto2Brutto($dPrice, $dVat), $oCurrency->decimal);
+        $o_currency = Registry::get_config()->get_act_shop_currency_object();
+        $bl_enter_net_price = Registry::get_config()->get_config_param('blEnterNetPrice');
+        if ($bl_calculation_mode_netto && !$bl_enter_net_price) {
+            $d_price = round(Price::brutto2Netto($d_price, $d_vat), $o_currency->decimal);
+        } elseif (!$bl_calculation_mode_netto && $bl_enter_net_price) {
+            $d_price = round(Price::netto2Brutto($d_price, $d_vat), $o_currency->decimal);
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Return price suffix
      */
-    protected function getUserPriceSufix()
+    protected function get_user_price_sufix()
     {
-        $sPriceSuffix = '';
-        $oUser = $this->getArticleUser();
-
-        if ($oUser) {
-            if ($oUser->inGroup('oxidpricea')) {
-                $sPriceSuffix = 'a';
-            } elseif ($oUser->inGroup('oxidpriceb')) {
-                $sPriceSuffix = 'b';
-            } elseif ($oUser->inGroup('oxidpricec')) {
-                $sPriceSuffix = 'c';
+        $s_price_suffix = '';
+        $o_user = $this->get_article_user();
+        if ($o_user) {
+            if ($o_user->in_group('oxidpricea')) {
+                $s_price_suffix = 'a';
+            } elseif ($o_user->in_group('oxidpriceb')) {
+                $s_price_suffix = 'b';
+            } elseif ($o_user->in_group('oxidpricec')) {
+                $s_price_suffix = 'c';
             }
         }
-
-        return $sPriceSuffix;
+        return $s_price_suffix;
     }
-
     /**
      * Return prepared price
      */
-    protected function getRawPrice()
+    protected function get_raw_price()
     {
-        $sPriceSuffix = $this->getUserPriceSufix();
-        if ($sPriceSuffix === '') {
-            $dPrice = $this->oxarticles__oxprice->value;
+        $s_price_suffix = $this->get_user_price_sufix();
+        if ($s_price_suffix === '') {
+            $d_price = $this->oxarticles__oxprice->value;
+        } else if (Registry::get_config()->get_config_param('blOverrideZeroABCPrices')) {
+            $d_price = $this->{'oxarticles__oxprice' . $s_price_suffix}->value != 0 ? $this->{'oxarticles__oxprice' . $s_price_suffix}->value : $this->oxarticles__oxprice->value;
         } else {
-            if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices')) {
-                $dPrice = ($this->{'oxarticles__oxprice' . $sPriceSuffix}->value != 0)
-                    ? $this->{'oxarticles__oxprice' . $sPriceSuffix}->value
-                    : $this->oxarticles__oxprice->value;
-            } else {
-                $dPrice = $this->{'oxarticles__oxprice' . $sPriceSuffix}->value;
-            }
+            $d_price = $this->{'oxarticles__oxprice' . $s_price_suffix}->value;
         }
-
-        return $dPrice;
+        return $d_price;
     }
-
     /**
      * Return variant min price
      */
-    protected function getVarMinRawPrice()
+    protected function get_var_min_raw_price()
     {
-        if ($this->_dVarMinPrice === null) {
-            $dPrice = $this->getShopVarMinPrice();
-
-            if (is_null($dPrice)) {
-                $sPriceSuffix = $this->getUserPriceSufix();
-                if ($sPriceSuffix === '') {
-                    $dPrice = $this->oxarticles__oxvarminprice->value;
+        if ($this->_d_var_min_price === null) {
+            $d_price = $this->get_shop_var_min_price();
+            if (is_null($d_price)) {
+                $s_price_suffix = $this->get_user_price_sufix();
+                if ($s_price_suffix === '') {
+                    $d_price = $this->oxarticles__oxvarminprice->value;
                 } else {
-                    $sSql = 'SELECT ';
-                    if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices')) {
-                        $sSql .= 'MIN( IF(`oxprice' . $sPriceSuffix . '` = 0, `oxprice`, `oxprice'
-                            . $sPriceSuffix . '`) ) AS `varminprice` ';
+                    $s_sql = 'SELECT ';
+                    if (Registry::get_config()->get_config_param('blOverrideZeroABCPrices')) {
+                        $s_sql .= 'MIN( IF(`oxprice' . $s_price_suffix . '` = 0, `oxprice`, `oxprice' . $s_price_suffix . '`) ) AS `varminprice` ';
                     } else {
-                        $sSql .= 'MIN(`oxprice' . $sPriceSuffix . '`) AS `varminprice` ';
+                        $s_sql .= 'MIN(`oxprice' . $s_price_suffix . '`) AS `varminprice` ';
                     }
-
-                    $sSql .= ' FROM ' . $this->getViewName(true) . '
-                    WHERE ' . $this->getSqlActiveSnippet(true) . '
+                    $s_sql .= ' FROM ' . $this->get_view_name(true) . '
+                    WHERE ' . $this->get_sql_active_snippet(true) . '
                         AND ( `oxparentid` = :oxparentid )';
-
-                    $dPrice = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSql, [
-                        'oxparentid' => $this->getId(),
-                    ]);
+                    $d_price = \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_one($s_sql, ['oxparentid' => $this->get_id()]);
                 }
             }
-
-            $this->_dVarMinPrice = $dPrice;
+            $this->_d_var_min_price = $d_price;
         }
-
-        return $this->_dVarMinPrice;
+        return $this->_d_var_min_price;
     }
-
     /**
      * Return variant max price
      */
-    protected function getVarMaxPrice()
+    protected function get_var_max_price()
     {
-        if ($this->_dVarMaxPrice === null) {
-            $dPrice = $this->getShopVarMaxPrice();
-
-            if (is_null($dPrice)) {
-                $sPriceSuffix = $this->getUserPriceSufix();
-                if ($sPriceSuffix === '') {
-                    $dPrice = $this->oxarticles__oxvarmaxprice->value;
+        if ($this->_d_var_max_price === null) {
+            $d_price = $this->get_shop_var_max_price();
+            if (is_null($d_price)) {
+                $s_price_suffix = $this->get_user_price_sufix();
+                if ($s_price_suffix === '') {
+                    $d_price = $this->oxarticles__oxvarmaxprice->value;
                 } else {
-                    $sSql = 'SELECT ';
-                    if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices')) {
-                        $sSql .= 'MAX( IF(`oxprice' . $sPriceSuffix . '` = 0, `oxprice`, `oxprice'
-                            . $sPriceSuffix . '`) ) AS `varmaxprice` ';
+                    $s_sql = 'SELECT ';
+                    if (Registry::get_config()->get_config_param('blOverrideZeroABCPrices')) {
+                        $s_sql .= 'MAX( IF(`oxprice' . $s_price_suffix . '` = 0, `oxprice`, `oxprice' . $s_price_suffix . '`) ) AS `varmaxprice` ';
                     } else {
-                        $sSql .= 'MAX(`oxprice' . $sPriceSuffix . '`) AS `varmaxprice` ';
+                        $s_sql .= 'MAX(`oxprice' . $s_price_suffix . '`) AS `varmaxprice` ';
                     }
-
-                    $sSql .= ' FROM ' . $this->getViewName(true) . '
-                        WHERE ' . $this->getSqlActiveSnippet(true) . '
+                    $s_sql .= ' FROM ' . $this->get_view_name(true) . '
+                        WHERE ' . $this->get_sql_active_snippet(true) . '
                             AND ( `oxparentid` = :oxparentid )';
-
-                    $dPrice = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSql, [
-                        'oxparentid' => $this->getId(),
-                    ]);
+                    $d_price = \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_one($s_sql, ['oxparentid' => $this->get_id()]);
                 }
             }
-
-            $this->_dVarMaxPrice = $dPrice;
+            $this->_d_var_max_price = $d_price;
         }
-
-        return $this->_dVarMaxPrice;
+        return $this->_d_var_max_price;
     }
-
     /**
      * Place to hook to return variant min price if it might be different,
      * for example for subshops.
      *
      * @return double|null
      */
-    protected function getShopVarMinPrice()
+    protected function get_shop_var_min_price()
     {
         return null;
     }
-
     /**
      * Place to hook to return variant max price if it might be different,
      * for example for subshops.
      *
      * @return double|null
      */
-    protected function getShopVarMaxPrice()
+    protected function get_shop_var_max_price()
     {
         return null;
     }
-
     /**
      * Get data from db
      *
@@ -5026,81 +4072,70 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return array
      */
-    protected function loadFromDb($articleId)
+    protected function load_from_db($article_id)
     {
-        $sSelect = $this->buildSelectString([$this->getViewName() . '.oxid' => $articleId]);
-
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getRow($sSelect);
+        $s_select = $this->build_select_string([$this->get_view_name() . '.oxid' => $article_id]);
+        return \Oxid_Esales\Eshop\Core\Database_Provider::get_db()->get_row($s_select);
     }
-
     /**
      * Place to hook and change amount if it should be calculated by different logic,
      * for example VPE.
      *
      * @param double $amount Amount
      */
-    public function checkForVpe($amount)
+    public function check_for_vpe($amount)
     {
     }
-
     /**
      * Set parent field value to child - variants in DB
      *
      * @return bool
      */
-    protected function updateParentDependFields()
+    protected function update_parent_depend_fields()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        foreach ($this->getCopyParentFields() as $sField) {
-            $sValue = $this->$sField->value ?? 0;
-            $sSqlSets[] = '`' . str_replace('oxarticles__', '', $sField) . '` = ' . $oDb->quote($sValue);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        foreach ($this->get_copy_parent_fields() as $s_field) {
+            $s_value = $this->{$s_field}->value ?? 0;
+            $s_sql_sets[] = '`' . str_replace('oxarticles__', '', $s_field) . '` = ' . $o_db->quote($s_value);
         }
-
-        $sSql = 'UPDATE `oxarticles` SET ';
-        $sSql .= implode(', ', $sSqlSets) . '';
-        $sSql .= ' WHERE `oxparentid` = :oxparentid';
-
-        return $oDb->execute($sSql, ['oxparentid' => $this->getId()]);
+        $s_sql = 'UPDATE `oxarticles` SET ';
+        $s_sql .= implode(', ', $s_sql_sets) . '';
+        $s_sql .= ' WHERE `oxparentid` = :oxparentid';
+        return $o_db->execute($s_sql, ['oxparentid' => $this->get_id()]);
     }
-
     /**
      * Returns array of fields which should not changed in variants
      *
      * @return array
      */
-    protected function getCopyParentFields()
+    protected function get_copy_parent_fields()
     {
-        return $this->_aCopyParentField;
+        return $this->_a_copy_parent_field;
     }
-
     /**
      * Set parent field value to child - variants
      */
-    protected function assignParentDependFields()
+    protected function assign_parent_depend_fields()
     {
-        $sParent = $this->getParentArticle();
-        if ($sParent) {
-            foreach ($this->getCopyParentFields() as $sField) {
-                $this->$sField = new Field($sParent->$sField->value);
+        $s_parent = $this->get_parent_article();
+        if ($s_parent) {
+            foreach ($this->get_copy_parent_fields() as $s_field) {
+                $this->{$s_field} = new Field($s_parent->{$s_field}->value);
             }
         }
     }
-
     /**
      * Saves values of sorting fields on article load.
      */
-    protected function saveSortingFieldValuesOnLoad()
+    protected function save_sorting_field_values_on_load()
     {
-        $aSortingFields = Registry::getConfig()->getConfigParam('aSortCols');
-        $aSortingFields = !empty($aSortingFields) ? (array) $aSortingFields : [];
-
-        foreach ($aSortingFields as $sField) {
-            $sFullField = $this->getFieldLongName($sField);
-            $this->_aSortingFieldsOnLoad[$sFullField] = $this->$sFullField->value;
+        $a_sorting_fields = Registry::get_config()->get_config_param('aSortCols');
+        $a_sorting_fields = !empty($a_sorting_fields) ? (array) $a_sorting_fields : [];
+        foreach ($a_sorting_fields as $s_field) {
+            $s_full_field = $this->get_field_long_name($s_field);
+            $this->_a_sorting_fields_on_load[$s_full_field] = $this->{$s_full_field}->value;
         }
     }
-
     /**
      * Forms query to load variants.
      *
@@ -5111,14 +4146,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @return string
      */
-    protected function getLoadVariantsQuery($blRemoveNotOrderables, $forceCoreTableUsage, $baseObject, $sArticleTable)
+    protected function get_load_variants_query($bl_remove_not_orderables, $force_core_table_usage, $base_object, $s_article_table)
     {
-        return 'select ' . $baseObject->getSelectFields($forceCoreTableUsage) . " from $sArticleTable where " .
-               $this->getActiveCheckQuery($forceCoreTableUsage) .
-               $this->getVariantsQuery($blRemoveNotOrderables, $forceCoreTableUsage) .
-               " order by $sArticleTable.oxsort";
+        return 'select ' . $base_object->get_select_fields($force_core_table_usage) . " from {$s_article_table} where " . $this->get_active_check_query($force_core_table_usage) . $this->get_variants_query($bl_remove_not_orderables, $force_core_table_usage) . " order by {$s_article_table}.oxsort";
     }
-
     /**
      * Set needed parameters to article list object like language.
      *
@@ -5126,52 +4157,38 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param bool|null                              $forceCoreTableUsage if true forces core table use, default is
      *                                                                    false [optional]
      */
-    protected function updateVariantsBaseObject($baseObject, $forceCoreTableUsage = null)
+    protected function update_variants_base_object($base_object, $force_core_table_usage = null)
     {
-        $baseObject->setLanguage($this->getLanguage());
+        $base_object->set_language($this->get_language());
     }
-
     /**
      * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer
      */
-    protected function updateManufacturerBeforeLoading($oManufacturer)
+    protected function update_manufacturer_before_loading($o_manufacturer)
     {
-        $oManufacturer->setReadOnly(true);
+        $o_manufacturer->set_read_only(true);
     }
-
-    protected function addSqlActiveRangeSnippet($query, $tableName): string
+    protected function add_sql_active_range_snippet($query, $table_name): string
     {
-        $dateUtils = Registry::getUtilsDate();
-        $secondsToRoundForQueryCache = $this->getSecondsToRoundForQueryCache();
-        $dateNow = $dateUtils->getRoundedRequestDateDBFormatted($secondsToRoundForQueryCache);
-        $defaultDBDate = $dateUtils->formatDBDate('-');
-
-        $activeToCondition = "$tableName.oxactivefrom <= '$dateNow' AND " .
-            "$tableName.oxactivefrom != '$defaultDBDate' AND " .
-            "$tableName.oxactiveto = '$defaultDBDate'";
-        $activeFromToCondition = "$tableName.oxactivefrom <= '$dateNow' AND $tableName.oxactiveto >= '$dateNow'";
-
-        $query = $query ? " $query or " : '';
-
-        return " ( $query (($activeToCondition) OR ($activeFromToCondition)) )";
+        $date_utils = Registry::get_utils_date();
+        $seconds_to_round_for_query_cache = $this->get_seconds_to_round_for_query_cache();
+        $date_now = $date_utils->get_rounded_request_date_db_formatted($seconds_to_round_for_query_cache);
+        $default_db_date = $date_utils->format_db_date('-');
+        $active_to_condition = "{$table_name}.oxactivefrom <= '{$date_now}' AND " . "{$table_name}.oxactivefrom != '{$default_db_date}' AND " . "{$table_name}.oxactiveto = '{$default_db_date}'";
+        $active_from_to_condition = "{$table_name}.oxactivefrom <= '{$date_now}' AND {$table_name}.oxactiveto >= '{$date_now}'";
+        $query = $query ? " {$query} or " : '';
+        return " ( {$query} (({$active_to_condition}) OR ({$active_from_to_condition})) )";
     }
-
-    private function getAvailableStock(): int
+    private function get_available_stock(): int
     {
-        return (int) ($this->_blNotBuyableParent
-            ? $this->oxarticles__oxvarstock->value
-            : $this->oxarticles__oxstock->value);
+        return (int) ($this->_bl_not_buyable_parent ? $this->oxarticles__oxvarstock->value : $this->oxarticles__oxstock->value);
     }
-
-    private function isLowStock(): bool
+    private function is_low_stock(): bool
     {
-        return $this->getAvailableStock() <= $this->getLowStockThreshold();
+        return $this->get_available_stock() <= $this->get_low_stock_threshold();
     }
-
-    private function getLowStockThreshold(): int
+    private function get_low_stock_threshold(): int
     {
-        return (int) ($this->oxarticles__oxlowstockactive->value ?
-            $this->oxarticles__oxremindamount->value :
-            Registry::getConfig()->getConfigParam('sStockWarningLimit'));
+        return (int) ($this->oxarticles__oxlowstockactive->value ? $this->oxarticles__oxremindamount->value : Registry::get_config()->get_config_param('sStockWarningLimit'));
     }
 }

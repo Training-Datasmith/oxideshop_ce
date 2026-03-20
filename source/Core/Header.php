@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * HTTP headers formator.
@@ -15,49 +13,45 @@ namespace OxidEsales\EshopCommunity\Core;
  */
 class Header
 {
-    protected $_aHeader = [];
-
+    protected $_a_header = [];
     /**
      * Sets header.
      *
      * @param string $header header value.
      */
-    public function setHeader($header): void
+    public function set_header($header): void
     {
         $header = str_replace(["\n", "\r"], '', $header);
-        $this->_aHeader[] = $header . "\r\n";
+        $this->_a_header[] = $header . "\r\n";
     }
-
     /**
      * Return header.
      *
      * @return array
      */
-    public function getHeader()
+    public function get_header()
     {
-        return $this->_aHeader;
+        return $this->_a_header;
     }
-
     /**
      * Outputs HTTP header.
      */
-    public function sendHeader(): void
+    public function send_header(): void
     {
-        foreach ($this->_aHeader as $header) {
+        foreach ($this->_a_header as $header) {
             if (isset($header)) {
                 header($header);
             }
         }
     }
-
     /**
      * Set to not cacheable.
      *
      * @todo check browser for different no-cache signs.
      */
-    public function setNonCacheable(): void
+    public function set_non_cacheable(): void
     {
         $header = 'Cache-Control: no-cache;';
-        $this->setHeader($header);
+        $this->set_header($header);
     }
 }

@@ -1,29 +1,24 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator;
 
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-
-class ModuleConfigurationValidatorAggregate implements ModuleConfigurationValidatorInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration;
+class Module_Configuration_Validator_Aggregate implements Module_Configuration_Validator_Interface
 {
     private readonly array $validators;
-
-    public function __construct(ModuleConfigurationValidatorInterface ...$validators)
+    public function __construct(Module_Configuration_Validator_Interface ...$validators)
     {
         $this->validators = $validators;
     }
-
-    public function validate(ModuleConfiguration $configuration, int $shopId): void
+    public function validate(Module_Configuration $configuration, int $shop_id): void
     {
         foreach ($this->validators as $validator) {
-            $validator->validate($configuration, $shopId);
+            $validator->validate($configuration, $shop_id);
         }
     }
 }

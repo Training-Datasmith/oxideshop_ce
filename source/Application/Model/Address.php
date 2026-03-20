@@ -1,52 +1,45 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Address handler
  */
-class Address extends \OxidEsales\Eshop\Core\Model\BaseModel implements \Stringable
+class Address extends \Oxid_Esales\Eshop\Core\Model\Base_Model implements \Stringable
 {
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxaddress';
-
+    protected $_s_class_name = 'oxaddress';
     /**
      * Active address status
      *
      * @var bool
      */
-    protected $_blSelected = false;
-
+    protected $_bl_selected = false;
     /**
      * @var \OxidEsales\Eshop\Application\Model\State
      */
-    protected $_oStateObject;
-
+    protected $_o_state_object;
     /**
      * Returns oxState object
      *
      * @return \OxidEsales\Eshop\Application\Model\State
      */
-    protected function getStateObject()
+    protected function get_state_object()
     {
-        if (is_null($this->_oStateObject)) {
-            $this->_oStateObject = oxNew(\OxidEsales\Eshop\Application\Model\State::class);
+        if (is_null($this->_o_state_object)) {
+            $this->_o_state_object = ox_new(\Oxid_Esales\Eshop\Application\Model\State::class);
         }
-
-        return $this->_oStateObject;
+        return $this->_o_state_object;
     }
-
     /**
      * Class constructor
      */
@@ -55,58 +48,51 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel implements \Stringa
         parent::__construct();
         $this->init('oxaddress');
     }
-
     /**
      * Magic getter returns address as a single line string
      */
     public function __toString(): string
     {
-        return $this->toString();
+        return $this->to_string();
     }
-
     /**
      * Formats address as a single line string
      *
      * @return string
      */
-    public function toString()
+    public function to_string()
     {
-        $sFirstName = $this->oxaddress__oxfname->value;
-        $sLastName = $this->oxaddress__oxlname->value;
-        $sStreet = $this->oxaddress__oxstreet->value;
-        $sStreetNr = $this->oxaddress__oxstreetnr->value;
-        $sCity = $this->oxaddress__oxcity->value;
-
+        $s_first_name = $this->oxaddress__oxfname->value;
+        $s_last_name = $this->oxaddress__oxlname->value;
+        $s_street = $this->oxaddress__oxstreet->value;
+        $s_street_nr = $this->oxaddress__oxstreetnr->value;
+        $s_city = $this->oxaddress__oxcity->value;
         //format it
-        $sAddress = '';
-        if ($sFirstName || $sLastName) {
-            $sAddress = $sFirstName . ($sFirstName ? ' ' : '') . "$sLastName, ";
+        $s_address = '';
+        if ($s_first_name || $s_last_name) {
+            $s_address = $s_first_name . ($s_first_name ? ' ' : '') . "{$s_last_name}, ";
         }
-        $sAddress .= "$sStreet $sStreetNr, $sCity";
-
-        return trim($sAddress);
+        $s_address .= "{$s_street} {$s_street_nr}, {$s_city}";
+        return trim($s_address);
     }
-
     /**
      * Returns encoded address.
      *
      * @return string
      */
-    public function getEncodedDeliveryAddress()
+    public function get_encoded_delivery_address()
     {
-        return md5($this->getMergedAddressFields());
+        return md5($this->get_merged_address_fields());
     }
-
     /**
      * Get state id for current address
      *
      * @return mixed
      */
-    public function getStateId()
+    public function get_state_id()
     {
         return $this->oxaddress__oxstateid->value;
     }
-
     /**
      * Get state title
      *
@@ -114,56 +100,50 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel implements \Stringa
      *
      * @return string
      */
-    public function getStateTitle($sId = null)
+    public function get_state_title($s_id = null)
     {
-        $oState = $this->getStateObject();
-
-        if (is_null($sId)) {
-            $sId = $this->getStateId();
+        $o_state = $this->get_state_object();
+        if (is_null($s_id)) {
+            $s_id = $this->get_state_id();
         }
-
-        return $oState->getTitleById($sId);
+        return $o_state->get_title_by_id($s_id);
     }
-
     /**
      * Returns TRUE if current address is selected
      *
      * @return bool
      */
-    public function isSelected()
+    public function is_selected()
     {
-        return $this->_blSelected;
+        return $this->_bl_selected;
     }
-
     /**
      * Sets address state as selected
      */
-    public function setSelected(): void
+    public function set_selected(): void
     {
-        $this->_blSelected = true;
+        $this->_bl_selected = true;
     }
-
     /**
      * Returns merged address fields.
      *
      * @return string
      */
-    protected function getMergedAddressFields()
+    protected function get_merged_address_fields()
     {
-        $sDelAddress = '';
-        $sDelAddress .= $this->oxaddress__oxcompany;
-        $sDelAddress .= $this->oxaddress__oxfname;
-        $sDelAddress .= $this->oxaddress__oxlname;
-        $sDelAddress .= $this->oxaddress__oxstreet;
-        $sDelAddress .= $this->oxaddress__oxstreetnr;
-        $sDelAddress .= $this->oxaddress__oxaddinfo;
-        $sDelAddress .= $this->oxaddress__oxcity;
-        $sDelAddress .= $this->oxaddress__oxcountryid;
-        $sDelAddress .= $this->oxaddress__oxstateid;
-        $sDelAddress .= $this->oxaddress__oxzip;
-        $sDelAddress .= $this->oxaddress__oxfon;
-        $sDelAddress .= $this->oxaddress__oxfax;
-
-        return $sDelAddress . $this->oxaddress__oxsal;
+        $s_del_address = '';
+        $s_del_address .= $this->oxaddress__oxcompany;
+        $s_del_address .= $this->oxaddress__oxfname;
+        $s_del_address .= $this->oxaddress__oxlname;
+        $s_del_address .= $this->oxaddress__oxstreet;
+        $s_del_address .= $this->oxaddress__oxstreetnr;
+        $s_del_address .= $this->oxaddress__oxaddinfo;
+        $s_del_address .= $this->oxaddress__oxcity;
+        $s_del_address .= $this->oxaddress__oxcountryid;
+        $s_del_address .= $this->oxaddress__oxstateid;
+        $s_del_address .= $this->oxaddress__oxzip;
+        $s_del_address .= $this->oxaddress__oxfon;
+        $s_del_address .= $this->oxaddress__oxfax;
+        return $s_del_address . $this->oxaddress__oxsal;
     }
 }

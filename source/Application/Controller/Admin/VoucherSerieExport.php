@@ -1,164 +1,138 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 use Symfony\Component\Filesystem\Path;
-
 /**
  * General export class.
  */
-class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain
+class Voucher_Serie_Export extends \Oxid_Esales\Eshop\Application\Controller\Admin\Voucher_Serie_Main
 {
     /**
      * Export class name
      *
      * @var string
      */
-    public $sClassDo = 'voucherserie_export';
-
+    public $s_class_do = 'voucherserie_export';
     /**
      * Export file extension
      *
      * @var string
      */
-    public $sExportFileType = 'csv';
-
+    public $s_export_file_type = 'csv';
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'voucherserie_export';
-
+    protected $_s_this_template = 'voucherserie_export';
     /**
      * Number of records to export per tick
      *
      * @var int
      */
-    public $iExportPerTick = 1000;
-
+    public $i_export_per_tick = 1000;
     /**
      * Calls parent costructor and initializes $this->_sFilePath parameter
      */
     public function __construct()
     {
         parent::__construct();
-
         // export file name
-        $this->sExportFileName = $this->getExportFileName();
-
+        $this->s_export_file_name = $this->get_export_file_name();
         // set generic frame template
-        $this->_sFilePath = $this->getExportFilePath();
+        $this->_s_file_path = $this->get_export_file_path();
     }
-
     /**
      * Returns export file download url
      *
      * @return string
      */
-    public function getDownloadUrl()
+    public function get_download_url()
     {
-        $myConfig = Registry::getConfig();
-
-        ContainerFacade::getParameter('oxid_esales.shop_admin_url');
-        $url = ContainerFacade::getParameter('oxid_esales.shop_admin_url') ?:
-            ContainerFacade::getParameter('oxid_esales.shop_url') . $myConfig->getConfigParam('sAdminDir');
-
-        $url = Registry::getUtilsUrl()->processUrl($url . '/index.php');
-
-        return $url . '&amp;cl=' . $this->sClassDo . '&amp;fnc=download';
+        $my_config = Registry::get_config();
+        Container_Facade::get_parameter('oxid_esales.shop_admin_url');
+        $url = Container_Facade::get_parameter('oxid_esales.shop_admin_url') ?: Container_Facade::get_parameter('oxid_esales.shop_url') . $my_config->get_config_param('sAdminDir');
+        $url = Registry::get_utils_url()->process_url($url . '/index.php');
+        return $url . '&amp;cl=' . $this->s_class_do . '&amp;fnc=download';
     }
-
     /**
      * Return export file name
      *
      * @return string
      */
-    protected function getExportFileName()
+    protected function get_export_file_name()
     {
-        $sSessionFileName = Registry::getSession()->getVariable('sExportFileName');
-        if (!$sSessionFileName) {
-            $session = Registry::getSession();
-            $sSessionFileName = md5($session->getId() . Registry::getUtilsObject()->generateUId());
-            Registry::getSession()->setVariable('sExportFileName', $sSessionFileName);
+        $s_session_file_name = Registry::get_session()->get_variable('sExportFileName');
+        if (!$s_session_file_name) {
+            $session = Registry::get_session();
+            $s_session_file_name = md5($session->get_id() . Registry::get_utils_object()->generate_u_id());
+            Registry::get_session()->set_variable('sExportFileName', $s_session_file_name);
         }
-
-        return $sSessionFileName;
+        return $s_session_file_name;
     }
-
     /**
      * Return export file path
      *
      * @return string
      */
-    protected function getExportFilePath()
+    protected function get_export_file_path()
     {
-        return Path::join(
-            ContainerFacade::getParameter('oxid_esales.shop_source_directory'),
-            'export',
-            $this->getExportFileName()
-        );
+        return Path::join(Container_Facade::get_parameter('oxid_esales.shop_source_directory'), 'export', $this->get_export_file_name());
     }
-
     /**
      * Performs Voucherserie export to export file.
      */
     public function download(): void
     {
-        $oUtils = Registry::getUtils();
-        $oUtils->setHeader('Pragma: public');
-        $oUtils->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        $oUtils->setHeader('Expires: 0');
-        $oUtils->setHeader('Content-Disposition: attachment; filename=vouchers.csv');
-        $oUtils->setHeader('Content-Type: application/csv');
-        $sFile = $this->getExportFilePath();
-        if (file_exists($sFile) && is_readable($sFile)) {
-            readfile($sFile);
+        $o_utils = Registry::get_utils();
+        $o_utils->set_header('Pragma: public');
+        $o_utils->set_header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        $o_utils->set_header('Expires: 0');
+        $o_utils->set_header('Content-Disposition: attachment; filename=vouchers.csv');
+        $o_utils->set_header('Content-Type: application/csv');
+        $s_file = $this->get_export_file_path();
+        if (file_exists($s_file) && is_readable($s_file)) {
+            readfile($s_file);
         }
-        $oUtils->showMessageAndExit('');
+        $o_utils->show_message_and_exit('');
     }
-
     /**
      * Does Export
      */
     public function run(): void
     {
-        $blContinue = true;
-
-        $this->fpFile = @fopen($this->_sFilePath, 'a');
-        if (!isset($this->fpFile) || !$this->fpFile) {
+        $bl_continue = true;
+        $this->fp_file = @fopen($this->_s_file_path, 'a');
+        if (!isset($this->fp_file) || !$this->fp_file) {
             // we do have an error !
             $this->stop(ERR_FILEIO);
         } else {
             // file is open
-            $iStart = Registry::getRequest()->getRequestEscapedParameter('iStart');
-            if (!$iStart) {
-                ftruncate($this->fpFile, 0);
+            $i_start = Registry::get_request()->get_request_escaped_parameter('iStart');
+            if (!$i_start) {
+                ftruncate($this->fp_file, 0);
             }
-
-            if (($iExportedItems = $this->exportVouchers($iStart)) === false) {
+            if (($i_exported_items = $this->export_vouchers($i_start)) === false) {
                 // end reached
                 $this->stop(ERR_SUCCESS);
-                $blContinue = false;
+                $bl_continue = false;
             }
             // make ticker continue
-            $this->_aViewData['refresh'] = 0;
-            $this->_aViewData['iStart'] = $iStart + $iExportedItems;
-            $this->_aViewData['iExpItems'] = $iStart + $iExportedItems;
-            fclose($this->fpFile);
+            $this->_a_view_data['refresh'] = 0;
+            $this->_a_view_data['iStart'] = $i_start + $i_exported_items;
+            $this->_a_view_data['iExpItems'] = $i_start + $i_exported_items;
+            fclose($this->fp_file);
         }
     }
-
     /**
      * Writes voucher number information to export file and returns number of written records info
      *
@@ -166,52 +140,38 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
      *
      * @return int
      */
-    public function exportVouchers($iStart)
+    public function export_vouchers($i_start)
     {
-        $voucherSerie = $this->getVoucherSerie();
-        if (!$voucherSerie) {
+        $voucher_serie = $this->get_voucher_serie();
+        if (!$voucher_serie) {
             return false;
         }
-        $resultSet = DatabaseProvider::getDb()
-            ->selectLimit(
-                'select oxvouchernr from oxvouchers where oxvoucherserieid = :oxvoucherserieid',
-                $this->iExportPerTick,
-                $iStart,
-                ['oxvoucherserieid' => $voucherSerie->getId()]
-            );
-        if ($resultSet->EOF) {
+        $result_set = Database_Provider::get_db()->select_limit('select oxvouchernr from oxvouchers where oxvoucherserieid = :oxvoucherserieid', $this->i_export_per_tick, $i_start, ['oxvoucherserieid' => $voucher_serie->get_id()]);
+        if ($result_set->EOF) {
             return false;
         }
-        $exportedVouchersCount = 0;
+        $exported_vouchers_count = 0;
         // writing header text
-        if ($iStart == 0) {
-            $this->write(
-                Registry::getLang()->translateString(
-                    'VOUCHERSERIE_MAIN_VOUCHERSTATISTICS',
-                    Registry::getLang()->getTplLanguage(),
-                    true
-                )
-            );
+        if ($i_start == 0) {
+            $this->write(Registry::get_lang()->translate_string('VOUCHERSERIE_MAIN_VOUCHERSTATISTICS', Registry::get_lang()->get_tpl_language(), true));
         }
         // writing vouchers..
-        while (!$resultSet->EOF) {
-            $this->write(current($resultSet->fields));
-            $exportedVouchersCount++;
-            $resultSet->fetchRow();
+        while (!$result_set->EOF) {
+            $this->write(current($result_set->fields));
+            $exported_vouchers_count++;
+            $result_set->fetch_row();
         }
-
-        return $exportedVouchersCount;
+        return $exported_vouchers_count;
     }
-
     /**
      * writes one line into open export file
      *
      * @param string $sLine exported line
      */
-    public function write($sLine): void
+    public function write($s_line): void
     {
-        if ($sLine) {
-            fwrite($this->fpFile, $sLine . "\n");
+        if ($s_line) {
+            fwrite($this->fp_file, $s_line . "\n");
         }
     }
 }

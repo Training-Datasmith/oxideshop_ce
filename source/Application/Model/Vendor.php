@@ -1,105 +1,90 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Vendor manager
  */
-class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class Vendor extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model implements \Oxid_Esales\Eshop\Core\Contract\I_Url
 {
-    protected static $_aRootVendor = [];
-
+    protected static $_a_root_vendor = [];
     /**
      * @var string Name of current class
      */
-    protected $_sClassName = 'oxvendor';
-
+    protected $_s_class_name = 'oxvendor';
     /**
      * Marker to load vendor article count info
      *
      * @var bool
      */
-    protected $_blShowArticleCnt = false;
-
+    protected $_bl_show_article_cnt = false;
     /**
      * Vendor article count (default is -1, which means not calculated)
      *
      * @var int
      */
-    protected $_iNrOfArticles = -1;
-
+    protected $_i_nr_of_articles = -1;
     /**
      * Marks that current object is managed by SEO
      *
      * @var bool
      */
-    protected $_blIsSeoObject = true;
-
+    protected $_bl_is_seo_object = true;
     /**
      * Visibility of a vendor
      *
      * @var int
      */
-    protected $_blIsVisible;
-
+    protected $_bl_is_visible;
     /**
      * has visible endors state of a category
      *
      * @var int
      */
-    protected $_blHasVisibleSubCats;
-
+    protected $_bl_has_visible_sub_cats;
     /**
      * Seo article urls for languages
      *
      * @var array
      */
-    protected $_aSeoUrls = [];
-
+    protected $_a_seo_urls = [];
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
      */
     public function __construct()
     {
-        $this->setShowArticleCnt(\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt'));
+        $this->set_show_article_cnt(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('bl_perfShowActionCatArticleCnt'));
         parent::__construct();
         $this->init('oxvendor');
     }
-
     /**
      * Marker to load vendor article count info setter
      *
      * @param bool $blShowArticleCount Marker to load vendor article count
      */
-    public function setShowArticleCnt($blShowArticleCount = false): void
+    public function set_show_article_cnt($bl_show_article_count = false): void
     {
-        $this->_blShowArticleCnt = $blShowArticleCount;
+        $this->_bl_show_article_cnt = $bl_show_article_count;
     }
-
     /**
      * Assigns to $this object some base parameters/values.
      *
      * @param array $dbRecord parameters/values
      */
-    public function assign($dbRecord): void
+    public function assign($db_record): void
     {
-        parent::assign($dbRecord);
-
+        parent::assign($db_record);
         // vendor article count is stored in cache
-        if ($this->_blShowArticleCnt && !$this->isAdmin()) {
-            $this->_iNrOfArticles = \OxidEsales\Eshop\Core\Registry::getUtilsCount()->getVendorArticleCount($this->getId());
+        if ($this->_bl_show_article_cnt && !$this->is_admin()) {
+            $this->_i_nr_of_articles = \Oxid_Esales\Eshop\Core\Registry::get_utils_count()->get_vendor_article_count($this->get_id());
         }
-
-        $this->oxvendor__oxnrofarticles = new \OxidEsales\Eshop\Core\Field($this->_iNrOfArticles, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxvendor__oxnrofarticles = new \Oxid_Esales\Eshop\Core\Field($this->_i_nr_of_articles, \Oxid_Esales\Eshop\Core\Field::T_RAW);
     }
-
     /**
      * Loads object data from DB (object data ID is passed to method). Returns
      * true on success.
@@ -108,30 +93,26 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @return bool
      */
-    public function load($sOxid)
+    public function load($s_oxid)
     {
-        if ($sOxid == 'root') {
-            return $this->setRootObjectData();
+        if ($s_oxid == 'root') {
+            return $this->set_root_object_data();
         }
-
-        return parent::load($sOxid);
+        return parent::load($s_oxid);
     }
-
     /**
      * Sets root vendor data. Returns true
      *
      * @return bool
      */
-    protected function setRootObjectData()
+    protected function set_root_object_data()
     {
-        $this->setId('root');
-        $this->oxvendor__oxicon = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxvendor__oxtitle = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('BY_VENDOR', $this->getLanguage(), false), \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxvendor__oxshortdesc = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
-
+        $this->set_id('root');
+        $this->oxvendor__oxicon = new \Oxid_Esales\Eshop\Core\Field('', \Oxid_Esales\Eshop\Core\Field::T_RAW);
+        $this->oxvendor__oxtitle = new \Oxid_Esales\Eshop\Core\Field(\Oxid_Esales\Eshop\Core\Registry::get_lang()->translate_string('BY_VENDOR', $this->get_language(), false), \Oxid_Esales\Eshop\Core\Field::T_RAW);
+        $this->oxvendor__oxshortdesc = new \Oxid_Esales\Eshop\Core\Field('', \Oxid_Esales\Eshop\Core\Field::T_RAW);
         return true;
     }
-
     /**
      * Returns raw content seo url
      *
@@ -140,16 +121,14 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @return string
      */
-    public function getBaseSeoLink($iLang, $iPage = 0)
+    public function get_base_seo_link($i_lang, $i_page = 0)
     {
-        $oEncoder = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class);
-        if (!$iPage) {
-            return $oEncoder->getVendorUrl($this, $iLang);
+        $o_encoder = \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Vendor::class);
+        if (!$i_page) {
+            return $o_encoder->get_vendor_url($this, $i_lang);
         }
-
-        return $oEncoder->getVendorPageUrl($this, $iPage, $iLang);
+        return $o_encoder->get_vendor_page_url($this, $i_page, $i_lang);
     }
-
     /**
      * Returns vendor link Url
      *
@@ -157,23 +136,19 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function get_link($i_lang = null)
     {
-        if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
-            return $this->getStdLink($iLang);
+        if (!\Oxid_Esales\Eshop\Core\Registry::get_utils()->seo_is_active()) {
+            return $this->get_std_link($i_lang);
         }
-
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        if (!isset($this->_aSeoUrls[$iLang])) {
-            $this->_aSeoUrls[$iLang] = $this->getBaseSeoLink($iLang);
+        if (!isset($this->_a_seo_urls[$i_lang])) {
+            $this->_a_seo_urls[$i_lang] = $this->get_base_seo_link($i_lang);
         }
-
-        return $this->_aSeoUrls[$iLang];
+        return $this->_a_seo_urls[$i_lang];
     }
-
     /**
      * Returns base dynamic url: shopurl/index.php?cl=details
      *
@@ -183,17 +158,15 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @return string
      */
-    public function getBaseStdLink($iLang, $blAddId = true, $blFull = true)
+    public function get_base_std_link($i_lang, $bl_add_id = true, $bl_full = true)
     {
-        $sUrl = '';
-        if ($blFull) {
+        $s_url = '';
+        if ($bl_full) {
             //always returns shop url, not admin
-            $sUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopUrl($iLang, false);
+            $s_url = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_url($i_lang, false);
         }
-
-        return $sUrl . 'index.php?cl=vendorlist' . ($blAddId ? '&amp;cnid=v_' . $this->getId() : '');
+        return $s_url . 'index.php?cl=vendorlist' . ($bl_add_id ? '&amp;cnid=v_' . $this->get_id() : '');
     }
-
     /**
      * Returns standard URL to vendor
      *
@@ -202,87 +175,76 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      *
      * @return string
      */
-    public function getStdLink($iLang = null, $aParams = [])
+    public function get_std_link($i_lang = null, $a_params = [])
     {
-        if ($iLang === null) {
-            $iLang = $this->getLanguage();
+        if ($i_lang === null) {
+            $i_lang = $this->get_language();
         }
-
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
+        return \Oxid_Esales\Eshop\Core\Registry::get_utils_url()->process_url($this->get_base_std_link($i_lang), true, $a_params, $i_lang);
     }
-
     /**
      * returns number or articles of this vendor
      *
      * @return integer
      */
-    public function getNrOfArticles()
+    public function get_nr_of_articles()
     {
-        if (!$this->_blShowArticleCnt || $this->isAdmin()) {
+        if (!$this->_bl_show_article_cnt || $this->is_admin()) {
             return -1;
         }
-
-        return $this->_iNrOfArticles;
+        return $this->_i_nr_of_articles;
     }
-
     /**
      * returns the sub category array
      */
-    public function getSubCats()
+    public function get_sub_cats()
     {
     }
-
     /**
      * returns the visibility of a vendor
      *
      * @return bool
      */
-    public function getIsVisible()
+    public function get_is_visible()
     {
-        return $this->_blIsVisible;
+        return $this->_bl_is_visible;
     }
-
     /**
      * sets the visibilty of a category
      *
      * @param bool $blVisible vendors visibility status setter
      */
-    public function setIsVisible($blVisible): void
+    public function set_is_visible($bl_visible): void
     {
-        $this->_blIsVisible = $blVisible;
+        $this->_bl_is_visible = $bl_visible;
     }
-
     /**
      * returns if a vendor has visible sub categories
      *
      * @return bool
      */
-    public function getHasVisibleSubCats()
+    public function get_has_visible_sub_cats()
     {
-        if (!isset($this->_blHasVisibleSubCats)) {
-            $this->_blHasVisibleSubCats = false;
+        if (!isset($this->_bl_has_visible_sub_cats)) {
+            $this->_bl_has_visible_sub_cats = false;
         }
-
-        return $this->_blHasVisibleSubCats;
+        return $this->_bl_has_visible_sub_cats;
     }
-
     /**
      * sets the state of has visible sub vendors
      *
      * @param bool $blHasVisibleSubcats marker if vendor has visible subcategories
      */
-    public function setHasVisibleSubCats($blHasVisibleSubcats): void
+    public function set_has_visible_sub_cats($bl_has_visible_subcats): void
     {
-        $this->_blHasVisibleSubCats = $blHasVisibleSubcats;
+        $this->_bl_has_visible_sub_cats = $bl_has_visible_subcats;
     }
-
     /**
      * Empty method, called in templates when vendor is used in same code like category
      */
-    public function getContentCats()
+    public function get_content_cats()
     {
     }
-
     /**
      * Delete this object from the database, returns true on success.
      *
@@ -295,62 +257,54 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
         if ($oxid) {
             $this->load($oxid);
         } else {
-            $oxid = $this->getId();
+            $oxid = $this->get_id();
         }
-
         if (parent::delete($oxid)) {
-            \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class)->onDeleteVendor($this);
-
+            \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Seo_Encoder_Vendor::class)->on_delete_vendor($this);
             return true;
         }
-
         return false;
     }
-
     /**
      * Returns article picture
      *
      * @return string
      */
-    public function getIconUrl()
+    public function get_icon_url()
     {
-        if (($sIcon = $this->oxvendor__oxicon->value)) {
-            $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-            $sSize = $oConfig->getConfigParam('sManufacturerIconsize');
-            if (!isset($sSize)) {
-                $sSize = $oConfig->getConfigParam('sIconsize');
+        if ($s_icon = $this->oxvendor__oxicon->value) {
+            $o_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+            $s_size = $o_config->get_config_param('sManufacturerIconsize');
+            if (!isset($s_size)) {
+                $s_size = $o_config->get_config_param('sIconsize');
             }
-
-            return \OxidEsales\Eshop\Core\Registry::getPictureHandler()->getPicUrl('vendor/icon/', $sIcon, $sSize);
+            return \Oxid_Esales\Eshop\Core\Registry::get_picture_handler()->get_pic_url('vendor/icon/', $s_icon, $s_size);
         }
     }
-
     /**
      * Returns category thumbnail picture url if exist, false - if not
      *
      * @return mixed
      */
-    public function getThumbUrl()
+    public function get_thumb_url()
     {
         return false;
     }
-
     /**
      * Returns vendor title
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
         return $this->oxvendor__oxtitle->value;
     }
-
     /**
      * Returns short description
      *
      * @return string
      */
-    public function getShortDescription()
+    public function get_short_description()
     {
         return $this->oxvendor__oxshortdesc->value;
     }

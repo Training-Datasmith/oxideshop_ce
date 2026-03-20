@@ -1,87 +1,75 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * List of articles for a selected vendor.
  * Collects list of articles, according to it generates links for list gallery,
  * meta tags (for search engines). Result - "vendorlist" template.
  * OXID eShop -> (Any selected shop product category).
  */
-class VendorListController extends \OxidEsales\Eshop\Application\Controller\ArticleListController
+class Vendor_List_Controller extends \Oxid_Esales\Eshop\Application\Controller\Article_List_Controller
 {
     /**
      * List type
      *
      * @var string
      */
-    protected $_sListType = 'vendor';
-
+    protected $_s_list_type = 'vendor';
     /**
      * List type
      *
      * @var string
      */
-    protected $_blVisibleSubCats;
-
+    protected $_bl_visible_sub_cats;
     /**
      * List type
      *
      * @var string
      */
-    protected $_oSubCatList;
-
+    protected $_o_sub_cat_list;
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sTplLocation;
-
+    protected $_s_tpl_location;
     /**
      * Template location
      *
      * @var string
      */
-    protected $_sCatTitle;
-
+    protected $_s_cat_title;
     /**
      * Page navigation
      *
      * @var object
      */
-    protected $_oPageNavigation;
-
+    protected $_o_page_navigation;
     /**
      * Marked which defines if current view is sortable or not
      *
      * @var bool
      */
-    protected $_blShowSorting = true;
-
+    protected $_bl_show_sorting = true;
     /**
      * Current view search engine indexing state
      *
      * @var int
      */
-    protected $_iViewIndexState = VIEW_INDEXSTATE_INDEX;
-
+    protected $_i_view_index_state = VIEW_INDEXSTATE_INDEX;
     /**
      * Vendor list object.
      *
      * @var object
      */
-    protected $_oVendorTree;
-
+    protected $_o_vendor_tree;
     /**
      * Executes parent::render(), loads active vendor, prepares article
      * list sorting rules. Loads list of articles which belong to this vendor
@@ -94,37 +82,31 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      */
     public function render()
     {
-        \OxidEsales\Eshop\Application\Controller\FrontendController::render();
-
+        \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller::render();
         // load vendor
-        if (($this->getVendorIdFromRequest() && $this->getVendorTree())) {
-            if (($oVendor = $this->getActVendor())) {
-                if ($oVendor->getId() != 'root') {
+        if ($this->get_vendor_id_from_request() && $this->get_vendor_tree()) {
+            if ($o_vendor = $this->get_act_vendor()) {
+                if ($o_vendor->get_id() != 'root') {
                     // load the articles
-                    $this->getArticleList();
-
+                    $this->get_article_list();
                     // checking if requested page is correct
-                    $this->checkRequestedPage();
-
+                    $this->check_requested_page();
                     // processing list articles
-                    $this->processListArticles();
+                    $this->process_list_articles();
                 }
             }
         }
-
-        return $this->_sThisTemplate;
+        return $this->_s_this_template;
     }
-
     /**
      * Returns product link type (OXARTICLE_LINKTYPE_VENDOR)
      *
      * @return int
      */
-    protected function getProductLinkType()
+    protected function get_product_link_type()
     {
         return OXARTICLE_LINKTYPE_VENDOR;
     }
-
     /**
      * Loads and returns article list of active vendor.
      *
@@ -132,39 +114,32 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @return array
      */
-    protected function loadArticles($oVendor)
+    protected function load_articles($o_vendor)
     {
-        $sVendorId = $oVendor->getId();
-
+        $s_vendor_id = $o_vendor->get_id();
         // load only articles which we show on screen
-        $iNrOfCatArticles = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iNrofCatArticles');
-        $iNrOfCatArticles = $iNrOfCatArticles ?: 1;
-
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oArtList->setSqlLimit($iNrOfCatArticles * $this->getRequestPageNr(), $iNrOfCatArticles);
-        $oArtList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
-
+        $i_nr_of_cat_articles = (int) \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iNrofCatArticles');
+        $i_nr_of_cat_articles = $i_nr_of_cat_articles ?: 1;
+        $o_art_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Article_List::class);
+        $o_art_list->set_sql_limit($i_nr_of_cat_articles * $this->get_request_page_nr(), $i_nr_of_cat_articles);
+        $o_art_list->set_custom_sorting($this->get_sorting_sql($this->get_sort_ident()));
         // load the articles
-        $this->_iAllArtCnt = $oArtList->loadVendorArticles($sVendorId, $oVendor);
-
+        $this->_i_all_art_cnt = $o_art_list->load_vendor_articles($s_vendor_id, $o_vendor);
         // counting pages
-        $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrOfCatArticles);
-
-        return [$oArtList, $this->_iAllArtCnt];
+        $this->_i_cnt_pages = ceil($this->_i_all_art_cnt / $i_nr_of_cat_articles);
+        return [$o_art_list, $this->_i_all_art_cnt];
     }
-
     /**
      * Returns active product id to load its seo meta info
      *
      * @return string
      */
-    protected function getSeoObjectId()
+    protected function get_seo_object_id()
     {
-        if (($oVendor = $this->getActVendor())) {
-            return $oVendor->getId();
+        if ($o_vendor = $this->get_act_vendor()) {
+            return $o_vendor->get_id();
         }
     }
-
     /**
      * Modifies url by adding page parameters. When seo is on, url is additionally
      * formatted by SEO engine
@@ -175,179 +150,161 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @return string
      */
-    protected function addPageNrParam($sUrl, $iPage, $iLang = null)
+    protected function add_page_nr_param($s_url, $i_page, $i_lang = null)
     {
-        if (\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor())) {
-            if ($iPage) {
+        if (\Oxid_Esales\Eshop\Core\Registry::get_utils()->seo_is_active() && $o_vendor = $this->get_act_vendor()) {
+            if ($i_page) {
                 // only if page number > 0
-                $sUrl = $oVendor->getBaseSeoLink($iLang, $iPage);
+                $s_url = $o_vendor->get_base_seo_link($i_lang, $i_page);
             }
         } else {
-            $sUrl = \OxidEsales\Eshop\Application\Controller\FrontendController::addPageNrParam($sUrl, $iPage, $iLang);
+            $s_url = \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller::add_page_nr_param($s_url, $i_page, $i_lang);
         }
-
-        return $sUrl;
+        return $s_url;
     }
-
     /**
      * Returns current view Url
      *
      * @return string
      */
-    public function generatePageNavigationUrl()
+    public function generate_page_navigation_url()
     {
-        if ((\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor()))) {
-            return $oVendor->getLink();
+        if (\Oxid_Esales\Eshop\Core\Registry::get_utils()->seo_is_active() && $o_vendor = $this->get_act_vendor()) {
+            return $o_vendor->get_link();
         }
-        return parent::generatePageNavigationUrl();
+        return parent::generate_page_navigation_url();
     }
-
     /**
      * Returns if vendor has visible sub-cats and load them.
      *
      * @return bool
      */
-    public function hasVisibleSubCats()
+    public function has_visible_sub_cats()
     {
-        if ($this->_blVisibleSubCats === null) {
-            $this->_blVisibleSubCats = false;
-            if (($this->getVendorIdFromRequest() && $oVendorTree = $this->getVendorTree())) {
-                if (($oVendor = $this->getActVendor())) {
-                    if ($oVendor->getId() == 'root') {
-                        $this->_blVisibleSubCats = $oVendorTree->count();
-                        $this->_oSubCatList = $oVendorTree;
+        if ($this->_bl_visible_sub_cats === null) {
+            $this->_bl_visible_sub_cats = false;
+            if ($this->get_vendor_id_from_request() && $o_vendor_tree = $this->get_vendor_tree()) {
+                if ($o_vendor = $this->get_act_vendor()) {
+                    if ($o_vendor->get_id() == 'root') {
+                        $this->_bl_visible_sub_cats = $o_vendor_tree->count();
+                        $this->_o_sub_cat_list = $o_vendor_tree;
                     }
                 }
             }
         }
-
-        return $this->_blVisibleSubCats;
+        return $this->_bl_visible_sub_cats;
     }
-
     /**
      * Returns vendor subcategories
      *
      * @return array
      */
-    public function getSubCatList()
+    public function get_sub_cat_list()
     {
-        if ($this->_oSubCatList === null) {
-            $this->_oSubCatList = [];
-            if ($this->hasVisibleSubCats()) {
-                return $this->_oSubCatList;
+        if ($this->_o_sub_cat_list === null) {
+            $this->_o_sub_cat_list = [];
+            if ($this->has_visible_sub_cats()) {
+                return $this->_o_sub_cat_list;
             }
         }
-
-        return $this->_oSubCatList;
+        return $this->_o_sub_cat_list;
     }
-
     /**
      * Get vendor article list
      *
      * @return array
      */
-    public function getArticleList()
+    public function get_article_list()
     {
-        if ($this->_aArticleList === null) {
-            $this->_aArticleList = [];
-            if (($oVendor = $this->getActVendor()) && ($oVendor->getId() != 'root')) {
-                [$aArticleList, $iAllArtCnt] = $this->loadArticles($oVendor);
-                if ($iAllArtCnt) {
-                    $this->_aArticleList = $aArticleList;
+        if ($this->_a_article_list === null) {
+            $this->_a_article_list = [];
+            if (($o_vendor = $this->get_act_vendor()) && $o_vendor->get_id() != 'root') {
+                [$a_article_list, $i_all_art_cnt] = $this->load_articles($o_vendor);
+                if ($i_all_art_cnt) {
+                    $this->_a_article_list = $a_article_list;
                 }
             }
         }
-
-        return $this->_aArticleList;
+        return $this->_a_article_list;
     }
-
     /**
      * Return vendor title
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        if ($this->_sCatTitle === null) {
-            $this->_sCatTitle = '';
-            if ($oVendor = $this->getActVendor()) {
-                $this->_sCatTitle = $oVendor->oxvendor__oxtitle->value;
+        if ($this->_s_cat_title === null) {
+            $this->_s_cat_title = '';
+            if ($o_vendor = $this->get_act_vendor()) {
+                $this->_s_cat_title = $o_vendor->oxvendor__oxtitle->value;
             }
         }
-
-        return $this->_sCatTitle;
+        return $this->_s_cat_title;
     }
-
     /**
      * Template variable getter. Returns category path array
      *
      * @return array
      */
-    public function getTreePath()
+    public function get_tree_path()
     {
-        if ($this->getVendorIdFromRequest() && $oVendorTree = $this->getVendorTree()) {
-            return $oVendorTree->getPath();
+        if ($this->get_vendor_id_from_request() && $o_vendor_tree = $this->get_vendor_tree()) {
+            return $o_vendor_tree->get_path();
         }
     }
-
     /**
      * Returns request parameter of vendor id.
      *
      * @return string
      */
-    protected function getVendorIdFromRequest()
+    protected function get_vendor_id_from_request()
     {
-        return Registry::getRequest()->getRequestEscapedParameter('cnid');
+        return Registry::get_request()->get_request_escaped_parameter('cnid');
     }
-
     /**
      * Template variable getter. Returns active vendor
      *
      * @return object
      */
-    public function getActiveCategory()
+    public function get_active_category()
     {
-        if ($this->_oActCategory === null) {
-            $this->_oActCategory = false;
-            if (($this->getVendorIdFromRequest() && $oVendorTree = $this->getVendorTree())) {
-                if ($oVendor = $this->getActVendor()) {
-                    $this->_oActCategory = $oVendor;
+        if ($this->_o_act_category === null) {
+            $this->_o_act_category = false;
+            if ($this->get_vendor_id_from_request() && $o_vendor_tree = $this->get_vendor_tree()) {
+                if ($o_vendor = $this->get_act_vendor()) {
+                    $this->_o_act_category = $o_vendor;
                 }
             }
         }
-
-        return $this->_oActCategory;
+        return $this->_o_act_category;
     }
-
     /**
      * Template variable getter. Returns template location
      *
      * @return string
      */
-    public function getCatTreePath()
+    public function get_cat_tree_path()
     {
-        if ($this->_sCatTreePath === null) {
-            $this->_sCatTreePath = false;
-            if (($oVendorTree = $this->getVendorTree())) {
-                $this->_sCatTreePath = $oVendorTree->getPath();
+        if ($this->_s_cat_tree_path === null) {
+            $this->_s_cat_tree_path = false;
+            if ($o_vendor_tree = $this->get_vendor_tree()) {
+                $this->_s_cat_tree_path = $o_vendor_tree->get_path();
             }
         }
-
-        return $this->_sCatTreePath;
+        return $this->_s_cat_tree_path;
     }
-
     /**
      * Returns title suffix used in template
      *
      * @return string
      */
-    public function getTitleSuffix()
+    public function get_title_suffix()
     {
-        if ($this->getActVendor()->getFieldData('oxshowsuffix')) {
-            return \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveShop()->getFieldData('oxtitlesuffix');
+        if ($this->get_act_vendor()->get_field_data('oxshowsuffix')) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_active_shop()->get_field_data('oxtitlesuffix');
         }
     }
-
     /**
      * Returns current view keywords separated by comma
      * (calls parent::collectMetaKeyword())
@@ -357,11 +314,10 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @return string
      */
-    protected function prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords = true)
+    protected function prepare_meta_keyword($s_keywords, $bl_remove_duplicated_words = true)
     {
-        return parent::collectMetaKeyword($sKeywords);
+        return parent::collect_meta_keyword($s_keywords);
     }
-
     /**
      * Returns current view meta description data
      * (calls parent::collectMetaDescription())
@@ -372,11 +328,10 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @return string
      */
-    protected function prepareMetaDescription($sMeta, $iLength = 1024, $blDescTag = false)
+    protected function prepare_meta_description($s_meta, $i_length = 1024, $bl_desc_tag = false)
     {
-        return parent::collectMetaDescription($sMeta, $iLength, $blDescTag);
+        return parent::collect_meta_description($s_meta, $i_length, $bl_desc_tag);
     }
-
     /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
@@ -385,89 +340,74 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      *
      * @return object
      */
-    protected function getSubject($iLang)
+    protected function get_subject($i_lang)
     {
-        return $this->getActVendor();
+        return $this->get_act_vendor();
     }
-
     /**
      * Returns additional URL parameters which must be added to list products dynamic urls
      *
      * @return string
      */
-    public function getAddUrlParams()
+    public function get_add_url_params()
     {
-        $sAddParams = parent::getAddUrlParams();
-        $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
-        if ($oVendor = $this->getActVendor()) {
-            $sAddParams .= '&amp;cnid=v_' . $oVendor->getId();
+        $s_add_params = parent::get_add_url_params();
+        $s_add_params .= ($s_add_params ? '&amp;' : '') . "listtype={$this->_s_list_type}";
+        if ($o_vendor = $this->get_act_vendor()) {
+            $s_add_params .= '&amp;cnid=v_' . $o_vendor->get_id();
         }
-
-        return $sAddParams;
+        return $s_add_params;
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        $aPaths = [];
-        $oCatTree = $this->getVendorTree();
-
-        if ($oCatTree) {
-            foreach ($oCatTree->getPath() as $oCat) {
-                $aCatPath = [];
-
-                $aCatPath['link'] = $oCat->getLink();
-                $aCatPath['title'] = $oCat->oxcategories__oxtitle->value;
-
-                $aPaths[] = $aCatPath;
+        $a_paths = [];
+        $o_cat_tree = $this->get_vendor_tree();
+        if ($o_cat_tree) {
+            foreach ($o_cat_tree->get_path() as $o_cat) {
+                $a_cat_path = [];
+                $a_cat_path['link'] = $o_cat->get_link();
+                $a_cat_path['title'] = $o_cat->oxcategories__oxtitle->value;
+                $a_paths[] = $a_cat_path;
             }
         }
-
-        return $aPaths;
+        return $a_paths;
     }
-
     /**
      * Returns vendor tree
      *
      * @return \OxidEsales\Eshop\Application\Model\VendorList
      */
-    public function getVendorTree()
+    public function get_vendor_tree()
     {
-        if ($this->getVendorIdFromRequest() && $this->_oVendorTree === null) {
+        if ($this->get_vendor_id_from_request() && $this->_o_vendor_tree === null) {
             /** @var \OxidEsales\Eshop\Application\Model\VendorList $oVendorTree */
-            $oVendorTree = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
-            $oVendorTree->buildVendorTree(
-                'vendorlist',
-                $this->getActVendor()->getId(),
-                \OxidEsales\Eshop\Core\Registry::getConfig()->getShopHomeUrl()
-            );
-            $this->_oVendorTree = $oVendorTree;
+            $o_vendor_tree = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor_List::class);
+            $o_vendor_tree->build_vendor_tree('vendorlist', $this->get_act_vendor()->get_id(), \Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_home_url());
+            $this->_o_vendor_tree = $o_vendor_tree;
         }
-
-        return $this->_oVendorTree;
+        return $this->_o_vendor_tree;
     }
-
     /**
      * Vendor tree setter
      *
      * @param \OxidEsales\Eshop\Application\Model\VendorList $oVendorTree vendor tree
      */
-    public function setVendorTree($oVendorTree): void
+    public function set_vendor_tree($o_vendor_tree): void
     {
-        $this->_oVendorTree = $oVendorTree;
+        $this->_o_vendor_tree = $o_vendor_tree;
     }
-
     /**
      * Template variable getter. Returns array of attribute values
      * we do have here in this category
      *
      * @return array
      */
-    public function getAttributes()
+    public function get_attributes()
     {
         return null;
     }

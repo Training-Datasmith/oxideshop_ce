@@ -1,148 +1,128 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Application\Model\Category;
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceBridgeInterface;
-
+use Oxid_Esales\Eshop\Application\Model\Category;
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service_Bridge_Interface;
 /**
  * Article details information page.
  * Collects detailed article information, possible variants, such information
  * as crosselling, similarlist, picture gallery list, etc.
  * OXID eShop -> (Any chosen product).
  */
-class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Article_Details_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Current class default template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'page/details/details';
-
+    protected $_s_this_template = 'page/details/details';
     /**
      * Current product parent article object
      *
      * @var \OxidEsales\Eshop\Application\Model\Article
      */
-    protected $_oParentProd;
-
+    protected $_o_parent_prod;
     /**
      * Parent article name
      *
      * @var string
      */
-    protected $_sParentName;
-
+    protected $_s_parent_name;
     /**
      * Parent article url
      *
      * @var string
      */
-    protected $_sParentUrl;
-
+    protected $_s_parent_url;
     /**
      * Picture gallery
      *
      * @var array
      */
-    protected $_aPicGallery;
-
+    protected $_a_pic_gallery;
     /**
      * Select lists
      *
      * @var array
      */
-    protected $_aSelectLists;
-
+    protected $_a_select_lists;
     /**
      * Reviews of current article
      *
      * @var array
      */
-    protected $_aReviews;
-
+    protected $_a_reviews;
     /**
      * CrossSelling article list
      *
      * @var object
      */
-    protected $_oCrossSelling;
-
+    protected $_o_cross_selling;
     /**
      * Similar products article list
      *
      * @var object
      */
-    protected $_oSimilarProducts;
-
+    protected $_o_similar_products;
     /**
      * Accessories of current article
      *
      * @var object
      */
-    protected $_oAccessoires;
-
+    protected $_o_accessoires;
     /**
      * List of customer also bought these products
      *
      * @var object
      */
-    protected $_aAlsoBoughtArts;
-
+    protected $_a_also_bought_arts;
     /**
      * Search title
      *
      * @var string
      */
-    protected $_sSearchTitle;
-
+    protected $_s_search_title;
     /**
      * Marker if active product was fully initialized before returning it
      * (see details::getProduct())
      *
      * @var bool
      */
-    protected $_blIsInitialized = false;
-
+    protected $_bl_is_initialized = false;
     /**
      * Current view link type
      *
      * @var int
      */
-    protected $_iLinkType;
-
+    protected $_i_link_type;
     /**
      * Bid price.
      *
      * @var string
      */
-    protected $_sBidPrice;
-
+    protected $_s_bid_price;
     /**
      * Price alarm status.
      *
      * @var integer
      */
-    protected $_iPriceAlarmStatus;
-
+    protected $_i_price_alarm_status;
     /**
      * Search parameter for Html
      *
      * @var string
      */
-    protected $_sSearchParamForHtml;
-
+    protected $_s_search_param_for_html;
     /**
      * Array of id to form recommendation list.
      *
@@ -150,15 +130,13 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @var array
      */
-    protected $_aSimilarRecommListIds;
-
+    protected $_a_similar_recomm_list_ids;
     /**
      * Marked which defines if current view is sortable or not
      *
      * @var bool
      */
-    protected $_blShowSorting = true;
-
+    protected $_bl_show_sorting = true;
     /**
      * Returns current product parent article object if it is available
      *
@@ -166,32 +144,29 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    protected function getParentProduct($parentId)
+    protected function get_parent_product($parent_id)
     {
-        if ($parentId && $this->_oParentProd === null) {
-            $this->_oParentProd = false;
-            $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            if (($article->load($parentId))) {
-                $this->processProduct($article);
-                $this->_oParentProd = $article;
+        if ($parent_id && $this->_o_parent_prod === null) {
+            $this->_o_parent_prod = false;
+            $article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            if ($article->load($parent_id)) {
+                $this->process_product($article);
+                $this->_o_parent_prod = $article;
             }
         }
-
-        return $this->_oParentProd;
+        return $this->_o_parent_prod;
     }
-
     /**
      * In case list type is "search" returns search parameters which will be added to product details link
      *
      * @return string|null
      */
-    protected function getAddDynUrlParams()
+    protected function get_add_dyn_url_params()
     {
-        if ($this->getListType() == 'search') {
-            return $this->getDynUrlParams();
+        if ($this->get_list_type() == 'search') {
+            return $this->get_dyn_url_params();
         }
     }
-
     /**
      * Returns array of params => values which are used in hidden forms and as additional url params.
      * NOTICE: this method SHOULD return raw (non encoded into entities) parameters, because values
@@ -200,54 +175,47 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return array
      */
-    public function getNavigationParams()
+    public function get_navigation_params()
     {
-        $parameters = parent::getNavigationParams();
-
-        $variantSelectionListId = Registry::getRequest()->getRequestEscapedParameter('varselid');
-        $selectListParameters = Registry::getRequest()->getRequestEscapedParameter('sel');
-        if (!$variantSelectionListId && !$selectListParameters) {
+        $parameters = parent::get_navigation_params();
+        $variant_selection_list_id = Registry::get_request()->get_request_escaped_parameter('varselid');
+        $select_list_parameters = Registry::get_request()->get_request_escaped_parameter('sel');
+        if (!$variant_selection_list_id && !$select_list_parameters) {
             return $parameters;
         }
-
-        if (is_array($variantSelectionListId)) {
-            foreach ($variantSelectionListId as $key => $value) {
-                $parameters["varselid[$key]"] = $value;
+        if (is_array($variant_selection_list_id)) {
+            foreach ($variant_selection_list_id as $key => $value) {
+                $parameters["varselid[{$key}]"] = $value;
             }
         }
-
-        if (is_array($selectListParameters)) {
-            foreach ($selectListParameters as $key => $value) {
-                $parameters["sel[$key]"] = $value;
+        if (is_array($select_list_parameters)) {
+            foreach ($select_list_parameters as $key => $value) {
+                $parameters["sel[{$key}]"] = $value;
             }
         }
-
         return $parameters;
     }
-
     /**
      * Processes product by setting link type and in case list type is search adds search parameters to details link
      *
      * @param \OxidEsales\Eshop\Application\Model\Article $article Product to process
      */
-    protected function processProduct($article)
+    protected function process_product($article)
     {
-        $article->setLinkType($this->getLinkType());
-        if ($dynamicParameters = $this->getAddDynUrlParams()) {
-            $article->appendLink($dynamicParameters);
+        $article->set_link_type($this->get_link_type());
+        if ($dynamic_parameters = $this->get_add_dyn_url_params()) {
+            $article->append_link($dynamic_parameters);
         }
     }
-
     /**
      * Generates current view id.
      *
      * @return string
      */
-    protected function generateViewId()
+    protected function generate_view_id()
     {
-        return parent::generateViewId() . '|' . Registry::getRequest()->getRequestEscapedParameter('anid') . '|';
+        return parent::generate_view_id() . '|' . Registry::get_request()->get_request_escaped_parameter('anid') . '|';
     }
-
     /**
      * If possible loads additional article info (\OxidEsales\Eshop\Application\Model\Article::getCrossSelling(),
      * \OxidEsales\Eshop\Application\Model\Article::getAccessoires(), \OxidEsales\Eshop\Application\Model\Article::getReviews(), \OxidEsales\Eshop\Application\Model\Article::GetSimilarProducts(),
@@ -261,35 +229,28 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function render()
     {
-        $article = $this->getProduct();
-
+        $article = $this->get_product();
         if ($article->oxarticles__oxtemplate->value) {
-            $this->_sThisTemplate = $article->oxarticles__oxtemplate->value;
+            $this->_s_this_template = $article->oxarticles__oxtemplate->value;
         }
-
-        if ($templateName = Registry::getRequest()->getRequestEscapedParameter('tpl')) {
-            $this->_sThisTemplate = 'custom/' . basename((string) $templateName);
+        if ($template_name = Registry::get_request()->get_request_escaped_parameter('tpl')) {
+            $this->_s_this_template = 'custom/' . basename((string) $template_name);
         }
-
         parent::render();
-
-        $renderPartial = Registry::getRequest()->getRequestEscapedParameter('renderPartial');
-        $this->addTplParam('renderPartial', $renderPartial);
-
-        switch ($renderPartial) {
+        $render_partial = Registry::get_request()->get_request_escaped_parameter('renderPartial');
+        $this->add_tpl_param('renderPartial', $render_partial);
+        switch ($render_partial) {
             case 'productInfo':
                 return 'page/details/ajax/fullproductinfo';
             case 'detailsMain':
                 return 'page/details/ajax/productmain';
             default:
                 // can not be removed, as it is used for breadcrumb loading
-                $locator = oxNew('oxLocator', $this->getListType());
-                $locator->setLocatorData($article, $this);
-
-                return $this->_sThisTemplate;
+                $locator = ox_new('oxLocator', $this->get_list_type());
+                $locator->set_locator_data($article, $this);
+                return $this->_s_this_template;
         }
     }
-
     /**
      * Returns current view meta data
      * If $meta parameter comes empty, sets to it article title and description.
@@ -301,21 +262,18 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return string
      */
-    protected function prepareMetaDescription($meta, $length = 200, $descriptionTag = false)
+    protected function prepare_meta_description($meta, $length = 200, $description_tag = false)
     {
         if (!$meta) {
-            $article = $this->getProduct();
-
-            $meta = $article->getLongDescription()->value;
+            $article = $this->get_product();
+            $meta = $article->get_long_description()->value;
             if ($meta == '') {
                 $meta = $article->oxarticles__oxshortdesc->value;
             }
             $meta = $article->oxarticles__oxtitle->value . ' - ' . $meta;
         }
-
-        return parent::prepareMetaDescription($meta, $length, $descriptionTag);
+        return parent::prepare_meta_description($meta, $length, $description_tag);
     }
-
     /**
      * Returns current view keywords seperated by comma
      * If $keywords parameter comes empty, sets to it article title and description.
@@ -326,312 +284,268 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return string
      */
-    protected function prepareMetaKeyword($keywords, $removeDuplicatedWords = true)
+    protected function prepare_meta_keyword($keywords, $remove_duplicated_words = true)
     {
         if (!$keywords) {
-            $article = $this->getProduct();
-            $keywords = trim((string) $this->getTitle());
-
-            if ($categoryTree = $this->getCategoryTree()) {
-                foreach ($categoryTree->getPath() as $category) {
+            $article = $this->get_product();
+            $keywords = trim((string) $this->get_title());
+            if ($category_tree = $this->get_category_tree()) {
+                foreach ($category_tree->get_path() as $category) {
                     $keywords .= ', ' . trim((string) $category->oxcategories__oxtitle->value);
                 }
             }
-
             // Adding search keys info
-            if ($searchKeys = trim((string) $article->oxarticles__oxsearchkeys->value)) {
-                $keywords .= ', ' . $searchKeys;
+            if ($search_keys = trim((string) $article->oxarticles__oxsearchkeys->value)) {
+                $keywords .= ', ' . $search_keys;
             }
-
-            $keywords = parent::prepareMetaKeyword($keywords, $removeDuplicatedWords);
+            $keywords = parent::prepare_meta_keyword($keywords, $remove_duplicated_words);
         }
-
         return $keywords;
     }
-
     /**
      * Saves user ratings and review text (oxReview object)
      */
-    public function saveReview(): void
+    public function save_review(): void
     {
-        if (!Registry::getSession()->checkSessionChallenge()) {
+        if (!Registry::get_session()->check_session_challenge()) {
             return;
         }
-
-        if (
-            $this->canAcceptFormData() &&
-            ($user = $this->getUser()) && ($article = $this->getProduct())
-        ) {
-            $articleRating = Registry::getRequest()->getRequestEscapedParameter('artrating');
-            if ($articleRating !== null) {
-                $articleRating = (int) $articleRating;
+        if ($this->can_accept_form_data() && ($user = $this->get_user()) && $article = $this->get_product()) {
+            $article_rating = Registry::get_request()->get_request_escaped_parameter('artrating');
+            if ($article_rating !== null) {
+                $article_rating = (int) $article_rating;
             }
-
             //save rating
-            if ($articleRating !== null && $articleRating >= 1 && $articleRating <= 5) {
-                $rating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
-                if ($rating->allowRating($user->getId(), 'oxarticle', $article->getId())) {
-                    $rating->oxratings__oxuserid = new Field($user->getId());
+            if ($article_rating !== null && $article_rating >= 1 && $article_rating <= 5) {
+                $rating = ox_new(\Oxid_Esales\Eshop\Application\Model\Rating::class);
+                if ($rating->allow_rating($user->get_id(), 'oxarticle', $article->get_id())) {
+                    $rating->oxratings__oxuserid = new Field($user->get_id());
                     $rating->oxratings__oxtype = new Field('oxarticle');
-                    $rating->oxratings__oxobjectid = new Field($article->getId());
-                    $rating->oxratings__oxrating = new Field($articleRating);
+                    $rating->oxratings__oxobjectid = new Field($article->get_id());
+                    $rating->oxratings__oxrating = new Field($article_rating);
                     $rating->save();
-                    $article->addToRatingAverage($articleRating);
+                    $article->add_to_rating_average($article_rating);
                 }
             }
-
-            if (($reviewText = trim((string) Registry::getRequest()->getRequestParameter('rvw_txt')))) {
-                $review = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
-                $review->oxreviews__oxobjectid = new Field($article->getId());
+            if ($review_text = trim((string) Registry::get_request()->get_request_parameter('rvw_txt'))) {
+                $review = ox_new(\Oxid_Esales\Eshop\Application\Model\Review::class);
+                $review->oxreviews__oxobjectid = new Field($article->get_id());
                 $review->oxreviews__oxtype = new Field('oxarticle');
-                $review->oxreviews__oxtext = new Field($reviewText, Field::T_RAW);
-                $review->oxreviews__oxlang = new Field(Registry::getLang()->getBaseLanguage());
-                $review->oxreviews__oxuserid = new Field($user->getId());
-                $review->oxreviews__oxrating = new Field($articleRating ?? 0);
+                $review->oxreviews__oxtext = new Field($review_text, Field::T_RAW);
+                $review->oxreviews__oxlang = new Field(Registry::get_lang()->get_base_language());
+                $review->oxreviews__oxuserid = new Field($user->get_id());
+                $review->oxreviews__oxrating = new Field($article_rating ?? 0);
                 $review->save();
             }
         }
     }
-
     /**
      * Adds article to selected recommendation list
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      */
-    public function addToRecomm(): void
+    public function add_to_recomm(): void
     {
-        if (!Registry::getSession()->checkSessionChallenge()) {
+        if (!Registry::get_session()->check_session_challenge()) {
             return;
         }
-
-        if (!$this->getViewConfig()->getShowListmania()) {
+        if (!$this->get_view_config()->get_show_listmania()) {
             return;
         }
-
-        $recommendationText = trim((string) Registry::getRequest()->getRequestEscapedParameter('recomm_txt'));
-        $recommendationListId = Registry::getRequest()->getRequestEscapedParameter('recomm');
-        $articleId = $this->getProduct()->getId();
-
-        if ($articleId) {
-            $recommendationList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
-            $recommendationList->load($recommendationListId);
-            $recommendationList->addArticle($articleId, $recommendationText);
+        $recommendation_text = trim((string) Registry::get_request()->get_request_escaped_parameter('recomm_txt'));
+        $recommendation_list_id = Registry::get_request()->get_request_escaped_parameter('recomm');
+        $article_id = $this->get_product()->get_id();
+        if ($article_id) {
+            $recommendation_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Recommendation_List::class);
+            $recommendation_list->load($recommendation_list_id);
+            $recommendation_list->add_article($article_id, $recommendation_text);
         }
     }
-
     /**
      * Returns active product id to load its seo meta info
      *
      * @return string
      */
-    protected function getSeoObjectId()
+    protected function get_seo_object_id()
     {
-        if ($article = $this->getProduct()) {
-            return $article->getId();
+        if ($article = $this->get_product()) {
+            return $article->get_id();
         }
     }
-
     /**
      * Returns current product
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    public function getProduct()
+    public function get_product()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-
-        if ($this->_oProduct === null) {
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        if ($this->_o_product === null) {
             //this option is only for lists and we must reset value
             //as blLoadVariants = false affect "ab price" functionality
-            $config->setConfigParam('blLoadVariants', true);
-
-            $articleId = Registry::getRequest()->getRequestEscapedParameter('anid');
-
+            $config->set_config_param('blLoadVariants', true);
+            $article_id = Registry::get_request()->get_request_escaped_parameter('anid');
             // object is not yet loaded
-            $this->_oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-
-            if (!$this->_oProduct->load($articleId)) {
+            $this->_o_product = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            if (!$this->_o_product->load($article_id)) {
                 unset($_GET, $_POST);
-                $config->dropLastActiveView();
+                $config->drop_last_active_view();
                 error_404_handler($_SERVER['REQUEST_URI']);
             }
-
-            $variantSelectionId = Registry::getRequest()->getRequestEscapedParameter('varselid');
-            $variantSelections = $this->_oProduct->getVariantSelections($variantSelectionId);
-            if ($variantSelections && $variantSelections['oActiveVariant'] && $variantSelections['blPerfectFit']) {
-                $this->_oProduct = $variantSelections['oActiveVariant'];
+            $variant_selection_id = Registry::get_request()->get_request_escaped_parameter('varselid');
+            $variant_selections = $this->_o_product->get_variant_selections($variant_selection_id);
+            if ($variant_selections && $variant_selections['oActiveVariant'] && $variant_selections['blPerfectFit']) {
+                $this->_o_product = $variant_selections['oActiveVariant'];
             }
         }
-
         // additional checks
-        if (!$this->_blIsInitialized) {
-            $this->additionalChecksForArticle();
+        if (!$this->_bl_is_initialized) {
+            $this->additional_checks_for_article();
         }
-
-        return $this->_oProduct;
+        return $this->_o_product;
     }
-
     /**
      * Runs additional checks for article.
      */
-    protected function additionalChecksForArticle()
+    protected function additional_checks_for_article()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $utils = \OxidEsales\Eshop\Core\Registry::getUtils();
-
-        $shouldContinue = true;
-        if (!$this->_oProduct->isVisible()) {
-            $shouldContinue = false;
-        } elseif ($this->_oProduct->oxarticles__oxparentid->value) {
-            $parentArticle = $this->getParentProduct($this->_oProduct->oxarticles__oxparentid->value);
-            if (!$parentArticle || !$parentArticle->isVisible()) {
-                $shouldContinue = false;
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $utils = \Oxid_Esales\Eshop\Core\Registry::get_utils();
+        $should_continue = true;
+        if (!$this->_o_product->is_visible()) {
+            $should_continue = false;
+        } elseif ($this->_o_product->oxarticles__oxparentid->value) {
+            $parent_article = $this->get_parent_product($this->_o_product->oxarticles__oxparentid->value);
+            if (!$parent_article || !$parent_article->is_visible()) {
+                $should_continue = false;
             }
         }
-
-        if (!$shouldContinue) {
-            $utils->redirect($config->getShopHomeUrl());
-            $utils->showMessageAndExit('');
+        if (!$should_continue) {
+            $utils->redirect($config->get_shop_home_url());
+            $utils->show_message_and_exit('');
         }
-
-        $this->processProduct($this->_oProduct);
-        $this->_blIsInitialized = true;
+        $this->process_product($this->_o_product);
+        $this->_bl_is_initialized = true;
     }
-
     /**
      * Returns current view link type
      *
      * @return int
      */
-    public function getLinkType()
+    public function get_link_type()
     {
-        if ($this->_iLinkType === null) {
-            $listType = Registry::getRequest()->getRequestEscapedParameter('listtype');
-            if ('vendor' == $listType) {
-                $this->_iLinkType = OXARTICLE_LINKTYPE_VENDOR;
-            } elseif ('manufacturer' == $listType) {
-                $this->_iLinkType = OXARTICLE_LINKTYPE_MANUFACTURER;
+        if ($this->_i_link_type === null) {
+            $list_type = Registry::get_request()->get_request_escaped_parameter('listtype');
+            if ('vendor' == $list_type) {
+                $this->_i_link_type = OXARTICLE_LINKTYPE_VENDOR;
+            } elseif ('manufacturer' == $list_type) {
+                $this->_i_link_type = OXARTICLE_LINKTYPE_MANUFACTURER;
                 // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-            } elseif ('recommlist' == $listType) {
-                $this->_iLinkType = OXARTICLE_LINKTYPE_RECOMM;
+            } elseif ('recommlist' == $list_type) {
+                $this->_i_link_type = OXARTICLE_LINKTYPE_RECOMM;
                 // END deprecated
             } else {
-                $this->_iLinkType = OXARTICLE_LINKTYPE_CATEGORY;
-
+                $this->_i_link_type = OXARTICLE_LINKTYPE_CATEGORY;
                 // price category has own type..
-                $activeCategory = $this->getActiveCategory();
-                if ($activeCategory && $activeCategory->isPriceCategory()) {
-                    $this->_iLinkType = OXARTICLE_LINKTYPE_PRICECATEGORY;
+                $active_category = $this->get_active_category();
+                if ($active_category && $active_category->is_price_category()) {
+                    $this->_i_link_type = OXARTICLE_LINKTYPE_PRICECATEGORY;
                 }
             }
         }
-
-        return $this->_iLinkType;
+        return $this->_i_link_type;
     }
-
     /**
      * Template variable getter. Returns if draw parent url
      *
      * @return bool
      */
-    public function drawParentUrl()
+    public function draw_parent_url()
     {
-        return $this->getProduct()->isVariant();
+        return $this->get_product()->is_variant();
     }
-
     /**
      * Template variable getter. Returns picture gallery of current article
      *
      * @return array
      */
-    public function getPictureGallery()
+    public function get_picture_gallery()
     {
-        if ($this->_aPicGallery === null) {
+        if ($this->_a_pic_gallery === null) {
             //get picture gallery
-            $this->_aPicGallery = $this->getPicturesProduct()->getPictureGallery();
+            $this->_a_pic_gallery = $this->get_pictures_product()->get_picture_gallery();
         }
-
-        return $this->_aPicGallery;
+        return $this->_a_pic_gallery;
     }
-
     /**
      * Template variable getter. Returns active picture
      *
      * @return object
      */
-    public function getActPicture()
+    public function get_act_picture()
     {
-        return $this->getPictureGallery()['activeMedia']?->getDetailUrl();
+        return $this->get_picture_gallery()['activeMedia']?->get_detail_url();
     }
-
     /**
      * Template variable getter. Returns selectLists of current article
      *
      * @return array
      */
-    public function getSelectLists()
+    public function get_select_lists()
     {
-        if ($this->_aSelectLists === null) {
-            $this->_aSelectLists = false;
-            if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfLoadSelectLists')) {
-                $this->_aSelectLists = $this->getProduct()->getSelectLists();
+        if ($this->_a_select_lists === null) {
+            $this->_a_select_lists = false;
+            if (\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('bl_perfLoadSelectLists')) {
+                $this->_a_select_lists = $this->get_product()->get_select_lists();
             }
         }
-
-        return $this->_aSelectLists;
+        return $this->_a_select_lists;
     }
-
     /**
      * Template variable getter. Returns reviews of current article
      *
      * @return array
      */
-    public function getReviews()
+    public function get_reviews()
     {
-        if ($this->_aReviews === null) {
-            $this->_aReviews = false;
-            if (\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfLoadReviews')) {
-                $this->_aReviews = $this->getProduct()->getReviews();
+        if ($this->_a_reviews === null) {
+            $this->_a_reviews = false;
+            if (\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('bl_perfLoadReviews')) {
+                $this->_a_reviews = $this->get_product()->get_reviews();
             }
         }
-
-        return $this->_aReviews;
+        return $this->_a_reviews;
     }
-
     /**
      * Template variable getter. Returns cross selling
      *
      * @return object
      */
-    public function getCrossSelling()
+    public function get_cross_selling()
     {
-        if ($this->_oCrossSelling === null) {
-            $this->_oCrossSelling = false;
-            if ($article = $this->getProduct()) {
-                $this->_oCrossSelling = $article->getCrossSelling();
+        if ($this->_o_cross_selling === null) {
+            $this->_o_cross_selling = false;
+            if ($article = $this->get_product()) {
+                $this->_o_cross_selling = $article->get_cross_selling();
             }
         }
-
-        return $this->_oCrossSelling;
+        return $this->_o_cross_selling;
     }
-
     /**
      * Template variable getter. Returns similar article list
      *
      * @return object
      */
-    public function getSimilarProducts()
+    public function get_similar_products()
     {
-        if ($this->_oSimilarProducts === null) {
-            $this->_oSimilarProducts = false;
-            if ($article = $this->getProduct()) {
-                $this->_oSimilarProducts = $article->getSimilarProducts();
+        if ($this->_o_similar_products === null) {
+            $this->_o_similar_products = false;
+            if ($article = $this->get_product()) {
+                $this->_o_similar_products = $article->get_similar_products();
             }
         }
-
-        return $this->_oSimilarProducts;
+        return $this->_o_similar_products;
     }
-
     /**
      * Return array of id to form recommend list.
      *
@@ -639,63 +553,55 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return array
      */
-    public function getSimilarRecommListIds()
+    public function get_similar_recomm_list_ids()
     {
-        if ($this->_aSimilarRecommListIds === null) {
-            $this->_aSimilarRecommListIds = false;
-
-            if ($article = $this->getProduct()) {
-                $this->_aSimilarRecommListIds = [$article->getId()];
+        if ($this->_a_similar_recomm_list_ids === null) {
+            $this->_a_similar_recomm_list_ids = false;
+            if ($article = $this->get_product()) {
+                $this->_a_similar_recomm_list_ids = [$article->get_id()];
             }
         }
-
-        return $this->_aSimilarRecommListIds;
+        return $this->_a_similar_recomm_list_ids;
     }
-
     /**
      * Template variable getter. Returns accessories of article
      *
      * @return object
      */
-    public function getAccessoires()
+    public function get_accessoires()
     {
-        if ($this->_oAccessoires === null) {
-            $this->_oAccessoires = false;
-            if ($article = $this->getProduct()) {
-                $this->_oAccessoires = $article->getAccessoires();
+        if ($this->_o_accessoires === null) {
+            $this->_o_accessoires = false;
+            if ($article = $this->get_product()) {
+                $this->_o_accessoires = $article->get_accessoires();
             }
         }
-
-        return $this->_oAccessoires;
+        return $this->_o_accessoires;
     }
-
     /**
      * Template variable getter. Returns list of customer also bought these products
      *
      * @return \OxidEsales\Eshop\Application\Model\ArticleList|false
      */
-    public function getAlsoBoughtTheseProducts()
+    public function get_also_bought_these_products()
     {
-        if ($this->_aAlsoBoughtArts === null) {
-            $this->_aAlsoBoughtArts = false;
-            if ($article = $this->getProduct()) {
-                $this->_aAlsoBoughtArts = $article->getCustomerAlsoBoughtThisProducts();
+        if ($this->_a_also_bought_arts === null) {
+            $this->_a_also_bought_arts = false;
+            if ($article = $this->get_product()) {
+                $this->_a_also_bought_arts = $article->get_customer_also_bought_this_products();
             }
         }
-
-        return $this->_aAlsoBoughtArts;
+        return $this->_a_also_bought_arts;
     }
-
     /**
      * Template variable getter. Returns if price alarm is enabled
      *
      * @return bool
      */
-    public function isPriceAlarm()
+    public function is_price_alarm()
     {
-        return $this->getProduct()->isPriceAlarm();
+        return $this->get_product()->is_price_alarm();
     }
-
     /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
@@ -704,264 +610,228 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    protected function getSubject($languageId)
+    protected function get_subject($language_id)
     {
-        return $this->getProduct();
+        return $this->get_product();
     }
-
     /**
      * Returns search title. It will be set in oxLocator
      *
      * @return string
      */
-    public function getSearchTitle()
+    public function get_search_title()
     {
-        return $this->_sSearchTitle;
+        return $this->_s_search_title;
     }
-
     /**
      * Returns search title setter
      *
      * @param string $title search title
      */
-    public function setSearchTitle($title): void
+    public function set_search_title($title): void
     {
-        $this->_sSearchTitle = $title;
+        $this->_s_search_title = $title;
     }
-
     /**
      * Active category path setter.
      *
      * @param string $activeCategoryPath Category tree path
      */
-    public function setCatTreePath($activeCategoryPath): void
+    public function set_cat_tree_path($active_category_path): void
     {
-        $this->_sCatTreePath = $activeCategoryPath;
+        $this->_s_cat_tree_path = $active_category_path;
     }
-
     /**
      * If product details are accessed by vendor url
      * view must not be indexable
      *
      * @return int
      */
-    public function noIndex()
+    public function no_index()
     {
-        $listType = Registry::getRequest()->getRequestEscapedParameter('listtype');
-        if ($listType && ('vendor' == $listType || 'manufacturer' == $listType)) {
-            return $this->_iViewIndexState = VIEW_INDEXSTATE_NOINDEXFOLLOW;
+        $list_type = Registry::get_request()->get_request_escaped_parameter('listtype');
+        if ($list_type && ('vendor' == $list_type || 'manufacturer' == $list_type)) {
+            return $this->_i_view_index_state = VIEW_INDEXSTATE_NOINDEXFOLLOW;
         }
-
-        return parent::noIndex();
+        return parent::no_index();
     }
-
     /**
      * Returns current view title. Default is null
      */
-    public function getTitle()
+    public function get_title()
     {
-        if ($article = $this->getProduct()) {
-            $articleTitle = $article->oxarticles__oxtitle->value;
-            $variantSelectionId = $article->oxarticles__oxvarselect->value;
-
-            $variantSelectionValue = $variantSelectionId ? ' ' . $variantSelectionId : '';
-
-            return $articleTitle . $variantSelectionValue;
+        if ($article = $this->get_product()) {
+            $article_title = $article->oxarticles__oxtitle->value;
+            $variant_selection_id = $article->oxarticles__oxvarselect->value;
+            $variant_selection_value = $variant_selection_id ? ' ' . $variant_selection_id : '';
+            return $article_title . $variant_selection_value;
         }
     }
-
     /**
      * Returns view canonical url
      *
      * @return string
      */
-    public function getCanonicalUrl()
+    public function get_canonical_url()
     {
-        if (($article = $this->getProduct())) {
+        if ($article = $this->get_product()) {
             if ($article->oxarticles__oxparentid->value) {
-                $article = $this->getParentProduct($article->oxarticles__oxparentid->value);
+                $article = $this->get_parent_product($article->oxarticles__oxparentid->value);
             }
-
-            $utilsUrl = Registry::getUtilsUrl();
-            if (Registry::getUtils()->seoIsActive()) {
-                return $utilsUrl->prepareCanonicalUrl($article->getBaseSeoLink($article->getLanguage(), true));
+            $utils_url = Registry::get_utils_url();
+            if (Registry::get_utils()->seo_is_active()) {
+                return $utils_url->prepare_canonical_url($article->get_base_seo_link($article->get_language(), true));
             }
-
-            return $utilsUrl->prepareCanonicalUrl($article->getBaseStdLink($article->getLanguage()));
+            return $utils_url->prepare_canonical_url($article->get_base_std_link($article->get_language()));
         }
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        if ('search' == $this->getListType()) {
-            $paths = $this->getSearchBreadCrumb();
+        if ('search' == $this->get_list_type()) {
+            $paths = $this->get_search_bread_crumb();
             // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-        } elseif ('recommlist' == $this->getListType()) {
-            $paths = $this->_getRecommendationListBredCrumb();
+        } elseif ('recommlist' == $this->get_list_type()) {
+            $paths = $this->_get_recommendation_list_bred_crumb();
             // END deprecated
-        } elseif ('vendor' == $this->getListType()) {
-            $paths = $this->getVendorBreadCrumb();
+        } elseif ('vendor' == $this->get_list_type()) {
+            $paths = $this->get_vendor_bread_crumb();
         } else {
-            $paths = $this->getCategoryBreadCrumb();
+            $paths = $this->get_category_bread_crumb();
         }
-
         return $paths;
     }
-
     /**
      * Validates email address.
      * If email address is OK - creates price alarm object and saves it (oxPriceAlarm::save()).
      * If email is wrong - returns false.
      * Sends price alarm notification mail to shop owner.
      */
-    public function addMe(): void
+    public function add_me(): void
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $utils = \OxidEsales\Eshop\Core\Registry::getUtils();
-
-        $parameters = Registry::getRequest()->getRequestEscapedParameter('pa');
-        $emailValidator = ContainerFacade::get(EmailValidatorServiceBridgeInterface::class);
-        if (!isset($parameters['email']) || !$emailValidator->isEmailValid($parameters['email'])) {
-            $this->_iPriceAlarmStatus = 0;
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $utils = \Oxid_Esales\Eshop\Core\Registry::get_utils();
+        $parameters = Registry::get_request()->get_request_escaped_parameter('pa');
+        $email_validator = Container_Facade::get(Email_Validator_Service_Bridge_Interface::class);
+        if (!isset($parameters['email']) || !$email_validator->is_email_valid($parameters['email'])) {
+            $this->_i_price_alarm_status = 0;
             return;
         }
-
-        $parameters['aid'] = $this->getProduct()->getId();
-        $activeCurrency = $config->getActShopCurrencyObject();
+        $parameters['aid'] = $this->get_product()->get_id();
+        $active_currency = $config->get_act_shop_currency_object();
         // convert currency to default
         $price = $utils->currency2Float($parameters['price']);
-
-        $priceAlarm = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
-        $priceAlarm->oxpricealarm__oxuserid = new Field(Registry::getSession()->getVariable('usr'));
-        $priceAlarm->oxpricealarm__oxemail = new Field($parameters['email']);
-        $priceAlarm->oxpricealarm__oxartid = new Field($parameters['aid']);
-        $priceAlarm->oxpricealarm__oxprice = new Field($utils->fRound($price, $activeCurrency));
-        $priceAlarm->oxpricealarm__oxshopid = new Field($config->getShopId());
-        $priceAlarm->oxpricealarm__oxcurrency = new Field($activeCurrency->name);
-
-        $priceAlarm->oxpricealarm__oxlang = new Field(Registry::getLang()->getBaseLanguage());
-
-        $priceAlarm->save();
-
+        $price_alarm = ox_new(\Oxid_Esales\Eshop\Application\Model\Price_Alarm::class);
+        $price_alarm->oxpricealarm__oxuserid = new Field(Registry::get_session()->get_variable('usr'));
+        $price_alarm->oxpricealarm__oxemail = new Field($parameters['email']);
+        $price_alarm->oxpricealarm__oxartid = new Field($parameters['aid']);
+        $price_alarm->oxpricealarm__oxprice = new Field($utils->f_round($price, $active_currency));
+        $price_alarm->oxpricealarm__oxshopid = new Field($config->get_shop_id());
+        $price_alarm->oxpricealarm__oxcurrency = new Field($active_currency->name);
+        $price_alarm->oxpricealarm__oxlang = new Field(Registry::get_lang()->get_base_language());
+        $price_alarm->save();
         // Send Email
-        $email = oxNew(\OxidEsales\Eshop\Core\Email::class);
-        $this->_iPriceAlarmStatus = (int) $email->sendPricealarmNotification($parameters, $priceAlarm);
+        $email = ox_new(\Oxid_Esales\Eshop\Core\Email::class);
+        $this->_i_price_alarm_status = (int) $email->send_pricealarm_notification($parameters, $price_alarm);
     }
-
     /**
      * Return price alarm status (if it was send)
      *
      * @return integer
      */
-    public function getPriceAlarmStatus()
+    public function get_price_alarm_status()
     {
-        return $this->_iPriceAlarmStatus;
+        return $this->_i_price_alarm_status;
     }
-
     /**
      * Template variable getter. Returns bid price
      *
      * @return string
      */
-    public function getBidPrice()
+    public function get_bid_price()
     {
-        if ($this->_sBidPrice === null) {
-            $this->_sBidPrice = false;
-
-            $parameters = Registry::getRequest()->getRequestEscapedParameter('pa');
-            $activeCurrency = \OxidEsales\Eshop\Core\Registry::getConfig()->getActShopCurrencyObject();
-            $price = \OxidEsales\Eshop\Core\Registry::getUtils()->currency2Float($parameters['price']);
-            $this->_sBidPrice = \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($price, $activeCurrency);
+        if ($this->_s_bid_price === null) {
+            $this->_s_bid_price = false;
+            $parameters = Registry::get_request()->get_request_escaped_parameter('pa');
+            $active_currency = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_act_shop_currency_object();
+            $price = \Oxid_Esales\Eshop\Core\Registry::get_utils()->currency2Float($parameters['price']);
+            $this->_s_bid_price = \Oxid_Esales\Eshop\Core\Registry::get_lang()->format_currency($price, $active_currency);
         }
-
-        return $this->_sBidPrice;
+        return $this->_s_bid_price;
     }
-
     /**
      * Returns variant selection
      *
      * @return \OxidEsales\Eshop\Application\Model\VariantSelectList
      */
-    public function getVariantSelections()
+    public function get_variant_selections()
     {
-        $article = $this->getProduct();
-        $variantSelectionListId = Registry::getRequest()->getRequestEscapedParameter('varselid');
-        if (($articleParent = $this->getParentProduct($article->oxarticles__oxparentid->value))) {
-            return $articleParent->getVariantSelections($variantSelectionListId, $article->getId());
+        $article = $this->get_product();
+        $variant_selection_list_id = Registry::get_request()->get_request_escaped_parameter('varselid');
+        if ($article_parent = $this->get_parent_product($article->oxarticles__oxparentid->value)) {
+            return $article_parent->get_variant_selections($variant_selection_list_id, $article->get_id());
         }
-
-        return $article->getVariantSelections($variantSelectionListId);
+        return $article->get_variant_selections($variant_selection_list_id);
     }
-
     /**
      * Returns pictures product object
      *
      * @return \OxidEsales\Eshop\Application\Model\Article
      */
-    public function getPicturesProduct()
+    public function get_pictures_product()
     {
-        $variantSelections = $this->getVariantSelections();
-        if ($variantSelections && $variantSelections['oActiveVariant'] && !$variantSelections['blPerfectFit']) {
-            return $variantSelections['oActiveVariant'];
+        $variant_selections = $this->get_variant_selections();
+        if ($variant_selections && $variant_selections['oActiveVariant'] && !$variant_selections['blPerfectFit']) {
+            return $variant_selections['oActiveVariant'];
         }
-
-        return $this->getProduct();
+        return $this->get_product();
     }
-
     /**
      * Template variable getter. Returns search parameter for Html
      *
      * @return string
      */
-    public function getSearchParamForHtml()
+    public function get_search_param_for_html()
     {
-        if ($this->_sSearchParamForHtml === null) {
-            $this->_sSearchParamForHtml = Registry::getRequest()->getRequestEscapedParameter('searchparam');
+        if ($this->_s_search_param_for_html === null) {
+            $this->_s_search_param_for_html = Registry::get_request()->get_request_escaped_parameter('searchparam');
         }
-
-        return $this->_sSearchParamForHtml;
+        return $this->_s_search_param_for_html;
     }
-
     /**
      * Returns if page has rdfa
      *
      * @return bool
      */
-    public function showRdfa()
+    public function show_rdfa()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blRDFaEmbedding');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blRDFaEmbedding');
     }
-
     /**
      * Sets normalized rating
      *
      * @return array
      */
-    public function getRDFaNormalizedRating()
+    public function get_rd_fa_normalized_rating()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $minRating = $config->getConfigParam('iRDFaMinRating');
-        $maxRating = $config->getConfigParam('iRDFaMaxRating');
-
-        $article = $this->getProduct();
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $min_rating = $config->get_config_param('iRDFaMinRating');
+        $max_rating = $config->get_config_param('iRDFaMaxRating');
+        $article = $this->get_product();
         $count = $article->oxarticles__oxratingcnt->value;
-        if (isset($minRating) && isset($maxRating) && $maxRating != '' && $minRating != '' && $count > 0) {
-            $normalizedRating = [];
-            $value = ((4 * ($article->oxarticles__oxrating->value - $minRating) / ($maxRating - $minRating))) + 1;
-            $normalizedRating['count'] = $count;
-            $normalizedRating['value'] = round($value, 2);
-
-            return $normalizedRating;
+        if (isset($min_rating) && isset($max_rating) && $max_rating != '' && $min_rating != '' && $count > 0) {
+            $normalized_rating = [];
+            $value = 4 * ($article->oxarticles__oxrating->value - $min_rating) / ($max_rating - $min_rating) + 1;
+            $normalized_rating['count'] = $count;
+            $normalized_rating['value'] = round($value, 2);
+            return $normalized_rating;
         }
-
         return false;
     }
-
     /**
      * Sets and returns validity period of given object
      *
@@ -969,234 +839,202 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return array
      */
-    public function getRDFaValidityPeriod($configVariableName)
+    public function get_rd_fa_validity_period($config_variable_name)
     {
-        if ($configVariableName) {
+        if ($config_variable_name) {
             $validity = [];
-            $days = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam($configVariableName);
-            $from = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
-
-            $through = $from + ($days * 24 * 60 * 60);
+            $days = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param($config_variable_name);
+            $from = \Oxid_Esales\Eshop\Core\Registry::get_utils_date()->get_time();
+            $through = $from + $days * 24 * 60 * 60;
             $validity['from'] = date('Y-m-d\TH:i:s', $from) . 'Z';
             $validity['through'] = date('Y-m-d\TH:i:s', $through) . 'Z';
-
             return $validity;
         }
-
         return false;
     }
-
     /**
      * Gets business function of the gr:Offering
      *
      * @return string
      */
-    public function getRDFaBusinessFnc()
+    public function get_rd_fa_business_fnc()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sRDFaBusinessFnc');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sRDFaBusinessFnc');
     }
-
     /**
      * Gets the types of customers for which the given gr:Offering is valid
      *
      * @return array
      */
-    public function getRDFaCustomers()
+    public function get_rd_fa_customers()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('aRDFaCustomers');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('aRDFaCustomers');
     }
-
     /**
      * Gets information whether prices include vat
      *
      * @return int
      */
-    public function getRDFaVAT()
+    public function get_rd_fa_vat()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iRDFaVAT');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iRDFaVAT');
     }
-
     /**
      * Gets a generic description of product condition
      *
      * @return string
      */
-    public function getRDFaGenericCondition()
+    public function get_rd_fa_generic_condition()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iRDFaCondition');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iRDFaCondition');
     }
-
     /**
      * Returns bundle product
      *
      * @return \OxidEsales\Eshop\Application\Model\Article|false
      */
-    public function getBundleArticle()
+    public function get_bundle_article()
     {
-        $article = $this->getProduct();
+        $article = $this->get_product();
         if ($article && $article->oxarticles__oxbundleid->value) {
-            $bundle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $bundle = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
             $bundle->load($article->oxarticles__oxbundleid->value);
-
             return $bundle;
         }
-
         return false;
     }
-
     /**
      * Gets accepted payment methods
      *
      * @return \OxidEsales\Eshop\Application\Model\PaymentList
      */
-    public function getRDFaPaymentMethods()
+    public function get_rd_fa_payment_methods()
     {
-        $price = $this->getProduct()->getPrice()->getBruttoPrice();
-        $paymentList = oxNew(\OxidEsales\Eshop\Application\Model\PaymentList::class);
-        $paymentList->loadRDFaPaymentList($price);
-
-        return $paymentList;
+        $price = $this->get_product()->get_price()->get_brutto_price();
+        $payment_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Payment_List::class);
+        $payment_list->load_rd_fa_payment_list($price);
+        return $payment_list;
     }
-
     /**
      * Returns delivery methods with assigned delivery sets.
      *
      * @return \OxidEsales\Eshop\Application\Model\DeliverySetList
      */
-    public function getRDFaDeliverySetMethods()
+    public function get_rd_fa_delivery_set_methods()
     {
-        $deliverySetList = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySetList::class);
-        $deliverySetList->loadRDFaDeliverySetList();
-
-        return $deliverySetList;
+        $delivery_set_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Delivery_Set_List::class);
+        $delivery_set_list->load_rd_fa_delivery_set_list();
+        return $delivery_set_list;
     }
-
     /**
      * Template variable getter. Returns delivery list for current product
      *
      * @return \OxidEsales\Eshop\Application\Model\DeliveryList
      */
-    public function getProductsDeliveryList()
+    public function get_products_delivery_list()
     {
-        $article = $this->getProduct();
-        $deliveryList = oxNew(\OxidEsales\Eshop\Application\Model\DeliveryList::class);
-        $deliveryList->loadDeliveryListForProduct($article);
-
-        return $deliveryList;
+        $article = $this->get_product();
+        $delivery_list = ox_new(\Oxid_Esales\Eshop\Application\Model\Delivery_List::class);
+        $delivery_list->load_delivery_list_for_product($article);
+        return $delivery_list;
     }
-
     /**
      * Gets content id of delivery information page
      *
      * @return string
      */
-    public function getRDFaDeliveryChargeSpecLoc()
+    public function get_rd_fa_delivery_charge_spec_loc()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sRDFaDeliveryChargeSpecLoc');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sRDFaDeliveryChargeSpecLoc');
     }
-
     /**
      * Gets content id of payments
      *
      * @return string
      */
-    public function getRDFaPaymentChargeSpecLoc()
+    public function get_rd_fa_payment_charge_spec_loc()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sRDFaPaymentChargeSpecLoc');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sRDFaPaymentChargeSpecLoc');
     }
-
     /**
      * Gets content id of company info page (About Us)
      *
      * @return string
      */
-    public function getRDFaBusinessEntityLoc()
+    public function get_rd_fa_business_entity_loc()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sRDFaBusinessEntityLoc');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('sRDFaBusinessEntityLoc');
     }
-
     /**
      * Returns if to show products left stock
      *
      * @return string
      */
-    public function showRDFaProductStock()
+    public function show_rd_fa_product_stock()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowRDFaProductStock');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blShowRDFaProductStock');
     }
-
     /**
      * Template variable getter. Returns if review module is on
      *
      * @return bool
      */
-    public function isReviewActive()
+    public function is_review_active()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('bl_perfLoadReviews');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('bl_perfLoadReviews');
     }
-
     /**
      * Returns default category sorting for selected category
      *
      * @return array
      */
-    public function getDefaultSorting()
+    public function get_default_sorting()
     {
-        $sorting = parent::getDefaultSorting();
-        $activeCategory = $this->getActiveCategory();
-
-        if ($this->getListType() != 'search' && $activeCategory && $activeCategory instanceof Category) {
-            if ($categorySorting = $activeCategory->getDefaultSorting()) {
-                $sortingDirection = ($activeCategory->getDefaultSortingMode()) ? 'desc' : 'asc';
-                $sorting = ['sortby' => $categorySorting, 'sortdir' => $sortingDirection];
+        $sorting = parent::get_default_sorting();
+        $active_category = $this->get_active_category();
+        if ($this->get_list_type() != 'search' && $active_category && $active_category instanceof Category) {
+            if ($category_sorting = $active_category->get_default_sorting()) {
+                $sorting_direction = $active_category->get_default_sorting_mode() ? 'desc' : 'asc';
+                $sorting = ['sortby' => $category_sorting, 'sortdir' => $sorting_direction];
             }
         }
-
         return $sorting;
     }
-
     /**
      * Returns sorting parameters separated by "|"
      *
      * @return string
      */
-    public function getSortingParameters()
+    public function get_sorting_parameters()
     {
-        $sorting = $this->getSorting($this->getSortIdent());
+        $sorting = $this->get_sorting($this->get_sort_ident());
         if (!is_array($sorting)) {
             return null;
         }
-
         return implode('|', $sorting);
     }
-
     /**
      * Vendor bread crumb
      *
      * @return array
      */
-    protected function getVendorBreadCrumb()
+    protected function get_vendor_bread_crumb()
     {
         $paths = [];
-        $vendorPath = [];
-
-        $vendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $vendor_path = [];
+        $vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
         $vendor->load('root');
-
-        $vendorPath['link'] = $vendor->getLink();
-        $vendorPath['title'] = $vendor->oxvendor__oxtitle->value;
-        $paths[] = $vendorPath;
-
-        $vendor = $this->getActVendor();
-        if ($vendor instanceof \OxidEsales\Eshop\Application\Model\Vendor) {
-            $vendorPath['link'] = $vendor->getLink();
-            $vendorPath['title'] = $vendor->oxvendor__oxtitle->value;
-            $paths[] = $vendorPath;
+        $vendor_path['link'] = $vendor->get_link();
+        $vendor_path['title'] = $vendor->oxvendor__oxtitle->value;
+        $paths[] = $vendor_path;
+        $vendor = $this->get_act_vendor();
+        if ($vendor instanceof \Oxid_Esales\Eshop\Application\Model\Vendor) {
+            $vendor_path['link'] = $vendor->get_link();
+            $vendor_path['title'] = $vendor->oxvendor__oxtitle->value;
+            $paths[] = $vendor_path;
         }
-
         return $paths;
     }
-
     /**
      * Recommendation list bread crumb
      *
@@ -1204,64 +1042,51 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @return array
      */
-    protected function _getRecommendationListBredCrumb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _get_recommendation_list_bred_crumb()
     {
         $paths = [];
-        $recommListPath = [];
-        $baseLanguageId = Registry::getLang()->getBaseLanguage();
-        $recommListPath['title'] = Registry::getLang()->translateString('LISTMANIA', $baseLanguageId, false);
-        $paths[] = $recommListPath;
-
+        $recomm_list_path = [];
+        $base_language_id = Registry::get_lang()->get_base_language();
+        $recomm_list_path['title'] = Registry::get_lang()->translate_string('LISTMANIA', $base_language_id, false);
+        $paths[] = $recomm_list_path;
         return $paths;
     }
-
     /**
      * Search bread crumb
      *
      * @return array
      */
-    protected function getSearchBreadCrumb()
+    protected function get_search_bread_crumb()
     {
         $paths = [];
-        $searchPath = [];
-
-        $baseLanguageId = Registry::getLang()->getBaseLanguage();
-        $translatedString = Registry::getLang()->translateString('SEARCH_RESULT', $baseLanguageId, false);
-        $selfLink = $this->getViewConfig()->getSelfLink();
-        $sessionToken = Registry::getSession()->getVariable('sess_stoken');
-
-        $searchPath['title'] = sprintf($translatedString, $this->getSearchParamForHtml());
-        $searchPath['link'] = $selfLink . 'stoken=' . $sessionToken . '&amp;cl=search&amp;' .
-                              'searchparam=' . $this->getSearchParamForHtml();
-
-        $paths[] = $searchPath;
-
+        $search_path = [];
+        $base_language_id = Registry::get_lang()->get_base_language();
+        $translated_string = Registry::get_lang()->translate_string('SEARCH_RESULT', $base_language_id, false);
+        $self_link = $this->get_view_config()->get_self_link();
+        $session_token = Registry::get_session()->get_variable('sess_stoken');
+        $search_path['title'] = sprintf($translated_string, $this->get_search_param_for_html());
+        $search_path['link'] = $self_link . 'stoken=' . $session_token . '&amp;cl=search&amp;' . 'searchparam=' . $this->get_search_param_for_html();
+        $paths[] = $search_path;
         return $paths;
     }
-
     /**
      * Category bread crumb
      *
      * @return array
      */
-    protected function getCategoryBreadCrumb()
+    protected function get_category_bread_crumb()
     {
         $paths = [];
-
-        $categoryTree = $this->getCatTreePath();
-
-        if ($categoryTree) {
-            foreach ($categoryTree as $category) {
+        $category_tree = $this->get_cat_tree_path();
+        if ($category_tree) {
+            foreach ($category_tree as $category) {
                 /** @var Category $category */
-                $categoryPath = [];
-
-                $categoryPath['link'] = $category->getLink();
-                $categoryPath['title'] = $category->oxcategories__oxtitle->value;
-
-                $paths[] = $categoryPath;
+                $category_path = [];
+                $category_path['link'] = $category->get_link();
+                $category_path['title'] = $category->oxcategories__oxtitle->value;
+                $paths[] = $category_path;
             }
         }
-
         return $paths;
     }
 }

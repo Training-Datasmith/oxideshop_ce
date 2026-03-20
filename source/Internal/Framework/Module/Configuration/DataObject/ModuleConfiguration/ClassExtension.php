@@ -4,26 +4,20 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-
-class ClassExtension
+class Class_Extension
 {
-    public function __construct(
-        private readonly string $ShopClassName,
-        private readonly string $moduleExtensionClassName
-    ) {
-    }
-
-    public function getShopClassName(): string
+    public function __construct(private readonly string $shop_class_name, private readonly string $module_extension_class_name)
     {
-        return $this->ShopClassName;
     }
-
-    public function getModuleExtensionClassName(): string
+    public function get_shop_class_name(): string
     {
-        return $this->moduleExtensionClassName;
+        return $this->shop_class_name;
+    }
+    public function get_module_extension_class_name(): string
+    {
+        return $this->module_extension_class_name;
     }
 }

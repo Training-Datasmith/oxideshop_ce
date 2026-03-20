@@ -4,12 +4,10 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Application\Enum;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Application\Enum;
-
-enum NewsletterSubscriptionStatus: int
+enum Newsletter_Subscription_Status : int
 {
     case Subscribed = 1;
     case SubscriptionConfirmed = 2;

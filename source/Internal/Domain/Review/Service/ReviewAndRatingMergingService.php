@@ -4,149 +4,98 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Service;
-
-use Doctrine\Common\Collections\ArrayCollection;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Rating;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\Review;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRating;
-
-class ReviewAndRatingMergingService implements ReviewAndRatingMergingServiceInterface
+use Doctrine\Common\Collections\Array_Collection;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Object\Rating;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Object\Review;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\View_Data_Object\Review_And_Rating;
+class Review_And_Rating_Merging_Service implements Review_And_Rating_Merging_Service_Interface
 {
     /**
      * Merges Reviews and Ratings to Collection of ReviewAndRating view objects.
      *
      */
-    public function mergeReviewAndRating(ArrayCollection $reviews, ArrayCollection $ratings): \Doctrine\Common\Collections\ArrayCollection
+    public function merge_review_and_rating(Array_Collection $reviews, Array_Collection $ratings): \Doctrine\Common\Collections\Array_Collection
     {
-        $ratingAndReviewList = array_merge(
-            $this->getReviewDataWithRating($reviews, $ratings),
-            $this->getRatingWithoutReviewData($reviews, $ratings)
-        );
-
-        return $this->mapReviewAndRatingList($ratingAndReviewList);
+        $rating_and_review_list = array_merge($this->get_review_data_with_rating($reviews, $ratings), $this->get_rating_without_review_data($reviews, $ratings));
+        return $this->map_review_and_rating_list($rating_and_review_list);
     }
-
-    private function getReviewDataWithRating(ArrayCollection $reviews, ArrayCollection $ratings): array
+    private function get_review_data_with_rating(Array_Collection $reviews, Array_Collection $ratings): array
     {
-        $reviewList = [];
-
+        $review_list = [];
         foreach ($reviews as $review) {
-            $ratingAndReview = [
-                'reviewId'      => $review->getId(),
-                'text'          => $review->getText(),
-                'createdAt'     => $review->getCreatedAt(),
-                'objectId'      => $review->getObjectId(),
-                'objectType'    => $review->getType(),
-                'rating'        => false,
-                'ratingId'      => false,
-            ];
-
+            $rating_and_review = ['reviewId' => $review->get_id(), 'text' => $review->get_text(), 'createdAt' => $review->get_created_at(), 'objectId' => $review->get_object_id(), 'objectType' => $review->get_type(), 'rating' => false, 'ratingId' => false];
             foreach ($ratings as $rating) {
-                if ($this->isReviewRating($review, $rating)) {
-                    $ratingAndReview['rating'] = $rating->getRating();
-                    $ratingAndReview['ratingId'] = $rating->getId();
-
+                if ($this->is_review_rating($review, $rating)) {
+                    $rating_and_review['rating'] = $rating->get_rating();
+                    $rating_and_review['ratingId'] = $rating->get_id();
                     break;
                 }
             }
-
-            $reviewList[] = $ratingAndReview;
+            $review_list[] = $rating_and_review;
         }
-
-        return $reviewList;
+        return $review_list;
     }
-
-    private function getRatingWithoutReviewData(ArrayCollection $reviews, ArrayCollection $ratings): array
+    private function get_rating_without_review_data(Array_Collection $reviews, Array_Collection $ratings): array
     {
-        $ratingList = [];
-
+        $rating_list = [];
         foreach ($ratings as $rating) {
-            if ($this->isRatingWithoutReview($rating, $reviews)) {
-                $ratingList[] = [
-                    'ratingId'      => $rating->getId(),
-                    'reviewId'      => false,
-                    'rating'        => $rating->getRating(),
-                    'text'          => '',
-                    'objectId'      => $rating->getObjectId(),
-                    'objectType'    => $rating->getType(),
-                    'createdAt'     => $rating->getCreatedAt(),
-                ];
+            if ($this->is_rating_without_review($rating, $reviews)) {
+                $rating_list[] = ['ratingId' => $rating->get_id(), 'reviewId' => false, 'rating' => $rating->get_rating(), 'text' => '', 'objectId' => $rating->get_object_id(), 'objectType' => $rating->get_type(), 'createdAt' => $rating->get_created_at()];
             }
         }
-
-        return $ratingList;
+        return $rating_list;
     }
-
     /**
      * Returns true if Rating doesn't belong to any review.
      *
      *
      * @return bool
      */
-    private function isRatingWithoutReview(Rating $rating, ArrayCollection $reviews)
+    private function is_rating_without_review(Rating $rating, Array_Collection $reviews)
     {
-        $withoutReview = true;
-
+        $without_review = true;
         foreach ($reviews as $review) {
-            if ($this->isReviewRating($review, $rating)) {
-                $withoutReview = false;
+            if ($this->is_review_rating($review, $rating)) {
+                $without_review = false;
                 break;
             }
         }
-
-        return $withoutReview;
+        return $without_review;
     }
-
     /**
      * Returns true if Rating belongs to Review.
      *
      *
      */
-    private function isReviewRating(Review $review, Rating $rating): bool
+    private function is_review_rating(Review $review, Rating $rating): bool
     {
-        return $rating->getType() === $review->getType()
-            && $rating->getObjectId() === $review->getObjectId()
-            && $rating->getRating() === $review->getRating()
-            && $rating->getUserId() === $review->getUserId();
+        return $rating->get_type() === $review->get_type() && $rating->get_object_id() === $review->get_object_id() && $rating->get_rating() === $review->get_rating() && $rating->get_user_id() === $review->get_user_id();
     }
-
     /**
      * Maps Reviews and Ratings data to Collection of ReviewAndRating view objects.
      *
      *
      */
-    private function mapReviewAndRatingList(array $reviewAndRatingDataList): \Doctrine\Common\Collections\ArrayCollection
+    private function map_review_and_rating_list(array $review_and_rating_data_list): \Doctrine\Common\Collections\Array_Collection
     {
-        $mappedReviewAndRating = new ArrayCollection();
-
-        foreach ($reviewAndRatingDataList as $reviewAndRatingData) {
-            $mappedReviewAndRating[] = $this->mapReviewAndRating($reviewAndRatingData);
+        $mapped_review_and_rating = new Array_Collection();
+        foreach ($review_and_rating_data_list as $review_and_rating_data) {
+            $mapped_review_and_rating[] = $this->map_review_and_rating($review_and_rating_data);
         }
-
-        return $mappedReviewAndRating;
+        return $mapped_review_and_rating;
     }
-
     /**
      * Maps Review and Rating data to ReviewAndRating view object.
      *
      *
      */
-    private function mapReviewAndRating(array $reviewAndRatingData): \OxidEsales\EshopCommunity\Internal\Domain\Review\ViewDataObject\ReviewAndRating
+    private function map_review_and_rating(array $review_and_rating_data): \Oxid_Esales\Eshop_Community\Internal\Domain\Review\View_Data_Object\Review_And_Rating
     {
-        $reviewAndRating = new ReviewAndRating();
-        $reviewAndRating
-            ->setReviewId($reviewAndRatingData['reviewId'])
-            ->setRatingId($reviewAndRatingData['ratingId'])
-            ->setRating($reviewAndRatingData['rating'])
-            ->setReviewText($reviewAndRatingData['text'])
-            ->setObjectId($reviewAndRatingData['objectId'])
-            ->setObjectType($reviewAndRatingData['objectType'])
-            ->setCreatedAt($reviewAndRatingData['createdAt']);
-
-        return $reviewAndRating;
+        $review_and_rating = new Review_And_Rating();
+        $review_and_rating->set_review_id($review_and_rating_data['reviewId'])->set_rating_id($review_and_rating_data['ratingId'])->set_rating($review_and_rating_data['rating'])->set_review_text($review_and_rating_data['text'])->set_object_id($review_and_rating_data['objectId'])->set_object_type($review_and_rating_data['objectType'])->set_created_at($review_and_rating_data['createdAt']);
+        return $review_and_rating;
     }
 }

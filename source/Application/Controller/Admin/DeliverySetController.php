@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin article deliveryset manager.
@@ -15,12 +13,12 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * and "deliveryset_main") to frame.
  * Admin Menu: Shop settings -> Shipping & Handling Sets.
  */
-class DeliverySetController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Delivery_Set_Controller extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'deliveryset';
+    protected $_s_this_template = 'deliveryset';
 }

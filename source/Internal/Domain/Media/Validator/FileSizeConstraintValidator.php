@@ -4,44 +4,29 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\FileSizeTooLargeException;
-use OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception\FileSizeTooSmallException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-class FileSizeConstraintValidator implements MediaConstraintValidatorInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception\File_Size_Too_Large_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception\File_Size_Too_Small_Exception;
+use Symfony\Component\Http_Foundation\File\Uploaded_File;
+class File_Size_Constraint_Validator implements Media_Constraint_Validator_Interface
 {
-    private readonly int $minSizeBytes;
-    private readonly int $maxSizeBytes;
-
-    public function __construct(
-        private readonly int $minSizeKb,
-        private readonly int $maxSizeKb
-    ) {
-        $this->minSizeBytes = $minSizeKb * 1024;
-        $this->maxSizeBytes = $maxSizeKb * 1024;
-    }
-
-    public function validate(UploadedFile $uploadedFile): void
+    private readonly int $min_size_bytes;
+    private readonly int $max_size_bytes;
+    public function __construct(private readonly int $min_size_kb, private readonly int $max_size_kb)
     {
-        $filesize = $uploadedFile->getSize();
-
-        if ($filesize < $this->minSizeBytes) {
-            throw new FileSizeTooSmallException(
-                $filesize,
-                $this->minSizeKb
-            );
+        $this->min_size_bytes = $min_size_kb * 1024;
+        $this->max_size_bytes = $max_size_kb * 1024;
+    }
+    public function validate(Uploaded_File $uploaded_file): void
+    {
+        $filesize = $uploaded_file->get_size();
+        if ($filesize < $this->min_size_bytes) {
+            throw new File_Size_Too_Small_Exception($filesize, $this->min_size_kb);
         }
-
-        if ($filesize > $this->maxSizeBytes) {
-            throw new FileSizeTooLargeException(
-                $filesize,
-                $this->maxSizeKb
-            );
+        if ($filesize > $this->max_size_bytes) {
+            throw new File_Size_Too_Large_Exception($filesize, $this->max_size_kb);
         }
     }
 }

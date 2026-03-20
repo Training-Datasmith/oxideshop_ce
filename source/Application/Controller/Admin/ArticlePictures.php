@@ -4,67 +4,41 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Domain\Media\MediaUrlGeneratorInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Dao\ProductMediaDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMedia;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRole;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
-
-class ArticlePictures extends AdminDetailsController
+use Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Media_Url_Generator_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Dao\Product_Media_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_Role;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Id;
+class Article_Pictures extends Admin_Details_Controller
 {
-    private readonly string $detailImageSize;
-    private readonly string $zoomImageSize;
-    private readonly MediaUrlGeneratorInterface $mediaUrlGenerator;
-    private readonly ProductMediaDaoInterface $productMediaDao;
-
+    private readonly string $detail_image_size;
+    private readonly string $zoom_image_size;
+    private readonly Media_Url_Generator_Interface $media_url_generator;
+    private readonly Product_Media_Dao_Interface $product_media_dao;
     public function __construct()
     {
-        $this->mediaUrlGenerator = ContainerFacade::get(MediaUrlGeneratorInterface::class);
-        $this->productMediaDao = ContainerFacade::get(ProductMediaDaoInterface::class);
-
-        $this->detailImageSize = ContainerFacade::getParameter('oxid_esales.theme.admin.media.image_grid_size');
-        $this->zoomImageSize = ContainerFacade::getParameter('oxid_esales.theme.admin.media.image_zoom_size');
-
+        $this->media_url_generator = Container_Facade::get(Media_Url_Generator_Interface::class);
+        $this->product_media_dao = Container_Facade::get(Product_Media_Dao_Interface::class);
+        $this->detail_image_size = Container_Facade::get_parameter('oxid_esales.theme.admin.media.image_grid_size');
+        $this->zoom_image_size = Container_Facade::get_parameter('oxid_esales.theme.admin.media.image_zoom_size');
         parent::__construct();
     }
-
     public function render()
     {
         parent::render();
-
-        $productId = Id::fromString($this->getEditObjectId());
-
-        $icon = $this->productMediaDao->getByRole($productId, ProductMediaRole::from(ProductMediaRole::ICON));
-        $thumbnail = $this->productMediaDao->getByRole($productId, ProductMediaRole::from(ProductMediaRole::THUMBNAIL));
-
-        $this->_aViewData['productImages'] = [
-            'icon' => $icon ? $this->buildImageData($icon) : null,
-            'thumbnail' => $thumbnail ? $this->buildImageData($thumbnail) : null,
-            'detailImages' => $this->productMediaDao
-                ->getAllByRole($productId, ProductMediaRole::from(ProductMediaRole::DETAIL))
-                ->map(fn (ProductMedia $media): array => $this->buildImageData($media))
-                ->toArray(),
-        ];
-
+        $product_id = Id::from_string($this->get_edit_object_id());
+        $icon = $this->product_media_dao->get_by_role($product_id, Product_Media_Role::from(Product_Media_Role::ICON));
+        $thumbnail = $this->product_media_dao->get_by_role($product_id, Product_Media_Role::from(Product_Media_Role::THUMBNAIL));
+        $this->_a_view_data['productImages'] = ['icon' => $icon ? $this->build_image_data($icon) : null, 'thumbnail' => $thumbnail ? $this->build_image_data($thumbnail) : null, 'detailImages' => $this->product_media_dao->get_all_by_role($product_id, Product_Media_Role::from(Product_Media_Role::DETAIL))->map(fn(Product_Media $media): array => $this->build_image_data($media))->to_array()];
         return 'article_pictures';
     }
-
-    private function buildImageData(ProductMedia $media): array
+    private function build_image_data(Product_Media $media): array
     {
-        return [
-            'id' => (string) $media->getId(),
-            'productId' => (string) $media->getProductId(),
-            'url' => $this->mediaUrlGenerator->generateSizedImageUrl($media->getMedia(), $this->detailImageSize),
-            'zoomUrl' => $this->mediaUrlGenerator->generateSizedImageUrl($media->getMedia(), $this->zoomImageSize),
-            'position' => $media->getPosition(),
-            'active' => $media->isActive(),
-        ];
+        return ['id' => (string) $media->get_id(), 'productId' => (string) $media->get_product_id(), 'url' => $this->media_url_generator->generate_sized_image_url($media->get_media(), $this->detail_image_size), 'zoomUrl' => $this->media_url_generator->generate_sized_image_url($media->get_media(), $this->zoom_image_size), 'position' => $media->get_position(), 'active' => $media->is_active()];
     }
 }

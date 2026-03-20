@@ -4,20 +4,17 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Form;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Form;
-
-interface FormValidatorInterface
+interface Form_Validator_Interface
 {
     /**
      * @return bool
      */
-    public function isValid(FormInterface $form);
-
+    public function is_valid(Form_Interface $form);
     /**
      * @return array
      */
-    public function getErrors();
+    public function get_errors();
 }

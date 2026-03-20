@@ -4,42 +4,28 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Translation\Locator;
 
 // phpcs:disable
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator\FrontendModuleTranslationFileLocatorInterface as LocatorInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Translation\Locator\ModuleTranslationFileLocatorAbstract as LocatorAbstract;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Translation\Locator\Frontend_Module_Translation_File_Locator_Interface as LocatorInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Translation\Locator\Module_Translation_File_Locator_Abstract as LocatorAbstract;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-
 // phpcs:enable
-
-class FrontendModuleTranslationFileLocator extends LocatorAbstract implements LocatorInterface
+class Frontend_Module_Translation_File_Locator extends Locator_Abstract implements Locator_Interface
 {
-    public function __construct(
-        private readonly ActiveModulesDataProviderInterface $activeModulesDataProvider,
-        private readonly Filesystem $filesystem
-    ) {
+    public function __construct(private readonly Active_Modules_Data_Provider_Interface $active_modules_data_provider, private readonly Filesystem $filesystem)
+    {
     }
-
     public function locate(string $lang): array
     {
-        $langFiles = [];
-
-        foreach ($this->activeModulesDataProvider->getModulePaths() as $moduleLangPath) {
-            $moduleLangPath = Path::join(
-                $this->checkAndAddApplicationFolder($this->filesystem, $moduleLangPath),
-                'translations',
-                $lang
-            );
-
-            $langFiles = $this->appendLangFiles($langFiles, $moduleLangPath);
+        $lang_files = [];
+        foreach ($this->active_modules_data_provider->get_module_paths() as $module_lang_path) {
+            $module_lang_path = Path::join($this->check_and_add_application_folder($this->filesystem, $module_lang_path), 'translations', $lang);
+            $lang_files = $this->append_lang_files($lang_files, $module_lang_path);
         }
-
-        return $langFiles;
+        return $lang_files;
     }
 }

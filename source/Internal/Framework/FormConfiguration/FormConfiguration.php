@@ -4,23 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Form_Configuration;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration;
-
-class FormConfiguration implements FormConfigurationInterface
+class Form_Configuration implements Form_Configuration_Interface
 {
-    private array $fieldConfigurations = [];
-
-    public function addFieldConfiguration(FieldConfigurationInterface $fieldConfiguration): static
+    private array $field_configurations = [];
+    public function add_field_configuration(Field_Configuration_Interface $field_configuration): static
     {
-        $this->fieldConfigurations[] = $fieldConfiguration;
+        $this->field_configurations[] = $field_configuration;
         return $this;
     }
-
-    public function getFieldConfigurations(): array
+    public function get_field_configurations(): array
     {
-        return $this->fieldConfigurations;
+        return $this->field_configurations;
     }
 }

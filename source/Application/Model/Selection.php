@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\Str;
-
+use Oxid_Esales\Eshop\Core\Str;
 /**
  * Variant selection container class
  */
@@ -28,86 +25,80 @@ class Selection
         /**
          * Selection name
          */
-        protected $_sName,
+        protected $_s_name,
         /**
          * Selection value
          */
-        protected $_sValue,
+        protected $_s_value,
         /**
          * Selection state: disabled
          */
-        protected $_blDisabled,
+        protected $_bl_disabled,
         /**
          * Selection state: active
          */
-        protected $_blActive
-    ) {
+        protected $_bl_active
+    )
+    {
     }
-
     /**
      * Returns selection value
      *
      * @return string
      */
-    public function getValue()
+    public function get_value()
     {
-        return $this->_sValue;
+        return $this->_s_value;
     }
-
     /**
      * Returns selection name
      *
      * @return string
      */
-    public function getName()
+    public function get_name()
     {
-        return Str::getStr()->htmlspecialchars($this->_sName);
+        return Str::get_str()->htmlspecialchars($this->_s_name);
     }
-
     /**
      * Returns TRUE if current selection is active (chosen)
      *
      * @return bool
      */
-    public function isActive()
+    public function is_active()
     {
-        return $this->_blActive;
+        return $this->_bl_active;
     }
-
     /**
      * Returns TRUE if current selection is disabled
      *
      * @return bool
      */
-    public function isDisabled()
+    public function is_disabled()
     {
-        return $this->_blDisabled;
+        return $this->_bl_disabled;
     }
-
     /**
      * Sets selection active/inactive
      *
      * @param bool $blActive selection state TRUE/FALSE
      */
-    public function setActiveState($blActive): void
+    public function set_active_state($bl_active): void
     {
-        $this->_blActive = $blActive;
+        $this->_bl_active = $bl_active;
     }
-
     /**
      * Sets selection disabled/enables
      *
      * @param bool $blDisabled selection state TRUE/FALSE
      */
-    public function setDisabled($blDisabled): void
+    public function set_disabled($bl_disabled): void
     {
-        $this->_blDisabled = $blDisabled;
+        $this->_bl_disabled = $bl_disabled;
     }
-
     /**
      * Returns selection link (currently returns "#")
      */
-    public function getLink(): string
+    public function get_link(): string
     {
         return '#';
     }

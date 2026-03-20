@@ -4,11 +4,9 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Dao;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Dao;
-
-class InvalidObjectIdDaoException extends \Exception
+class Invalid_Object_Id_Dao_Exception extends \Exception
 {
 }

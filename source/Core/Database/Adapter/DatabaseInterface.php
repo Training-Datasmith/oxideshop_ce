@@ -1,26 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core\Database\Adapter;
 
-namespace OxidEsales\EshopCommunity\Core\Database\Adapter;
-
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-
+use Oxid_Esales\Eshop\Core\Exception\Database_Connection_Exception;
+use Oxid_Esales\Eshop\Core\Exception\Database_Error_Exception;
 /**
  * @deprecated since v6.5.0 (2019-09-24);
  * Use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface
  */
-interface DatabaseInterface
+interface Database_Interface
 {
     /** @var int code of exception to check against. Use same number as MySQL to avoid duplications. */
     public const DUPLICATE_KEY_ERROR_CODE = 1062;
-
     /**
      * Set the necessary connection parameters to connect to the database.
      * The parameter array must at least contain the key 'default'. E.g.
@@ -36,33 +32,28 @@ interface DatabaseInterface
      *      ]
      * ]
      */
-    public function setConnectionParameters(array $connectionParameters);
-
+    public function set_connection_parameters(array $connection_parameters);
     /**
      * Connects to the database using the connection parameters set in DatabaseInterface::setConnectionParameters().
      *
      * @throws DatabaseConnectionException If a connection to the database cannot be established
      */
     public function connect();
-
     /**
      * Force database master connection.
      */
-    public function forceMasterConnection();
-
+    public function force_master_connection();
     /**
      * Force database slave connection. Do not use this function unless
      * you know exactly what you are doing. Usage of this function
      * can lead to write access to a MySQL slave and getting replication out
      * of sync.
      */
-    public function forceSlaveConnection();
-
+    public function force_slave_connection();
     /**
      * Closes an open connection
      */
-    public function closeConnection();
-
+    public function close_connection();
     /**
      * Get the first value of the first row of the result set of a given sql SELECT or SHOW statement.
      * Returns false for any other statement.
@@ -75,8 +66,7 @@ interface DatabaseInterface
      *
      * @return string|false      Returns a string for SELECT or SHOW statements and FALSE for any other statement.
      */
-    public function getOne($query, $parameters = []);
-
+    public function get_one($query, $parameters = []);
     /**
      * Get an array with the values of the first row of a given sql SELECT or SHOW statement .
      * Returns an empty array for any other statement.
@@ -98,8 +88,7 @@ interface DatabaseInterface
      *
      * @return array The row, we selected with the given sql statement.
      */
-    public function getRow($query, $parameters = []);
-
+    public function get_row($query, $parameters = []);
     /**
      * Return the first column of all rows of the results of a given sql SELECT or SHOW statement as an numeric array.
      * Throws an exception for any other statement.
@@ -120,8 +109,7 @@ interface DatabaseInterface
      *
      * @return array The values of the first column of a corresponding sql query.
      */
-    public function getCol($query, $parameters = []);
-
+    public function get_col($query, $parameters = []);
     /**
      * Get an multi-dimensional array of arrays with the values of the all rows of a given sql SELECT or SHOW statement.
      * Returns an empty array for any other statement.
@@ -143,8 +131,7 @@ interface DatabaseInterface
      *
      * @return array
      */
-    public function getAll($query, $parameters = []);
-
+    public function get_all($query, $parameters = []);
     /**
      * Return the results of a given sql SELECT or SHOW statement as a ResultSet.
      * Throws an exception for any other statement.
@@ -169,7 +156,6 @@ interface DatabaseInterface
      * @return ResultSetInterface The result of the given query.
      */
     public function select($query, $parameters = []);
-
     /**
      * Return the results of a given SQL SELECT or SHOW statement limited by a LIMIT clause as a ResultSet.
      * Throws an exception for any other statement.
@@ -198,8 +184,7 @@ interface DatabaseInterface
      *@throws DatabaseErrorException The exception, that can occur while executing the sql statement.
      *
      */
-    public function selectLimit($query, $rowCount = -1, $offset = 0, $parameters = []);
-
+    public function select_limit($query, $row_count = -1, $offset = 0, $parameters = []);
     /**
      * Execute non read statements like INSERT, UPDATE, DELETE and return the number of rows affected by the statement.
      * This method has to be used EXCLUSIVELY for non read statements.
@@ -221,7 +206,6 @@ interface DatabaseInterface
      * @return integer Number of rows affected by the SQL statement
      */
     public function execute($query, $parameters = []);
-
     /**
      * Quote a string, that it might be used as a value in a sql statement.
      * Returns false for values that cannot be quoted.
@@ -246,7 +230,6 @@ interface DatabaseInterface
      * or set to false, if the value could not have been quoted.
      */
     public function quote($value);
-
     /**
      * Quote every value in a given array in a way, that it might be used as a value in a sql statement and return the
      * result as a new array. Numeric values will be converted to strings which quotes.
@@ -261,8 +244,7 @@ interface DatabaseInterface
      * @return array Array with all string and numeric values quoted with single quotes or set to false,
      * if the value could not have been quoted.
      */
-    public function quoteArray($array);
-
+    public function quote_array($array);
     /**
      * Quote a string in a way, that it can be used as a identifier (i.e. table name or field name) in a sql statement.
      * You are strongly encouraged to always use quote identifiers.
@@ -271,8 +253,7 @@ interface DatabaseInterface
      *
      * @return string
      */
-    public function quoteIdentifier($string);
-
+    public function quote_identifier($string);
     /**
      * Get the meta information about all the columns of the given table.
      * This is kind of a poor man's schema manager, which only works for MySQL.
@@ -281,29 +262,25 @@ interface DatabaseInterface
      *
      * @return array Array of objects with meta information of each column.
      */
-    public function metaColumns($table);
-
+    public function meta_columns($table);
     /**
      * Start a database transaction.
      *
      * @throws DatabaseErrorException
      */
-    public function startTransaction();
-
+    public function start_transaction();
     /**
      * Commit a database transaction.
      *
      * @throws DatabaseErrorException
      */
-    public function commitTransaction();
-
+    public function commit_transaction();
     /**
      * RollBack a database transaction.
      *
      * @throws DatabaseErrorException
      */
-    public function rollbackTransaction();
-
+    public function rollback_transaction();
     /**
      * @inheritdoc
      *
@@ -326,22 +303,19 @@ interface DatabaseInterface
      *
      * @throws \InvalidArgumentException|DatabaseErrorException
      */
-    public function setTransactionIsolationLevel($level);
-
+    public function set_transaction_isolation_level($level);
     /**
      * Return true, if the connection is marked rollbackOnly.
      *
      * @return bool
      */
-    public function isRollbackOnly();
-
+    public function is_rollback_only();
     /**
      * Checks whether a transaction is currently active.
      *
      * @return boolean TRUE if a transaction is currently active, FALSE otherwise.
      */
-    public function isTransactionActive();
-
+    public function is_transaction_active();
     /**
      * Return string representing the row ID of the last row that was inserted into
      * the database.
@@ -349,5 +323,5 @@ interface DatabaseInterface
      *
      * @return string|int Row ID
      */
-    public function getLastInsertId();
+    public function get_last_insert_id();
 }

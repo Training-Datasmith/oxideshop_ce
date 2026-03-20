@@ -1,76 +1,66 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * PriceAlarm manager.
  * Performs PriceAlarm data/objects loading, deleting.
  */
-class PriceAlarm extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Price_Alarm extends \Oxid_Esales\Eshop\Core\Model\Base_Model
 {
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxpricealarm';
-
+    protected $_s_class_name = 'oxpricealarm';
     /**
      * Article object
      *
      * @var object
      */
-    protected $_oArticle;
-
+    protected $_o_article;
     /**
      * Formatted original article price
      *
      * @var string
      */
-    protected $_fPrice;
-
+    protected $_f_price;
     /**
      * Original article price
      *
      * @var double
      */
-    protected $_dPrice;
-
+    protected $_d_price;
     /**
      * Full article title
      *
      * @var string
      */
-    protected $_sTitle;
-
+    protected $_s_title;
     /**
      * Currency object
      *
      * @var object
      */
-    protected $_oCurrency;
-
+    protected $_o_currency;
     /**
      * Customer proposed price
      *
      * @var string
      */
-    protected $_fProposedPrice;
-
+    protected $_f_proposed_price;
     /**
      * PriceAlarm status
      *
      * @var int
      */
-    protected $_iStatus;
-
+    protected $_i_status;
     /**
      * Class constructor, initiates parent constructor (parent::oxBase()), loads
      * base shop objects.
@@ -80,7 +70,6 @@ class PriceAlarm extends \OxidEsales\Eshop\Core\Model\BaseModel
         parent::__construct();
         $this->init('oxpricealarm');
     }
-
     /**
      * Inserts object data into DB, returns true on success.
      *
@@ -89,161 +78,141 @@ class PriceAlarm extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function insert()
     {
         // set oxinsert value
-        $this->oxpricealarm__oxinsert = new \OxidEsales\Eshop\Core\Field(date('Y-m-d', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
-
+        $this->oxpricealarm__oxinsert = new \Oxid_Esales\Eshop\Core\Field(date('Y-m-d', \Oxid_Esales\Eshop\Core\Registry::get_utils_date()->get_time()));
         return parent::insert();
     }
-
     /**
      * Loads pricealarm article
      *
      * @return object
      */
-    public function getArticle()
+    public function get_article()
     {
-        if ($this->_oArticle == null) {
-            $this->_oArticle = false;
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            if ($oArticle->load($this->oxpricealarm__oxartid->value)) {
-                $this->_oArticle = $oArticle;
+        if ($this->_o_article == null) {
+            $this->_o_article = false;
+            $o_article = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+            if ($o_article->load($this->oxpricealarm__oxartid->value)) {
+                $this->_o_article = $o_article;
             }
         }
-
-        return $this->_oArticle;
+        return $this->_o_article;
     }
-
     /**
      * Returns formatted pricealarm article original price
      *
      * @return string
      */
-    public function getFPrice()
+    public function get_f_price()
     {
-        if ($this->_fPrice == null) {
-            $this->_fPrice = false;
-            if ($dArtPrice = $this->getPrice()) {
-                $myLang = \OxidEsales\Eshop\Core\Registry::getLang();
-                $oThisCurr = $this->getPriceAlarmCurrency();
-                $this->_fPrice = $myLang->formatCurrency($dArtPrice, $oThisCurr);
+        if ($this->_f_price == null) {
+            $this->_f_price = false;
+            if ($d_art_price = $this->get_price()) {
+                $my_lang = \Oxid_Esales\Eshop\Core\Registry::get_lang();
+                $o_this_curr = $this->get_price_alarm_currency();
+                $this->_f_price = $my_lang->format_currency($d_art_price, $o_this_curr);
             }
         }
-
-        return $this->_fPrice;
+        return $this->_f_price;
     }
-
     /**
      * Returns pricealarm article original price
      *
      * @return double
      */
-    public function getPrice()
+    public function get_price()
     {
-        if ($this->_dPrice == null) {
-            $this->_dPrice = false;
-            if ($oArticle = $this->getArticle()) {
-                $myUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
-                $oThisCurr = $this->getPriceAlarmCurrency();
-
+        if ($this->_d_price == null) {
+            $this->_d_price = false;
+            if ($o_article = $this->get_article()) {
+                $my_utils = \Oxid_Esales\Eshop\Core\Registry::get_utils();
+                $o_this_curr = $this->get_price_alarm_currency();
                 // #889C - Netto prices in Admin
                 // (we have to call $oArticle->getPrice() to get price with VAT)
-                $dArtPrice = $oArticle->getPrice()->getBruttoPrice() * $oThisCurr->rate;
-                $dArtPrice = $myUtils->fRound($dArtPrice);
-
-                $this->_dPrice = $dArtPrice;
+                $d_art_price = $o_article->get_price()->get_brutto_price() * $o_this_curr->rate;
+                $d_art_price = $my_utils->f_round($d_art_price);
+                $this->_d_price = $d_art_price;
             }
         }
-
-        return $this->_dPrice;
+        return $this->_d_price;
     }
-
     /**
      * Returns pricealarm article full title
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        if ($this->_sTitle == null) {
-            $this->_sTitle = false;
-            if ($oArticle = $this->getArticle()) {
-                $this->_sTitle = $oArticle->oxarticles__oxtitle->value;
-                if ($oArticle->oxarticles__oxparentid->value && !$oArticle->oxarticles__oxtitle->value) {
-                    $oParent = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-                    $oParent->load($oArticle->oxarticles__oxparentid->value);
-                    $this->_sTitle = $oParent->oxarticles__oxtitle->value . ' ' . $oArticle->oxarticles__oxvarselect->value;
+        if ($this->_s_title == null) {
+            $this->_s_title = false;
+            if ($o_article = $this->get_article()) {
+                $this->_s_title = $o_article->oxarticles__oxtitle->value;
+                if ($o_article->oxarticles__oxparentid->value && !$o_article->oxarticles__oxtitle->value) {
+                    $o_parent = ox_new(\Oxid_Esales\Eshop\Application\Model\Article::class);
+                    $o_parent->load($o_article->oxarticles__oxparentid->value);
+                    $this->_s_title = $o_parent->oxarticles__oxtitle->value . ' ' . $o_article->oxarticles__oxvarselect->value;
                 }
             }
         }
-
-        return $this->_sTitle;
+        return $this->_s_title;
     }
-
     /**
      * Returns pricealarm currency object
      *
      * @return object
      */
-    public function getPriceAlarmCurrency()
+    public function get_price_alarm_currency()
     {
-        if ($this->_oCurrency == null) {
-            $this->_oCurrency = false;
-            $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-            $oThisCurr = $myConfig->getCurrencyObject($this->oxpricealarm__oxcurrency->value);
-
+        if ($this->_o_currency == null) {
+            $this->_o_currency = false;
+            $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+            $o_this_curr = $my_config->get_currency_object($this->oxpricealarm__oxcurrency->value);
             // #869A we should perform currency conversion
             // (older versions doesn't have currency info - assume as it is default - first in currency array)
-            if (!$oThisCurr) {
-                $oDefCurr = $myConfig->getActShopCurrencyObject();
-                $oThisCurr = $myConfig->getCurrencyObject($oDefCurr->name);
-                $this->oxpricealarm__oxcurrency->setValue($oDefCurr->name);
+            if (!$o_this_curr) {
+                $o_def_curr = $my_config->get_act_shop_currency_object();
+                $o_this_curr = $my_config->get_currency_object($o_def_curr->name);
+                $this->oxpricealarm__oxcurrency->set_value($o_def_curr->name);
             }
-            $this->_oCurrency = $oThisCurr;
+            $this->_o_currency = $o_this_curr;
         }
-
-        return $this->_oCurrency;
+        return $this->_o_currency;
     }
-
     /**
      * Returns formatted proposed price
      *
      * @return string
      */
-    public function getFProposedPrice()
+    public function get_f_proposed_price()
     {
-        if ($this->_fProposedPrice == null) {
-            $this->_fProposedPrice = false;
-            if ($oThisCurr = $this->getPriceAlarmCurrency()) {
-                $myLang = \OxidEsales\Eshop\Core\Registry::getLang();
-                $this->_fProposedPrice = $myLang->formatCurrency($this->oxpricealarm__oxprice->value, $oThisCurr);
+        if ($this->_f_proposed_price == null) {
+            $this->_f_proposed_price = false;
+            if ($o_this_curr = $this->get_price_alarm_currency()) {
+                $my_lang = \Oxid_Esales\Eshop\Core\Registry::get_lang();
+                $this->_f_proposed_price = $my_lang->format_currency($this->oxpricealarm__oxprice->value, $o_this_curr);
             }
         }
-
-        return $this->_fProposedPrice;
+        return $this->_f_proposed_price;
     }
-
     /**
      * Returns pricealarm status
      *
      * @return integer
      */
-    public function getPriceAlarmStatus()
+    public function get_price_alarm_status()
     {
-        if ($this->_iStatus == null) {
+        if ($this->_i_status == null) {
             // neutral status
-            $this->_iStatus = 0;
-
+            $this->_i_status = 0;
             // shop price is less or equal
-            $dArtPrice = $this->getPrice();
-            if ($this->oxpricealarm__oxprice->value >= $dArtPrice) {
-                $this->_iStatus = 1;
+            $d_art_price = $this->get_price();
+            if ($this->oxpricealarm__oxprice->value >= $d_art_price) {
+                $this->_i_status = 1;
             }
-
             // suggestion to user is sent
             if ($this->oxpricealarm__oxsended->value != '0000-00-00 00:00:00') {
-                $this->_iStatus = 2;
+                $this->_i_status = 2;
             }
         }
-
-        return $this->_iStatus;
+        return $this->_i_status;
     }
 }

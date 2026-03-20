@@ -4,86 +4,64 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service;
-
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ProjectYamlDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception\NoServiceYamlException;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Dao\Project_Yaml_Dao_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Exception\No_Service_Yaml_Exception;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface;
 use Symfony\Component\Filesystem\Path;
-
 /**
  * @internal
  */
-class ProjectYamlImportService implements ProjectYamlImportServiceInterface
+class Project_Yaml_Import_Service implements Project_Yaml_Import_Service_Interface
 {
     private const SERVICE_FILE_NAME = 'services.yaml';
-
-    public function __construct(
-        private readonly ProjectYamlDaoInterface $projectYamlDao,
-        private readonly BasicContextInterface $context
-    ) {
-    }
-
-    public function addImport(string $serviceDir): void
+    public function __construct(private readonly Project_Yaml_Dao_Interface $project_yaml_dao, private readonly Basic_Context_Interface $context)
     {
-        if (!realpath($serviceDir)) {
-            throw new NoServiceYamlException();
+    }
+    public function add_import(string $service_dir): void
+    {
+        if (!realpath($service_dir)) {
+            throw new No_Service_Yaml_Exception();
         }
-        $projectConfig = $this->projectYamlDao->loadProjectConfigFile();
-        $projectConfig->addImport($this->getServiceRelativeFilePath($serviceDir));
-
-        $this->projectYamlDao->saveProjectConfigFile($projectConfig);
+        $project_config = $this->project_yaml_dao->load_project_config_file();
+        $project_config->add_import($this->get_service_relative_file_path($service_dir));
+        $this->project_yaml_dao->save_project_config_file($project_config);
     }
-
-    public function removeImport(string $serviceDir): void
+    public function remove_import(string $service_dir): void
     {
-        $projectConfig = $this->projectYamlDao->loadProjectConfigFile();
-
-        $projectConfig->removeImport($this->getServiceRelativeFilePath($serviceDir));
-
-        $this->projectYamlDao->saveProjectConfigFile($projectConfig);
+        $project_config = $this->project_yaml_dao->load_project_config_file();
+        $project_config->remove_import($this->get_service_relative_file_path($service_dir));
+        $this->project_yaml_dao->save_project_config_file($project_config);
     }
-
     /**
      * Checks if the import files exist and if not removes them
      */
-    public function removeNonExistingImports(): void
+    public function remove_non_existing_imports(): void
     {
-        $projectConfig = $this->projectYamlDao->loadProjectConfigFile();
-
-        $configChanged = false;
-        foreach ($projectConfig->getImportFileNames() as $fileName) {
-            if (file_exists($this->getAbsolutePath($fileName))) {
+        $project_config = $this->project_yaml_dao->load_project_config_file();
+        $config_changed = false;
+        foreach ($project_config->get_import_file_names() as $file_name) {
+            if (file_exists($this->get_absolute_path($file_name))) {
                 continue;
             }
-            $projectConfig->removeImport($fileName);
-            $configChanged = true;
+            $project_config->remove_import($file_name);
+            $config_changed = true;
         }
-
-        if ($configChanged) {
-            $this->projectYamlDao->saveProjectConfigFile($projectConfig);
+        if ($config_changed) {
+            $this->project_yaml_dao->save_project_config_file($project_config);
         }
     }
-
     /**
      * @param $fileName
      */
-    private function getAbsolutePath(string $fileName): string
+    private function get_absolute_path(string $file_name): string
     {
-        return Path::makeAbsolute(
-            $fileName,
-            Path::getDirectory($this->context->getGeneratedServicesFilePath())
-        );
+        return Path::make_absolute($file_name, Path::get_directory($this->context->get_generated_services_file_path()));
     }
-
-    private function getServiceRelativeFilePath(string $serviceDir): string
+    private function get_service_relative_file_path(string $service_dir): string
     {
-        return Path::makeRelative(
-            $serviceDir . DIRECTORY_SEPARATOR . static::SERVICE_FILE_NAME,
-            Path::getDirectory($this->context->getGeneratedServicesFilePath())
-        );
+        return Path::make_relative($service_dir . DIRECTORY_SEPARATOR . static::SERVICE_FILE_NAME, Path::get_directory($this->context->get_generated_services_file_path()));
     }
 }

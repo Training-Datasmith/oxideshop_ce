@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Article file download page.
  */
-class DownloadController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Download_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Prevents from loading any component as this controller
@@ -24,7 +21,6 @@ class DownloadController extends \OxidEsales\Eshop\Application\Controller\Fronte
     {
         // empty for performance reasons
     }
-
     /**
      * Checks if given token is valid, formats HTTP headers,
      * and outputs file to buffer.
@@ -33,33 +29,32 @@ class DownloadController extends \OxidEsales\Eshop\Application\Controller\Fronte
      */
     public function render(): void
     {
-        $sFileOrderId = Registry::getRequest()->getRequestEscapedParameter('sorderfileid');
-
-        if ($sFileOrderId) {
-            $oArticleFile = oxNew(\OxidEsales\Eshop\Application\Model\File::class);
+        $s_file_order_id = Registry::get_request()->get_request_escaped_parameter('sorderfileid');
+        if ($s_file_order_id) {
+            $o_article_file = ox_new(\Oxid_Esales\Eshop\Application\Model\File::class);
             try {
                 /** @var \OxidEsales\Eshop\Application\Model\OrderFile $oOrderFile */
-                $oOrderFile = oxNew(\OxidEsales\Eshop\Application\Model\OrderFile::class);
-                if ($oOrderFile->load($sFileOrderId)) {
-                    $sFileId = $oOrderFile->getFileId();
-                    $blLoadedAndExists = $oArticleFile->load($sFileId) && $oArticleFile->exist();
-                    if ($sFileId && $blLoadedAndExists && $oOrderFile->processOrderFile()) {
-                        $oArticleFile->download();
+                $o_order_file = ox_new(\Oxid_Esales\Eshop\Application\Model\Order_File::class);
+                if ($o_order_file->load($s_file_order_id)) {
+                    $s_file_id = $o_order_file->get_file_id();
+                    $bl_loaded_and_exists = $o_article_file->load($s_file_id) && $o_article_file->exist();
+                    if ($s_file_id && $bl_loaded_and_exists && $o_order_file->process_order_file()) {
+                        $o_article_file->download();
                     } else {
-                        $sError = 'ERROR_MESSAGE_FILE_DOESNOT_EXIST';
+                        $s_error = 'ERROR_MESSAGE_FILE_DOESNOT_EXIST';
                     }
                 }
-            } catch (\OxidEsales\Eshop\Core\Exception\StandardException) {
-                $sError = 'ERROR_MESSAGE_FILE_DOWNLOAD_FAILED';
+            } catch (\Oxid_Esales\Eshop\Core\Exception\Standard_Exception) {
+                $s_error = 'ERROR_MESSAGE_FILE_DOWNLOAD_FAILED';
             }
         } else {
-            $sError = 'ERROR_MESSAGE_WRONG_DOWNLOAD_LINK';
+            $s_error = 'ERROR_MESSAGE_WRONG_DOWNLOAD_LINK';
         }
-        if ($sError) {
-            $oEx = new \OxidEsales\Eshop\Core\Exception\ExceptionToDisplay();
-            $oEx->setMessage($sError);
-            Registry::getUtilsView()->addErrorToDisplay($oEx, false);
-            Registry::getUtils()->redirect(Registry::getConfig()->getShopUrl() . 'index.php?cl=account_downloads');
+        if ($s_error) {
+            $o_ex = new \Oxid_Esales\Eshop\Core\Exception\Exception_To_Display();
+            $o_ex->set_message($s_error);
+            Registry::get_utils_view()->add_error_to_display($o_ex, false);
+            Registry::get_utils()->redirect(Registry::get_config()->get_shop_url() . 'index.php?cl=account_downloads');
         }
     }
 }

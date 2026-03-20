@@ -1,24 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\GenericImport\ImportObject;
+namespace Oxid_Esales\Eshop_Community\Core\Generic_Import\Import_Object;
 
 /**
  * Import object for Scale Prices.
  */
-class ScalePrice extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject
+class Scale_Price extends \Oxid_Esales\Eshop\Core\Generic_Import\Import_Object\Import_Object
 {
     /** @var string Database table name. */
-    protected $tableName = 'oxprice2article';
-
+    protected $table_name = 'oxprice2article';
     /** @var array List of database key fields (i.e. oxid). */
-    protected $keyFieldList = [
-        'OXID' => 'OXID',
-    ];
+    protected $key_field_list = ['OXID' => 'OXID'];
 }

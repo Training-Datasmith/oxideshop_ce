@@ -4,29 +4,20 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-use OxidEsales\EshopCommunity\Internal\Framework\Api\Api;
-use OxidEsales\EshopCommunity\Internal\Framework\Api\ExceptionHandler;
-use OxidEsales\EshopCommunity\Internal\Framework\Env\DotenvLoader;
-use Symfony\Component\ErrorHandler\Debug;
-
+declare (strict_types=1);
+use Oxid_Esales\Eshop_Community\Internal\Framework\Api\Api;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Api\Exception_Handler;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Env\Dotenv_Loader;
+use Symfony\Component\Error_Handler\Debug;
 define('INSTALLATION_ROOT_PATH', dirname(__DIR__));
 define('OX_BASE_PATH', INSTALLATION_ROOT_PATH . DIRECTORY_SEPARATOR . 'source' . DIRECTORY_SEPARATOR);
 define('VENDOR_PATH', INSTALLATION_ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR);
-
 require_once VENDOR_PATH . 'autoload.php';
-
 require_once INSTALLATION_ROOT_PATH . '/source/oxfunctions.php';
 require_once INSTALLATION_ROOT_PATH . '/source/overridablefunctions.php';
-
-new DotenvLoader(INSTALLATION_ROOT_PATH)->loadEnvironmentVariables();
-
-set_exception_handler([new ExceptionHandler(), 'handle']);
-
+(new Dotenv_Loader(INSTALLATION_ROOT_PATH))->load_environment_variables();
+set_exception_handler([new Exception_Handler(), 'handle']);
 if (filter_var(getenv('OXID_DEBUG_MODE'), FILTER_VALIDATE_BOOLEAN)) {
     Debug::enable();
 }
-
-new Api()->run();
+(new Api())->run();

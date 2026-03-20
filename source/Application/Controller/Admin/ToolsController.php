@@ -1,20 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Admin systeminfo manager.
  * Returns template, that arranges two other templates ("delivery_list"
  * and "delivery_main") to frame.
  */
-class ToolsController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Tools_Controller extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Executes parent method parent::render(), prints shop and
@@ -24,12 +22,10 @@ class ToolsController extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     public function render()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->isDemoShop()) {
-            return \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit('Access denied !');
+        if (\Oxid_Esales\Eshop\Core\Registry::get_config()->is_demo_shop()) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_utils()->show_message_and_exit('Access denied !');
         }
-
         parent::render();
-
         return 'tools';
     }
 }

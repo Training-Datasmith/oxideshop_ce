@@ -1,19 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Dao;
 
-namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao;
-
-interface ParameterDaoInterface
+interface Parameter_Dao_Interface
 {
-    public function add(string $name, array|bool|string|int|float|\UnitEnum|null $value, int $shopId): void;
-
-    public function remove(string $name, int $shopId): void;
-
-    public function has(string $name, int $shopId): bool;
+    public function add(string $name, array|bool|string|int|float|\Unit_Enum|null $value, int $shop_id): void;
+    public function remove(string $name, int $shop_id): void;
+    public function has(string $name, int $shop_id): bool;
 }

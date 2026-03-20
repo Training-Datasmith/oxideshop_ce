@@ -4,29 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject;
-
-class UnresolvedModuleDependencies
+class Unresolved_Module_Dependencies
 {
-    private array $moduleDependencyIds = [];
-
-    public function getModuleIds(): array
+    private array $module_dependency_ids = [];
+    public function get_module_ids(): array
     {
-        return $this->moduleDependencyIds;
+        return $this->module_dependency_ids;
     }
-
-    public function addModuleId(string $moduleId): static
+    public function add_module_id(string $module_id): static
     {
-        $this->moduleDependencyIds[] = $moduleId;
-
+        $this->module_dependency_ids[] = $module_id;
         return $this;
     }
-
-    public function hasModuleDependencies(): bool
+    public function has_module_dependencies(): bool
     {
-        return !empty($this->moduleDependencyIds);
+        return !empty($this->module_dependency_ids);
     }
 }

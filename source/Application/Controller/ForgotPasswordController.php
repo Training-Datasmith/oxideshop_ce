@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Email;
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Email;
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Password reminder page.
  * Collects toparticle, bargain article list. There is a form with entry
@@ -19,29 +16,26 @@ use OxidEsales\Eshop\Core\Registry;
  * information and submits "Request Password" button mail is sent to users email.
  * OXID eShop -> MY ACCOUNT -> "Forgot your password? - click here."
  */
-class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Forgot_Password_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'page/account/forgotpwd';
-
+    protected $_s_this_template = 'page/account/forgotpwd';
     /**
      * Send forgot E-Mail.
      *
      * @var string
      */
-    protected $_sForgotEmail;
-
+    protected $_s_forgot_email;
     /**
      * Current view search engine indexing state
      *
      * @var int
      */
-    protected $_iViewIndexState = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
-
+    protected $_i_view_index_state = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
     /**
      * Update link expiration status
      *
@@ -49,155 +43,133 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @deprecated property will be removed in next major
      */
-    protected $_blUpdateLinkStatus;
-
+    protected $_bl_update_link_status;
     /**
      * Sign if to load and show bargain action
      *
      * @var bool
      */
-    protected $_blBargainAction = true;
-
+    protected $_bl_bargain_action = true;
     /**
      * Executes Email::sendForgotPwdEmail() to send "forgot password" email to user
      */
-    public function forgotPassword(): void
+    public function forgot_password(): void
     {
-        $this->_sForgotEmail = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
-        if ($this->_sForgotEmail) {
-            $result = oxNew(Email::class)->sendForgotPwdEmail($this->_sForgotEmail);
+        $this->_s_forgot_email = Registry::get_request()->get_request_escaped_parameter('lgn_usr');
+        if ($this->_s_forgot_email) {
+            $result = ox_new(Email::class)->send_forgot_pwd_email($this->_s_forgot_email);
             if ($result === -1) {
-                Registry::getUtilsView()->addErrorToDisplay('MESSAGE_NOT_ABLE_TO_SEND_EMAIL');
-                $this->_sForgotEmail = false;
+                Registry::get_utils_view()->add_error_to_display('MESSAGE_NOT_ABLE_TO_SEND_EMAIL');
+                $this->_s_forgot_email = false;
             }
         }
     }
-
     /**
      * Checks if password is fine and updates old one with new
      * password. On success user is redirected to success page
      *
      * @return string
      */
-    public function updatePassword()
+    public function update_password()
     {
-        $sNewPass = Registry::getRequest()->getRequestParameter('password_new');
-        $sConfPass = Registry::getRequest()->getRequestParameter('password_new_confirm');
-
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-
+        $s_new_pass = Registry::get_request()->get_request_parameter('password_new');
+        $s_conf_pass = Registry::get_request()->get_request_parameter('password_new_confirm');
+        $o_user = ox_new(\Oxid_Esales\Eshop\Application\Model\User::class);
         /** @var \OxidEsales\Eshop\Core\InputValidator $oInputValidator */
-        $oInputValidator = Registry::getInputValidator();
-        if (($oExcp = $oInputValidator->checkPassword($oUser, $sNewPass, $sConfPass, true))) {
-            return Registry::getUtilsView()->addErrorToDisplay($oExcp->getMessage(), false, true);
+        $o_input_validator = Registry::get_input_validator();
+        if ($o_excp = $o_input_validator->check_password($o_user, $s_new_pass, $s_conf_pass, true)) {
+            return Registry::get_utils_view()->add_error_to_display($o_excp->get_message(), false, true);
         }
-
         // passwords are fine - updating and loggin user in
-        if ($oUser->loadUserByUpdateId($this->getUpdateId())) {
+        if ($o_user->load_user_by_update_id($this->get_update_id())) {
             // setting new pass ..
-            $oUser->setPassword($sNewPass);
-
+            $o_user->set_password($s_new_pass);
             // resetting update pass params
-            $oUser->setUpdateKey(true);
-
+            $o_user->set_update_key(true);
             // saving ..
-            $oUser->save();
-
+            $o_user->save();
             // forcing user login
-            Registry::getSession()->setVariable('usr', $oUser->getId());
-
+            Registry::get_session()->set_variable('usr', $o_user->get_id());
             return 'forgotpwd?success=1';
         }
         // expired reminder
-        $oUtilsView = Registry::getUtilsView();
-        return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_PASSWORD_LINK_EXPIRED', false, true);
+        $o_utils_view = Registry::get_utils_view();
+        return $o_utils_view->add_error_to_display('ERROR_MESSAGE_PASSWORD_LINK_EXPIRED', false, true);
     }
-
     /**
      * If user password update was successfull - setting success status
      *
      * @return bool
      */
-    public function updateSuccess()
+    public function update_success()
     {
-        return (bool) Registry::getRequest()->getRequestEscapedParameter('success');
+        return (bool) Registry::get_request()->get_request_escaped_parameter('success');
     }
-
     /**
      * Notifies that password update form must be shown
      *
      * @return bool
      */
-    public function showUpdateScreen()
+    public function show_update_screen()
     {
-        return (bool) $this->getUpdateId();
+        return (bool) $this->get_update_id();
     }
-
     /**
      * Returns special id used for password update functionality
      *
      * @return string
      */
-    public function getUpdateId()
+    public function get_update_id()
     {
-        return Registry::getRequest()->getRequestEscapedParameter('uid');
+        return Registry::get_request()->get_request_escaped_parameter('uid');
     }
-
     /**
      * Returns password update link expiration status
      *
      * @return bool
      */
-    public function isExpiredLink()
+    public function is_expired_link()
     {
-        if (($sKey = $this->getUpdateId())) {
-            return oxNew(\OxidEsales\Eshop\Application\Model\User::class)->isExpiredUpdateId($sKey);
+        if ($s_key = $this->get_update_id()) {
+            return ox_new(\Oxid_Esales\Eshop\Application\Model\User::class)->is_expired_update_id($s_key);
         }
-
         return false;
     }
-
     /**
      * @return string
      */
-    public function getForgotEmail()
+    public function get_forgot_email()
     {
-        return $this->_sForgotEmail;
+        return $this->_s_forgot_email;
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        $aPaths = [];
-        $aPath = [];
-
-        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
-        $aPath['title'] = Registry::getLang()->translateString('FORGOT_PASSWORD', $iBaseLanguage, false);
-        $aPath['link'] = $this->getLink();
-        $aPaths[] = $aPath;
-
-        return $aPaths;
+        $a_paths = [];
+        $a_path = [];
+        $i_base_language = Registry::get_lang()->get_base_language();
+        $a_path['title'] = Registry::get_lang()->translate_string('FORGOT_PASSWORD', $i_base_language, false);
+        $a_path['link'] = $this->get_link();
+        $a_paths[] = $a_path;
+        return $a_paths;
     }
-
     /**
      * Get password reminder page title
      *
      * @return string
      */
-    public function getTitle()
+    public function get_title()
     {
-        $sTitle = 'FORGOT_PASSWORD';
-
-        if ($this->showUpdateScreen()) {
-            $sTitle = 'NEW_PASSWORD';
-        } elseif ($this->updateSuccess()) {
-            $sTitle = 'CHANGE_PASSWORD';
+        $s_title = 'FORGOT_PASSWORD';
+        if ($this->show_update_screen()) {
+            $s_title = 'NEW_PASSWORD';
+        } elseif ($this->update_success()) {
+            $s_title = 'CHANGE_PASSWORD';
         }
-
-        return Registry::getLang()->translateString($sTitle, Registry::getLang()->getBaseLanguage(), false);
+        return Registry::get_lang()->translate_string($s_title, Registry::get_lang()->get_base_language(), false);
     }
 }

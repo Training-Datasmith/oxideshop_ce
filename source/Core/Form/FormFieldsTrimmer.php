@@ -1,52 +1,45 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core\Form;
 
-namespace OxidEsales\EshopCommunity\Core\Form;
-
-use OxidEsales\Eshop\Core\Form\FormFields as EshopFormFields;
-use OxidEsales\Eshop\Core\Form\FormFieldsTrimmerInterface as EshopFormFieldsTrimmerInterface;
-
+use Oxid_Esales\Eshop\Core\Form\Form_Fields as EshopFormFields;
+use Oxid_Esales\Eshop\Core\Form\Form_Fields_Trimmer_Interface as EshopFormFieldsTrimmerInterface;
 /**
  * Trim FormFields.
  */
-class FormFieldsTrimmer implements EshopFormFieldsTrimmerInterface
+class Form_Fields_Trimmer implements Eshop_Form_Fields_Trimmer_Interface
 {
     /**
      * Returns trimmed fields.
      *
      * @param EshopFormFields $fields to trim.
      */
-    public function trim(EshopFormFields $fields): \ArrayIterator
+    public function trim(Eshop_Form_Fields $fields): \ArrayIterator
     {
-        $updatableFields = $fields->getUpdatableFields()->getArrayCopy();
-
-        array_walk_recursive($updatableFields, function (&$value): void {
-            $value = $this->isTrimmableField($value) ? $this->trimField($value) : $value;
+        $updatable_fields = $fields->get_updatable_fields()->get_array_copy();
+        array_walk_recursive($updatable_fields, function (&$value): void {
+            $value = $this->is_trimmable_field($value) ? $this->trim_field($value) : $value;
         });
-
-        return new \ArrayIterator($updatableFields);
+        return new \ArrayIterator($updatable_fields);
     }
-
     /**
      * @param mixed $value
      */
-    private function isTrimmableField($value): bool
+    private function is_trimmable_field($value): bool
     {
         return is_string($value);
     }
-
     /**
      * Returns trimmed field value.
      *
      * @param   string $field
      */
-    private function trimField($field): string
+    private function trim_field($field): string
     {
         return trim($field);
     }

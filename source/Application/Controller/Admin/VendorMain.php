@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 use stdClass;
-
 /**
  * Admin vendor main screen.
  * Performs collection and updating (on user submit) main item information.
  */
-class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Vendor_Main extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /**
      * Executes parent method parent::render(),
@@ -29,123 +26,99 @@ class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
     public function render()
     {
         parent::render();
-
-        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != '-1') {
+        $sox_id = $this->_a_view_data['oxid'] = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
             // load object
-            $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-            $oVendor->loadInLang($this->_iEditLang, $soxId);
-
-            $oOtherLang = $oVendor->getAvailableInLangs();
-            if (!isset($oOtherLang[$this->_iEditLang])) {
-                $oVendor->loadInLang(key($oOtherLang), $soxId);
+            $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+            $o_vendor->load_in_lang($this->_i_edit_lang, $sox_id);
+            $o_other_lang = $o_vendor->get_available_in_langs();
+            if (!isset($o_other_lang[$this->_i_edit_lang])) {
+                $o_vendor->load_in_lang(key($o_other_lang), $sox_id);
             }
-            $this->_aViewData['edit'] = $oVendor;
-
+            $this->_a_view_data['edit'] = $o_vendor;
             // category tree
-            $this->createCategoryTree('artcattree');
-
+            $this->create_category_tree('artcattree');
             //Disable editing for derived articles
-            if ($oVendor->isDerived()) {
-                $this->_aViewData['readonly'] = true;
+            if ($o_vendor->is_derived()) {
+                $this->_a_view_data['readonly'] = true;
             }
-
             // remove already created languages
-            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
-            if (count($aLang)) {
-                $this->_aViewData['posslang'] = $aLang;
+            $a_lang = array_diff(Registry::get_lang()->get_language_names(), $o_other_lang);
+            if (count($a_lang)) {
+                $this->_a_view_data['posslang'] = $a_lang;
             }
-
-            foreach ($oOtherLang as $id => $language) {
-                $oLang = new stdClass();
-                $oLang->sLangDesc = $language;
-                $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData['otherlang'][$id] = clone $oLang;
+            foreach ($o_other_lang as $id => $language) {
+                $o_lang = new stdClass();
+                $o_lang->s_lang_desc = $language;
+                $o_lang->selected = $id == $this->_i_edit_lang;
+                $this->_a_view_data['otherlang'][$id] = clone $o_lang;
             }
         }
-
-        if ($this->getViewConfig()->isAltImageServerConfigured()) {
-            $this->_aViewData['imageUrl'] = ContainerFacade::getParameter('oxid_esales.alternative_image_url');
+        if ($this->get_view_config()->is_alt_image_server_configured()) {
+            $this->_a_view_data['imageUrl'] = Container_Facade::get_parameter('oxid_esales.alternative_image_url');
         }
-
-        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
-            $oVendorMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class);
-            $this->_aViewData['oxajax'] = $oVendorMainAjax->getColumns();
-
+        if (Registry::get_request()->get_request_escaped_parameter('aoc')) {
+            $o_vendor_main_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\Vendor_Main_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_vendor_main_ajax->get_columns();
             return 'popups/vendor_main';
         }
-
         return 'vendor_main';
     }
-
     /**
      * Saves selection list parameters changes.
      */
     public function save(): void
     {
         parent::save();
-
-        $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-
-        if (!isset($aParams['oxvendor__oxactive'])) {
-            $aParams['oxvendor__oxactive'] = 0;
+        $sox_id = $this->get_edit_object_id();
+        $a_params = Registry::get_request()->get_request_escaped_parameter('editval');
+        if (!isset($a_params['oxvendor__oxactive'])) {
+            $a_params['oxvendor__oxactive'] = 0;
         }
-
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-        if ($soxId != '-1') {
-            $oVendor->loadInLang($this->_iEditLang, $soxId);
+        $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+        if ($sox_id != '-1') {
+            $o_vendor->load_in_lang($this->_i_edit_lang, $sox_id);
         } else {
-            $aParams['oxvendor__oxid'] = null;
+            $a_params['oxvendor__oxid'] = null;
         }
-
         //Disable editing for derived articles
-        if ($oVendor->isDerived()) {
+        if ($o_vendor->is_derived()) {
             return;
         }
-
-        $oVendor->setLanguage(0);
-        $oVendor->assign($aParams);
-        $oVendor->setLanguage($this->_iEditLang);
-        $oVendor = Registry::getUtilsFile()->processFiles($oVendor);
-        $oVendor->save();
-
+        $o_vendor->set_language(0);
+        $o_vendor->assign($a_params);
+        $o_vendor->set_language($this->_i_edit_lang);
+        $o_vendor = Registry::get_utils_file()->process_files($o_vendor);
+        $o_vendor->save();
         // set oxid if inserted
-        $this->setEditObjectId($oVendor->getId());
+        $this->set_edit_object_id($o_vendor->get_id());
     }
-
     /**
      * Saves selection list parameters changes in different language (eg. english).
      */
     public function saveinnlang(): void
     {
-        $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-
-        if (!isset($aParams['oxvendor__oxactive'])) {
-            $aParams['oxvendor__oxactive'] = 0;
+        $sox_id = $this->get_edit_object_id();
+        $a_params = Registry::get_request()->get_request_escaped_parameter('editval');
+        if (!isset($a_params['oxvendor__oxactive'])) {
+            $a_params['oxvendor__oxactive'] = 0;
         }
-
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-
-        if ($soxId != '-1') {
-            $oVendor->loadInLang($this->_iEditLang, $soxId);
+        $o_vendor = ox_new(\Oxid_Esales\Eshop\Application\Model\Vendor::class);
+        if ($sox_id != '-1') {
+            $o_vendor->load_in_lang($this->_i_edit_lang, $sox_id);
         } else {
-            $aParams['oxvendor__oxid'] = null;
+            $a_params['oxvendor__oxid'] = null;
         }
-
         //Disable editing for derived articles
-        if ($oVendor->isDerived()) {
+        if ($o_vendor->is_derived()) {
             return;
         }
-
-        $oVendor->setLanguage(0);
-        $oVendor->assign($aParams);
-        $oVendor->setLanguage($this->_iEditLang);
-        $oVendor = Registry::getUtilsFile()->processFiles($oVendor);
-        $oVendor->save();
-
+        $o_vendor->set_language(0);
+        $o_vendor->assign($a_params);
+        $o_vendor->set_language($this->_i_edit_lang);
+        $o_vendor = Registry::get_utils_file()->process_files($o_vendor);
+        $o_vendor->save();
         // set oxid if inserted
-        $this->setEditObjectId($oVendor->getId());
+        $this->set_edit_object_id($o_vendor->get_id());
     }
 }

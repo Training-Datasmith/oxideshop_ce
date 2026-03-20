@@ -1,52 +1,45 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Admin article main voucherserie manager.
  * There is possibility to change voucherserie name, description, valid terms
  * and etc.
  * Admin Menu: Shop Settings -> Vouchers -> Main.
  */
-class VoucherSerieMain extends \OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController
+class Voucher_Serie_Main extends \Oxid_Esales\Eshop\Application\Controller\Admin\Dynamic_Export_Base_Controller
 {
     /**
      * Export class name
      *
      * @var string
      */
-    public $sClassDo = 'voucherSerie_generate';
-
+    public $s_class_do = 'voucherSerie_generate';
     /**
      * Voucher serie object
      *
      * @var \OxidEsales\Eshop\Application\Model\VoucherSerie
      */
-    protected $_oVoucherSerie;
-
+    protected $_o_voucher_serie;
     /**
      * Current class template name
      *
      * @var string
      */
-    protected $_sThisTemplate = 'voucherserie_main';
-
+    protected $_s_this_template = 'voucherserie_main';
     /**
      * View id, use old class name for compatibility reasons.
      *
      * @var string
      */
-    protected $viewId = 'voucherserie_main';
-
+    protected $view_id = 'voucherserie_main';
     /**
      * Executes parent method parent::render(), creates VoucherSerie object
      * and returns the name of the template file.
@@ -56,128 +49,109 @@ class VoucherSerieMain extends \OxidEsales\Eshop\Application\Controller\Admin\Dy
     public function render()
     {
         parent::render();
-
-        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != '-1') {
+        $sox_id = $this->_a_view_data['oxid'] = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
             // load object
-            $oVoucherSerie = oxNew(\OxidEsales\Eshop\Application\Model\VoucherSerie::class);
-            $oVoucherSerie->load($soxId);
-            $this->_aViewData['edit'] = $oVoucherSerie;
-
+            $o_voucher_serie = ox_new(\Oxid_Esales\Eshop\Application\Model\Voucher_Serie::class);
+            $o_voucher_serie->load($sox_id);
+            $this->_a_view_data['edit'] = $o_voucher_serie;
             //Disable editing for derived items
-            if ($oVoucherSerie->isDerived()) {
-                $this->_aViewData['readonly'] = true;
+            if ($o_voucher_serie->is_derived()) {
+                $this->_a_view_data['readonly'] = true;
             }
         }
-
-        return $this->_sThisTemplate;
+        return $this->_s_this_template;
     }
-
     /**
      * Saves main Voucherserie parameters changes.
      */
     public function save(): void
     {
         parent::save();
-
         // Parameter Processing
-        $soxId = $this->getEditObjectId();
-        $aSerieParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-
+        $sox_id = $this->get_edit_object_id();
+        $a_serie_params = Registry::get_request()->get_request_escaped_parameter('editval');
         // Voucher Serie Processing
-        $oVoucherSerie = oxNew(\OxidEsales\Eshop\Application\Model\VoucherSerie::class);
+        $o_voucher_serie = ox_new(\Oxid_Esales\Eshop\Application\Model\Voucher_Serie::class);
         // if serie already exist use it
-        if ($soxId != '-1') {
-            $oVoucherSerie->load($soxId);
+        if ($sox_id != '-1') {
+            $o_voucher_serie->load($sox_id);
         } else {
-            $aSerieParams['oxvoucherseries__oxid'] = null;
+            $a_serie_params['oxvoucherseries__oxid'] = null;
         }
-
         //Disable editing for derived items
-        if ($oVoucherSerie->isDerived()) {
+        if ($o_voucher_serie->is_derived()) {
             return;
         }
-
-        $aSerieParams['oxvoucherseries__oxdiscount'] = abs((float) $aSerieParams['oxvoucherseries__oxdiscount']);
-
-        $oVoucherSerie->assign($aSerieParams);
-        $oVoucherSerie->save();
-
+        $a_serie_params['oxvoucherseries__oxdiscount'] = abs((float) $a_serie_params['oxvoucherseries__oxdiscount']);
+        $o_voucher_serie->assign($a_serie_params);
+        $o_voucher_serie->save();
         // set oxid if inserted
-        $this->setEditObjectId($oVoucherSerie->getId());
+        $this->set_edit_object_id($o_voucher_serie->get_id());
     }
-
     /**
      * Returns voucher status information array
      *
      * @return array
      */
-    public function getStatus()
+    public function get_status()
     {
-        if ($oSerie = $this->getVoucherSerie()) {
-            return $oSerie->countVouchers();
+        if ($o_serie = $this->get_voucher_serie()) {
+            return $o_serie->count_vouchers();
         }
     }
-
     /**
      * Overriding parent function, doing nothing..
      */
-    public function prepareExport()
+    public function prepare_export()
     {
     }
-
     /**
      * Returns voucher serie object
      *
      * @return \OxidEsales\Eshop\Application\Model\VoucherSerie
      */
-    protected function getVoucherSerie()
+    protected function get_voucher_serie()
     {
-        if ($this->_oVoucherSerie == null) {
-            $oVoucherSerie = oxNew(\OxidEsales\Eshop\Application\Model\VoucherSerie::class);
-            $sId = Registry::getRequest()->getRequestEscapedParameter('voucherid');
-            if ($oVoucherSerie->load($sId ?: \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('voucherid'))) {
-                $this->_oVoucherSerie = $oVoucherSerie;
+        if ($this->_o_voucher_serie == null) {
+            $o_voucher_serie = ox_new(\Oxid_Esales\Eshop\Application\Model\Voucher_Serie::class);
+            $s_id = Registry::get_request()->get_request_escaped_parameter('voucherid');
+            if ($o_voucher_serie->load($s_id ?: \Oxid_Esales\Eshop\Core\Registry::get_session()->get_variable('voucherid'))) {
+                $this->_o_voucher_serie = $o_voucher_serie;
             }
         }
-
-        return $this->_oVoucherSerie;
+        return $this->_o_voucher_serie;
     }
-
     /**
      * Prepares Export
      */
     public function start(): void
     {
-        $sVoucherNr = trim((string) Registry::getRequest()->getRequestEscapedParameter('voucherNr'));
-        $bRandomNr = Registry::getRequest()->getRequestEscapedParameter('randomVoucherNr');
-        $controllerId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestControllerId();
-
-        if ($controllerId == 'voucherserie_generate' && !$bRandomNr && empty($sVoucherNr)) {
+        $s_voucher_nr = trim((string) Registry::get_request()->get_request_escaped_parameter('voucherNr'));
+        $b_random_nr = Registry::get_request()->get_request_escaped_parameter('randomVoucherNr');
+        $controller_id = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_request_controller_id();
+        if ($controller_id == 'voucherserie_generate' && !$b_random_nr && empty($s_voucher_nr)) {
             return;
         }
-
-        $this->_aViewData['refresh'] = 0;
-        $this->_aViewData['iStart'] = 0;
-        $iEnd = $this->prepareExport();
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('iEnd', $iEnd);
-        $this->_aViewData['iEnd'] = $iEnd;
-
+        $this->_a_view_data['refresh'] = 0;
+        $this->_a_view_data['iStart'] = 0;
+        $i_end = $this->prepare_export();
+        \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('iEnd', $i_end);
+        $this->_a_view_data['iEnd'] = $i_end;
         // saving export info
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('voucherid', Registry::getRequest()->getRequestEscapedParameter('voucherid'));
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('voucherAmount', abs((int) Registry::getRequest()->getRequestEscapedParameter('voucherAmount')));
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('randomVoucherNr', $bRandomNr);
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('voucherNr', $sVoucherNr);
+        \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('voucherid', Registry::get_request()->get_request_escaped_parameter('voucherid'));
+        \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('voucherAmount', abs((int) Registry::get_request()->get_request_escaped_parameter('voucherAmount')));
+        \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('randomVoucherNr', $b_random_nr);
+        \Oxid_Esales\Eshop\Core\Registry::get_session()->set_variable('voucherNr', $s_voucher_nr);
     }
-
     /**
      * Current view ID getter helps to identify navigation position
      * fix for 0003701, passing dynexportbase::getViewId
      *
      * @return string
      */
-    public function getViewId()
+    public function get_view_id()
     {
-        return \OxidEsales\Eshop\Application\Controller\Admin\AdminController::getViewId();
+        return \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller::get_view_id();
     }
 }

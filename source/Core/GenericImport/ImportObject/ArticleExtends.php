@@ -1,35 +1,30 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\GenericImport\ImportObject;
+namespace Oxid_Esales\Eshop_Community\Core\Generic_Import\Import_Object;
 
 /**
  * Import object for Article Extends.
  */
-class ArticleExtends extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject
+class Article_Extends extends \Oxid_Esales\Eshop\Core\Generic_Import\Import_Object\Import_Object
 {
     /** @var string Database table name. */
-    protected $tableName = 'oxartextends';
-
+    protected $table_name = 'oxartextends';
     /** @var string Shop object name. */
-    protected $shopObjectName = 'oxI18n';
-
+    protected $shop_object_name = 'oxI18n';
     /**
      * Creates shop object.
      *
      * @return \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
-    protected function createShopObject()
+    protected function create_shop_object()
     {
-        $shopObject = parent::createShopObject();
-        $shopObject->init('oxartextends');
-
-        return $shopObject;
+        $shop_object = parent::create_shop_object();
+        $shop_object->init('oxartextends');
+        return $shop_object;
     }
 }

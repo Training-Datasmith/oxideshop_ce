@@ -1,121 +1,92 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker;
-
+use Oxid_Esales\Eshop\Core\Open_Ssl_Functionality_Checker;
 /**
  * Class oxUniversallyUniqueIdGenerator used as universally unique id generator.
  */
-class UniversallyUniqueIdGenerator
+class Universally_Unique_Id_Generator
 {
     /**
      * @var OpenSSLFunctionalityChecker
      */
-    private $_openSSLChecker;
-
+    private $_open_ssl_checker;
     /**
      * Sets dependencies.
      */
-    public function __construct(?OpenSSLFunctionalityChecker $openSSLChecker = null)
+    public function __construct(?Open_Ssl_Functionality_Checker $open_ssl_checker = null)
     {
-        if (is_null($openSSLChecker)) {
-            $openSSLChecker = oxNew(OpenSSLFunctionalityChecker::class);
+        if (is_null($open_ssl_checker)) {
+            $open_ssl_checker = ox_new(Open_Ssl_Functionality_Checker::class);
         }
-        $this->_openSSLChecker = $openSSLChecker;
+        $this->_open_ssl_checker = $open_ssl_checker;
     }
-
     /**
      * Generates UUID based on either openSSL's openssl_random_pseudo_bytes or mt_rand.
      */
     public function generate(): string
     {
-        $sSeed = $this->generateV4();
-
-        return $this->generateV5($sSeed, php_uname('n'));
+        $s_seed = $this->generate_v4();
+        return $this->generate_v5($s_seed, php_uname('n'));
     }
-
     /**
      * Generates version 4 UUID.
      */
-    public function generateV4(): string
+    public function generate_v4(): string
     {
-        if ($this->getOpenSSLChecker()->isOpenSslRandomBytesGeneratorAvailable()) {
-            return $this->generateBasedOnOpenSSL();
+        if ($this->get_open_ssl_checker()->is_open_ssl_random_bytes_generator_available()) {
+            return $this->generate_based_on_open_ssl();
         }
-
-        return $this->generateBasedOnMtRand();
+        return $this->generate_based_on_mt_rand();
     }
-
     /**
      * Generates version 5 UUID.
      *
      * @param string $sSeed
      *
      */
-    public function generateV5($sSeed, string $sSalt): string
+    public function generate_v5($s_seed, string $s_salt): string
     {
-        $sSeed = str_replace(['-', '{', '}'], '', $sSeed);
-        $sBinarySeed = '';
-        for ($i = 0; $i < strlen($sSeed); $i += 2) {
-            $sBinarySeed .= chr(hexdec($sSeed[$i] . $sSeed[$i + 1]));
+        $s_seed = str_replace(['-', '{', '}'], '', $s_seed);
+        $s_binary_seed = '';
+        for ($i = 0; $i < strlen($s_seed); $i += 2) {
+            $s_binary_seed .= chr(hexdec($s_seed[$i] . $s_seed[$i + 1]));
         }
-        $sHash = sha1($sBinarySeed . $sSalt);
-
-        return sprintf(
-            '%08s-%04s-%04x-%04x-%12s',
-            substr($sHash, 0, 8),
-            substr($sHash, 8, 4),
-            (hexdec(substr($sHash, 12, 4)) & 0x0fff) | 0x3000,
-            (hexdec(substr($sHash, 16, 4)) & 0x3fff) | 0x8000,
-            substr($sHash, 20, 12)
-        );
+        $s_hash = sha1($s_binary_seed . $s_salt);
+        return sprintf('%08s-%04s-%04x-%04x-%12s', substr($s_hash, 0, 8), substr($s_hash, 8, 4), hexdec(substr($s_hash, 12, 4)) & 0xfff | 0x3000, hexdec(substr($s_hash, 16, 4)) & 0x3fff | 0x8000, substr($s_hash, 20, 12));
     }
-
     /**
      * gets open SSL checker.
      *
      * @return OpenSSLFunctionalityChecker
      */
-    protected function getOpenSSLChecker()
+    protected function get_open_ssl_checker()
     {
-        return $this->_openSSLChecker;
+        return $this->_open_ssl_checker;
     }
-
     /**
      * Generates UUID based on OpenSSL's openssl_random_pseudo_bytes.
      */
-    protected function generateBasedOnOpenSSL(): string
+    protected function generate_based_on_open_ssl(): string
     {
-        $sRandomData = openssl_random_pseudo_bytes(16);
-        $sRandomData[6] = chr(ord($sRandomData[6]) & 0x0f | 0x40); // set version to 0100
-        $sRandomData[8] = chr(ord($sRandomData[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($sRandomData), 4));
+        $s_random_data = openssl_random_pseudo_bytes(16);
+        $s_random_data[6] = chr(ord($s_random_data[6]) & 0xf | 0x40);
+        // set version to 0100
+        $s_random_data[8] = chr(ord($s_random_data[8]) & 0x3f | 0x80);
+        // set bits 6-7 to 10
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($s_random_data), 4));
     }
-
     /**
      * Generates UUID based on mt_rand.
      */
-    protected function generateBasedOnMtRand(): string
+    protected function generate_based_on_mt_rand(): string
     {
-        return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff)
-        );
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xfff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
     }
 }

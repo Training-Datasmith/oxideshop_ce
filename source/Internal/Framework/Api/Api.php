@@ -4,47 +4,34 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Api;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Api;
-
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
-use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
-use Symfony\Component\HttpKernel\EventListener\RouterListener;
-use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
-use Symfony\Component\Routing\RequestContext;
-
+use Oxid_Esales\Eshop_Community\Internal\Container\Container_Factory;
+use Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface;
+use Symfony\Component\Http_Foundation\Request;
+use Symfony\Component\Http_Foundation\Request_Stack;
+use Symfony\Component\Http_Kernel\Controller\Argument_Resolver;
+use Symfony\Component\Http_Kernel\Controller\Container_Controller_Resolver;
+use Symfony\Component\Http_Kernel\Event_Listener\Router_Listener;
+use Symfony\Component\Http_Kernel\Http_Kernel;
+use Symfony\Component\Routing\Matcher\Compiled_Url_Matcher;
+use Symfony\Component\Routing\Request_Context;
 class Api
 {
     public function run(): void
     {
-        $container = ContainerFactory::getInstance()->getContainer();
-        $request = Request::createFromGlobals();
-
-        $context = new RequestContext();
-        $context->fromRequest($request);
-        $matcher = new CompiledUrlMatcher($container->getParameter('oxid.routes'), $context);
-
-        $requestStack = new RequestStack();
-        $dispatcher = $container->get(EventDispatcherInterface::class);
-        $dispatcher->addSubscriber(new RouterListener($matcher, $requestStack));
-
-        $kernel = new HttpKernel(
-            $dispatcher,
-            new ContainerControllerResolver($container),
-            $requestStack,
-            new ArgumentResolver(namedResolvers: $container)
-        );
-
+        $container = Container_Factory::get_instance()->get_container();
+        $request = Request::create_from_globals();
+        $context = new Request_Context();
+        $context->from_request($request);
+        $matcher = new Compiled_Url_Matcher($container->get_parameter('oxid.routes'), $context);
+        $request_stack = new Request_Stack();
+        $dispatcher = $container->get(Event_Dispatcher_Interface::class);
+        $dispatcher->add_subscriber(new Router_Listener($matcher, $request_stack));
+        $kernel = new Http_Kernel($dispatcher, new Container_Controller_Resolver($container), $request_stack, new Argument_Resolver(namedResolvers: $container));
         $response = $kernel->handle($request);
         $response->send();
-
         $kernel->terminate($request, $response);
     }
 }

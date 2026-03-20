@@ -4,32 +4,24 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Validator;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Validator;
-
-use Symfony\Component\Mime\MimeTypesInterface;
-
-class FileValidator implements FileValidatorInterface
+use Symfony\Component\Mime\Mime_Types_Interface;
+class File_Validator implements File_Validator_Interface
 {
-    public function __construct(private readonly MimeTypesInterface $mimeTypesService)
+    public function __construct(private readonly Mime_Types_Interface $mime_types_service)
     {
     }
-
-    public function validateImage(string $filePath): bool
+    public function validate_image(string $file_path): bool
     {
         try {
-            if (
-                !empty($filePath)
-                && !str_starts_with(strtoupper($this->mimeTypesService->guessMimeType($filePath)), 'IMAGE/')
-            ) {
+            if (!empty($file_path) && !str_starts_with(strtoupper($this->mime_types_service->guess_mime_type($file_path)), 'IMAGE/')) {
                 return false;
             }
         } catch (\Exception) {
-            throw new ImageValidationException('Unable to get MimeType of file');
+            throw new Image_Validation_Exception('Unable to get MimeType of file');
         }
-
         return true;
     }
 }

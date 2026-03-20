@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Contract;
+namespace Oxid_Esales\Eshop_Community\Core\Contract;
 
 /**
  * Interface for object URLs getters
  */
-interface IUrl
+interface I_Url
 {
     /**
      * Returns object URL. If SEO if ON returned link will be in SEO form,
@@ -22,8 +20,7 @@ interface IUrl
      *
      * @return string
      */
-    public function getLink($iLang = null);
-
+    public function get_link($i_lang = null);
     /**
      * Returns standard (dynamic) object URL
      *
@@ -32,8 +29,7 @@ interface IUrl
      *
      * @return string
      */
-    public function getStdLink($iLang = null, $aParams = []);
-
+    public function get_std_link($i_lang = null, $a_params = []);
     /**
      * Returns base dynamic url: e.g. shopurl/index.php?cl=details&anid=artid
      *
@@ -43,5 +39,5 @@ interface IUrl
      *
      * @return string
      */
-    public function getBaseStdLink($iLang, $blAddId = true, $blFull = true);
+    public function get_base_std_link($i_lang, $bl_add_id = true, $bl_full = true);
 }

@@ -4,37 +4,29 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Bridge;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge;
-
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleActivationServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface;
-
-class ModuleActivationBridge implements ModuleActivationBridgeInterface
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Activation_Service_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\State\Module_State_Service_Interface;
+class Module_Activation_Bridge implements Module_Activation_Bridge_Interface
 {
-    public function __construct(
-        private readonly ModuleActivationServiceInterface $moduleActivationService,
-        private readonly ModuleStateServiceInterface $moduleStateService
-    ) {
-    }
-
-    public function activate(string $moduleId, int $shopId): void
+    public function __construct(private readonly Module_Activation_Service_Interface $module_activation_service, private readonly Module_State_Service_Interface $module_state_service)
     {
-        $this->moduleActivationService->activate($moduleId, $shopId);
-        Registry::getConfig()->reinitialize();
     }
-
-    public function deactivate(string $moduleId, int $shopId): void
+    public function activate(string $module_id, int $shop_id): void
     {
-        $this->moduleActivationService->deactivate($moduleId, $shopId);
-        Registry::getConfig()->reinitialize();
+        $this->module_activation_service->activate($module_id, $shop_id);
+        Registry::get_config()->reinitialize();
     }
-
-    public function isActive(string $moduleId, int $shopId): bool
+    public function deactivate(string $module_id, int $shop_id): void
     {
-        return $this->moduleStateService->isActive($moduleId, $shopId);
+        $this->module_activation_service->deactivate($module_id, $shop_id);
+        Registry::get_config()->reinitialize();
+    }
+    public function is_active(string $module_id, int $shop_id): bool
+    {
+        return $this->module_state_service->is_active($module_id, $shop_id);
     }
 }

@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Model\ListModel;
-use OxidEsales\Eshop\Core\TableViewNameGenerator;
-
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Model\List_Model;
+use Oxid_Esales\Eshop\Core\Table_View_Name_Generator;
 /**
  * Payment manager.
  * Performs payment methods, such as assigning to someone, returning value etc.
  */
-class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Payment extends \Oxid_Esales\Eshop\Core\Model\Multi_Language_Model
 {
     /**
      * Consider for calculation of base sum - Value of all goods in basket
@@ -25,170 +22,144 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @var int
      */
     public const PAYMENT_ADDSUMRULE_ALLGOODS = 1;
-
     /**
      * Consider for calculation of base sum - Discounts
      *
      * @var int
      */
     public const PAYMENT_ADDSUMRULE_DISCOUNTS = 2;
-
     /**
      * Consider for calculation of base sum - Vouchers
      *
      * @var int
      */
     public const PAYMENT_ADDSUMRULE_VOUCHERS = 4;
-
     /**
      * Consider for calculation of base sum - Shipping costs
      *
      * @var int
      */
     public const PAYMENT_ADDSUMRULE_SHIPCOSTS = 8;
-
     /**
      * Consider for calculation of base sum - Gift Wrapping/Greeting Card
      *
      * @var int
      */
     public const PAYMENT_ADDSUMRULE_GIFTS = 16;
-
     /**
      * User groups object (default null).
      *
      * @var object
      */
-    protected $_oGroups;
-
+    protected $_o_groups;
     /**
      * Countries assigned to current payment. Value from outside accessible
      * by calling \OxidEsales\Eshop\Application\Model\Payment::getCountries
      *
      * @var array
      */
-    protected $_aCountries;
-
+    protected $_a_countries;
     /**
      * Current class name
      *
      * @var string
      */
-    protected $_sClassName = 'oxpayment';
-
+    protected $_s_class_name = 'oxpayment';
     /**
      * current dyn values
      *
      * @var array
      */
-    protected $_aDynValues;
-
+    protected $_a_dyn_values;
     /**
      * payment error type
      *
      * @var int
      */
-    protected $_iPaymentError;
-
+    protected $_i_payment_error;
     /**
      * Payment VAT config
      *
      * @var bool
      */
-    protected $_blPaymentVatOnTop = false;
-
+    protected $_bl_payment_vat_on_top = false;
     /**
      * Payment price
      *
      * @var \OxidEsales\Eshop\Core\Price
      */
-    protected $_oPrice;
-
+    protected $_o_price;
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
      */
     public function __construct()
     {
-        $this->setPaymentVatOnTop(\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blPaymentVatOnTop'));
+        $this->set_payment_vat_on_top(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('blPaymentVatOnTop'));
         parent::__construct();
         $this->init('oxpayments');
     }
-
     /**
      * Payment VAT config setter
      *
      * @param bool $blOnTop Payment vat config
      */
-    public function setPaymentVatOnTop($blOnTop): void
+    public function set_payment_vat_on_top($bl_on_top): void
     {
-        $this->_blPaymentVatOnTop = $blOnTop;
+        $this->_bl_payment_vat_on_top = $bl_on_top;
     }
-
     /**
      * Payment groups getter. Returns groups list
      *
      * @return \OxidEsales\Eshop\Core\Model\ListModel
      */
-    public function getGroups()
+    public function get_groups()
     {
-        if ($this->_oGroups == null && ($sOxid = $this->getId())) {
+        if ($this->_o_groups == null && $s_oxid = $this->get_id()) {
             // user groups
-            $this->_oGroups = oxNew(ListModel::class, 'oxgroups');
-            $tableViewNameGenerator = oxNew(TableViewNameGenerator::class);
-            $sViewName = $tableViewNameGenerator->getViewName('oxgroups', $this->getLanguage());
-
+            $this->_o_groups = ox_new(List_Model::class, 'oxgroups');
+            $table_view_name_generator = ox_new(Table_View_Name_Generator::class);
+            $s_view_name = $table_view_name_generator->get_view_name('oxgroups', $this->get_language());
             // performance
-            $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group
-                        where oxobject2group.oxobjectid = :oxobjectid
-                        and oxobject2group.oxgroupsid = {$sViewName}.oxid ";
-            $this->_oGroups->selectString($sSelect, [
-                'oxobjectid' => $sOxid,
-            ]);
+            $s_select = "select {$s_view_name}.* from {$s_view_name}, oxobject2group\n                        where oxobject2group.oxobjectid = :oxobjectid\n                        and oxobject2group.oxgroupsid = {$s_view_name}.oxid ";
+            $this->_o_groups->select_string($s_select, ['oxobjectid' => $s_oxid]);
         }
-
-        return $this->_oGroups;
+        return $this->_o_groups;
     }
-
     /**
      * sets the dyn values
      *
      * @param array $aDynValues the array of dy values
      */
-    public function setDynValues($aDynValues): void
+    public function set_dyn_values($a_dyn_values): void
     {
-        $this->_aDynValues = $aDynValues;
+        $this->_a_dyn_values = $a_dyn_values;
     }
-
     /**
      * Sets a single dyn value
      *
      * @param mixed $oKey the key
      * @param mixed $oVal the value
      */
-    public function setDynValue($oKey, $oVal): void
+    public function set_dyn_value($o_key, $o_val): void
     {
-        $this->_aDynValues[$oKey] = $oVal;
+        $this->_a_dyn_values[$o_key] = $o_val;
     }
-
     /**
      * Returns an array of dyn payment values
      *
      * @return array
      */
-    public function getDynValues()
+    public function get_dyn_values()
     {
-        if (!$this->_aDynValues) {
-            $sRawDynValue = null;
+        if (!$this->_a_dyn_values) {
+            $s_raw_dyn_value = null;
             if (is_object($this->oxpayments__oxvaldesc)) {
-                $sRawDynValue = $this->oxpayments__oxvaldesc->getRawValue();
+                $s_raw_dyn_value = $this->oxpayments__oxvaldesc->get_raw_value();
             }
-
-            $this->_aDynValues = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($sRawDynValue);
+            $this->_a_dyn_values = \Oxid_Esales\Eshop\Core\Registry::get_utils()->assign_values_from_text($s_raw_dyn_value);
         }
-
-        return $this->_aDynValues;
+        return $this->_a_dyn_values;
     }
-
     /**
      * Returns additional taxes to base article price.
      *
@@ -196,22 +167,19 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return double
      */
-    public function getPaymentValue($dBasePrice)
+    public function get_payment_value($d_base_price)
     {
         if ($this->oxpayments__oxaddsumtype->value == '%') {
-            $dRet = $dBasePrice * $this->oxpayments__oxaddsum->value / 100;
+            $d_ret = $d_base_price * $this->oxpayments__oxaddsum->value / 100;
         } else {
-            $oCur = \OxidEsales\Eshop\Core\Registry::getConfig()->getActShopCurrencyObject();
-            $dRet = $this->oxpayments__oxaddsum->value * $oCur->rate;
+            $o_cur = \Oxid_Esales\Eshop\Core\Registry::get_config()->get_act_shop_currency_object();
+            $d_ret = $this->oxpayments__oxaddsum->value * $o_cur->rate;
         }
-
-        if (($dRet * -1) > $dBasePrice) {
-            return $dBasePrice;
+        if ($d_ret * -1 > $d_base_price) {
+            return $d_base_price;
         }
-
-        return $dRet;
+        return $d_ret;
     }
-
     /**
      * Returns base basket price for payment cost calculations. Price depends on
      * payment setup (payment administration)
@@ -220,103 +188,78 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return double
      */
-    public function getBaseBasketPriceForPaymentCostCalc($oBasket)
+    public function get_base_basket_price_for_payment_cost_calc($o_basket)
     {
-        $dBasketPrice = 0;
-        $iRules = $this->oxpayments__oxaddsumrules->value;
-
+        $d_basket_price = 0;
+        $i_rules = $this->oxpayments__oxaddsumrules->value;
         // products brutto price
-        if (!$iRules || ($iRules & self::PAYMENT_ADDSUMRULE_ALLGOODS)) {
-            $dBasketPrice += $oBasket->getProductsPrice()->getSum($oBasket->isCalculationModeNetto());
+        if (!$i_rules || $i_rules & self::PAYMENT_ADDSUMRULE_ALLGOODS) {
+            $d_basket_price += $o_basket->get_products_price()->get_sum($o_basket->is_calculation_mode_netto());
         }
-
         // discounts
-        if (
-            (!$iRules || ($iRules & self::PAYMENT_ADDSUMRULE_DISCOUNTS)) &&
-            ($oCosts = $oBasket->getTotalDiscount())
-        ) {
-            $dBasketPrice -= $oCosts->getPrice();
+        if ((!$i_rules || $i_rules & self::PAYMENT_ADDSUMRULE_DISCOUNTS) && $o_costs = $o_basket->get_total_discount()) {
+            $d_basket_price -= $o_costs->get_price();
         }
-
         // vouchers
-        if (!$iRules || ($iRules & self::PAYMENT_ADDSUMRULE_VOUCHERS)) {
-            $dBasketPrice -= $oBasket->getVoucherDiscValue();
+        if (!$i_rules || $i_rules & self::PAYMENT_ADDSUMRULE_VOUCHERS) {
+            $d_basket_price -= $o_basket->get_voucher_disc_value();
         }
-
         // delivery
-        if (
-            (!$iRules || ($iRules & self::PAYMENT_ADDSUMRULE_SHIPCOSTS)) &&
-            ($oCosts = $oBasket->getCosts('oxdelivery'))
-        ) {
-            if ($oBasket->isCalculationModeNetto()) {
-                $dBasketPrice += $oCosts->getNettoPrice();
+        if ((!$i_rules || $i_rules & self::PAYMENT_ADDSUMRULE_SHIPCOSTS) && $o_costs = $o_basket->get_costs('oxdelivery')) {
+            if ($o_basket->is_calculation_mode_netto()) {
+                $d_basket_price += $o_costs->get_netto_price();
             } else {
-                $dBasketPrice += $oCosts->getBruttoPrice();
+                $d_basket_price += $o_costs->get_brutto_price();
             }
         }
-
         // wrapping
-        if (
-            ($iRules & self::PAYMENT_ADDSUMRULE_GIFTS) &&
-            ($oCosts = $oBasket->getCosts('oxwrapping'))
-        ) {
-            if ($oBasket->isCalculationModeNetto()) {
-                $dBasketPrice += $oCosts->getNettoPrice();
+        if ($i_rules & self::PAYMENT_ADDSUMRULE_GIFTS && $o_costs = $o_basket->get_costs('oxwrapping')) {
+            if ($o_basket->is_calculation_mode_netto()) {
+                $d_basket_price += $o_costs->get_netto_price();
             } else {
-                $dBasketPrice += $oCosts->getBruttoPrice();
+                $d_basket_price += $o_costs->get_brutto_price();
             }
         }
-
         // gift card
-        if (
-            ($iRules & self::PAYMENT_ADDSUMRULE_GIFTS) &&
-            ($oCosts = $oBasket->getCosts('oxgiftcard'))
-        ) {
-            if ($oBasket->isCalculationModeNetto()) {
-                $dBasketPrice += $oCosts->getNettoPrice();
+        if ($i_rules & self::PAYMENT_ADDSUMRULE_GIFTS && $o_costs = $o_basket->get_costs('oxgiftcard')) {
+            if ($o_basket->is_calculation_mode_netto()) {
+                $d_basket_price += $o_costs->get_netto_price();
             } else {
-                $dBasketPrice += $oCosts->getBruttoPrice();
+                $d_basket_price += $o_costs->get_brutto_price();
             }
         }
-
-        return $dBasketPrice;
+        return $d_basket_price;
     }
-
     /**
      * Returns price object for current payment applied on basket
      *
      * @param \OxidEsales\Eshop\Application\Model\UserBasket $oBasket session basket
      */
-    public function calculate($oBasket): void
+    public function calculate($o_basket): void
     {
         //getting basket price with applied discounts and vouchers
-        $dPrice = $this->getPaymentValue($this->getBaseBasketPriceForPaymentCostCalc($oBasket));
-
-        if (!$dPrice) {
-            $dPrice = 0;
+        $d_price = $this->get_payment_value($this->get_base_basket_price_for_payment_cost_calc($o_basket));
+        if (!$d_price) {
+            $d_price = 0;
         }
         // calculating total price
-        $oPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
-        $oPrice->setNettoMode($this->_blPaymentVatOnTop);
-
-        $oPrice->setPrice($dPrice);
-        if ($dPrice > 0) {
-            $oPrice->setVat($oBasket->getAdditionalServicesVatPercent());
+        $o_price = ox_new(\Oxid_Esales\Eshop\Core\Price::class);
+        $o_price->set_netto_mode($this->_bl_payment_vat_on_top);
+        $o_price->set_price($d_price);
+        if ($d_price > 0) {
+            $o_price->set_vat($o_basket->get_additional_services_vat_percent());
         }
-
-        $this->_oPrice = $oPrice;
+        $this->_o_price = $o_price;
     }
-
     /**
      * Returns calculated price.
      *
      * @return \OxidEsales\Eshop\Core\Price
      */
-    public function getPrice()
+    public function get_price()
     {
-        return $this->_oPrice;
+        return $this->_o_price;
     }
-
     /**
      * Returns formatted netto price.
      *
@@ -324,13 +267,12 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return string
      */
-    public function getFNettoPrice()
+    public function get_f_netto_price()
     {
-        if ($this->getPrice()) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getPrice()->getNettoPrice());
+        if ($this->get_price()) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_lang()->format_currency($this->get_price()->get_netto_price());
         }
     }
-
     /**
      * Returns formatted brutto price.
      *
@@ -338,13 +280,12 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return string
      */
-    public function getFBruttoPrice()
+    public function get_f_brutto_price()
     {
-        if ($this->getPrice()) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getPrice()->getBruttoPrice());
+        if ($this->get_price()) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_lang()->format_currency($this->get_price()->get_brutto_price());
         }
     }
-
     /**
      * Returns formatted vat value.
      *
@@ -352,35 +293,29 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return string
      */
-    public function getFPriceVat()
+    public function get_f_price_vat()
     {
-        if ($this->getPrice()) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getPrice()->getVatValue());
+        if ($this->get_price()) {
+            return \Oxid_Esales\Eshop\Core\Registry::get_lang()->format_currency($this->get_price()->get_vat_value());
         }
     }
-
     /**
      * Returns array of country Ids which are assigned to current payment
      *
      * @return array
      */
-    public function getCountries()
+    public function get_countries()
     {
-        if ($this->_aCountries === null) {
-            $oDb = DatabaseProvider::getDb();
-            $this->_aCountries = [];
-            $sSelect = 'select oxobjectid from oxobject2payment
+        if ($this->_a_countries === null) {
+            $o_db = Database_Provider::get_db();
+            $this->_a_countries = [];
+            $s_select = 'select oxobjectid from oxobject2payment
                 where oxpaymentid = :oxpaymentid and oxtype = :oxtype ';
-            $rs = $oDb->getCol($sSelect, [
-                'oxpaymentid' => $this->getId(),
-                'oxtype' => 'oxcountry',
-            ]);
-            $this->_aCountries = $rs;
+            $rs = $o_db->get_col($s_select, ['oxpaymentid' => $this->get_id(), 'oxtype' => 'oxcountry']);
+            $this->_a_countries = $rs;
         }
-
-        return $this->_aCountries;
+        return $this->_a_countries;
     }
-
     /**
      * Delete this object from the database, returns true on success.
      *
@@ -391,21 +326,12 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function delete($id = null)
     {
         if (parent::delete($id)) {
-            $id = $id ?: $this->getId();
-
-            $deletedRows = DatabaseProvider::getDb()->execute(
-                'delete from oxobject2payment where oxpaymentid = :oxpaymentid',
-                [
-                'oxpaymentid' => $id,
-                ]
-            );
-
-            return $deletedRows > 0;
+            $id = $id ?: $this->get_id();
+            $deleted_rows = Database_Provider::get_db()->execute('delete from oxobject2payment where oxpaymentid = :oxpaymentid', ['oxpaymentid' => $id]);
+            return $deleted_rows > 0;
         }
-
         return false;
     }
-
     /**
      * Function checks if loaded payment is valid to current basket
      *
@@ -417,71 +343,51 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @return bool true if payment is valid
      */
-    public function isValidPayment($aDynValue, $sShopId, $oUser, $dBasketPrice, $sShipSetId)
+    public function is_valid_payment($a_dyn_value, $s_shop_id, $o_user, $d_basket_price, $s_ship_set_id)
     {
-        $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
         if ($this->oxpayments__oxid->value == 'oxempty') {
             // inactive or blOtherCountryOrder is off
-            if (!$this->oxpayments__oxactive->value || !$myConfig->getConfigParam('blOtherCountryOrder')) {
-                $this->_iPaymentError = -2;
-
+            if (!$this->oxpayments__oxactive->value || !$my_config->get_config_param('blOtherCountryOrder')) {
+                $this->_i_payment_error = -2;
                 return false;
             }
-            if (
-                count(
-                    \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DeliverySetList::class)
-                    ->getDeliverySetList(
-                        $oUser,
-                        $oUser->getActiveCountry()
-                    )
-                )
-            ) {
-                $this->_iPaymentError = -3;
-
+            if (count(\Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Delivery_Set_List::class)->get_delivery_set_list($o_user, $o_user->get_active_country()))) {
+                $this->_i_payment_error = -3;
                 return false;
             }
-
             return true;
         }
-
-        $mxValidationResult = \OxidEsales\Eshop\Core\Registry::getInputValidator()->validatePaymentInputData($this->oxpayments__oxid->value, $aDynValue);
-        if (is_integer($mxValidationResult)) {
-            $this->_iPaymentError = $mxValidationResult;
+        $mx_validation_result = \Oxid_Esales\Eshop\Core\Registry::get_input_validator()->validate_payment_input_data($this->oxpayments__oxid->value, $a_dyn_value);
+        if (is_integer($mx_validation_result)) {
+            $this->_i_payment_error = $mx_validation_result;
             return false;
         }
-
-        if ($mxValidationResult === false) {
-            $this->_iPaymentError = 1;
+        if ($mx_validation_result === false) {
+            $this->_i_payment_error = 1;
             return false;
         }
-
-        $oCur = $myConfig->getActShopCurrencyObject();
-        $dBasketPrice = $dBasketPrice / $oCur->rate;
-
-        if ($sShipSetId) {
-            $aPaymentList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\PaymentList::class)->getPaymentList($sShipSetId, $dBasketPrice, $oUser);
-
-            if (!array_key_exists($this->getId(), $aPaymentList)) {
-                $this->_iPaymentError = -3;
-
+        $o_cur = $my_config->get_act_shop_currency_object();
+        $d_basket_price = $d_basket_price / $o_cur->rate;
+        if ($s_ship_set_id) {
+            $a_payment_list = \Oxid_Esales\Eshop\Core\Registry::get(\Oxid_Esales\Eshop\Application\Model\Payment_List::class)->get_payment_list($s_ship_set_id, $d_basket_price, $o_user);
+            if (!array_key_exists($this->get_id(), $a_payment_list)) {
+                $this->_i_payment_error = -3;
                 return false;
             }
         } else {
-            $this->_iPaymentError = -2;
-
+            $this->_i_payment_error = -2;
             return false;
         }
-
         return true;
     }
-
     /**
      * Payment error number getter
      *
      * @return int
      */
-    public function getPaymentErrorNumber()
+    public function get_payment_error_number()
     {
-        return $this->_iPaymentError;
+        return $this->_i_payment_error;
     }
 }

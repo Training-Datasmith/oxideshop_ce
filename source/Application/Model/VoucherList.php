@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Voucher list manager.
  */
-class VoucherList extends \OxidEsales\Eshop\Core\Model\ListModel
+class Voucher_List extends \Oxid_Esales\Eshop\Core\Model\List_Model
 {
     /**
      * Calls parent constructor

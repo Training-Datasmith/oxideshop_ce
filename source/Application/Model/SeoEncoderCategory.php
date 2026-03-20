@@ -1,35 +1,30 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Application\Model\Category;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-
+use Oxid_Esales\Eshop\Application\Model\Category;
+use Oxid_Esales\Eshop\Core\Database_Provider;
 /**
  * Seo encoder category
  */
-class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
+class Seo_Encoder_Category extends \Oxid_Esales\Eshop\Core\Seo_Encoder
 {
     /** @var array _aCatCache cache for categories. */
-    protected $_aCatCache = [];
-
+    protected $_a_cat_cache = [];
     /**
      * Returns target "extension" (/)
      *
      * @return string
      */
-    protected function getUrlExtension()
+    protected function get_url_extension()
     {
         return '/';
     }
-
     /**
      * _categoryUrlLoader loads category from db
      * returns false if cat needs to be encoded (load failed)
@@ -41,19 +36,17 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return boolean
      */
-    protected function categoryUrlLoader($oCat, $iLang)
+    protected function category_url_loader($o_cat, $i_lang)
     {
-        $sCacheId = $this->getCategoryCacheId($oCat, $iLang);
-        if (isset($this->_aCatCache[$sCacheId])) {
-            $sSeoUrl = $this->_aCatCache[$sCacheId];
-        } elseif (($sSeoUrl = $this->loadFromDb('oxcategory', $oCat->getId(), $iLang))) {
+        $s_cache_id = $this->get_category_cache_id($o_cat, $i_lang);
+        if (isset($this->_a_cat_cache[$s_cache_id])) {
+            $s_seo_url = $this->_a_cat_cache[$s_cache_id];
+        } elseif ($s_seo_url = $this->load_from_db('oxcategory', $o_cat->get_id(), $i_lang)) {
             // caching
-            $this->_aCatCache[$sCacheId] = $sSeoUrl;
+            $this->_a_cat_cache[$s_cache_id] = $s_seo_url;
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * _getCatecgoryCacheId return string for isntance cache id
      *
@@ -62,11 +55,10 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @access private
      */
-    private function getCategoryCacheId($oCat, $iLang): string
+    private function get_category_cache_id($o_cat, $i_lang): string
     {
-        return $oCat->getId() . '_' . ((int) $iLang);
+        return $o_cat->get_id() . '_' . (int) $i_lang;
     }
-
     /**
      * Returns SEO uri for passed category
      *
@@ -76,57 +68,45 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getCategoryUri($oCat, $iLang = null, $blRegenerate = false)
+    public function get_category_uri($o_cat, $i_lang = null, $bl_regenerate = false)
     {
-        startProfile(__FUNCTION__);
-        $sCatId = $oCat->getId();
-
+        start_profile(__FUNCTION__);
+        $s_cat_id = $o_cat->get_id();
         // skipping external category URLs
-        if ($oCat->oxcategories__oxextlink->value) {
-            $sSeoUrl = null;
+        if ($o_cat->oxcategories__oxextlink->value) {
+            $s_seo_url = null;
         } else {
             // not found in cache, process it from the top
-            if (!isset($iLang)) {
-                $iLang = $oCat->getLanguage();
+            if (!isset($i_lang)) {
+                $i_lang = $o_cat->get_language();
             }
-
-            $aCacheMap = [];
-            $aStdLinks = [];
-
-            while ($oCat && !($sSeoUrl = $this->categoryUrlLoader($oCat, $iLang))) {
-                if ($iLang != $oCat->getLanguage()) {
-                    $sId = $oCat->getId();
-                    $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-                    $oCat->loadInLang($iLang, $sId);
+            $a_cache_map = [];
+            $a_std_links = [];
+            while ($o_cat && !$s_seo_url = $this->category_url_loader($o_cat, $i_lang)) {
+                if ($i_lang != $o_cat->get_language()) {
+                    $s_id = $o_cat->get_id();
+                    $o_cat = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+                    $o_cat->load_in_lang($i_lang, $s_id);
                 }
-
                 // prepare oCat title part
-                $sTitle = $this->prepareTitle($oCat->oxcategories__oxtitle->value, false, $oCat->getLanguage());
-
-                foreach (array_keys($aCacheMap) as $id) {
-                    $aCacheMap[$id] = $sTitle . '/' . $aCacheMap[$id];
+                $s_title = $this->prepare_title($o_cat->oxcategories__oxtitle->value, false, $o_cat->get_language());
+                foreach (array_keys($a_cache_map) as $id) {
+                    $a_cache_map[$id] = $s_title . '/' . $a_cache_map[$id];
                 }
-
-                $aCacheMap[$oCat->getId()] = $sTitle;
-                $aStdLinks[$oCat->getId()] = $oCat->getBaseStdLink($iLang);
-
+                $a_cache_map[$o_cat->get_id()] = $s_title;
+                $a_std_links[$o_cat->get_id()] = $o_cat->get_base_std_link($i_lang);
                 // load parent
-                $oCat = $oCat->getParentCategory();
+                $o_cat = $o_cat->get_parent_category();
             }
-
-            foreach ($aCacheMap as $sId => $sUri) {
-                $this->_aCatCache[$sId . '_' . $iLang] = $this->processSeoUrl($sSeoUrl . $sUri . '/', $sId, $iLang);
-                $this->saveToDb('oxcategory', $sId, $aStdLinks[$sId], $this->_aCatCache[$sId . '_' . $iLang], $iLang);
+            foreach ($a_cache_map as $s_id => $s_uri) {
+                $this->_a_cat_cache[$s_id . '_' . $i_lang] = $this->process_seo_url($s_seo_url . $s_uri . '/', $s_id, $i_lang);
+                $this->save_to_db('oxcategory', $s_id, $a_std_links[$s_id], $this->_a_cat_cache[$s_id . '_' . $i_lang], $i_lang);
             }
-
-            $sSeoUrl = $this->_aCatCache[$sCatId . '_' . $iLang];
+            $s_seo_url = $this->_a_cat_cache[$s_cat_id . '_' . $i_lang];
         }
-
-        stopProfile(__FUNCTION__);
-
-        return $sSeoUrl;
+        stop_profile(__FUNCTION__);
+        return $s_seo_url;
     }
-
     /**
      * Returns category SEO url for specified page
      *
@@ -137,24 +117,20 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getCategoryPageUrl($category, $pageNumber, $languageId = null, $isFixed = null)
+    public function get_category_page_url($category, $page_number, $language_id = null, $is_fixed = null)
     {
-        if (!isset($languageId)) {
-            $languageId = $category->getLanguage();
+        if (!isset($language_id)) {
+            $language_id = $category->get_language();
         }
-        $stdUrl = $category->getBaseStdLink($languageId);
+        $std_url = $category->get_base_std_link($language_id);
         $parameters = null;
-
-        $stdUrl = $this->trimUrl($stdUrl, $languageId);
-        $seoUrl = $this->getCategoryUri($category, $languageId);
-
-        if ($isFixed === null) {
-            $isFixed = $this->isFixed('oxcategory', $category->getId(), $languageId);
+        $std_url = $this->trim_url($std_url, $language_id);
+        $seo_url = $this->get_category_uri($category, $language_id);
+        if ($is_fixed === null) {
+            $is_fixed = $this->is_fixed('oxcategory', $category->get_id(), $language_id);
         }
-
-        return $this->assembleFullPageUrl($category, 'oxcategory', $stdUrl, $seoUrl, $pageNumber, $parameters, $languageId, $isFixed);
+        return $this->assemble_full_page_url($category, 'oxcategory', $std_url, $seo_url, $page_number, $parameters, $language_id, $is_fixed);
     }
-
     /**
      * Category URL encoder. If category has external URLs, skip encoding
      * for this category. If SEO id is not set, generates and saves SEO id
@@ -166,84 +142,49 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getCategoryUrl($oCategory, $iLang = null)
+    public function get_category_url($o_category, $i_lang = null)
     {
-        $sUrl = '';
-        if (!isset($iLang)) {
-            $iLang = $oCategory->getLanguage();
+        $s_url = '';
+        if (!isset($i_lang)) {
+            $i_lang = $o_category->get_language();
         }
         // category may have specified url
-        if (($sSeoUrl = $this->getCategoryUri($oCategory, $iLang))) {
-            return $this->getFullUrl($sSeoUrl, $iLang);
+        if ($s_seo_url = $this->get_category_uri($o_category, $i_lang)) {
+            return $this->get_full_url($s_seo_url, $i_lang);
         }
-
-        return $sUrl;
+        return $s_url;
     }
-
     /**
      * Marks related to category objects as expired
      *
      * @param \OxidEsales\Eshop\Application\Model\Category $oCategory Category object
      */
-    public function markRelatedAsExpired($oCategory): void
+    public function mark_related_as_expired($o_category): void
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         // select it from table instead of using object carrying value
         // this is because this method is usually called inside update,
         // where object may already be carrying changed id
-        $aCatInfo = $oDb->getRow('select oxrootid, oxleft, oxright from oxcategories where oxid = :oxid limit 1', [
-            'oxid' => $oCategory->getId(),
-        ]);
-
+        $a_cat_info = $o_db->get_row('select oxrootid, oxleft, oxright from oxcategories where oxid = :oxid limit 1', ['oxid' => $o_category->get_id()]);
         // update sub cats
-        $sQ = "update oxseo as seo1, (select oxid from oxcategories 
-            where oxrootid = :oxrootid 
-            and oxleft > :oxleft 
-            and oxright < :oxright ) as seo2 
-                set seo1.oxexpired = '1' where seo1.oxtype = 'oxcategory' and seo1.oxobjectid = seo2.oxid";
-        $oDb->execute($sQ, [
-            'oxrootid' => $aCatInfo['oxrootid'],
-            'oxleft' => (int) $aCatInfo['oxleft'],
-            'oxright' => (int) $aCatInfo['oxright'],
-        ]);
-
+        $s_q = "update oxseo as seo1, (select oxid from oxcategories \n            where oxrootid = :oxrootid \n            and oxleft > :oxleft \n            and oxright < :oxright ) as seo2 \n                set seo1.oxexpired = '1' where seo1.oxtype = 'oxcategory' and seo1.oxobjectid = seo2.oxid";
+        $o_db->execute($s_q, ['oxrootid' => $a_cat_info['oxrootid'], 'oxleft' => (int) $a_cat_info['oxleft'], 'oxright' => (int) $a_cat_info['oxright']]);
         // update subarticles
-        $sQ = 'update oxseo as seo1, (select distinct o2c.oxobjectid as id from oxcategories as cat left join oxobject2category '
-              . 'as o2c on o2c.oxcatnid=cat.oxid where cat.oxrootid = :oxrootid and cat.oxleft >= :oxleft '
-              . 'and cat.oxright <= :oxright) as seo2 '
-              . "set seo1.oxexpired = '1' where seo1.oxtype = 'oxarticle' and seo1.oxobjectid = seo2.id "
-              . 'and seo1.oxfixed = 0';
-        $oDb->execute($sQ, [
-            'oxrootid' => $aCatInfo['oxrootid'],
-            'oxleft' => (int) $aCatInfo['oxleft'],
-            'oxright' => (int) $aCatInfo['oxright'],
-        ]);
+        $s_q = 'update oxseo as seo1, (select distinct o2c.oxobjectid as id from oxcategories as cat left join oxobject2category ' . 'as o2c on o2c.oxcatnid=cat.oxid where cat.oxrootid = :oxrootid and cat.oxleft >= :oxleft ' . 'and cat.oxright <= :oxright) as seo2 ' . "set seo1.oxexpired = '1' where seo1.oxtype = 'oxarticle' and seo1.oxobjectid = seo2.id " . 'and seo1.oxfixed = 0';
+        $o_db->execute($s_q, ['oxrootid' => $a_cat_info['oxrootid'], 'oxleft' => (int) $a_cat_info['oxleft'], 'oxright' => (int) $a_cat_info['oxright']]);
     }
-
     /**
      * @param Category $category
      */
-    public function onDeleteCategory($category): void
+    public function on_delete_category($category): void
     {
-        $this->setRelatedToCategorySeoUrlsAsExpired($category);
-
-        $database = DatabaseProvider::getDb();
-
-        $database->execute("delete from oxseo where oxseo.oxtype = 'oxarticle' and oxseo.oxparams = :oxparams", [
-            'oxparams' => $category->getId(),
-        ]);
-        $database->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcategory'", [
-            'oxobjectid' => $category->getId(),
-        ]);
-        $database->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $category->getId(),
-        ]);
-        $database->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
-            'oxobjectid' => $category->getId(),
-        ]);
+        $this->set_related_to_category_seo_urls_as_expired($category);
+        $database = Database_Provider::get_db();
+        $database->execute("delete from oxseo where oxseo.oxtype = 'oxarticle' and oxseo.oxparams = :oxparams", ['oxparams' => $category->get_id()]);
+        $database->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcategory'", ['oxobjectid' => $category->get_id()]);
+        $database->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', ['oxobjectid' => $category->get_id()]);
+        $database->execute('delete from oxseohistory where oxobjectid = :oxobjectid', ['oxobjectid' => $category->get_id()]);
     }
-
     /**
      * Returns alternative uri used while updating seo
      *
@@ -252,56 +193,31 @@ class SeoEncoderCategory extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    protected function getAltUri($sObjectId, $iLang)
+    protected function get_alt_uri($s_object_id, $i_lang)
     {
-        $sSeoUrl = null;
-        $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        if ($oCat->loadInLang($iLang, $sObjectId)) {
-            return $this->getCategoryUri($oCat, $iLang);
+        $s_seo_url = null;
+        $o_cat = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+        if ($o_cat->load_in_lang($i_lang, $s_object_id)) {
+            return $this->get_category_uri($o_cat, $i_lang);
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
-    private function setRelatedToCategorySeoUrlsAsExpired(Category $category): void
+    private function set_related_to_category_seo_urls_as_expired(Category $category): void
     {
-        foreach ($this->getSeoUrlsForCategory($category) as $seoUrl) {
-            $this->setSeoUrlsAsExpired(
-                $this->getRelatedProductsAndSubCategories($seoUrl)
-            );
+        foreach ($this->get_seo_urls_for_category($category) as $seo_url) {
+            $this->set_seo_urls_as_expired($this->get_related_products_and_sub_categories($seo_url));
         }
     }
-
-    private function getSeoUrlsForCategory(Category $category): array
+    private function get_seo_urls_for_category(Category $category): array
     {
-        return DatabaseProvider::getDb()
-            ->getCol(
-                "select oxseourl from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcategory'",
-                ['oxobjectid' => $category->getId()]
-            );
+        return Database_Provider::get_db()->get_col("select oxseourl from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcategory'", ['oxobjectid' => $category->get_id()]);
     }
-
-    private function getRelatedProductsAndSubCategories(string $rootCategoryUrl): array
+    private function get_related_products_and_sub_categories(string $root_category_url): array
     {
-        return DatabaseProvider::getDb()
-            ->getCol(
-                "
-            select oxident
-            from oxseo
-            where oxseo.oxseourl like CONCAT(:url, '%') 
-              and oxtype in ('oxarticle', 'oxcategory')",
-                ['url' => $rootCategoryUrl]
-            );
+        return Database_Provider::get_db()->get_col("\n            select oxident\n            from oxseo\n            where oxseo.oxseourl like CONCAT(:url, '%') \n              and oxtype in ('oxarticle', 'oxcategory')", ['url' => $root_category_url]);
     }
-
-    private function setSeoUrlsAsExpired(array $idents): void
+    private function set_seo_urls_as_expired(array $idents): void
     {
-        DatabaseProvider::getDb()
-            ->execute(
-                sprintf(
-                    "update oxseo set oxseo.oxexpired=1 where oxseo.oxident in ('%s')",
-                    implode("','", $idents)
-                )
-            );
+        Database_Provider::get_db()->execute(sprintf("update oxseo set oxseo.oxexpired=1 where oxseo.oxident in ('%s')", implode("','", $idents)));
     }
 }

@@ -1,41 +1,36 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\ViewHelper;
+namespace Oxid_Esales\Eshop_Community\Core\View_Helper;
 
 /**
  * Class for preparing Stylesheets.
  */
-class StyleRenderer
+class Style_Renderer
 {
     /**
      * @param string $widget
      * @param bool   $forceRender
      * @param bool   $isDynamic
      */
-    public function render($widget, $forceRender, $isDynamic): string
+    public function render($widget, $force_render, $is_dynamic): string
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $suffix = $isDynamic ? '_dynamic' : '';
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $suffix = $is_dynamic ? '_dynamic' : '';
         $output = '';
-
-        if (!$widget || $this->shouldForceRender($forceRender)) {
-            $styles = (array) $config->getGlobalParameter(\OxidEsales\Eshop\Core\ViewHelper\StyleRegistrator::STYLES_PARAMETER_NAME . $suffix);
-            $output .= $this->formStylesOutput($styles);
+        if (!$widget || $this->should_force_render($force_render)) {
+            $styles = (array) $config->get_global_parameter(\Oxid_Esales\Eshop\Core\View_Helper\Style_Registrator::STYLES_PARAMETER_NAME . $suffix);
+            $output .= $this->form_styles_output($styles);
             $output .= PHP_EOL;
-            $conditionalStyles = (array) $config->getGlobalParameter(\OxidEsales\Eshop\Core\ViewHelper\StyleRegistrator::CONDITIONAL_STYLES_PARAMETER_NAME . $suffix);
-            $output .= $this->formConditionalStylesOutput($conditionalStyles);
+            $conditional_styles = (array) $config->get_global_parameter(\Oxid_Esales\Eshop\Core\View_Helper\Style_Registrator::CONDITIONAL_STYLES_PARAMETER_NAME . $suffix);
+            $output .= $this->form_conditional_styles_output($conditional_styles);
         }
-
         return $output;
     }
-
     /**
      * Returns whether rendering of scripts should be forced.
      *
@@ -43,36 +38,32 @@ class StyleRenderer
      *
      * @return bool
      */
-    protected function shouldForceRender($forceRender)
+    protected function should_force_render($force_render)
     {
-        return $forceRender;
+        return $force_render;
     }
-
     /**
      * @param array $styles
      */
-    protected function formStylesOutput($styles): string
+    protected function form_styles_output($styles): string
     {
-        $preparedStyles = [];
+        $prepared_styles = [];
         $template = '<link rel="stylesheet" type="text/css" href="%s" />';
         foreach ($styles as $style) {
-            $preparedStyles[] = sprintf($template, $style);
+            $prepared_styles[] = sprintf($template, $style);
         }
-
-        return implode(PHP_EOL, $preparedStyles);
+        return implode(PHP_EOL, $prepared_styles);
     }
-
     /**
      * @param array $styles
      */
-    protected function formConditionalStylesOutput($styles): string
+    protected function form_conditional_styles_output($styles): string
     {
-        $preparedStyles = [];
+        $prepared_styles = [];
         $template = '<!--[if %s]><link rel="stylesheet" type="text/css" href="%s"><![endif]-->';
         foreach ($styles as $style => $condition) {
-            $preparedStyles[] = sprintf($template, $condition, $style);
+            $prepared_styles[] = sprintf($template, $condition, $style);
         }
-
-        return implode(PHP_EOL, $preparedStyles);
+        return implode(PHP_EOL, $prepared_styles);
     }
 }

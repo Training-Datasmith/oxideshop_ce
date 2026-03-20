@@ -1,49 +1,42 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Core;
 
-namespace OxidEsales\EshopCommunity\Core;
-
-use OxidEsales\Eshop\Application\Model\Shop;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-
+use Oxid_Esales\Eshop\Application\Model\Shop;
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 /**
  * Class for handling database related operations
  */
-class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
+class Db_Meta_Data_Handler extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      *
      * @var array
      */
-    protected $_aTables;
-
+    protected $_a_tables;
     /**
      *
      * @var int
      */
-    protected $_iCurrentMaxLangId;
-
+    protected $_i_current_max_lang_id;
     /**
      *
      * @var array Tables which should be skipped from resetting
      */
-    protected $_aSkipTablesOnReset = ['oxcountry'];
-
+    protected $_a_skip_tables_on_reset = ['oxcountry'];
     /**
      * When creating views, always use those fields from core table.
      *
      * @var array
      */
-    protected $forceOriginalFields = ['OXID'];
-
+    protected $force_original_fields = ['OXID'];
     /**
      *  Get table fields
      *
@@ -51,19 +44,17 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    public function getFields($tableName)
+    public function get_fields($table_name)
     {
         $fields = [];
-        $rawFields = DatabaseProvider::getDb()->MetaColumns($tableName);
-        if (is_array($rawFields)) {
-            foreach ($rawFields as $field) {
-                $fields[$field->name] = "{$tableName}.{$field->name}";
+        $raw_fields = Database_Provider::get_db()->meta_columns($table_name);
+        if (is_array($raw_fields)) {
+            foreach ($raw_fields as $field) {
+                $fields[$field->name] = "{$table_name}.{$field->name}";
             }
         }
-
         return $fields;
     }
-
     /**
      * Check if table exists
      *
@@ -71,14 +62,12 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function tableExists($tableName)
+    public function table_exists($table_name)
     {
-        $db = DatabaseProvider::getDb();
-        $tables = $db->getAll('show tables like ' . $db->quote($tableName));
-
+        $db = Database_Provider::get_db();
+        $tables = $db->get_all('show tables like ' . $db->quote($table_name));
         return count($tables) > 0;
     }
-
     /**
      * Check if field exists in table
      *
@@ -87,21 +76,19 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function fieldExists($fieldName, $tableName)
+    public function field_exists($field_name, $table_name)
     {
-        $tableFields = $this->getFields($tableName);
-        $tableName = strtoupper($tableName);
-        if (is_array($tableFields)) {
-            $fieldName = strtoupper($fieldName);
-            $tableFields = array_map(strtoupper(...), $tableFields);
-            if (in_array("{$tableName}.{$fieldName}", $tableFields)) {
+        $table_fields = $this->get_fields($table_name);
+        $table_name = strtoupper($table_name);
+        if (is_array($table_fields)) {
+            $field_name = strtoupper($field_name);
+            $table_fields = array_map(strtoupper(...), $table_fields);
+            if (in_array("{$table_name}.{$field_name}", $table_fields)) {
                 return true;
             }
         }
-
         return false;
     }
-
     /**
      * Get the indices of a table
      *
@@ -109,15 +96,13 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array The indices of the given table
      */
-    public function getIndices($tableName)
+    public function get_indices($table_name)
     {
-        if ($this->tableExists($tableName)) {
-            return DatabaseProvider::getDb()->getAll("SHOW INDEX FROM $tableName");
+        if ($this->table_exists($table_name)) {
+            return Database_Provider::get_db()->get_all("SHOW INDEX FROM {$table_name}");
         }
-
         return [];
     }
-
     /**
      * Check, if the table has an index with the given name
      *
@@ -126,19 +111,16 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool Has the table the given index?
      */
-    public function hasIndex($indexName, $tableName)
+    public function has_index($index_name, $table_name)
     {
         $result = false;
-
-        foreach ($this->getIndices($tableName) as $index) {
-            if ($indexName === $index['Column_name']) {
+        foreach ($this->get_indices($table_name) as $index) {
+            if ($index_name === $index['Column_name']) {
                 $result = true;
             }
         }
-
         return $result;
     }
-
     /**
      * Get the index of a given table by its name
      *
@@ -147,42 +129,35 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return null|array The index with the given name
      */
-    public function getIndexByName($indexName, $tableName)
+    public function get_index_by_name($index_name, $table_name)
     {
-        $indices = $this->getIndices($tableName);
-
+        $indices = $this->get_indices($table_name);
         $result = null;
-
         foreach ($indices as $index) {
-            if ($indexName === $index['Column_name']) {
+            if ($index_name === $index['Column_name']) {
                 $result = $index;
             }
         }
-
         return $result;
     }
-
     /**
      * Get all tables names from db. Views tables are not included in
      * this list.
      *
      * @return array
      */
-    public function getAllTables()
+    public function get_all_tables()
     {
-        if (empty($this->_aTables)) {
-            $tablesNames = DatabaseProvider::getDb()->getCol('show tables');
-
-            foreach ($tablesNames as $tableName) {
-                if ($this->validateTableName($tableName)) {
-                    $this->_aTables[] = $tableName;
+        if (empty($this->_a_tables)) {
+            $tables_names = Database_Provider::get_db()->get_col('show tables');
+            foreach ($tables_names as $table_name) {
+                if ($this->validate_table_name($table_name)) {
+                    $this->_a_tables[] = $table_name;
                 }
             }
         }
-
-        return $this->_aTables;
+        return $this->_a_tables;
     }
-
     /**
      * return all DB tables for the language sets
      *
@@ -190,19 +165,17 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    public function getAllMultiTables($table)
+    public function get_all_multi_tables($table)
     {
-        $mLTables = [];
-        foreach (array_keys(Registry::getLang()->getLanguageIds()) as $langId) {
-            $langTableName = getLangTableName($table, $langId);
-            if ($table != $langTableName && !in_array($langTableName, $mLTables)) {
-                $mLTables[] = $langTableName;
+        $m_l_tables = [];
+        foreach (array_keys(Registry::get_lang()->get_language_ids()) as $lang_id) {
+            $lang_table_name = get_lang_table_name($table, $lang_id);
+            if ($table != $lang_table_name && !in_array($lang_table_name, $m_l_tables)) {
+                $m_l_tables[] = $lang_table_name;
             }
         }
-
-        return $mLTables;
+        return $m_l_tables;
     }
-
     /**
      * Get sql for new multi-language table set creation
      *
@@ -211,25 +184,13 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getCreateTableSetSql($table, $lang)
+    protected function get_create_table_set_sql($table, $lang)
     {
-        $tableSet = getLangTableName($table, $lang);
-
-        $tableStatus = DatabaseProvider::getDb()->getRow(
-            'SHOW TABLE STATUS LIKE :tablename',
-            [
-                'tablename' => $table,
-            ]
-        );
-        $tableStatus = array_values($tableStatus);
-
-        return "CREATE TABLE `{$tableSet}` (" .
-               '`OXID` char(32) NOT NULL, ' .
-               'PRIMARY KEY (`OXID`)) ' .
-               'DEFAULT CHARACTER SET latin1 COLLATE latin1_general_ci ENGINE= ' . $tableStatus[1] . ' ' .
-               "COMMENT='" . $tableStatus[17] . "'";
+        $table_set = get_lang_table_name($table, $lang);
+        $table_status = Database_Provider::get_db()->get_row('SHOW TABLE STATUS LIKE :tablename', ['tablename' => $table]);
+        $table_status = array_values($table_status);
+        return "CREATE TABLE `{$table_set}` (" . '`OXID` char(32) NOT NULL, ' . 'PRIMARY KEY (`OXID`)) ' . 'DEFAULT CHARACTER SET latin1 COLLATE latin1_general_ci ENGINE= ' . $table_status[1] . ' ' . "COMMENT='" . $table_status[17] . "'";
     }
-
     /**
      * Get sql for new multi-language field creation
      *
@@ -241,30 +202,26 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getAddFieldSql($table, $field, $newField, $prevField, $tableSet = null)
+    public function get_add_field_sql($table, $field, $new_field, $prev_field, $table_set = null)
     {
-        if (!$tableSet) {
-            $tableSet = $table;
+        if (!$table_set) {
+            $table_set = $table;
         }
-        $tableSql = $this->getTableCreationSql($table);
-
+        $table_sql = $this->get_table_creation_sql($table);
         // removing comments;
-        $tableSql = preg_replace('/COMMENT \\\'.*?\\\'/', '', $tableSql);
-        preg_match("/.*,\s+(['`]?" . preg_quote($field, '/') . "['`]?\s+[^,]+),.*/", (string) $tableSql, $match);
-        $fieldSql = $match[1] ?? '';
-
+        $table_sql = preg_replace('/COMMENT \\\'.*?\\\'/', '', $table_sql);
+        preg_match("/.*,\\s+(['`]?" . preg_quote($field, '/') . "['`]?\\s+[^,]+),.*/", (string) $table_sql, $match);
+        $field_sql = $match[1] ?? '';
         $sql = '';
-        if (!empty($fieldSql)) {
-            $fieldSql = preg_replace('/' . preg_quote($field, '/') . '/', $newField, $fieldSql);
-            $sql = "ALTER TABLE `$tableSet` ADD " . $fieldSql;
-            if ($this->tableExists($tableSet) && $this->fieldExists($prevField, $tableSet)) {
-                $sql .= " AFTER `$prevField`";
+        if (!empty($field_sql)) {
+            $field_sql = preg_replace('/' . preg_quote($field, '/') . '/', $new_field, $field_sql);
+            $sql = "ALTER TABLE `{$table_set}` ADD " . $field_sql;
+            if ($this->table_exists($table_set) && $this->field_exists($prev_field, $table_set)) {
+                $sql .= " AFTER `{$prev_field}`";
             }
         }
-
         return $sql;
     }
-
     /**
      * Get sql for new multi-language field index creation
      *
@@ -275,79 +232,68 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getAddFieldIndexSql($table, $field, $newField, $tableSet = null)
+    public function get_add_field_index_sql($table, $field, $new_field, $table_set = null)
     {
-        $tableSql = $this->getTableCreationSql($table);
-
-        preg_match_all("/([\w]+\s+)?\bKEY\s+(`[^`]+`)?\s*\([^)]+(\(\d++\))*\)/iU", $tableSql, $match);
+        $table_sql = $this->get_table_creation_sql($table);
+        preg_match_all("/([\\w]+\\s+)?\\bKEY\\s+(`[^`]+`)?\\s*\\([^)]+(\\(\\d++\\))*\\)/iU", $table_sql, $match);
         $index = $match[0];
-
-        $usingTableSet = $tableSet ? true : false;
-
-        if (!$tableSet) {
-            $tableSet = $table;
+        $using_table_set = $table_set ? true : false;
+        if (!$table_set) {
+            $table_set = $table;
         }
-
-        $indexQueries = [];
+        $index_queries = [];
         $sql = [];
         if (count($index)) {
-            foreach ($index as $key => $indexQuery) {
-                if (preg_match("/\([^)]*\b" . $field . "\b[^)]*\)/i", $indexQuery)) {
+            foreach ($index as $key => $index_query) {
+                if (preg_match("/\\([^)]*\\b" . $field . "\\b[^)]*\\)/i", $index_query)) {
                     //removing index name - new will be added automaticly
-                    $indexQuery = preg_replace("/(.*\bKEY\s+)`[^`]+`/", '$1', $indexQuery);
-
-                    if ($usingTableSet) {
+                    $index_query = preg_replace("/(.*\\bKEY\\s+)`[^`]+`/", '$1', $index_query);
+                    if ($using_table_set) {
                         // replacing multiple fields to one (#3269)
-                        $indexQuery = preg_replace("/\([^\)]+\)+/", "(`$newField`{$match[3][$key]})", (string) $indexQuery);
+                        $index_query = preg_replace("/\\([^\\)]+\\)+/", "(`{$new_field}`{$match[3][$key]})", (string) $index_query);
                     } else {
                         //replacing previous field name with new one
-                        $indexQuery = preg_replace("/\b" . $field . "\b/", $newField, (string) $indexQuery);
+                        $index_query = preg_replace("/\\b" . $field . "\\b/", $new_field, (string) $index_query);
                     }
-                    $indexQueries[] = 'ADD ' . $indexQuery;
+                    $index_queries[] = 'ADD ' . $index_query;
                 }
             }
-            if (count($indexQueries)) {
-                $sql = ["ALTER TABLE `$tableSet` " . implode(', ', $indexQueries)];
+            if (count($index_queries)) {
+                $sql = ["ALTER TABLE `{$table_set}` " . implode(', ', $index_queries)];
             }
         }
-
         return $sql;
     }
-
     /**
      * Get max language ID used in shop. For checking is used table "oxarticle"
      * field "oxtitle"
      *
      * @return int
      */
-    public function getCurrentMaxLangId()
+    public function get_current_max_lang_id()
     {
-        if (isset($this->_iCurrentMaxLangId)) {
-            return $this->_iCurrentMaxLangId;
+        if (isset($this->_i_current_max_lang_id)) {
+            return $this->_i_current_max_lang_id;
         }
-
-        $table = $tableSet = 'oxarticles';
-        $field = $fieldSet = 'oxtitle';
+        $table = $table_set = 'oxarticles';
+        $field = $field_set = 'oxtitle';
         $lang = 0;
-        while ($this->tableExists($tableSet) && $this->fieldExists($fieldSet, $tableSet)) {
+        while ($this->table_exists($table_set) && $this->field_exists($field_set, $table_set)) {
             $lang++;
-            $tableSet = getLangTableName($table, $lang);
-            $fieldSet = $field . '_' . $lang;
+            $table_set = get_lang_table_name($table, $lang);
+            $field_set = $field . '_' . $lang;
         }
-
-        return $this->_iCurrentMaxLangId = --$lang;
+        return $this->_i_current_max_lang_id = --$lang;
     }
-
     /**
      * Get next available language ID
      *
      * @return int
      */
-    public function getNextLangId()
+    public function get_next_lang_id()
     {
-        return $this->getCurrentMaxLangId() + 1;
+        return $this->get_current_max_lang_id() + 1;
     }
-
     /**
      * Get table multi-language fields
      *
@@ -355,20 +301,17 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    public function getMultilangFields($table)
+    public function get_multilang_fields($table)
     {
-        $fields = $this->getFields($table);
-        $multiLangFields = [];
-
+        $fields = $this->get_fields($table);
+        $multi_lang_fields = [];
         foreach ($fields as $field) {
-            if (preg_match("/({$table}\.)?(?<field>.+)_1$/", (string) $field, $matches)) {
-                $multiLangFields[] = $matches['field'];
+            if (preg_match("/({$table}\\.)?(?<field>.+)_1\$/", (string) $field, $matches)) {
+                $multi_lang_fields[] = $matches['field'];
             }
         }
-
-        return $multiLangFields;
+        return $multi_lang_fields;
     }
-
     /**
      * Get single language fields
      *
@@ -377,59 +320,49 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    public function getSinglelangFields($table, $lang)
+    public function get_singlelang_fields($table, $lang)
     {
-        $langTable = getLangTableName($table, $lang);
-
-        $baseFields = $this->getFields($table);
-        $langFields = $this->getFields($langTable);
-
+        $lang_table = get_lang_table_name($table, $lang);
+        $base_fields = $this->get_fields($table);
+        $lang_fields = $this->get_fields($lang_table);
         //Some fields (for example OXID) must be taken from core table.
-        $langFields = $this->filterCoreFields($langFields);
-
-        $fields = array_merge($baseFields, $langFields);
-        $singleLangFields = [];
-
-        foreach ($fields as $fieldName => $field) {
-            if (preg_match("/(({$table}|{$langTable})\.)?(?<field>.+)_(?<lang>[0-9]+)$/", (string) $field, $matches)) {
+        $lang_fields = $this->filter_core_fields($lang_fields);
+        $fields = array_merge($base_fields, $lang_fields);
+        $single_lang_fields = [];
+        foreach ($fields as $field_name => $field) {
+            if (preg_match("/(({$table}|{$lang_table})\\.)?(?<field>.+)_(?<lang>[0-9]+)\$/", (string) $field, $matches)) {
                 if ($matches['lang'] == $lang) {
-                    $singleLangFields[$matches['field']] = $field;
+                    $single_lang_fields[$matches['field']] = $field;
                 }
             } else {
-                $singleLangFields[$fieldName] = $field;
+                $single_lang_fields[$field_name] = $field;
             }
         }
-
-        return $singleLangFields;
+        return $single_lang_fields;
     }
-
     /**
      * Add new multi-languages fields to table. Duplicates all multi-language
      * fields and fields indexes with next available language ID
      *
      * @param string $table table name
      */
-    public function addNewMultilangField($table): void
+    public function add_new_multilang_field($table): void
     {
-        $newLang = $this->getNextLangId();
-
-        $this->ensureMultiLanguageFields($table, $newLang);
+        $new_lang = $this->get_next_lang_id();
+        $this->ensure_multi_language_fields($table, $new_lang);
     }
-
     /**
      * Ensure, that all multi language fields of the given table are present.
      *
      * @param string $table The table we want to assure, that the multi language fields are present.
      */
-    public function ensureAllMultiLanguageFields($table): void
+    public function ensure_all_multi_language_fields($table): void
     {
-        $max = $this->getCurrentMaxLangId();
-
+        $max = $this->get_current_max_lang_id();
         for ($index = 1; $index <= $max; $index++) {
-            $this->ensureMultiLanguageFields($table, $index);
+            $this->ensure_multi_language_fields($table, $index);
         }
     }
-
     /**
      * Resetting all multi-language fields with specific language id
      * to default value in selected table
@@ -437,87 +370,72 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      * @param int    $langId    Language id
      * @param string $tableName Table name
      */
-    public function resetMultilangFields($langId, $tableName): void
+    public function reset_multilang_fields($lang_id, $table_name): void
     {
-        $langId = (int) $langId;
-
-        if ($langId === 0) {
+        $lang_id = (int) $lang_id;
+        if ($lang_id === 0) {
             return;
         }
-
         $sql = [];
-
-        $fields = $this->getMultilangFields($tableName);
+        $fields = $this->get_multilang_fields($table_name);
         if (is_array($fields) && count($fields) > 0) {
-            foreach ($fields as $fieldName) {
-                $fieldName = $fieldName . '_' . $langId;
-
-                if ($this->fieldExists($fieldName, $tableName)) {
+            foreach ($fields as $field_name) {
+                $field_name = $field_name . '_' . $lang_id;
+                if ($this->field_exists($field_name, $table_name)) {
                     //resetting field value to default
-                    $sql[] = "UPDATE {$tableName} SET {$fieldName} = DEFAULT;";
+                    $sql[] = "UPDATE {$table_name} SET {$field_name} = DEFAULT;";
                 }
             }
         }
-
         if (!empty($sql)) {
-            $this->executeSql($sql);
+            $this->execute_sql($sql);
         }
     }
-
     /**
      * Add new language to database. Scans all tables and adds new
      * multi-language fields
      */
-    public function addNewLangToDb(): void
+    public function add_new_lang_to_db(): void
     {
         //reset max count
-        $this->_iCurrentMaxLangId = null;
-
-        $table = $this->getAllTables();
-
-        foreach ($table as $tableName) {
-            $this->addNewMultilangField($tableName);
+        $this->_i_current_max_lang_id = null;
+        $table = $this->get_all_tables();
+        foreach ($table as $table_name) {
+            $this->add_new_multilang_field($table_name);
         }
-
         //updating views
-        $this->updateViews();
+        $this->update_views();
     }
-
     /**
      * Resetting all multi-language fields with specific language id
      * to default value in all tables. Only if language ID > 0.
      *
      * @param int $langId Language id
      */
-    public function resetLanguage($langId): void
+    public function reset_language($lang_id): void
     {
-        if ((int) $langId === 0) {
+        if ((int) $lang_id === 0) {
             return;
         }
-
-        $tables = $this->getAllTables();
-
+        $tables = $this->get_all_tables();
         // removing tables which does not requires reset
-        foreach ($this->_aSkipTablesOnReset as $skipTable) {
-            if (($skipId = array_search($skipTable, $tables)) !== false) {
-                unset($tables[$skipId]);
+        foreach ($this->_a_skip_tables_on_reset as $skip_table) {
+            if (($skip_id = array_search($skip_table, $tables)) !== false) {
+                unset($tables[$skip_id]);
             }
         }
-
-        foreach ($tables as $tableName) {
-            $this->resetMultilangFields($langId, $tableName);
+        foreach ($tables as $table_name) {
+            $this->reset_multilang_fields($lang_id, $table_name);
         }
     }
-
     /**
      * Executes array of sql strings
      *
      * @param array $queries SQL query array
      */
-    public function executeSql($queries): void
+    public function execute_sql($queries): void
     {
-        $db = DatabaseProvider::getDb();
-
+        $db = Database_Provider::get_db();
         if (is_array($queries) && !empty($queries)) {
             foreach ($queries as $query) {
                 $query = trim((string) $query);
@@ -527,45 +445,36 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
             }
         }
     }
-
     /**
      * Updates all views
      *
      * @param array|null $tables array of DB table name that can store different data per shop like oxArticle
      */
-    public function updateViews(?array $tables = null): bool
+    public function update_views(?array $tables = null): bool
     {
         set_time_limit(0);
-
-        Shop::disableViews();
-
-        $db = DatabaseProvider::getDb();
-        $config = Registry::getConfig();
-
-        $this->safeGuardAdditionalMultiLanguageTables();
-
-        $shops = $db->getAll('select * from oxshops');
-
-        $tables = $tables ?: ContainerFacade::getParameter('oxid_esales.multi_shop_tables');
-
+        Shop::disable_views();
+        $db = Database_Provider::get_db();
+        $config = Registry::get_config();
+        $this->safe_guard_additional_multi_language_tables();
+        $shops = $db->get_all('select * from oxshops');
+        $tables = $tables ?: Container_Facade::get_parameter('oxid_esales.multi_shop_tables');
         $success = true;
-        foreach ($shops as $shopValues) {
-            $shopId = $shopValues['OXID'];
-            $shop = oxNew(Shop::class);
-            $shop->load($shopId);
-            $shop->setMultiShopTables($tables);
-            $mallInherit = [];
+        foreach ($shops as $shop_values) {
+            $shop_id = $shop_values['OXID'];
+            $shop = ox_new(Shop::class);
+            $shop->load($shop_id);
+            $shop->set_multi_shop_tables($tables);
+            $mall_inherit = [];
             foreach ($tables as $table) {
-                $mallInherit[$table] = $config->getShopConfVar('blMallInherit_' . $table, $shopId);
+                $mall_inherit[$table] = $config->get_shop_conf_var('blMallInherit_' . $table, $shop_id);
             }
-            if (!$shop->generateViews(false, $mallInherit) && $success) {
+            if (!$shop->generate_views(false, $mall_inherit) && $success) {
                 $success = false;
             }
         }
-
         return $success;
     }
-
     /**
      * Make sure that e.g. OXID is always used from core table when creating views.
      * Otherwise we might have unwanted side effects from rows with OXIDs null in view tables.
@@ -574,80 +483,71 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    protected function filterCoreFields($fields)
+    protected function filter_core_fields($fields)
     {
-        foreach ($this->forceOriginalFields as $fieldname) {
+        foreach ($this->force_original_fields as $fieldname) {
             if (array_key_exists($fieldname, $fields)) {
                 unset($fields[$fieldname]);
             }
         }
         return $fields;
     }
-
     /**
      * Ensure that all *_set* tables for all tables in container parameter 'oxid_multilingual_tables'
      * are created.
      */
-    protected function safeGuardAdditionalMultiLanguageTables()
+    protected function safe_guard_additional_multi_language_tables()
     {
-        $maxLang = $this->getCurrentMaxLangId();
-        $multiLanguageTables = ContainerFacade::getParameter('oxid_esales.multilingual_tables');
-
-        if (!is_array($multiLanguageTables) || empty($multiLanguageTables)) {
-            return; //nothing to do
+        $max_lang = $this->get_current_max_lang_id();
+        $multi_language_tables = Container_Facade::get_parameter('oxid_esales.multilingual_tables');
+        if (!is_array($multi_language_tables) || empty($multi_language_tables)) {
+            return;
+            //nothing to do
         }
-
-        foreach ($multiLanguageTables as $table) {
-            if ($this->tableExists($table)) {
+        foreach ($multi_language_tables as $table) {
+            if ($this->table_exists($table)) {
                 //We start with language id 1 and rely on that all fields for language 0 exists.
                 //For language id 0 we have e.g. OXTITLE and logic here would expect it to
                 //be OXTITLE_0, add that as new field, leading to incorrect data in views later on.
-                for ($i = 1; $i <= $maxLang; $i++) {
-                    $this->ensureMultiLanguageFields($table, $i);
+                for ($i = 1; $i <= $max_lang; $i++) {
+                    $this->ensure_multi_language_fields($table, $i);
                 }
             }
         }
     }
-
     /**
      * Make sure that all *_set* tables with all required multilanguage fields are created.
      *
      * @param string $table
      * @param int    $languageId
      */
-    protected function ensureMultiLanguageFields($table, $languageId)
+    protected function ensure_multi_language_fields($table, $language_id)
     {
-        $fields = $this->getMultilangFields($table);
+        $fields = $this->get_multilang_fields($table);
         $sql = [];
-
-        $tableSet = getLangTableName($table, $languageId);
-        if (!$this->tableExists($tableSet)) {
-            $sql[] = $this->getCreateTableSetSql($table, $languageId);
+        $table_set = get_lang_table_name($table, $language_id);
+        if (!$this->table_exists($table_set)) {
+            $sql[] = $this->get_create_table_set_sql($table, $language_id);
         }
-
         if (is_array($fields) && count($fields) > 0) {
             foreach ($fields as $field) {
-                $newFieldName = $field . '_' . $languageId;
-                if ($languageId > 1) {
-                    $previousLanguage = $languageId - 1;
-                    $previousField = $field . '_' . $previousLanguage;
+                $new_field_name = $field . '_' . $language_id;
+                if ($language_id > 1) {
+                    $previous_language = $language_id - 1;
+                    $previous_field = $field . '_' . $previous_language;
                 } else {
-                    $previousField = $field;
+                    $previous_field = $field;
                 }
-
-                if (!$this->tableExists($tableSet) || !$this->fieldExists($newFieldName, $tableSet)) {
+                if (!$this->table_exists($table_set) || !$this->field_exists($new_field_name, $table_set)) {
                     //getting add field sql
-                    $sql[] = $this->getAddFieldSql($table, $field, $newFieldName, $previousField, $tableSet);
-
+                    $sql[] = $this->get_add_field_sql($table, $field, $new_field_name, $previous_field, $table_set);
                     //getting add index sql on added field
-                    $sql = array_merge($sql, (array) $this->getAddFieldIndexSql($table, $field, $newFieldName, $tableSet));
+                    $sql = array_merge($sql, (array) $this->get_add_field_index_sql($table, $field, $new_field_name, $table_set));
                 }
             }
         }
-
-        $this->executeSql($sql);
+        $this->execute_sql($sql);
     }
-
     /**
      * Adds possibility to validate table names.
      *
@@ -655,17 +555,13 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    protected function validateTableName($tableName)
+    protected function validate_table_name($table_name)
     {
         return true;
     }
-
-    private function getTableCreationSql(string $tableName): string
+    private function get_table_creation_sql(string $table_name): string
     {
-        $result = DatabaseProvider::getDb()->getRow(
-            sprintf('show create table %s', DatabaseProvider::getDb()->quoteIdentifier($tableName))
-        );
-
+        $result = Database_Provider::get_db()->get_row(sprintf('show create table %s', Database_Provider::get_db()->quote_identifier($table_name)));
         return array_values($result)[1];
     }
 }

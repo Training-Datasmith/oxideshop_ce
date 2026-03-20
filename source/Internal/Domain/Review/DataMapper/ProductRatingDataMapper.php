@@ -4,38 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Review\DataObject\ProductRating;
-
-class ProductRatingDataMapper implements ProductRatingDataMapperInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Object\Product_Rating;
+class Product_Rating_Data_Mapper implements Product_Rating_Data_Mapper_Interface
 {
-    public function map(ProductRating $productRating, array $data): ProductRating
+    public function map(Product_Rating $product_rating, array $data): Product_Rating
     {
-        $productRating
-            ->setProductId($data['OXID'])
-            ->setRatingAverage($data['OXRATING'])
-            ->setRatingCount($data['OXRATINGCNT']);
-
-        return $productRating;
+        $product_rating->set_product_id($data['OXID'])->set_rating_average($data['OXRATING'])->set_rating_count($data['OXRATINGCNT']);
+        return $product_rating;
     }
-
-    public function getData(ProductRating $productRating): array
+    public function get_data(Product_Rating $product_rating): array
     {
-        return [
-            'OXID'        => $productRating->getProductId(),
-            'OXRATING'    => $productRating->getRatingAverage(),
-            'OXRATINGCNT' => $productRating->getRatingCount(),
-        ];
+        return ['OXID' => $product_rating->get_product_id(), 'OXRATING' => $product_rating->get_rating_average(), 'OXRATINGCNT' => $product_rating->get_rating_count()];
     }
-
-    public function getPrimaryKey(ProductRating $productRating): array
+    public function get_primary_key(Product_Rating $product_rating): array
     {
-        return [
-            'OXID' => $productRating->getProductId(),
-        ];
+        return ['OXID' => $product_rating->get_product_id()];
     }
 }

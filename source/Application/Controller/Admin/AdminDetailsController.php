@@ -1,61 +1,48 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Application\Controller\TextEditorHandler;
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\ShopVersion;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use Oxid_Esales\Eshop\Application\Controller\Text_Editor_Handler;
+use Oxid_Esales\Eshop\Core\Field;
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Shop_Version;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
 use Symfony\Component\Filesystem\Path;
-
-class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Admin_Details_Controller extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /** @inheritdoc */
     public function render()
     {
-        $sReturn = parent::render();
-
+        $s_return = parent::render();
         // generate help link
-        Registry::getConfig();
-        $sDir = Path::join(
-            ContainerFacade::getParameter('oxid_esales.shop_source_directory'),
-            'documentation',
-            'admin'
-        );
-        if (is_dir($sDir)) {
-            $sDir = ContainerFacade::getParameter('oxid_esales.shop_url') . 'documentation/admin';
+        Registry::get_config();
+        $s_dir = Path::join(Container_Facade::get_parameter('oxid_esales.shop_source_directory'), 'documentation', 'admin');
+        if (is_dir($s_dir)) {
+            $s_dir = Container_Facade::get_parameter('oxid_esales.shop_url') . 'documentation/admin';
         } else {
-            $languageId = $this->getDocumentationLanguageId();
-            $shopVersion = oxNew(ShopVersion::class)->getVersion();
-            $sDir = "http://docu.oxid-esales.com/PE/{$shopVersion}/" . $languageId . '/admin';
+            $language_id = $this->get_documentation_language_id();
+            $shop_version = ox_new(Shop_Version::class)->get_version();
+            $s_dir = "http://docu.oxid-esales.com/PE/{$shop_version}/" . $language_id . '/admin';
         }
-
-        $this->_aViewData['sHelpURL'] = $sDir;
-
-        return $sReturn;
+        $this->_a_view_data['sHelpURL'] = $s_dir;
+        return $s_return;
     }
-
     /**
      * Get language id for documentation by current language id.
      *
      * @return int
      */
-    protected function getDocumentationLanguageId()
+    protected function get_documentation_language_id()
     {
-        $language = Registry::getLang();
-        $languageAbbr = $language->getLanguageAbbr($language->getTplLanguage());
-
-        return $languageAbbr === 'de' ? 0 : 1;
+        $language = Registry::get_lang();
+        $language_abbr = $language->get_language_abbr($language->get_tpl_language());
+        return $language_abbr === 'de' ? 0 : 1;
     }
-
     /**
      * @param \OxidEsales\Eshop\Core\Model\BaseModel $object
      * @param string $fieldName
@@ -63,18 +50,16 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      * @return string
      * @deprecated method will be removed in v7.0
      */
-    protected function getEditValue($object, $fieldName)
+    protected function get_edit_value($object, $field_name)
     {
-        if (!$object || !$fieldName || !isset($object->$fieldName)) {
+        if (!$object || !$field_name || !isset($object->{$field_name})) {
             return '';
         }
-        if (!$object->$fieldName instanceof Field) {
-            $object->$fieldName = new Field($object->$fieldName->value, Field::T_RAW);
+        if (!$object->{$field_name} instanceof Field) {
+            $object->{$field_name} = new Field($object->{$field_name}->value, Field::T_RAW);
         }
-
-        return $object->$fieldName->getRawValue();
+        return $object->{$field_name}->get_raw_value();
     }
-
     /**
      * Generates Text editor html code.
      *
@@ -86,43 +71,37 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @return string Editor output
      */
-    protected function generateTextEditor($width, $height, $object, $field, $stylesheet = null)
+    protected function generate_text_editor($width, $height, $object, $field, $stylesheet = null)
     {
-        $objectValue = $this->getEditValue($object, $field);
-
-        $textEditorHandler = $this->createTextEditorHandler();
-        $this->configureTextEditorHandler($textEditorHandler, $object, $field, $stylesheet);
-
-        return $textEditorHandler->renderTextEditor($width, $height, $objectValue, $field);
+        $object_value = $this->get_edit_value($object, $field);
+        $text_editor_handler = $this->create_text_editor_handler();
+        $this->configure_text_editor_handler($text_editor_handler, $object, $field, $stylesheet);
+        return $text_editor_handler->render_text_editor($width, $height, $object_value, $field);
     }
-
     /**
      * Resets number of articles in current shop categories.
      */
-    public function resetNrOfCatArticles(): void
+    public function reset_nr_of_cat_articles(): void
     {
         // resetting categories article count cache
-        $this->resetContentCache();
+        $this->reset_content_cache();
     }
-
     /**
      * Resets number of articles in current shop vendors.
      */
-    public function resetNrOfVendorArticles(): void
+    public function reset_nr_of_vendor_articles(): void
     {
         // resetting vendors cache
-        $this->resetContentCache();
+        $this->reset_content_cache();
     }
-
     /**
      * Resets number of articles in current shop manufacturers.
      */
-    public function resetNrOfManufacturerArticles(): void
+    public function reset_nr_of_manufacturer_articles(): void
     {
         // resetting manufacturers cache
-        $this->resetContentCache();
+        $this->reset_content_cache();
     }
-
     /**
      * Function creates category tree for select list used in "Category main", "Article extend" etc.
      *
@@ -133,39 +112,31 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @return string
      */
-    protected function createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null)
+    protected function create_category_tree($s_tpl_var_name, $s_edit_cat_id = '', $bl_force_non_cache = false, $i_tree_shop_id = null)
     {
         // caching category tree, to load it once, not many times
-        if (!isset($this->oCatTree) || $blForceNonCache) {
-            $this->oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
-            $this->oCatTree->setShopID($iTreeShopId);
-
+        if (!isset($this->o_cat_tree) || $bl_force_non_cache) {
+            $this->o_cat_tree = ox_new(\Oxid_Esales\Eshop\Application\Model\Category_List::class);
+            $this->o_cat_tree->set_shop_id($i_tree_shop_id);
             // setting language
-            $oBase = $this->oCatTree->getBaseObject();
-            $oBase->setLanguage($this->_iEditLang);
-
-            $this->oCatTree->loadList();
+            $o_base = $this->o_cat_tree->get_base_object();
+            $o_base->set_language($this->_i_edit_lang);
+            $this->o_cat_tree->load_list();
         }
-
         // copying tree
-        $oCatTree = $this->oCatTree;
+        $o_cat_tree = $this->o_cat_tree;
         //removing current category
-        if ($sEditCatId && isset($oCatTree[$sEditCatId])) {
-            unset($oCatTree[$sEditCatId]);
+        if ($s_edit_cat_id && isset($o_cat_tree[$s_edit_cat_id])) {
+            unset($o_cat_tree[$s_edit_cat_id]);
         }
-
         // add first fake category for not assigned articles
-        $oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $oRoot->oxcategories__oxtitle = new Field('--');
-
-        $oCatTree->assign(array_merge(['' => $oRoot], $oCatTree->getArray()));
-
+        $o_root = ox_new(\Oxid_Esales\Eshop\Application\Model\Category::class);
+        $o_root->oxcategories__oxtitle = new Field('--');
+        $o_cat_tree->assign(array_merge(['' => $o_root], $o_cat_tree->get_array()));
         // passing to view
-        $this->_aViewData[$sTplVarName] = $oCatTree;
-
-        return $oCatTree;
+        $this->_a_view_data[$s_tpl_var_name] = $o_cat_tree;
+        return $o_cat_tree;
     }
-
     /**
      * Function creates category tree for select list used in "Category main", "Article extend" etc.
      * Returns ID of selected category if available.
@@ -178,98 +149,82 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @return string
      */
-    protected function getCategoryTree(
-        $sTplVarName,
-        $sSelectedCatId,
-        $sEditCatId = '',
-        $blForceNonCache = false,
-        $iTreeShopId = null
-    ) {
-        $oCatTree = $this->createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
-
+    protected function get_category_tree($s_tpl_var_name, $s_selected_cat_id, $s_edit_cat_id = '', $bl_force_non_cache = false, $i_tree_shop_id = null)
+    {
+        $o_cat_tree = $this->create_category_tree($s_tpl_var_name, $s_edit_cat_id, $bl_force_non_cache, $i_tree_shop_id);
         // mark selected
-        if ($sSelectedCatId) {
+        if ($s_selected_cat_id) {
             // fixed parent category in select list
-            foreach ($oCatTree as $oCategory) {
-                if (strcmp((string) $oCategory->getId(), $sSelectedCatId) == 0) {
-                    $oCategory->selected = 1;
+            foreach ($o_cat_tree as $o_category) {
+                if (strcmp((string) $o_category->get_id(), $s_selected_cat_id) == 0) {
+                    $o_category->selected = 1;
                     break;
                 }
             }
         } else {
             // no category selected - opening first available
-            $oCatTree->rewind();
-            if ($oCat = $oCatTree->current()) {
-                $oCat->selected = 1;
-                $sSelectedCatId = $oCat->getId();
+            $o_cat_tree->rewind();
+            if ($o_cat = $o_cat_tree->current()) {
+                $o_cat->selected = 1;
+                $s_selected_cat_id = $o_cat->get_id();
             }
         }
-
         // passing to view
-        $this->_aViewData[$sTplVarName] = $oCatTree;
-
-        return $sSelectedCatId;
+        $this->_a_view_data[$s_tpl_var_name] = $o_cat_tree;
+        return $s_selected_cat_id;
     }
-
     /**
      * Updates object folder parameters.
      */
-    public function changeFolder(): void
+    public function change_folder(): void
     {
-        $sFolder = Registry::getRequest()->getRequestEscapedParameter('setfolder');
-        $sFolderClass = Registry::getRequest()->getRequestEscapedParameter('folderclass');
-
-        if ($sFolderClass == 'oxcontent' && $sFolder == 'CMSFOLDER_NONE') {
-            $sFolder = '';
+        $s_folder = Registry::get_request()->get_request_escaped_parameter('setfolder');
+        $s_folder_class = Registry::get_request()->get_request_escaped_parameter('folderclass');
+        if ($s_folder_class == 'oxcontent' && $s_folder == 'CMSFOLDER_NONE') {
+            $s_folder = '';
         }
-
-        $oObject = oxNew($sFolderClass);
-        if ($oObject->load($this->getEditObjectId())) {
-            $oObject->{$oObject->getCoreTableName() . '__oxfolder'} = new Field($sFolder);
-            $oObject->save();
+        $o_object = ox_new($s_folder_class);
+        if ($o_object->load($this->get_edit_object_id())) {
+            $o_object->{$o_object->get_core_table_name() . '__oxfolder'} = new Field($s_folder);
+            $o_object->save();
         }
     }
-
     /**
      * Sets-up navigation parameters.
      *
      * @param string $sNode active view id
      */
-    protected function setupNavigation($sNode)
+    protected function setup_navigation($s_node)
     {
         // navigation according to class
-        if ($sNode) {
-            $myAdminNavig = $this->getNavigation();
-
+        if ($s_node) {
+            $my_admin_navig = $this->get_navigation();
             // default tab
-            $this->_aViewData['default_edit'] = $myAdminNavig->getActiveTab($sNode, $this->_iDefEdit);
-
+            $this->_a_view_data['default_edit'] = $my_admin_navig->get_active_tab($s_node, $this->_i_def_edit);
             // buttons
-            $this->_aViewData['bottom_buttons'] = $myAdminNavig->getBtn($sNode);
+            $this->_a_view_data['bottom_buttons'] = $my_admin_navig->get_btn($s_node);
         }
     }
-
     /**
      * Resets count of vendor/manufacturer category items.
      *
      * @param array $aIds to reset type => id
      */
-    protected function resetCounts($aIds)
+    protected function reset_counts($a_ids)
     {
-        foreach ($aIds as $sType => $aResetInfo) {
-            foreach ($aResetInfo as $sResetId => $iPos) {
-                switch ($sType) {
+        foreach ($a_ids as $s_type => $a_reset_info) {
+            foreach ($a_reset_info as $s_reset_id => $i_pos) {
+                switch ($s_type) {
                     case 'vendor':
-                        $this->resetCounter('vendorArticle', $sResetId);
+                        $this->reset_counter('vendorArticle', $s_reset_id);
                         break;
                     case 'manufacturer':
-                        $this->resetCounter('manufacturerArticle', $sResetId);
+                        $this->reset_counter('manufacturerArticle', $s_reset_id);
                         break;
                 }
             }
         }
     }
-
     /**
      * Create the handler for the text editor.
      *
@@ -281,22 +236,17 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      * @param string            $field             The input field we want to edit
      * @param string            $stylesheet        The name of the CSS file
      */
-    protected function configureTextEditorHandler(
-        TextEditorHandler $textEditorHandler,
-        $editedObject,
-        $field,
-        $stylesheet
-    ) {
-        $textEditorHandler->setStyleSheet($stylesheet);
+    protected function configure_text_editor_handler(Text_Editor_Handler $text_editor_handler, $edited_object, $field, $stylesheet)
+    {
+        $text_editor_handler->set_style_sheet($stylesheet);
     }
-
     /**
      * Create the handler for the text editor.
      *
      * @return TextEditorHandler The text editor handler
      */
-    protected function createTextEditorHandler()
+    protected function create_text_editor_handler()
     {
-        return oxNew(TextEditorHandler::class);
+        return ox_new(Text_Editor_Handler::class);
     }
 }

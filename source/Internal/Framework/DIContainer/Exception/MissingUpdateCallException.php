@@ -4,11 +4,9 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception;
-
-class MissingUpdateCallException extends \Exception
+class Missing_Update_Call_Exception extends \Exception
 {
 }

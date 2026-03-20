@@ -4,33 +4,27 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Di_Container\Compiler_Pass;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\CompilerPass;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Api\AttributeRouteControllerLoader;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
-use Symfony\Component\Routing\RouteCollection;
-
-class RoutePass implements CompilerPassInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Api\Attribute_Route_Controller_Loader;
+use Symfony\Component\Dependency_Injection\Compiler\Compiler_Pass_Interface;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Routing\Matcher\Dumper\Compiled_Url_Matcher_Dumper;
+use Symfony\Component\Routing\Route_Collection;
+class Route_Pass implements Compiler_Pass_Interface
 {
-    public function process(ContainerBuilder $container): void
+    public function process(Container_Builder $container): void
     {
-        $loader = new AttributeRouteControllerLoader();
-        $routes = new RouteCollection();
-
-        foreach ($container->getDefinitions() as $definition) {
-            $class = $definition->getClass();
-            if ($definition->isPublic() && !$definition->isAbstract() && $class !== null && class_exists($class)) {
-                $routes->addCollection($loader->load($class));
+        $loader = new Attribute_Route_Controller_Loader();
+        $routes = new Route_Collection();
+        foreach ($container->get_definitions() as $definition) {
+            $class = $definition->get_class();
+            if ($definition->is_public() && !$definition->is_abstract() && $class !== null && class_exists($class)) {
+                $routes->add_collection($loader->load($class));
             }
         }
-
-        $compiledRoutes = (new CompiledUrlMatcherDumper($routes))->getCompiledRoutes();
-
-        $container->setParameter('oxid.routes', $compiledRoutes);
+        $compiled_routes = (new Compiled_Url_Matcher_Dumper($routes))->get_compiled_routes();
+        $container->set_parameter('oxid.routes', $compiled_routes);
     }
 }

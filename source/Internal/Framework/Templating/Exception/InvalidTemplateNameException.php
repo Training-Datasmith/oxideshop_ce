@@ -4,13 +4,10 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating\Exception;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating\Exception;
 
 use Exception;
-
-final class InvalidTemplateNameException extends Exception
+final class Invalid_Template_Name_Exception extends Exception
 {
 }

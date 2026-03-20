@@ -1,107 +1,80 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Database_Provider;
+use Oxid_Esales\Eshop\Core\Registry;
 use stdClass;
-
 /**
  * Admin article RDFa deliveryset manager.
  * Performs collection and updatind (on user submit) main item information.
  * Admin Menu: Shop Settings -> Shipping & Handling -> RDFa.
  */
-class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\PaymentRdfa
+class Delivery_Set_Rdfa extends \Oxid_Esales\Eshop\Application\Controller\Admin\Payment_Rdfa
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'deliveryset_rdfa';
-
+    protected $_s_this_template = 'deliveryset_rdfa';
     /**
      * Predefined delivery methods
      *
      * @var array
      */
-    protected $_aRDFaDeliveries = [
-        'DeliveryModeDirectDownload' => 0,
-        'DeliveryModeFreight'        => 0,
-        'DeliveryModeMail'           => 0,
-        'DeliveryModeOwnFleet'       => 0,
-        'DeliveryModePickUp'         => 0,
-        'DHL'                        => 1,
-        'FederalExpress'             => 1,
-        'UPS'                        => 1,
-    ];
-
+    protected $_a_rd_fa_deliveries = ['DeliveryModeDirectDownload' => 0, 'DeliveryModeFreight' => 0, 'DeliveryModeMail' => 0, 'DeliveryModeOwnFleet' => 0, 'DeliveryModePickUp' => 0, 'DHL' => 1, 'FederalExpress' => 1, 'UPS' => 1];
     /**
      * Saves changed mapping configurations
      */
     public function save(): void
     {
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-        $aRDFaDeliveries = (array) Registry::getRequest()->getRequestEscapedParameter('ardfadeliveries');
-
+        $a_params = Registry::get_request()->get_request_escaped_parameter('editval');
+        $a_rd_fa_deliveries = (array) Registry::get_request()->get_request_escaped_parameter('ardfadeliveries');
         // Delete old mappings
-        $oDb = DatabaseProvider::getDb();
-        $sOxIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSql = "DELETE FROM oxobject2delivery WHERE oxdeliveryid = :oxdeliveryid AND OXTYPE = 'rdfadeliveryset'";
-        $oDb->execute($sSql, [
-            'oxdeliveryid' => $sOxIdParameter,
-        ]);
-
+        $o_db = Database_Provider::get_db();
+        $s_ox_id_parameter = Registry::get_request()->get_request_escaped_parameter('oxid');
+        $s_sql = "DELETE FROM oxobject2delivery WHERE oxdeliveryid = :oxdeliveryid AND OXTYPE = 'rdfadeliveryset'";
+        $o_db->execute($s_sql, ['oxdeliveryid' => $s_ox_id_parameter]);
         // Save new mappings
-        foreach ($aRDFaDeliveries as $sDelivery) {
-            $oMapping = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-            $oMapping->init('oxobject2delivery');
-            $oMapping->assign($aParams);
-            $oMapping->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sDelivery);
-            $oMapping->save();
+        foreach ($a_rd_fa_deliveries as $s_delivery) {
+            $o_mapping = ox_new(\Oxid_Esales\Eshop\Core\Model\Base_Model::class);
+            $o_mapping->init('oxobject2delivery');
+            $o_mapping->assign($a_params);
+            $o_mapping->oxobject2delivery__oxobjectid = new \Oxid_Esales\Eshop\Core\Field($s_delivery);
+            $o_mapping->save();
         }
     }
-
     /**
      * Returns an array including all available RDFa deliveries.
      *
      * @return array
      */
-    public function getAllRDFaDeliveries()
+    public function get_all_rd_fa_deliveries()
     {
-        $aRDFaDeliveries = [];
-        $aAssignedRDFaDeliveries = $this->getAssignedRDFaDeliveries();
-        foreach ($this->_aRDFaDeliveries as $sName => $iType) {
-            $oDelivery = new stdClass();
-            $oDelivery->name = $sName;
-            $oDelivery->type = $iType;
-            $oDelivery->checked = in_array($sName, $aAssignedRDFaDeliveries);
-            $aRDFaDeliveries[] = $oDelivery;
+        $a_rd_fa_deliveries = [];
+        $a_assigned_rd_fa_deliveries = $this->get_assigned_rd_fa_deliveries();
+        foreach ($this->_a_rd_fa_deliveries as $s_name => $i_type) {
+            $o_delivery = new stdClass();
+            $o_delivery->name = $s_name;
+            $o_delivery->type = $i_type;
+            $o_delivery->checked = in_array($s_name, $a_assigned_rd_fa_deliveries);
+            $a_rd_fa_deliveries[] = $o_delivery;
         }
-
-        return $aRDFaDeliveries;
+        return $a_rd_fa_deliveries;
     }
-
     /**
      * Returns array of RDFa deliveries which are assigned to current delivery
      *
      * @return array
      */
-    public function getAssignedRDFaDeliveries()
+    public function get_assigned_rd_fa_deliveries()
     {
-        return DatabaseProvider::getDb()->getCol(
-            'select oxobjectid from oxobject2delivery where oxdeliveryid = :oxdeliveryid'
-            . ' and oxtype = "rdfadeliveryset" ',
-            [
-                'oxdeliveryid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
-            ]
-        );
+        return Database_Provider::get_db()->get_col('select oxobjectid from oxobject2delivery where oxdeliveryid = :oxdeliveryid' . ' and oxtype = "rdfadeliveryset" ', ['oxdeliveryid' => Registry::get_request()->get_request_escaped_parameter('oxid')]);
     }
 }

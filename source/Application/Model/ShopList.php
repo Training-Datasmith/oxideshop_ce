@@ -1,19 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Shop list manager.
  * Organizes list of shop objects.
  */
-class ShopList extends \OxidEsales\Eshop\Core\Model\ListModel
+class Shop_List extends \Oxid_Esales\Eshop\Core\Model\List_Model
 {
     /**
      * Calls parent constructor
@@ -22,21 +20,19 @@ class ShopList extends \OxidEsales\Eshop\Core\Model\ListModel
     {
         parent::__construct('oxshop');
     }
-
     /**
      * Loads all shops to list
      */
-    public function getAll(): void
+    public function get_all(): void
     {
-        $this->selectString('SELECT `oxshops`.* FROM `oxshops`');
+        $this->select_string('SELECT `oxshops`.* FROM `oxshops`');
     }
-
     /**
      * Gets shop list into object
      */
-    public function getIdTitleList(): void
+    public function get_id_title_list(): void
     {
-        $this->setBaseObject(oxNew('oxListObject', 'oxshops'));
-        $this->selectString('SELECT `OXID`, `OXNAME` FROM `oxshops`');
+        $this->set_base_object(ox_new('oxListObject', 'oxshops'));
+        $this->select_string('SELECT `OXID`, `OXNAME` FROM `oxshops`');
     }
 }

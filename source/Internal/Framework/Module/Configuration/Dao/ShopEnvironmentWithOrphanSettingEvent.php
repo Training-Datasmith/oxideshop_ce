@@ -4,37 +4,32 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
-
-use Symfony\Contracts\EventDispatcher\Event;
-
-class ShopEnvironmentWithOrphanSettingEvent extends Event
+use Symfony\Contracts\Event_Dispatcher\Event;
+class Shop_Environment_With_Orphan_Setting_Event extends Event
 {
     public function __construct(
         /** @var int */
-        private $shopId,
+        private $shop_id,
         /** @var  string */
-        private $moduleId,
+        private $module_id,
         /** @var string */
-        private $settingId
-    ) {
-    }
-
-    public function getShopId(): int
+        private $setting_id
+    )
     {
-        return $this->shopId;
     }
-
-    public function getModuleId(): string
+    public function get_shop_id(): int
     {
-        return $this->moduleId;
+        return $this->shop_id;
     }
-
-    public function getSettingId(): string
+    public function get_module_id(): string
     {
-        return $this->settingId;
+        return $this->module_id;
+    }
+    public function get_setting_id(): string
+    {
+        return $this->setting_id;
     }
 }

@@ -4,49 +4,40 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Event;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Theme\Event;
-
-use Symfony\Contracts\EventDispatcher\Event;
-
+use Symfony\Contracts\Event_Dispatcher\Event;
 /**
  * @stable
  * @see OxidEsales/EshopCommunity/Internal/README.md
  */
-class ThemeSettingChangedEvent extends Event
+class Theme_Setting_Changed_Event extends Event
 {
     /**
      * @param string $theme Theme information as in oxconfig.oxmodule
      */
-    public function __construct(
-        private readonly string $configurationVariable,
-        private readonly int $shopId,
-        private readonly string $theme
-    ) {
+    public function __construct(private readonly string $configuration_variable, private readonly int $shop_id, private readonly string $theme)
+    {
     }
-
     /**
      * Getter for configuration variable name.
      */
-    public function getConfigurationVariable(): string
+    public function get_configuration_variable(): string
     {
-        return $this->configurationVariable;
+        return $this->configuration_variable;
     }
-
     /**
      * Getter for shop id.
      */
-    public function getShopId(): int
+    public function get_shop_id(): int
     {
-        return $this->shopId;
+        return $this->shop_id;
     }
-
     /**
      * Getter for theme information.
      */
-    public function getTheme(): string
+    public function get_theme(): string
     {
         return $this->theme;
     }

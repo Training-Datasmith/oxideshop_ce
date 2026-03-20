@@ -4,69 +4,56 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Config\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject;
-
-class ShopConfigurationSetting
+class Shop_Configuration_Setting
 {
-    private ?int $shopId = null;
-
+    private ?int $shop_id = null;
     private ?string $name = null;
-
     private ?string $type = null;
-
     /**
      * @var mixed
      */
     private $value;
-
-    public function getShopId(): int
+    public function get_shop_id(): int
     {
-        return $this->shopId;
+        return $this->shop_id;
     }
-
-    public function setShopId(int $shopId): ShopConfigurationSetting
+    public function set_shop_id(int $shop_id): Shop_Configuration_Setting
     {
-        $this->shopId = $shopId;
+        $this->shop_id = $shop_id;
         return $this;
     }
-
-    public function getName(): string
+    public function get_name(): string
     {
         return $this->name;
     }
-
-    public function setName(string $name): ShopConfigurationSetting
+    public function set_name(string $name): Shop_Configuration_Setting
     {
         $this->name = $name;
         return $this;
     }
-
-    public function getType(): string
+    public function get_type(): string
     {
         return $this->type;
     }
-
-    public function setType(string $type): ShopConfigurationSetting
+    public function set_type(string $type): Shop_Configuration_Setting
     {
         $this->type = $type;
         return $this;
     }
-
     /**
      * @return mixed
      */
-    public function getValue()
+    public function get_value()
     {
         return $this->value;
     }
-
     /**
      * @param mixed $value
      */
-    public function setValue($value): ShopConfigurationSetting
+    public function set_value($value): Shop_Configuration_Setting
     {
         $this->value = $value;
         return $this;

@@ -1,20 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Model;
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
 /**
  * Seo encoder base
  *
  * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
  */
-class SeoEncoderRecomm extends \OxidEsales\Eshop\Core\SeoEncoder
+class Seo_Encoder_Recomm extends \Oxid_Esales\Eshop\Core\Seo_Encoder
 {
     /**
      * Returns SEO uri for tag.
@@ -24,29 +22,19 @@ class SeoEncoderRecomm extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getRecommUri($oRecomm, $iLang = null)
+    public function get_recomm_uri($o_recomm, $i_lang = null)
     {
-        if (!($sSeoUrl = $this->loadFromDb('dynamic', $oRecomm->getId(), $iLang))) {
-            $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-
+        if (!$s_seo_url = $this->load_from_db('dynamic', $o_recomm->get_id(), $i_lang)) {
+            $my_config = \Oxid_Esales\Eshop\Core\Registry::get_config();
             // fetching part of base url
-            $sSeoUrl = $this->getStaticUri(
-                $oRecomm->getBaseStdLink($iLang, false),
-                $myConfig->getShopId(),
-                $iLang
-            )
-            . $this->prepareTitle($oRecomm->oxrecommlists__oxtitle->value, false, $iLang);
-
+            $s_seo_url = $this->get_static_uri($o_recomm->get_base_std_link($i_lang, false), $my_config->get_shop_id(), $i_lang) . $this->prepare_title($o_recomm->oxrecommlists__oxtitle->value, false, $i_lang);
             // creating unique
-            $sSeoUrl = $this->processSeoUrl($sSeoUrl, $oRecomm->getId(), $iLang);
-
+            $s_seo_url = $this->process_seo_url($s_seo_url, $o_recomm->get_id(), $i_lang);
             // inserting
-            $this->saveToDb('dynamic', $oRecomm->getId(), $oRecomm->getBaseStdLink($iLang), $sSeoUrl, $iLang, $myConfig->getShopId());
+            $this->save_to_db('dynamic', $o_recomm->get_id(), $o_recomm->get_base_std_link($i_lang), $s_seo_url, $i_lang, $my_config->get_shop_id());
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * Returns full url for passed tag
      *
@@ -55,15 +43,13 @@ class SeoEncoderRecomm extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getRecommUrl($oRecomm, $iLang = null)
+    public function get_recomm_url($o_recomm, $i_lang = null)
     {
-        if (!isset($iLang)) {
-            $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = \Oxid_Esales\Eshop\Core\Registry::get_lang()->get_base_language();
         }
-
-        return $this->getFullUrl($this->getRecommUri($oRecomm, $iLang), $iLang);
+        return $this->get_full_url($this->get_recomm_uri($o_recomm, $i_lang), $i_lang);
     }
-
     /**
      * Returns tag SEO url for specified page
      *
@@ -74,17 +60,15 @@ class SeoEncoderRecomm extends \OxidEsales\Eshop\Core\SeoEncoder
      *
      * @return string
      */
-    public function getRecommPageUrl($recomm, $pageNumber, $languageId = null, $isFixed = false)
+    public function get_recomm_page_url($recomm, $page_number, $language_id = null, $is_fixed = false)
     {
-        if (!isset($languageId)) {
-            $languageId = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+        if (!isset($language_id)) {
+            $language_id = \Oxid_Esales\Eshop\Core\Registry::get_lang()->get_base_language();
         }
-        $stdUrl = $recomm->getBaseStdLink($languageId);
+        $std_url = $recomm->get_base_std_link($language_id);
         $parameters = null;
-
-        $stdUrl = $this->trimUrl($stdUrl, $languageId);
-        $seoUrl = $this->getRecommUri($recomm, $languageId);
-
-        return $this->assembleFullPageUrl($recomm, 'dynamic', $stdUrl, $seoUrl, $pageNumber, $parameters, $languageId, $isFixed);
+        $std_url = $this->trim_url($std_url, $language_id);
+        $seo_url = $this->get_recomm_uri($recomm, $language_id);
+        return $this->assemble_full_page_url($recomm, 'dynamic', $std_url, $seo_url, $page_number, $parameters, $language_id, $is_fixed);
     }
 }

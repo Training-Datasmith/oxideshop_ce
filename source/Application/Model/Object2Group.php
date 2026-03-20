@@ -1,27 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Model;
 
-namespace OxidEsales\EshopCommunity\Application\Model;
-
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-
+use Oxid_Esales\Eshop\Core\Exception\Database_Error_Exception;
 /**
  * Manages object (users, discounts, deliveries...) assignment to groups.
  */
-class Object2Group extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Object2Group extends \Oxid_Esales\Eshop\Core\Model\Base_Model
 {
     /** @var boolean Load the relation even if from other shop */
-    protected $_blDisableShopCheck = true;
-
+    protected $_bl_disable_shop_check = true;
     /** @var string Current class name */
-    protected $_sClassName = 'oxobject2group';
-
+    protected $_s_class_name = 'oxobject2group';
     /**
      * Class constructor, initiates parent constructor (parent::oxBase()).
      */
@@ -29,9 +24,8 @@ class Object2Group extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         parent::__construct();
         $this->init('oxobject2group');
-        $this->oxobject2group__oxshopid = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getConfig()->getShopId(), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxobject2group__oxshopid = new \Oxid_Esales\Eshop\Core\Field(\Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_id(), \Oxid_Esales\Eshop\Core\Field::T_RAW);
     }
-
     /**
      * Extends the default save method
      * to prevent from exception if same relationship already exist.
@@ -46,8 +40,8 @@ class Object2Group extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         try {
             return parent::save();
-        } catch (\OxidEsales\Eshop\Core\Exception\DatabaseErrorException $exception) {
-            if ($exception->getCode() !== \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database::DUPLICATE_KEY_ERROR_CODE) {
+        } catch (\Oxid_Esales\Eshop\Core\Exception\Database_Error_Exception $exception) {
+            if ($exception->get_code() !== \Oxid_Esales\Eshop\Core\Database\Adapter\Doctrine\Database::DUPLICATE_KEY_ERROR_CODE) {
                 throw $exception;
             }
         }

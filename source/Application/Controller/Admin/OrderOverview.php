@@ -1,65 +1,54 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\Price;
-use OxidEsales\Eshop\Core\Registry;
-
+use Oxid_Esales\Eshop\Application\Model\Order;
+use Oxid_Esales\Eshop\Core\Price;
+use Oxid_Esales\Eshop\Core\Registry;
 /**
  * Admin order overview manager.
  * Collects order overview information, updates it on user submit, etc.
  * Admin Menu: Orders -> Display Orders -> Overview.
  */
-class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class Order_Overview extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
-        $myConfig = Registry::getConfig();
+        $my_config = Registry::get_config();
         parent::render();
-
-        $oOrder = oxNew(Order::class);
-        $oCur = $myConfig->getActShopCurrencyObject();
-        $oLang = Registry::getLang();
-
-        $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != '-1') {
-            $oOrder->load($soxId);
-
-            $this->_aViewData['edit'] = $oOrder;
-            $this->_aViewData['aProductVats'] = $oOrder->getProductVats();
-            $this->_aViewData['orderArticles'] = $oOrder->getOrderArticles();
-            $this->_aViewData['giftCard'] = $oOrder->getGiftCard();
-            $this->_aViewData['paymentType'] = $this->getPaymentType($oOrder);
-            $this->_aViewData['deliveryType'] = $oOrder->getDelSet();
-            if ($oOrder->getFieldData('oxtsprotectcosts')) {
-                $this->_aViewData['tsprotectcosts'] = $oLang->formatCurrency($oOrder->getFieldData('oxtsprotectcosts'), $oCur);
+        $o_order = ox_new(Order::class);
+        $o_cur = $my_config->get_act_shop_currency_object();
+        $o_lang = Registry::get_lang();
+        $sox_id = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
+            $o_order->load($sox_id);
+            $this->_a_view_data['edit'] = $o_order;
+            $this->_a_view_data['aProductVats'] = $o_order->get_product_vats();
+            $this->_a_view_data['orderArticles'] = $o_order->get_order_articles();
+            $this->_a_view_data['giftCard'] = $o_order->get_gift_card();
+            $this->_a_view_data['paymentType'] = $this->get_payment_type($o_order);
+            $this->_a_view_data['deliveryType'] = $o_order->get_del_set();
+            if ($o_order->get_field_data('oxtsprotectcosts')) {
+                $this->_a_view_data['tsprotectcosts'] = $o_lang->format_currency($o_order->get_field_data('oxtsprotectcosts'), $o_cur);
             }
         }
-
-        $todaySum = Price::getPriceInActCurrency($oOrder->getOrderSum(true));
-        $this->_aViewData['ordersum'] = $oLang->formatCurrency($todaySum, $oCur);
-        $this->_aViewData['ordercnt'] = $oOrder->getOrderCnt(true);
-
-        $totalSum = Price::getPriceInActCurrency($oOrder->getOrderSum());
-        $this->_aViewData['ordertotalsum'] = $oLang->formatCurrency($totalSum, $oCur);
-        $this->_aViewData['ordertotalcnt'] = $oOrder->getOrderCnt();
-        $this->_aViewData['afolder'] = $myConfig->getConfigParam('aOrderfolder');
-        $this->_aViewData['alangs'] = $oLang->getLanguageNames();
-
-        $this->_aViewData['currency'] = $oCur;
-
+        $today_sum = Price::get_price_in_act_currency($o_order->get_order_sum(true));
+        $this->_a_view_data['ordersum'] = $o_lang->format_currency($today_sum, $o_cur);
+        $this->_a_view_data['ordercnt'] = $o_order->get_order_cnt(true);
+        $total_sum = Price::get_price_in_act_currency($o_order->get_order_sum());
+        $this->_a_view_data['ordertotalsum'] = $o_lang->format_currency($total_sum, $o_cur);
+        $this->_a_view_data['ordertotalcnt'] = $o_order->get_order_cnt();
+        $this->_a_view_data['afolder'] = $my_config->get_config_param('aOrderfolder');
+        $this->_a_view_data['alangs'] = $o_lang->get_language_names();
+        $this->_a_view_data['currency'] = $o_cur;
         return 'order_overview';
     }
-
     /**
      * Returns user payment used for current order. In case current order was executed using
      * just for preview user payment is set from oxPayment
@@ -68,20 +57,18 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
      *
      * @return \OxidEsales\Eshop\Application\Model\Payment
      */
-    protected function getPaymentType($oOrder)
+    protected function get_payment_type($o_order)
     {
-        if (!($oUserPayment = $oOrder->getPaymentType()) && $oOrder->oxorder__oxpaymenttype->value) {
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
-            if ($oPayment->load($oOrder->oxorder__oxpaymenttype->value)) {
+        if (!($o_user_payment = $o_order->get_payment_type()) && $o_order->oxorder__oxpaymenttype->value) {
+            $o_payment = ox_new(\Oxid_Esales\Eshop\Application\Model\Payment::class);
+            if ($o_payment->load($o_order->oxorder__oxpaymenttype->value)) {
                 // in case due to security reasons payment info was not kept in db
-                $oUserPayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
-                $oUserPayment->oxpayments__oxdesc = new \OxidEsales\Eshop\Core\Field($oPayment->oxpayments__oxdesc->value);
+                $o_user_payment = ox_new(\Oxid_Esales\Eshop\Application\Model\User_Payment::class);
+                $o_user_payment->oxpayments__oxdesc = new \Oxid_Esales\Eshop\Core\Field($o_payment->oxpayments__oxdesc->value);
             }
         }
-
-        return $oUserPayment;
+        return $o_user_payment;
     }
-
     /**
      * Gets proper file name
      *
@@ -89,66 +76,58 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
      *
      * @return string
      */
-    public function makeValidFileName($sFilename)
+    public function make_valid_file_name($s_filename)
     {
-        $sFilename = preg_replace('/[\s]+/', '_', $sFilename);
-        $sFilename = preg_replace('/[^a-zA-Z0-9_\.-]/', '', (string) $sFilename);
-
-        return str_replace(' ', '_', $sFilename);
+        $s_filename = preg_replace('/[\s]+/', '_', $s_filename);
+        $s_filename = preg_replace('/[^a-zA-Z0-9_\.-]/', '', (string) $s_filename);
+        return str_replace(' ', '_', $s_filename);
     }
-
     /**
      * Sends order.
      */
     public function sendorder(): void
     {
-        $oOrder = oxNew(Order::class);
-        if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
-            $oOrder->save();
-
+        $o_order = ox_new(Order::class);
+        if ($o_order->load($this->get_edit_object_id())) {
+            $o_order->oxorder__oxsenddate = new \Oxid_Esales\Eshop\Core\Field(date('Y-m-d H:i:s', Registry::get_utils_date()->get_time()));
+            $o_order->save();
             // #1071C
-            $oOrderArticles = $oOrder->getOrderArticles();
-            foreach ($oOrderArticles as $sOxid => $oArticle) {
+            $o_order_articles = $o_order->get_order_articles();
+            foreach ($o_order_articles as $s_oxid => $o_article) {
                 // remove canceled articles from list
-                if ($oArticle->oxorderarticles__oxstorno->value == 1) {
-                    $oOrderArticles->offsetUnset($sOxid);
+                if ($o_article->oxorderarticles__oxstorno->value == 1) {
+                    $o_order_articles->offsetUnset($s_oxid);
                 }
             }
-
-            if (($blMail = Registry::getRequest()->getRequestEscapedParameter('sendmail'))) {
+            if ($bl_mail = Registry::get_request()->get_request_escaped_parameter('sendmail')) {
                 // send eMail
-                $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
-                $oEmail->sendSendedNowMail($oOrder);
+                $o_email = ox_new(\Oxid_Esales\Eshop\Core\Email::class);
+                $o_email->send_sended_now_mail($o_order);
             }
         }
     }
-
     /**
      * Resets order shipping date.
      */
     public function resetorder(): void
     {
-        $oOrder = oxNew(Order::class);
-        if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new \OxidEsales\Eshop\Core\Field('0000-00-00 00:00:00');
-            $oOrder->save();
+        $o_order = ox_new(Order::class);
+        if ($o_order->load($this->get_edit_object_id())) {
+            $o_order->oxorder__oxsenddate = new \Oxid_Esales\Eshop\Core\Field('0000-00-00 00:00:00');
+            $o_order->save();
         }
     }
-
     /**
      * Get information about shipping status
      *
      * @return bool
      */
-    public function canResetShippingDate()
+    public function can_reset_shipping_date()
     {
-        $oOrder = oxNew(Order::class);
-        if ($oOrder->load($this->getEditObjectId())) {
-            return $oOrder->oxorder__oxstorno->value == '0' &&
-                     !($oOrder->oxorder__oxsenddate->value == '0000-00-00 00:00:00' || $oOrder->oxorder__oxsenddate->value == '-');
+        $o_order = ox_new(Order::class);
+        if ($o_order->load($this->get_edit_object_id())) {
+            return $o_order->oxorder__oxstorno->value == '0' && !($o_order->oxorder__oxsenddate->value == '0000-00-00 00:00:00' || $o_order->oxorder__oxsenddate->value == '-');
         }
-
         return false;
     }
 }

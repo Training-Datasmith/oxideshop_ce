@@ -4,98 +4,75 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration;
-
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfigurationDataMapperInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
-
-class ModuleSettingsDataMapper implements ModuleConfigurationDataMapperInterface
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration_Data_Mapper_Interface;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Object\Module_Configuration;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setting\Setting;
+class Module_Settings_Data_Mapper implements Module_Configuration_Data_Mapper_Interface
 {
     public const MAPPING_KEY = 'moduleSettings';
-
-    public function toData(ModuleConfiguration $configuration): array
+    public function to_data(Module_Configuration $configuration): array
     {
         $data = [];
-
-        if ($configuration->hasModuleSettings()) {
-            $data[self::MAPPING_KEY] = $this->mapSettingsToData($configuration);
+        if ($configuration->has_module_settings()) {
+            $data[self::MAPPING_KEY] = $this->map_settings_to_data($configuration);
         }
-
         return $data;
     }
-
-    public function fromData(ModuleConfiguration $moduleConfiguration, array $data): ModuleConfiguration
+    public function from_data(Module_Configuration $module_configuration, array $data): Module_Configuration
     {
         if (isset($data[self::MAPPING_KEY])) {
-            $this->mapSettingsFromData($moduleConfiguration, $data);
+            $this->map_settings_from_data($module_configuration, $data);
         }
-
-        return $moduleConfiguration;
+        return $module_configuration;
     }
-
-    private function mapSettingsToData(ModuleConfiguration $configuration): array
+    private function map_settings_to_data(Module_Configuration $configuration): array
     {
         $data = [];
-
-        foreach ($configuration->getModuleSettings() as $setting) {
-            if ($setting->getGroupName()) {
-                $data[$setting->getName()]['group'] = $setting->getGroupName();
+        foreach ($configuration->get_module_settings() as $setting) {
+            if ($setting->get_group_name()) {
+                $data[$setting->get_name()]['group'] = $setting->get_group_name();
             }
-
-            if ($setting->getType()) {
-                $data[$setting->getName()]['type'] = $setting->getType();
+            if ($setting->get_type()) {
+                $data[$setting->get_name()]['type'] = $setting->get_type();
             }
-
-            $data[$setting->getName()]['value'] = $setting->getValue();
-
-            if (!empty($setting->getConstraints())) {
-                $data[$setting->getName()]['constraints'] = $setting->getConstraints();
+            $data[$setting->get_name()]['value'] = $setting->get_value();
+            if (!empty($setting->get_constraints())) {
+                $data[$setting->get_name()]['constraints'] = $setting->get_constraints();
             }
-
-            if ($setting->getPositionInGroup() > 0) {
-                $data[$setting->getName()]['position'] = $setting->getPositionInGroup();
+            if ($setting->get_position_in_group() > 0) {
+                $data[$setting->get_name()]['position'] = $setting->get_position_in_group();
             }
         }
-
         return $data;
     }
-
-    private function mapSettingsFromData(ModuleConfiguration $configuration, array $data): ModuleConfiguration
+    private function map_settings_from_data(Module_Configuration $configuration, array $data): Module_Configuration
     {
         if (isset($data[self::MAPPING_KEY])) {
-            foreach ($data[self::MAPPING_KEY] as $name => $settingData) {
+            foreach ($data[self::MAPPING_KEY] as $name => $setting_data) {
                 $setting = new Setting();
-                $setting->setName($name);
-                $setting->setType($settingData['type']);
-
-                if (isset($settingData['value'])) {
-                    $setting->setValue($settingData['value']);
+                $setting->set_name($name);
+                $setting->set_type($setting_data['type']);
+                if (isset($setting_data['value'])) {
+                    $setting->set_value($setting_data['value']);
                 }
-
-                if (!isset($settingData['value'])) {
-                    $setting->setValue('');
+                if (!isset($setting_data['value'])) {
+                    $setting->set_value('');
                 }
-
-                if (isset($settingData['group'])) {
-                    $setting->setGroupName($settingData['group']);
+                if (isset($setting_data['group'])) {
+                    $setting->set_group_name($setting_data['group']);
                 }
-
-                if (isset($settingData['position'])) {
-                    $setting->setPositionInGroup($settingData['position']);
+                if (isset($setting_data['position'])) {
+                    $setting->set_position_in_group($setting_data['position']);
                 }
-
-                if (isset($settingData['constraints'])) {
-                    $setting->setConstraints($settingData['constraints']);
+                if (isset($setting_data['constraints'])) {
+                    $setting->set_constraints($setting_data['constraints']);
                 }
-
-                $configuration->addModuleSetting($setting);
+                $configuration->add_module_setting($setting);
             }
         }
-
         return $configuration;
     }
 }

@@ -4,25 +4,21 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception;
-
-class MimeBaseTypeMismatchException extends MediaValidationException
+class Mime_Base_Type_Mismatch_Exception extends Media_Validation_Exception
 {
-    public function __construct(private readonly string $guessedMime, private readonly string $requiredBasePrefix)
+    public function __construct(private readonly string $guessed_mime, private readonly string $required_base_prefix)
     {
-        parent::__construct('MIME type ' . $guessedMime . ' does not match required base ' . $requiredBasePrefix);
+        parent::__construct('MIME type ' . $guessed_mime . ' does not match required base ' . $required_base_prefix);
     }
-
-    public function getGuessedMime(): string
+    public function get_guessed_mime(): string
     {
-        return $this->guessedMime;
+        return $this->guessed_mime;
     }
-
-    public function getRequiredBasePrefix(): string
+    public function get_required_base_prefix(): string
     {
-        return $this->requiredBasePrefix;
+        return $this->required_base_prefix;
     }
 }

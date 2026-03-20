@@ -4,70 +4,48 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao;
 
 use function is_string;
-
-class MetaDataNormalizer implements MetaDataNormalizerInterface
+class Meta_Data_Normalizer implements Meta_Data_Normalizer_Interface
 {
     /**
      * Normalize the array aModule in metadata.php
      *
      *
      */
-    public function normalizeData(array $data): array
+    public function normalize_data(array $data): array
     {
-        $normalizedMetaData = $data;
-
-        if (isset($normalizedMetaData[MetaDataProvider::METADATA_SETTINGS])) {
-            $normalizedMetaData[MetaDataProvider::METADATA_SETTINGS] = $this->convertModuleSettingConstraintsToArray(
-                $normalizedMetaData[MetaDataProvider::METADATA_SETTINGS]
-            );
+        $normalized_meta_data = $data;
+        if (isset($normalized_meta_data[Meta_Data_Provider::METADATA_SETTINGS])) {
+            $normalized_meta_data[Meta_Data_Provider::METADATA_SETTINGS] = $this->convert_module_setting_constraints_to_array($normalized_meta_data[Meta_Data_Provider::METADATA_SETTINGS]);
         }
-
-        if (isset($normalizedMetaData[MetaDataProvider::METADATA_TITLE])) {
-            $normalizedMetaData = $this->normalizeMultiLanguageField(
-                $normalizedMetaData,
-                MetaDataProvider::METADATA_TITLE
-            );
+        if (isset($normalized_meta_data[Meta_Data_Provider::METADATA_TITLE])) {
+            $normalized_meta_data = $this->normalize_multi_language_field($normalized_meta_data, Meta_Data_Provider::METADATA_TITLE);
         }
-
-        if (isset($normalizedMetaData[MetaDataProvider::METADATA_DESCRIPTION])) {
-            return $this->normalizeMultiLanguageField(
-                $normalizedMetaData,
-                MetaDataProvider::METADATA_DESCRIPTION
-            );
+        if (isset($normalized_meta_data[Meta_Data_Provider::METADATA_DESCRIPTION])) {
+            return $this->normalize_multi_language_field($normalized_meta_data, Meta_Data_Provider::METADATA_DESCRIPTION);
         }
-
-        return $normalizedMetaData;
+        return $normalized_meta_data;
     }
-
-    private function convertModuleSettingConstraintsToArray(array $metadataModuleSettings): array
+    private function convert_module_setting_constraints_to_array(array $metadata_module_settings): array
     {
-        foreach ($metadataModuleSettings as $key => $setting) {
+        foreach ($metadata_module_settings as $key => $setting) {
             if (isset($setting['constraints'])) {
-                $metadataModuleSettings[$key]['constraints'] = explode('|', $setting['constraints']);
+                $metadata_module_settings[$key]['constraints'] = explode('|', $setting['constraints']);
             }
         }
-
-        return $metadataModuleSettings;
+        return $metadata_module_settings;
     }
-
-    private function normalizeMultiLanguageField(array $normalizedMetaData, string $fieldName): array
+    private function normalize_multi_language_field(array $normalized_meta_data, string $field_name): array
     {
-        $title = $normalizedMetaData[$fieldName];
-
+        $title = $normalized_meta_data[$field_name];
         if (is_string($title)) {
-            $defaultLanguage = $normalizedMetaData[MetaDataProvider::METADATA_LANG] ?? 'en';
-            $normalizedTitle = [
-                $defaultLanguage => $title,
-            ];
-            $normalizedMetaData[$fieldName] = $normalizedTitle;
+            $default_language = $normalized_meta_data[Meta_Data_Provider::METADATA_LANG] ?? 'en';
+            $normalized_title = [$default_language => $title];
+            $normalized_meta_data[$field_name] = $normalized_title;
         }
-
-        return $normalizedMetaData;
+        return $normalized_meta_data;
     }
 }

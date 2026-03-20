@@ -4,70 +4,40 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Mapper;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataMapper;
-
-use OxidEsales\EshopCommunity\Internal\Domain\Media\DataMapper\DataMapperInterface as MediaDataMapperInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMedia;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRole;
-use OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject\ProductMediaRoleSet;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Id;
-
-readonly class DataMapper implements DataMapperInterface
+use Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Mapper\Data_Mapper_Interface as MediaDataMapperInterface;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_Role;
+use Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object\Product_Media_Role_Set;
+use Oxid_Esales\Eshop_Community\Internal\Framework\Database\Id;
+readonly class Data_Mapper implements Data_Mapper_Interface
 {
-    public function __construct(private MediaDataMapperInterface $mediaDataMapper)
+    public function __construct(private Media_Data_Mapper_Interface $media_data_mapper)
     {
     }
-
-    public function toData(ProductMedia $productMedia): array
+    public function to_data(Product_Media $product_media): array
     {
-        return [
-            'id' => (string)$productMedia->getId(),
-            'product_id' => (string)$productMedia->getProductId(),
-            'media_id' => (string)$productMedia->getMedia()->getId(),
-            'position' => $productMedia->getPosition(),
-            'roles' => $this->getRolesAsValues($productMedia),
-            'active' => $productMedia->isActive(),
-
-        ];
+        return ['id' => (string) $product_media->get_id(), 'product_id' => (string) $product_media->get_product_id(), 'media_id' => (string) $product_media->get_media()->get_id(), 'position' => $product_media->get_position(), 'roles' => $this->get_roles_as_values($product_media), 'active' => $product_media->is_active()];
     }
-
-    public function fromData(array $data): ProductMedia
+    public function from_data(array $data): Product_Media
     {
         $roles = [];
         if (!empty($data['roles'])) {
             foreach (explode(',', (string) $data['roles']) as $role) {
-                $roles[] = ProductMediaRole::from($role);
+                $roles[] = Product_Media_Role::from($role);
             }
         }
-        $productMedia = new ProductMedia(
-            Id::fromString($data['id']),
-            Id::fromString($data['product_id']),
-            $this->mediaDataMapper->fromData(
-                [
-                    'id' => $data['media_id'],
-                    'path' => $data['media_path'],
-                    'type' => $data['media_mime_type'],
-                ]
-            ),
-            new ProductMediaRoleSet(...$roles)
-        );
-        $productMedia->setPosition($data['position']);
+        $product_media = new Product_Media(Id::from_string($data['id']), Id::from_string($data['product_id']), $this->media_data_mapper->from_data(['id' => $data['media_id'], 'path' => $data['media_path'], 'type' => $data['media_mime_type']]), new Product_Media_Role_Set(...$roles));
+        $product_media->set_position($data['position']);
         if (!$data['active']) {
-            $productMedia->deactivate();
+            $product_media->deactivate();
         }
-
-        return $productMedia;
+        return $product_media;
     }
-
-    private function getRolesAsValues(ProductMedia $productMedia): array
+    private function get_roles_as_values(Product_Media $product_media): array
     {
-        return $productMedia
-            ->getRoleSet()
-            ->getRoles()
-            ->map(static fn (ProductMediaRole $role): string => $role->value())
-            ->getValues();
+        return $product_media->get_role_set()->get_roles()->map(static fn(Product_Media_Role $role): string => $role->value())->get_values();
     }
 }

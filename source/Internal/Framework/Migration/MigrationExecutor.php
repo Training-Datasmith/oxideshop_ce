@@ -4,20 +4,15 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Migration;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Migration;
-
-use OxidEsales\DoctrineMigrationWrapper\Migrations;
-use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
-
-class MigrationExecutor implements MigrationExecutorInterface
+use Oxid_Esales\Doctrine_Migration_Wrapper\Migrations;
+use Oxid_Esales\Doctrine_Migration_Wrapper\Migrations_Builder;
+class Migration_Executor implements Migration_Executor_Interface
 {
     public function execute(): void
     {
-        (new MigrationsBuilder())
-            ->build()
-            ->execute(Migrations::MIGRATE_COMMAND);
+        (new Migrations_Builder())->build()->execute(Migrations::MIGRATE_COMMAND);
     }
 }

@@ -4,23 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Templating;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Templating;
-
-interface TemplateEngineInterface
+interface Template_Engine_Interface
 {
     /**
      * @param mixed  $value
      */
-    public function addGlobal(string $name, $value);
-
+    public function add_global(string $name, $value);
     /**
      * Returns assigned globals.
      */
-    public function getGlobals(): array;
-
+    public function get_globals(): array;
     /**
      * Renders a template.
      *
@@ -30,7 +26,6 @@ interface TemplateEngineInterface
      * @return string The evaluated template as a string
      */
     public function render(string $name, array $context = []): string;
-
     /**
      * Renders a fragment of the template.
      *
@@ -38,8 +33,7 @@ interface TemplateEngineInterface
      * @param string $fragmentId The Id of the fragment
      * @param array  $context    An array of parameters to pass to the template
      */
-    public function renderFragment(string $fragment, string $fragmentId, array $context = []): string;
-
+    public function render_fragment(string $fragment, string $fragment_id, array $context = []): string;
     /**
      * Returns true if the template exists.
      *

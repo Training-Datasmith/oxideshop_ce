@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
 // checks if GD library version getter does not exist
 if (!function_exists('getGdVersion')) {
     /**
@@ -14,12 +12,11 @@ if (!function_exists('getGdVersion')) {
      *
      * @return int
      */
-    function getGdVersion()
+    function get_gd_version()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iUseGDVersion');
+        return \Oxid_Esales\Eshop\Core\Registry::get_config()->get_config_param('iUseGDVersion');
     }
 }
-
 // checks if image creation function does not exist
 if (!function_exists('copyAlteredImage')) {
     /**
@@ -33,12 +30,11 @@ if (!function_exists('copyAlteredImage')) {
      * @param string $sTarget           target file path @deprecated
      * @param int    $iGdVer            used gd version @deprecated
      */
-    function copyAlteredImage($sDestinationImage, $sSourceImage, $iNewWidth, $iNewHeight, array $aImageInfo, $sTarget = null, $iGdVer = null): bool
+    function copy_altered_image($s_destination_image, $s_source_image, $i_new_width, $i_new_height, array $a_image_info, $s_target = null, $i_gd_ver = null): bool
     {
-        return imagecopyresampled($sDestinationImage, $sSourceImage, 0, 0, 0, 0, $iNewWidth, $iNewHeight, $aImageInfo[0], $aImageInfo[1]);
+        return imagecopyresampled($s_destination_image, $s_source_image, 0, 0, 0, 0, $i_new_width, $i_new_height, $a_image_info[0], $a_image_info[1]);
     }
 }
-
 // checks if image size calculator does nor exist
 if (!function_exists('calcImageSize')) {
     /**
@@ -49,26 +45,24 @@ if (!function_exists('calcImageSize')) {
      * @param int $iPrefWidth     original image width
      * @param int $iPrefHeight    original image height
      */
-    function calcImageSize($iDesiredWidth, $iDesiredHeight, $iPrefWidth, $iPrefHeight): array
+    function calc_image_size($i_desired_width, $i_desired_height, $i_pref_width, $i_pref_height): array
     {
         // #1837/1177M - do not resize smaller pictures
-        if ($iDesiredWidth < $iPrefWidth || $iDesiredHeight < $iPrefHeight) {
-            if ($iPrefWidth >= $iPrefHeight * ((float) ($iDesiredWidth / $iDesiredHeight))) {
-                $iNewHeight = round(($iPrefHeight * (float) ($iDesiredWidth / $iPrefWidth)), 0);
-                $iNewWidth = $iDesiredWidth;
+        if ($i_desired_width < $i_pref_width || $i_desired_height < $i_pref_height) {
+            if ($i_pref_width >= $i_pref_height * (float) ($i_desired_width / $i_desired_height)) {
+                $i_new_height = round($i_pref_height * (float) ($i_desired_width / $i_pref_width), 0);
+                $i_new_width = $i_desired_width;
             } else {
-                $iNewHeight = $iDesiredHeight;
-                $iNewWidth = round(($iPrefWidth * (float) ($iDesiredHeight / $iPrefHeight)), 0);
+                $i_new_height = $i_desired_height;
+                $i_new_width = round($i_pref_width * (float) ($i_desired_height / $i_pref_height), 0);
             }
         } else {
-            $iNewWidth = $iPrefWidth;
-            $iNewHeight = $iPrefHeight;
+            $i_new_width = $i_pref_width;
+            $i_new_height = $i_pref_height;
         }
-
-        return [$iNewWidth, $iNewHeight];
+        return [$i_new_width, $i_new_height];
     }
 }
-
 if (!function_exists('checkSizeAndCopy')) {
     /**
      * Checks if preferred image dimensions size matches defined in config;
@@ -83,16 +77,15 @@ if (!function_exists('checkSizeAndCopy')) {
      * @param int    $iOrigWidth  original width
      * @param int    $iOrigHeight preferred height
      */
-    function checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $iOrigWidth, $iOrigHeight): bool|array
+    function check_size_and_copy($s_src, $s_target, $i_width, $i_height, $i_orig_width, $i_orig_height): bool|array
     {
-        [$iNewWidth, $iNewHeight] = calcImageSize($iWidth, $iHeight, $iOrigWidth, $iOrigHeight);
-        if ($iNewWidth == $iOrigWidth && $iNewHeight == $iOrigHeight) {
-            return copy($sSrc, $sTarget);
+        [$i_new_width, $i_new_height] = calc_image_size($i_width, $i_height, $i_orig_width, $i_orig_height);
+        if ($i_new_width == $i_orig_width && $i_new_height == $i_orig_height) {
+            return copy($s_src, $s_target);
         }
-        return [$iNewWidth, $iNewHeight];
+        return [$i_new_width, $i_new_height];
     }
 }
-
 // checks if GIF resizer does not exist
 if (!function_exists('resizeGif')) {
     /**
@@ -109,27 +102,22 @@ if (!function_exists('resizeGif')) {
      *
      * @return string|false
      */
-    function resizeGif($sSrc, $sTarget, $iWidth, $iHeight, $iOriginalWidth, $iOriginalHeight, $iGDVer)
+    function resize_gif($s_src, $s_target, $i_width, $i_height, $i_original_width, $i_original_height, $i_gd_ver)
     {
-        $aResult = checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $iOriginalWidth, $iOriginalHeight);
-        if (is_array($aResult)) {
-            [$iNewWidth, $iNewHeight] = $aResult;
-            $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
-            $hSourceImage = imagecreatefromgif($sSrc);
-
-            $iFillColor = imagecolorresolve($hDestinationImage, 255, 255, 255);
-            imagefill($hDestinationImage, 0, 0, $iFillColor);
-            imagecolortransparent($hDestinationImage, $iFillColor);
-
-            imagecopyresampled($hDestinationImage, $hSourceImage, 0, 0, 0, 0, $iNewWidth, $iNewHeight, $iOriginalWidth, $iOriginalHeight);
-
-            imagegif($hDestinationImage, $sTarget);
+        $a_result = check_size_and_copy($s_src, $s_target, $i_width, $i_height, $i_original_width, $i_original_height);
+        if (is_array($a_result)) {
+            [$i_new_width, $i_new_height] = $a_result;
+            $h_destination_image = imagecreatetruecolor($i_new_width, $i_new_height);
+            $h_source_image = imagecreatefromgif($s_src);
+            $i_fill_color = imagecolorresolve($h_destination_image, 255, 255, 255);
+            imagefill($h_destination_image, 0, 0, $i_fill_color);
+            imagecolortransparent($h_destination_image, $i_fill_color);
+            imagecopyresampled($h_destination_image, $h_source_image, 0, 0, 0, 0, $i_new_width, $i_new_height, $i_original_width, $i_original_height);
+            imagegif($h_destination_image, $s_target);
         }
-
-        return $sTarget;
+        return $s_target;
     }
 }
-
 // checks if PNG resizer does not exist
 if (!function_exists('resizePng')) {
     /**
@@ -146,45 +134,33 @@ if (!function_exists('resizePng')) {
      *
      * @return string|false
      */
-    function resizePng($sSrc, $sTarget, $iWidth, $iHeight, array $aImageInfo, $iGdVer, $hDestinationImage)
+    function resize_png($s_src, $s_target, $i_width, $i_height, array $a_image_info, $i_gd_ver, $h_destination_image)
     {
-        $aResult = checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $aImageInfo[0], $aImageInfo[1]);
-        if (is_array($aResult)) {
-            [$iNewWidth, $iNewHeight] = $aResult;
-            if ($hDestinationImage === null) {
-                $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
+        $a_result = check_size_and_copy($s_src, $s_target, $i_width, $i_height, $a_image_info[0], $a_image_info[1]);
+        if (is_array($a_result)) {
+            [$i_new_width, $i_new_height] = $a_result;
+            if ($h_destination_image === null) {
+                $h_destination_image = imagecreatetruecolor($i_new_width, $i_new_height);
             }
-            $hSourceImage = imagecreatefrompng($sSrc);
-            if (!imageistruecolor($hSourceImage)) {
-                $hDestinationImage = imagecreate($iNewWidth, $iNewHeight);
+            $h_source_image = imagecreatefrompng($s_src);
+            if (!imageistruecolor($h_source_image)) {
+                $h_destination_image = imagecreate($i_new_width, $i_new_height);
                 // fix for transparent images sets image to transparent
-                $imgWhite = imagecolorallocate($hDestinationImage, 255, 255, 255);
-                imagefill($hDestinationImage, 0, 0, $imgWhite);
-                imagecolortransparent($hDestinationImage, $imgWhite);
+                $img_white = imagecolorallocate($h_destination_image, 255, 255, 255);
+                imagefill($h_destination_image, 0, 0, $img_white);
+                imagecolortransparent($h_destination_image, $img_white);
                 //end of fix
             } else {
-                imagealphablending($hDestinationImage, false);
-                imagesavealpha($hDestinationImage, true);
+                imagealphablending($h_destination_image, false);
+                imagesavealpha($h_destination_image, true);
             }
-            if (
-                copyAlteredImage(
-                    $hDestinationImage,
-                    $hSourceImage,
-                    $iNewWidth,
-                    $iNewHeight,
-                    $aImageInfo,
-                    $sTarget,
-                    $iGdVer
-                )
-            ) {
-                imagepng($hDestinationImage, $sTarget);
+            if (copy_altered_image($h_destination_image, $h_source_image, $i_new_width, $i_new_height, $a_image_info, $s_target, $i_gd_ver)) {
+                imagepng($h_destination_image, $s_target);
             }
         }
-
-        return $sTarget;
+        return $s_target;
     }
 }
-
 // checks if JPG resizer does not exist
 if (!function_exists('resizeJpeg')) {
     /**
@@ -202,53 +178,38 @@ if (!function_exists('resizeJpeg')) {
      *
      * @return string|false
      */
-    function resizeJpeg($sSrc, $sTarget, $iWidth, $iHeight, array $aImageInfo, $iGdVer, $hDestinationImage, $iDefQuality)
+    function resize_jpeg($s_src, $s_target, $i_width, $i_height, array $a_image_info, $i_gd_ver, $h_destination_image, $i_def_quality)
     {
-        $aResult = checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $aImageInfo[0], $aImageInfo[1]);
-        if (is_array($aResult)) {
-            [$iNewWidth, $iNewHeight] = $aResult;
-            if ($hDestinationImage === null) {
-                $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
+        $a_result = check_size_and_copy($s_src, $s_target, $i_width, $i_height, $a_image_info[0], $a_image_info[1]);
+        if (is_array($a_result)) {
+            [$i_new_width, $i_new_height] = $a_result;
+            if ($h_destination_image === null) {
+                $h_destination_image = imagecreatetruecolor($i_new_width, $i_new_height);
             }
-            $hSourceImage = imagecreatefromstring(file_get_contents($sSrc));
-            if (
-                copyAlteredImage(
-                    $hDestinationImage,
-                    $hSourceImage,
-                    $iNewWidth,
-                    $iNewHeight,
-                    $aImageInfo,
-                    $sTarget,
-                    $iGdVer
-                )
-            ) {
-                imagejpeg($hDestinationImage, $sTarget, $iDefQuality);
+            $h_source_image = imagecreatefromstring(file_get_contents($s_src));
+            if (copy_altered_image($h_destination_image, $h_source_image, $i_new_width, $i_new_height, $a_image_info, $s_target, $i_gd_ver)) {
+                imagejpeg($h_destination_image, $s_target, $i_def_quality);
             }
         }
-
-        return $sTarget;
+        return $s_target;
     }
 }
-
 // checks if WebP resizer doesn't exist
 if (!function_exists('resizeWebp')) {
-    function resizeWebp(string $source, string $target, int $width, int $height, int $quality): string
+    function resize_webp(string $source, string $target, int $width, int $height, int $quality): string
     {
-        [$origWidth, $origHeight] = @getimagesize($source);
-        $result = checkSizeAndCopy($source, $target, $width, $height, $origWidth, $origHeight);
-
+        [$orig_width, $orig_height] = @getimagesize($source);
+        $result = check_size_and_copy($source, $target, $width, $height, $orig_width, $orig_height);
         if (is_array($result)) {
-            [$newWidth, $newHeight] = $result;
-            $destinationImage = imagecreatetruecolor($newWidth, $newHeight);
-            $sourceImage = imagecreatefromwebp($source);
-            imagealphablending($destinationImage, false);
-            imagesavealpha($destinationImage, true);
-
-            if (copyAlteredImage($destinationImage, $sourceImage, $newWidth, $newHeight, [$origWidth, $origHeight])) {
-                imagewebp($destinationImage, $target, $quality);
+            [$new_width, $new_height] = $result;
+            $destination_image = imagecreatetruecolor($new_width, $new_height);
+            $source_image = imagecreatefromwebp($source);
+            imagealphablending($destination_image, false);
+            imagesavealpha($destination_image, true);
+            if (copy_altered_image($destination_image, $source_image, $new_width, $new_height, [$orig_width, $orig_height])) {
+                imagewebp($destination_image, $target, $quality);
             }
         }
-
         return $target;
     }
 }

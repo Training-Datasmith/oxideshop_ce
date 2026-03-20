@@ -1,25 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Service;
+namespace Oxid_Esales\Eshop_Community\Core\Service;
 
 /**
  * Prepare application servers information for export.
  *
  * @internal Do not make a module extension for this class.
  */
-interface ApplicationServerExporterInterface
+interface Application_Server_Exporter_Interface
 {
     /**
      * Return active server nodes.
      *
      * @return array
      */
-    public function exportAppServerList();
+    public function export_app_server_list();
 }

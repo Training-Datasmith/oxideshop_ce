@@ -1,25 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
 /**
  * Sets view template, that arranges two other templates ("actions_list"
  * and "actions_main") to frame.
  * Admin Menu: Manage Products -> Actions.
  */
-class ActionsController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class Actions_Controller extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'actions';
+    protected $_s_this_template = 'actions';
 }

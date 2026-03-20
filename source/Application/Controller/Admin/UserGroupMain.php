@@ -1,96 +1,79 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller\Admin;
 
-namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
-
-use OxidEsales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Registry;
 use stdClass;
-
 /**
  * Admin article main usergroup manager.
  * Performs collection and updatind (on user submit) main item information.
  * Admin Menu: User Administration -> User Groups -> Main.
  */
-class UserGroupMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class User_Group_Main extends \Oxid_Esales\Eshop\Application\Controller\Admin\Admin_Details_Controller
 {
     /** @inheritdoc */
     public function render()
     {
         parent::render();
-
-        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != '-1') {
+        $sox_id = $this->_a_view_data['oxid'] = $this->get_edit_object_id();
+        if (isset($sox_id) && $sox_id != '-1') {
             // load object
-            $oGroup = oxNew(\OxidEsales\Eshop\Application\Model\Groups::class);
-            $oGroup->loadInLang($this->_iEditLang, $soxId);
-
-            $oOtherLang = $oGroup->getAvailableInLangs();
-            if (!isset($oOtherLang[$this->_iEditLang])) {
-                $oGroup->loadInLang(key($oOtherLang), $soxId);
+            $o_group = ox_new(\Oxid_Esales\Eshop\Application\Model\Groups::class);
+            $o_group->load_in_lang($this->_i_edit_lang, $sox_id);
+            $o_other_lang = $o_group->get_available_in_langs();
+            if (!isset($o_other_lang[$this->_i_edit_lang])) {
+                $o_group->load_in_lang(key($o_other_lang), $sox_id);
             }
-
-            $this->_aViewData['edit'] = $oGroup;
-
+            $this->_a_view_data['edit'] = $o_group;
             // remove already created languages
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
-
-            if (count($aLang)) {
-                $this->_aViewData['posslang'] = $aLang;
+            $a_lang = array_diff(\Oxid_Esales\Eshop\Core\Registry::get_lang()->get_language_names(), $o_other_lang);
+            if (count($a_lang)) {
+                $this->_a_view_data['posslang'] = $a_lang;
             }
-
-            foreach ($oOtherLang as $id => $language) {
-                $oLang = new stdClass();
-                $oLang->sLangDesc = $language;
-                $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData['otherlang'][$id] = clone $oLang;
+            foreach ($o_other_lang as $id => $language) {
+                $o_lang = new stdClass();
+                $o_lang->s_lang_desc = $language;
+                $o_lang->selected = $id == $this->_i_edit_lang;
+                $this->_a_view_data['otherlang'][$id] = clone $o_lang;
             }
         }
-        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
-            $oUsergroupMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\UserGroupMainAjax::class);
-            $this->_aViewData['oxajax'] = $oUsergroupMainAjax->getColumns();
-
+        if (Registry::get_request()->get_request_escaped_parameter('aoc')) {
+            $o_usergroup_main_ajax = ox_new(\Oxid_Esales\Eshop\Application\Controller\Admin\User_Group_Main_Ajax::class);
+            $this->_a_view_data['oxajax'] = $o_usergroup_main_ajax->get_columns();
             return 'popups/usergroup_main';
         }
-
         return 'usergroup_main';
     }
-
     /**
      * Saves changed usergroup parameters.
      */
     public function save(): void
     {
         parent::save();
-
-        $soxId = $this->getEditObjectId();
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
+        $sox_id = $this->get_edit_object_id();
+        $a_params = Registry::get_request()->get_request_escaped_parameter('editval');
         // checkbox handling
-        if (!isset($aParams['oxgroups__oxactive'])) {
-            $aParams['oxgroups__oxactive'] = 0;
+        if (!isset($a_params['oxgroups__oxactive'])) {
+            $a_params['oxgroups__oxactive'] = 0;
         }
-
-        $oGroup = oxNew(\OxidEsales\Eshop\Application\Model\Groups::class);
-        if ($soxId != '-1') {
-            $oGroup->load($soxId);
+        $o_group = ox_new(\Oxid_Esales\Eshop\Application\Model\Groups::class);
+        if ($sox_id != '-1') {
+            $o_group->load($sox_id);
         } else {
-            $aParams['oxgroups__oxid'] = null;
+            $a_params['oxgroups__oxid'] = null;
         }
-
-        $oGroup->setLanguage(0);
-        $oGroup->assign($aParams);
-        $oGroup->setLanguage($this->_iEditLang);
-        $oGroup->save();
-
+        $o_group->set_language(0);
+        $o_group->assign($a_params);
+        $o_group->set_language($this->_i_edit_lang);
+        $o_group->save();
         // set oxid if inserted
-        $this->setEditObjectId($oGroup->getId());
+        $this->set_edit_object_id($o_group->get_id());
     }
-
     /**
      * Saves changed selected group parameters in different language.
      */

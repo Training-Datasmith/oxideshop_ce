@@ -4,28 +4,24 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception;
-
-class FileExtensionMismatchException extends MediaValidationException
+class File_Extension_Mismatch_Exception extends Media_Validation_Exception
 {
-    public function __construct(private readonly string $clientExtension, private readonly array $validExtensions)
+    public function __construct(private readonly string $client_extension, private readonly array $valid_extensions)
     {
-        parent::__construct('Extension ' . $clientExtension . ' not valid for detected MIME type');
+        parent::__construct('Extension ' . $client_extension . ' not valid for detected MIME type');
     }
-
-    public function getClientExtension(): string
+    public function get_client_extension(): string
     {
-        return $this->clientExtension;
+        return $this->client_extension;
     }
-
     /**
      * @return array<string>
      */
-    public function getValidExtensions(): array
+    public function get_valid_extensions(): array
     {
-        return $this->validExtensions;
+        return $this->valid_extensions;
     }
 }

@@ -4,44 +4,32 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject;
-
-readonly class ProductMediaView
+readonly class Product_Media_View
 {
-    public function __construct(
-        private string $detailUrl,
-        private string $iconUrl,
-        private string $zoomUrl,
-        private string $thumbnailUrl,
-        private bool $isFallback = false
-    ) {
-    }
-
-    public function getDetailUrl(): string
+    public function __construct(private string $detail_url, private string $icon_url, private string $zoom_url, private string $thumbnail_url, private bool $is_fallback = false)
     {
-        return $this->detailUrl;
     }
-
-    public function getIconUrl(): string
+    public function get_detail_url(): string
     {
-        return $this->iconUrl;
+        return $this->detail_url;
     }
-
-    public function getZoomUrl(): string
+    public function get_icon_url(): string
     {
-        return $this->zoomUrl;
+        return $this->icon_url;
     }
-
-    public function getThumbnailUrl(): string
+    public function get_zoom_url(): string
     {
-        return $this->thumbnailUrl;
+        return $this->zoom_url;
     }
-
-    public function isFallback(): bool
+    public function get_thumbnail_url(): string
     {
-        return $this->isFallback;
+        return $this->thumbnail_url;
+    }
+    public function is_fallback(): bool
+    {
+        return $this->is_fallback;
     }
 }

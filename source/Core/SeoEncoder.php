@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 use Exception;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Str;
-
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop\Core\Str;
 /**
  * Seo encoder base
  */
-#[\AllowDynamicProperties]
-class SeoEncoder extends \OxidEsales\Eshop\Core\Base
+#[\Allow_Dynamic_Properties]
+class Seo_Encoder extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Strings that cannot be used in SEO URLs as this may cause
@@ -25,71 +22,61 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected static $_aReservedWords = ['admin'];
-
+    protected static $_a_reserved_words = ['admin'];
     /**
      * cache for reserved path root node keys
      *
      * @var array
      */
-    protected static $_aReservedEntryKeys;
-
+    protected static $_a_reserved_entry_keys;
     /**
      * SEO separator.
      *
      * @var string
      */
-    protected static $_sSeparator;
-
+    protected static $_s_separator;
     /**
      * SEO id length.
      *
      * @var integer
      */
-    protected $_iIdLength = 255;
-
+    protected $_i_id_length = 255;
     /**
      * SEO prefix.
      *
      * @var string
      */
-    protected static $_sPrefix;
-
+    protected static $_s_prefix;
     /**
      * Added parameters.
      *
      * @var string
      */
-    protected $_sAddParams;
-
+    protected $_s_add_params;
     /**
      * Url fixed state cache
      *
      * @return array
      */
-    protected static $_aFixedCache = [];
-
+    protected static $_a_fixed_cache = [];
     /**
      * SEO Cache key for active view
      *
      * @var string
      */
-    protected static $_sCacheKey;
-
+    protected static $_s_cache_key;
     /**
      * SEO cache array
      *
      * @var array
      */
-    protected static $_aCache = [];
-
+    protected static $_a_cache = [];
     /**
      * Maximum seo/dynamic url length
      *
      * @var int
      */
-    protected $_iMaxUrlLength;
-
+    protected $_i_max_url_length;
     /**
      * Returns part of url defining active language
      *
@@ -98,24 +85,16 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function addLanguageParam($sSeoUrl, $iLang)
+    public function add_language_param($s_seo_url, $i_lang)
     {
-        $iLang = (int) $iLang;
-        $iDefLang = (int) Registry::getConfig()->getConfigParam('iDefSeoLang');
-        $aLangIds = Registry::getLang()->getLanguageIds();
-
-        if (
-            $iLang != $iDefLang &&
-            isset($aLangIds[$iLang]) &&
-            // #0006407 bugfix, we should not search for the string saved in the db but for the escaped string
-            Str::getStr()->strpos($sSeoUrl, $this->replaceSpecialChars($aLangIds[$iLang]) . '/') !== 0
-        ) {
-            return $aLangIds[$iLang] . '/' . $sSeoUrl;
+        $i_lang = (int) $i_lang;
+        $i_def_lang = (int) Registry::get_config()->get_config_param('iDefSeoLang');
+        $a_lang_ids = Registry::get_lang()->get_language_ids();
+        if ($i_lang != $i_def_lang && isset($a_lang_ids[$i_lang]) && Str::get_str()->strpos($s_seo_url, $this->replace_special_chars($a_lang_ids[$i_lang]) . '/') !== 0) {
+            return $a_lang_ids[$i_lang] . '/' . $s_seo_url;
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * Processes seo url before saving to db:
      *  - \OxidEsales\Eshop\Core\SeoEncoder::addLanguageParam();
@@ -128,30 +107,27 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function processSeoUrl($sSeoUrl, $sObjectId = null, $iLang = null, $blExclude = false)
+    protected function process_seo_url($s_seo_url, $s_object_id = null, $i_lang = null, $bl_exclude = false)
     {
-        if (!$blExclude) {
-            $sSeoUrl = $this->addLanguageParam($sSeoUrl, $iLang);
+        if (!$bl_exclude) {
+            $s_seo_url = $this->add_language_param($s_seo_url, $i_lang);
         }
-
-        return $this->getUniqueSeoUrl($sSeoUrl, $sObjectId, $iLang);
+        return $this->get_unique_seo_url($s_seo_url, $s_object_id, $i_lang);
     }
-
     /**
      * SEO encoder constructor
      */
     public function __construct()
     {
-        $myConfig = Registry::getConfig();
-        if (!self::$_sSeparator) {
-            $this->setSeparator($myConfig->getConfigParam('sSEOSeparator'));
+        $my_config = Registry::get_config();
+        if (!self::$_s_separator) {
+            $this->set_separator($my_config->get_config_param('sSEOSeparator'));
         }
-        if (!self::$_sPrefix) {
-            $this->setPrefix($myConfig->getConfigParam('sSEOuprefix'));
+        if (!self::$_s_prefix) {
+            $this->set_prefix($my_config->get_config_param('sSEOuprefix'));
         }
-        $this->setReservedWords($myConfig->getConfigParam('aSEOReservedWords'));
+        $this->set_reserved_words($my_config->get_config_param('aSEOReservedWords'));
     }
-
     /**
      * Moves current seo record to seo history table
      *
@@ -161,21 +137,17 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      * @param string $sType   object type (if you pass real object - type is not necessary)
      * @param string $sNewId  new object id, mostly used for static url updates (optional)
      */
-    protected function copyToHistory($sId, $iShopId, $iLang, $sType = null, $sNewId = null)
+    protected function copy_to_history($s_id, $i_shop_id, $i_lang, $s_type = null, $s_new_id = null)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sObjectid = $sNewId ? $oDb->quote($sNewId) : 'oxobjectid';
-        $sType = $sType ? 'oxtype =' . $oDb->quote($sType) . ' and' : '';
-        $iLang = (int) $iLang;
-
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_objectid = $s_new_id ? $o_db->quote($s_new_id) : 'oxobjectid';
+        $s_type = $s_type ? 'oxtype =' . $o_db->quote($s_type) . ' and' : '';
+        $i_lang = (int) $i_lang;
         // moving
-        $sSub = "select $sObjectid, MD5( LOWER( oxseourl ) ), oxshopid, oxlang, now() from oxseo
-                 where {$sType} oxobjectid = " . $oDb->quote($sId) . ' and oxshopid = ' . $oDb->quote($iShopId) . " and
-                 oxlang = {$iLang} and oxexpired = '1'";
-        $sQ = "replace oxseohistory ( oxobjectid, oxident, oxshopid, oxlang, oxinsert ) {$sSub}";
-        $oDb->execute($sQ);
+        $s_sub = "select {$s_objectid}, MD5( LOWER( oxseourl ) ), oxshopid, oxlang, now() from oxseo\n                 where {$s_type} oxobjectid = " . $o_db->quote($s_id) . ' and oxshopid = ' . $o_db->quote($i_shop_id) . " and\n                 oxlang = {$i_lang} and oxexpired = '1'";
+        $s_q = "replace oxseohistory ( oxobjectid, oxident, oxshopid, oxlang, oxinsert ) {$s_sub}";
+        $o_db->execute($s_q);
     }
-
     /**
      * Generates dynamic url object id (calls \OxidEsales\Eshop\Core\SeoEncoder::_getStaticObjectId)
      *
@@ -184,11 +156,10 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getDynamicObjectId($iShopId, $sStdUrl)
+    public function get_dynamic_object_id($i_shop_id, $s_std_url)
     {
-        return $this->getStaticObjectId($iShopId, $sStdUrl);
+        return $this->get_static_object_id($i_shop_id, $s_std_url);
     }
-
     /**
      * Returns dynamic object SEO URI
      *
@@ -198,48 +169,39 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getDynamicUri($sStdUrl, $sSeoUrl, $iLang)
+    protected function get_dynamic_uri($s_std_url, $s_seo_url, $i_lang)
     {
-        $iShopId = Registry::getConfig()->getShopId();
-
-        $sStdUrl = $this->trimUrl($sStdUrl);
-        $sObjectId = $this->getDynamicObjectId($iShopId, $sStdUrl);
-        $sSeoUrl = $this->prepareUri($this->addLanguageParam($sSeoUrl, $iLang), $iLang);
-
+        $i_shop_id = Registry::get_config()->get_shop_id();
+        $s_std_url = $this->trim_url($s_std_url);
+        $s_object_id = $this->get_dynamic_object_id($i_shop_id, $s_std_url);
+        $s_seo_url = $this->prepare_uri($this->add_language_param($s_seo_url, $i_lang), $i_lang);
         //load details link from DB
-        $sOldSeoUrl = $this->loadFromDb('dynamic', $sObjectId, $iLang);
-        if ($sOldSeoUrl === $sSeoUrl) {
-            $sSeoUrl = $sOldSeoUrl;
+        $s_old_seo_url = $this->load_from_db('dynamic', $s_object_id, $i_lang);
+        if ($s_old_seo_url === $s_seo_url) {
+            $s_seo_url = $s_old_seo_url;
         } else {
-            if ($sOldSeoUrl) {
+            if ($s_old_seo_url) {
                 // old must be transferred to history
-                $this->copyToHistory($sObjectId, $iShopId, $iLang, 'dynamic');
+                $this->copy_to_history($s_object_id, $i_shop_id, $i_lang, 'dynamic');
             }
-
             // creating unique
-            $sSeoUrl = $this->processSeoUrl($sSeoUrl, $sObjectId, $iLang);
-
+            $s_seo_url = $this->process_seo_url($s_seo_url, $s_object_id, $i_lang);
             // inserting
-            $this->saveToDb('dynamic', $sObjectId, $sStdUrl, $sSeoUrl, $iLang, $iShopId);
+            $this->save_to_db('dynamic', $s_object_id, $s_std_url, $s_seo_url, $i_lang, $i_shop_id);
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * Returns SEO url with shop's path + additional params ( \OxidEsales\Eshop\Core\SeoEncoder:: _getAddParams)
      */
-    protected function getFullUrl($seoUrl, $lang = null)
+    protected function get_full_url($seo_url, $lang = null)
     {
-        if ($seoUrl) {
-            $fullUrl = Registry::getConfig()->getShopUrl($lang) . $seoUrl;
-
-            return Registry::getUtilsUrl()->processSeoUrl($fullUrl);
+        if ($seo_url) {
+            $full_url = Registry::get_config()->get_shop_url($lang) . $seo_url;
+            return Registry::get_utils_url()->process_seo_url($full_url);
         }
-
         return false;
     }
-
     /**
      * _getSeoIdent returns seo ident for db search
      *
@@ -249,11 +211,10 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getSeoIdent($sSeoUrl)
+    protected function get_seo_ident($s_seo_url)
     {
-        return md5(strtolower($sSeoUrl));
+        return md5(strtolower($s_seo_url));
     }
-
     /**
      * Returns SEO static uri
      *
@@ -263,20 +224,17 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getStaticUri($sStdUrl, $iShopId, $iLang)
+    protected function get_static_uri($s_std_url, $i_shop_id, $i_lang)
     {
-        $sStdUrl = $this->trimUrl($sStdUrl, $iLang);
-
-        return $this->loadFromDb('static', $this->getStaticObjectId($iShopId, $sStdUrl), $iLang, $iShopId);
+        $s_std_url = $this->trim_url($s_std_url, $i_lang);
+        return $this->load_from_db('static', $this->get_static_object_id($i_shop_id, $s_std_url), $i_lang, $i_shop_id);
     }
-
     /**
      * Returns target "extension"
      */
-    protected function getUrlExtension()
+    protected function get_url_extension()
     {
     }
-
     /**
      * _getUniqueSeoUrl returns possibly modified url
      * for not to be same as already existing in db
@@ -289,48 +247,42 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getUniqueSeoUrl($sSeoUrl, $sObjectId = null, $iObjectLang = null)
+    protected function get_unique_seo_url($s_seo_url, $s_object_id = null, $i_object_lang = null)
     {
-        $sSeoUrl = $this->prepareUri($sSeoUrl, $iObjectLang);
-        $oStr = Str::getStr();
-        $sExt = '';
-        if ($oStr->preg_match('/(\.html?|\/)$/i', $sSeoUrl, $aMatched)) {
-            $sExt = $aMatched[0];
+        $s_seo_url = $this->prepare_uri($s_seo_url, $i_object_lang);
+        $o_str = Str::get_str();
+        $s_ext = '';
+        if ($o_str->preg_match('/(\.html?|\/)$/i', $s_seo_url, $a_matched)) {
+            $s_ext = $a_matched[0];
         }
-        $sBaseSeoUrl = $sSeoUrl;
-        if ($sExt && $oStr->substr($sSeoUrl, 0 - $oStr->strlen($sExt)) == $sExt) {
-            $sBaseSeoUrl = $oStr->substr($sSeoUrl, 0, $oStr->strlen($sSeoUrl) - $oStr->strlen($sExt));
+        $s_base_seo_url = $s_seo_url;
+        if ($s_ext && $o_str->substr($s_seo_url, 0 - $o_str->strlen($s_ext)) == $s_ext) {
+            $s_base_seo_url = $o_str->substr($s_seo_url, 0, $o_str->strlen($s_seo_url) - $o_str->strlen($s_ext));
         }
-
-        $iShopId = Registry::getConfig()->getShopId();
-        $iCnt = 0;
-        $sCheckSeoUrl = $this->trimUrl($sSeoUrl);
-        $sQ = "select 1 from oxseo where oxshopid = '{$iShopId}'";
-
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $i_shop_id = Registry::get_config()->get_shop_id();
+        $i_cnt = 0;
+        $s_check_seo_url = $this->trim_url($s_seo_url);
+        $s_q = "select 1 from oxseo where oxshopid = '{$i_shop_id}'";
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         // skipping self
-        if ($sObjectId && isset($iObjectLang)) {
-            $iObjectLang = (int) $iObjectLang;
-            $sQ .= ' and not (oxobjectid = ' . $oDb->quote($sObjectId) . " and oxlang = $iObjectLang)";
+        if ($s_object_id && isset($i_object_lang)) {
+            $i_object_lang = (int) $i_object_lang;
+            $s_q .= ' and not (oxobjectid = ' . $o_db->quote($s_object_id) . " and oxlang = {$i_object_lang})";
         }
-
-        while ($oDb->getOne($sQ . ' and oxident= ' . $oDb->quote($this->getSeoIdent($sCheckSeoUrl)))) {
-            $sAdd = '';
-            if (self::$_sPrefix) {
-                $sAdd = self::$_sSeparator . self::$_sPrefix;
+        while ($o_db->get_one($s_q . ' and oxident= ' . $o_db->quote($this->get_seo_ident($s_check_seo_url)))) {
+            $s_add = '';
+            if (self::$_s_prefix) {
+                $s_add = self::$_s_separator . self::$_s_prefix;
             }
-            if ($iCnt) {
-                $sAdd .= self::$_sSeparator . $iCnt;
+            if ($i_cnt) {
+                $s_add .= self::$_s_separator . $i_cnt;
             }
-            ++$iCnt;
-
-            $sSeoUrl = $sBaseSeoUrl . $sAdd . $sExt;
-            $sCheckSeoUrl = $this->trimUrl($sSeoUrl);
+            ++$i_cnt;
+            $s_seo_url = $s_base_seo_url . $s_add . $s_ext;
+            $s_check_seo_url = $this->trim_url($s_seo_url);
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * check if seo url exist and is fixed
      *
@@ -345,37 +297,30 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    protected function isFixed($sType, $sId, $iLang, $iShopId = null, $sParams = null, $blStrictParamsCheck = true)
+    protected function is_fixed($s_type, $s_id, $i_lang, $i_shop_id = null, $s_params = null, $bl_strict_params_check = true)
     {
-        if ($iShopId === null) {
-            $iShopId = Registry::getConfig()->getShopId();
+        if ($i_shop_id === null) {
+            $i_shop_id = Registry::get_config()->get_shop_id();
         }
-        $iLang = (int) $iLang;
-
-        if (!isset(self::$_aFixedCache[$sType][$iShopId][$sId][$iLang])) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-            $sQ = 'SELECT `oxfixed`
+        $i_lang = (int) $i_lang;
+        if (!isset(self::$_a_fixed_cache[$s_type][$i_shop_id][$s_id][$i_lang])) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $s_q = 'SELECT `oxfixed`
                 FROM `oxseo`
-                WHERE `oxtype` = ' . $oDb->quote($sType) . '
-                   AND `oxobjectid` = ' . $oDb->quote($sId) . '
-                   AND `oxshopid` = ' . $oDb->quote($iShopId) . "
-                   AND `oxlang` = '{$iLang}'";
-
-            $sParams = $sParams ? $oDb->quote($sParams) : "''";
-            if ($sParams && $blStrictParamsCheck) {
-                $sQ .= " AND `oxparams` = {$sParams}";
+                WHERE `oxtype` = ' . $o_db->quote($s_type) . '
+                   AND `oxobjectid` = ' . $o_db->quote($s_id) . '
+                   AND `oxshopid` = ' . $o_db->quote($i_shop_id) . "\n                   AND `oxlang` = '{$i_lang}'";
+            $s_params = $s_params ? $o_db->quote($s_params) : "''";
+            if ($s_params && $bl_strict_params_check) {
+                $s_q .= " AND `oxparams` = {$s_params}";
             } else {
-                $sQ .= ' ORDER BY `oxparams` ASC';
+                $s_q .= ' ORDER BY `oxparams` ASC';
             }
-            $sQ .= ' LIMIT 1';
-
-            self::$_aFixedCache[$sType][$iShopId][$sId][$iLang] = (bool) $oDb->getOne($sQ);
+            $s_q .= ' LIMIT 1';
+            self::$_a_fixed_cache[$s_type][$i_shop_id][$s_id][$i_lang] = (bool) $o_db->get_one($s_q);
         }
-
-        return self::$_aFixedCache[$sType][$iShopId][$sId][$iLang];
+        return self::$_a_fixed_cache[$s_type][$i_shop_id][$s_id][$i_lang];
     }
-
     /**
      * Returns cache key (in non admin mode)
      *
@@ -386,24 +331,21 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getCacheKey($sType, $iLang = null, $iShopId = null, $sParams = null)
+    protected function get_cache_key($s_type, $i_lang = null, $i_shop_id = null, $s_params = null)
     {
-        $blAdmin = $this->isAdmin();
-        if (!$blAdmin && $sType !== 'oxarticle') {
-            return $sType . ((int) $iLang) . ((int) $iShopId) . 'seo';
+        $bl_admin = $this->is_admin();
+        if (!$bl_admin && $s_type !== 'oxarticle') {
+            return $s_type . (int) $i_lang . (int) $i_shop_id . 'seo';
         }
-
         // use cache in non admin mode
-        if (self::$_sCacheKey === null) {
-            self::$_sCacheKey = false;
-            if (!$blAdmin && ($oView = Registry::getConfig()->getActiveView())) {
-                self::$_sCacheKey = md5((string) $oView->getViewId()) . 'seo';
+        if (self::$_s_cache_key === null) {
+            self::$_s_cache_key = false;
+            if (!$bl_admin && $o_view = Registry::get_config()->get_active_view()) {
+                self::$_s_cache_key = md5((string) $o_view->get_view_id()) . 'seo';
             }
         }
-
-        return self::$_sCacheKey;
+        return self::$_s_cache_key;
     }
-
     /**
      * Loads seo data from cache for active view (in non admin mode)
      *
@@ -415,30 +357,23 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function loadFromCache($sCacheIdent, $sType, $iLang = null, $iShopId = null, $sParams = null)
+    protected function load_from_cache($s_cache_ident, $s_type, $i_lang = null, $i_shop_id = null, $s_params = null)
     {
-        if (!Registry::getConfig()->getConfigParam('blEnableSeoCache')) {
+        if (!Registry::get_config()->get_config_param('blEnableSeoCache')) {
             return false;
         }
-
-        startProfile('seoencoder_loadFromCache');
-
-        $sCacheKey = $this->getCacheKey($sType, $iLang, $iShopId, $sParams);
-        $sCache = false;
-
-        if ($sCacheKey && !isset(self::$_aCache[$sCacheKey])) {
-            self::$_aCache[$sCacheKey] = Registry::getUtils()->fromFileCache($sCacheKey);
+        start_profile('seoencoder_loadFromCache');
+        $s_cache_key = $this->get_cache_key($s_type, $i_lang, $i_shop_id, $s_params);
+        $s_cache = false;
+        if ($s_cache_key && !isset(self::$_a_cache[$s_cache_key])) {
+            self::$_a_cache[$s_cache_key] = Registry::get_utils()->from_file_cache($s_cache_key);
         }
-
-        if (isset(self::$_aCache[$sCacheKey]) && isset(self::$_aCache[$sCacheKey][$sCacheIdent])) {
-            $sCache = self::$_aCache[$sCacheKey][$sCacheIdent];
+        if (isset(self::$_a_cache[$s_cache_key]) && isset(self::$_a_cache[$s_cache_key][$s_cache_ident])) {
+            $s_cache = self::$_a_cache[$s_cache_key][$s_cache_ident];
         }
-
-        stopProfile('seoencoder_loadFromCache');
-
-        return $sCache;
+        stop_profile('seoencoder_loadFromCache');
+        return $s_cache;
     }
-
     /**
      * Saves seo cache data for active view (in non admin mode)
      *
@@ -451,25 +386,20 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    protected function saveInCache($sCacheIdent, $sCache, $sType, $iLang = null, $iShopId = null, $sParams = null)
+    protected function save_in_cache($s_cache_ident, $s_cache, $s_type, $i_lang = null, $i_shop_id = null, $s_params = null)
     {
-        if (!Registry::getConfig()->getConfigParam('blEnableSeoCache')) {
+        if (!Registry::get_config()->get_config_param('blEnableSeoCache')) {
             return false;
         }
-
-        startProfile('seoencoder_saveInCache');
-
-        $blSaved = false;
-        if ($sCache && ($sCacheKey = $this->getCacheKey($sType, $iLang, $iShopId, $sParams)) !== false) {
-            self::$_aCache[$sCacheKey][$sCacheIdent] = $sCache;
-            $blSaved = Registry::getUtils()->toFileCache($sCacheKey, self::$_aCache[$sCacheKey]);
+        start_profile('seoencoder_saveInCache');
+        $bl_saved = false;
+        if ($s_cache && ($s_cache_key = $this->get_cache_key($s_type, $i_lang, $i_shop_id, $s_params)) !== false) {
+            self::$_a_cache[$s_cache_key][$s_cache_ident] = $s_cache;
+            $bl_saved = Registry::get_utils()->to_file_cache($s_cache_key, self::$_a_cache[$s_cache_key]);
         }
-
-        stopProfile('seoencoder_saveInCache');
-
-        return $blSaved;
+        stop_profile('seoencoder_saveInCache');
+        return $bl_saved;
     }
-
     /**
      * _loadFromDb loads data from oxseo table if exists
      * returns oxseo url
@@ -485,22 +415,14 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string || false
      */
-    protected function loadFromDb($sType, $sId, $iLang, $iShopId = null, $sParams = null, $blStrictParamsCheck = true)
+    protected function load_from_db($s_type, $s_id, $i_lang, $i_shop_id = null, $s_params = null, $bl_strict_params_check = true)
     {
-        if ($iShopId === null) {
-            $iShopId = Registry::getConfig()->getShopId();
+        if ($i_shop_id === null) {
+            $i_shop_id = Registry::get_config()->get_shop_id();
         }
-
-        $iLang = (int) $iLang;
-
-        $params = [
-            'oxtype' => $sType,
-            'oxobjectid' => $sId,
-            'oxshopid' => $iShopId,
-            'oxlang' => $iLang,
-        ];
-
-        $sQ = '
+        $i_lang = (int) $i_lang;
+        $params = ['oxtype' => $s_type, 'oxobjectid' => $s_id, 'oxshopid' => $i_shop_id, 'oxlang' => $i_lang];
+        $s_q = '
             SELECT
                 `oxfixed`,
                 `oxseourl`,
@@ -511,75 +433,61 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
                AND `oxobjectid` = :oxobjectid
                AND `oxshopid` = :oxshopid
                AND `oxlang` = :oxlang';
-
-        $sParams = $sParams ?: '';
-        if ($sParams && $blStrictParamsCheck) {
-            $sQ .= ' AND `oxparams` = :oxparams';
-            $params['oxparams'] = $sParams;
+        $s_params = $s_params ?: '';
+        if ($s_params && $bl_strict_params_check) {
+            $s_q .= ' AND `oxparams` = :oxparams';
+            $params['oxparams'] = $s_params;
         } else {
-            $sQ .= ' ORDER BY `oxparams` ASC';
+            $s_q .= ' ORDER BY `oxparams` ASC';
         }
-
-        $sQ .= ' LIMIT 1';
-
+        $s_q .= ' LIMIT 1';
         // caching to avoid same queries..
-        $sIdent = md5('_loadFromDb' . serialize($params));
-
+        $s_ident = md5('_loadFromDb' . serialize($params));
         // looking in cache
-        if (($sSeoUrl = $this->loadFromCache($sIdent, $sType, $iLang, $iShopId, $sParams)) === false) {
-            $oDb = DatabaseProvider::getDb();
-            $oRs = $oDb->select($sQ, $params);
-
-            if ($oRs && $oRs->count() > 0 && !$oRs->EOF) {
+        if (($s_seo_url = $this->load_from_cache($s_ident, $s_type, $i_lang, $i_shop_id, $s_params)) === false) {
+            $o_db = Database_Provider::get_db();
+            $o_rs = $o_db->select($s_q, $params);
+            if ($o_rs && $o_rs->count() > 0 && !$o_rs->EOF) {
                 // moving expired static urls to history ..
-                if ($oRs->fields['oxexpired'] && ($oRs->fields['oxtype'] == 'static' || $oRs->fields['oxtype'] == 'dynamic')) {
+                if ($o_rs->fields['oxexpired'] && ($o_rs->fields['oxtype'] == 'static' || $o_rs->fields['oxtype'] == 'dynamic')) {
                     // if expired - copying to history, marking as not expired
-                    $this->copyToHistory($sId, $iShopId, $iLang);
-                    $oDb->execute('update oxseo set oxexpired = 0 where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid', [
-                        'oxobjectid' => $sId,
-                        'oxlang' => $iLang,
-                        'oxshopid' => $iShopId,
-                    ]);
-                    $sSeoUrl = $oRs->fields['oxseourl'];
-                } elseif (!$oRs->fields['oxexpired'] || $oRs->fields['oxfixed']) {
+                    $this->copy_to_history($s_id, $i_shop_id, $i_lang);
+                    $o_db->execute('update oxseo set oxexpired = 0 where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid', ['oxobjectid' => $s_id, 'oxlang' => $i_lang, 'oxshopid' => $i_shop_id]);
+                    $s_seo_url = $o_rs->fields['oxseourl'];
+                } elseif (!$o_rs->fields['oxexpired'] || $o_rs->fields['oxfixed']) {
                     // if seo url is available and is valid
-                    $sSeoUrl = $oRs->fields['oxseourl'];
+                    $s_seo_url = $o_rs->fields['oxseourl'];
                 }
-
                 // storing in cache
-                $this->saveInCache($sIdent, $sSeoUrl, $sType, $iLang, $iShopId, $sParams);
+                $this->save_in_cache($s_ident, $s_seo_url, $s_type, $i_lang, $i_shop_id, $s_params);
             }
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * cached getter: check root directory php file names for them not to be in 1st part of seo url
      * because then apache will execute that php file instead of url parser
      *
      * @return array
      */
-    protected function getReservedEntryKeys()
+    protected function get_reserved_entry_keys()
     {
-        if (!isset(self::$_aReservedEntryKeys) || !is_array(self::$_aReservedEntryKeys)) {
-            $sDir = getShopBasePath();
-            self::$_aReservedEntryKeys = array_map(preg_quote(...), self::$_aReservedWords, ['#']);
-            $oStr = Str::getStr();
-            foreach (glob("$sDir/*") as $sFile) {
-                if ($oStr->preg_match('/^(.+)\.php[0-9]*$/i', basename($sFile), $aMatches)) {
-                    self::$_aReservedEntryKeys[] = preg_quote((string) $aMatches[0], '#');
-                    self::$_aReservedEntryKeys[] = preg_quote((string) $aMatches[1], '#');
-                } elseif (is_dir($sFile)) {
-                    self::$_aReservedEntryKeys[] = preg_quote(basename($sFile), '#');
+        if (!isset(self::$_a_reserved_entry_keys) || !is_array(self::$_a_reserved_entry_keys)) {
+            $s_dir = get_shop_base_path();
+            self::$_a_reserved_entry_keys = array_map(preg_quote(...), self::$_a_reserved_words, ['#']);
+            $o_str = Str::get_str();
+            foreach (glob("{$s_dir}/*") as $s_file) {
+                if ($o_str->preg_match('/^(.+)\.php[0-9]*$/i', basename($s_file), $a_matches)) {
+                    self::$_a_reserved_entry_keys[] = preg_quote((string) $a_matches[0], '#');
+                    self::$_a_reserved_entry_keys[] = preg_quote((string) $a_matches[1], '#');
+                } elseif (is_dir($s_file)) {
+                    self::$_a_reserved_entry_keys[] = preg_quote(basename($s_file), '#');
                 }
             }
-            self::$_aReservedEntryKeys = array_unique(self::$_aReservedEntryKeys);
+            self::$_a_reserved_entry_keys = array_unique(self::$_a_reserved_entry_keys);
         }
-
-        return self::$_aReservedEntryKeys;
+        return self::$_a_reserved_entry_keys;
     }
-
     /**
      * Makes safe seo uri - removes unsupported/reserved characters
      *
@@ -588,64 +496,49 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function prepareUri($sUri, $iLang = false)
+    protected function prepare_uri($s_uri, $i_lang = false)
     {
         // decoding entities
-        $sUri = $this->encodeString($sUri, true, $iLang);
-
+        $s_uri = $this->encode_string($s_uri, true, $i_lang);
         // basic string preparation
-        $oStr = Str::getStr();
-        $sUri = $oStr->strip_tags($sUri);
-
+        $o_str = Str::get_str();
+        $s_uri = $o_str->strip_tags($s_uri);
         // if found ".html" or "/" at the end - removing it temporary
-        $sExt = $this->getUrlExtension();
-        if ($sExt === null) {
-            $aMatched = [];
-            if ($oStr->preg_match('/(\.html?|\/)$/i', $sUri, $aMatched)) {
-                $sExt = $aMatched[0];
+        $s_ext = $this->get_url_extension();
+        if ($s_ext === null) {
+            $a_matched = [];
+            if ($o_str->preg_match('/(\.html?|\/)$/i', $s_uri, $a_matched)) {
+                $s_ext = $a_matched[0];
             } else {
-                $sExt = '/';
+                $s_ext = '/';
             }
         }
-        if ($sExt && $oStr->substr($sUri, 0 - $oStr->strlen($sExt)) == $sExt) {
-            $sUri = $oStr->substr($sUri, 0, $oStr->strlen($sUri) - $oStr->strlen($sExt));
+        if ($s_ext && $o_str->substr($s_uri, 0 - $o_str->strlen($s_ext)) == $s_ext) {
+            $s_uri = $o_str->substr($s_uri, 0, $o_str->strlen($s_uri) - $o_str->strlen($s_ext));
         }
-
-        $sUri = $this->replaceSpecialChars($sUri);
-
+        $s_uri = $this->replace_special_chars($s_uri);
         // SEO id is empty ?
-        if (!$sUri && self::$_sPrefix) {
-            $sUri = $this->prepareUri(self::$_sPrefix, $iLang);
+        if (!$s_uri && self::$_s_prefix) {
+            $s_uri = $this->prepare_uri(self::$_s_prefix, $i_lang);
         }
-
-        $sAdd = '_' . self::$_sPrefix;
-        if ('/' != self::$_sSeparator) {
-            $sAdd = self::$_sSeparator . self::$_sPrefix;
-            $sUri = trim($sUri, self::$_sSeparator);
+        $s_add = '_' . self::$_s_prefix;
+        if ('/' != self::$_s_separator) {
+            $s_add = self::$_s_separator . self::$_s_prefix;
+            $s_uri = trim($s_uri, self::$_s_separator);
         }
-
         // binding the ending back
-        $sUri .= $sExt;
-
+        $s_uri .= $s_ext;
         // lowercase uri if option is set
-        if (Registry::getConfig()->getConfigParam('blSEOLowerCaseUrls')) {
-            $strUtility = Str::getStr();
-            $sUri = $strUtility->strtolower($sUri);
+        if (Registry::get_config()->get_config_param('blSEOLowerCaseUrls')) {
+            $str_utility = Str::get_str();
+            $s_uri = $str_utility->strtolower($s_uri);
         }
-
         // fix for not having url, which executes through /other/ script then seo decoder
-        $sUri = $oStr->preg_replace('#^(/*)(' . implode('|', $this->getReservedEntryKeys()) . ')(/|$)#i', "\$1\$2$sAdd\$3", $sUri);
-
+        $s_uri = $o_str->preg_replace('#^(/*)(' . implode('|', $this->get_reserved_entry_keys()) . ')(/|$)#i', "\$1\$2{$s_add}\$3", $s_uri);
         // cleaning
-        $sQuotedSeparator = preg_quote(self::$_sSeparator, '/');
-
-        return $oStr->preg_replace(
-            ['|//+|', '/' . $sQuotedSeparator . $sQuotedSeparator . '+/'],
-            ['/', self::$_sSeparator],
-            $sUri
-        );
+        $s_quoted_separator = preg_quote(self::$_s_separator, '/');
+        return $o_str->preg_replace(['|//+|', '/' . $s_quoted_separator . $s_quoted_separator . '+/'], ['/', self::$_s_separator], $s_uri);
     }
-
     /**
      * Prepares and returns formatted object SEO id
      *
@@ -655,36 +548,30 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function prepareTitle($sTitle, $blSkipTruncate = false, $iLang = false)
+    protected function prepare_title($s_title, $bl_skip_truncate = false, $i_lang = false)
     {
-        $sTitle = $this->encodeString($sTitle, true, $iLang);
-        $sSep = self::$_sSeparator;
-        if (!$sSep || ('/' == $sSep)) {
-            $sSep = '_';
+        $s_title = $this->encode_string($s_title, true, $i_lang);
+        $s_sep = self::$_s_separator;
+        if (!$s_sep || '/' == $s_sep) {
+            $s_sep = '_';
         }
-
-        $sRegExp = '/[^A-Za-z0-9\/' . preg_quote(self::$_sPrefix, '/') . preg_quote($sSep, '/') . ']+/';
-        $sTitle = preg_replace(['#/+#', $sRegExp, '# +#', '#(' . preg_quote($sSep, '/') . ')+#'], $sSep, $sTitle);
-
-        $oStr = Str::getStr();
+        $s_reg_exp = '/[^A-Za-z0-9\/' . preg_quote(self::$_s_prefix, '/') . preg_quote($s_sep, '/') . ']+/';
+        $s_title = preg_replace(['#/+#', $s_reg_exp, '# +#', '#(' . preg_quote($s_sep, '/') . ')+#'], $s_sep, $s_title);
+        $o_str = Str::get_str();
         // smart truncate
-        if (!$blSkipTruncate && $oStr->strlen($sTitle) > $this->_iIdLength) {
-            $iFirstSpace = $oStr->strpos($sTitle, $sSep, $this->_iIdLength);
-            if ($iFirstSpace !== false) {
-                $sTitle = $oStr->substr($sTitle, 0, $iFirstSpace);
+        if (!$bl_skip_truncate && $o_str->strlen($s_title) > $this->_i_id_length) {
+            $i_first_space = $o_str->strpos($s_title, $s_sep, $this->_i_id_length);
+            if ($i_first_space !== false) {
+                $s_title = $o_str->substr($s_title, 0, $i_first_space);
             }
         }
-
-        $sTitle = trim((string) $sTitle, $sSep);
-
-        if (!$sTitle) {
-            return self::$_sPrefix;
+        $s_title = trim((string) $s_title, $s_sep);
+        if (!$s_title) {
+            return self::$_s_prefix;
         }
-
         // cleaning
-        return $sTitle;
+        return $s_title;
     }
-
     /**
      * _saveToDb saves values to seo table
      *
@@ -701,89 +588,49 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return mixed
      */
-    protected function saveToDb($sType, $sObjectId, $sStdUrl, $sSeoUrl, $iLang, $iShopId = null, $blFixed = null, $sParams = null)
+    protected function save_to_db($s_type, $s_object_id, $s_std_url, $s_seo_url, $i_lang, $i_shop_id = null, $bl_fixed = null, $s_params = null)
     {
-        if ($iShopId === null) {
-            $iShopId = Registry::getConfig()->getShopId();
+        if ($i_shop_id === null) {
+            $i_shop_id = Registry::get_config()->get_shop_id();
         }
-
-        $iLang = (int) $iLang;
-
-        $sStdUrl = $this->trimUrl($sStdUrl);
-        $sSeoUrl = $this->trimUrl($sSeoUrl);
-        $sIdent = $this->getSeoIdent($sSeoUrl);
-
+        $i_lang = (int) $i_lang;
+        $s_std_url = $this->trim_url($s_std_url);
+        $s_seo_url = $this->trim_url($s_seo_url);
+        $s_ident = $this->get_seo_ident($s_seo_url);
         // transferring old url, thus current url will be regenerated
-
-        $params = [
-            'oxstdurl' => $sStdUrl,
-            'oxseourl' => $sSeoUrl,
-            'oxtype' => $sType,
-            'oxobjectid' => $sObjectId,
-            'oxshopid' => $iShopId,
-            'oxlang' => $iLang,
-        ];
-
-        $sQ = 'select oxfixed, oxexpired, ( oxstdurl like :oxstdurl ) as samestdurl, oxseourl like :oxseourl as sameseourl
+        $params = ['oxstdurl' => $s_std_url, 'oxseourl' => $s_seo_url, 'oxtype' => $s_type, 'oxobjectid' => $s_object_id, 'oxshopid' => $i_shop_id, 'oxlang' => $i_lang];
+        $s_q = 'select oxfixed, oxexpired, ( oxstdurl like :oxstdurl ) as samestdurl, oxseourl like :oxseourl as sameseourl
                 from oxseo
                 where oxtype = :oxtype and
                 oxobjectid = :oxobjectid and
                 oxshopid = :oxshopid and
                 oxlang = :oxlang';
-
-        if ($sParams) {
-            $sQ .= ' and oxparams = :oxparams ';
-            $params['oxparams'] = $sParams;
+        if ($s_params) {
+            $s_q .= ' and oxparams = :oxparams ';
+            $params['oxparams'] = $s_params;
         }
-
-        $sQ .= ' limit 1';
-
-        $oDb = DatabaseProvider::getDb();
-        $oRs = $oDb->select($sQ, $params);
-        if ($oRs && $oRs->count() > 0 && !$oRs->EOF) {
-            if ($oRs->fields['samestdurl'] && $oRs->fields['sameseourl'] && $oRs->fields['oxexpired']) {
+        $s_q .= ' limit 1';
+        $o_db = Database_Provider::get_db();
+        $o_rs = $o_db->select($s_q, $params);
+        if ($o_rs && $o_rs->count() > 0 && !$o_rs->EOF) {
+            if ($o_rs->fields['samestdurl'] && $o_rs->fields['sameseourl'] && $o_rs->fields['oxexpired']) {
                 // fixed state change
-                $sFixed = isset($blFixed) ? ', oxfixed = ' . ((int) $blFixed) . ' ' : '';
+                $s_fixed = isset($bl_fixed) ? ', oxfixed = ' . (int) $bl_fixed . ' ' : '';
                 // nothing was changed - setting expired status back to 0
-                $sSql = "update oxseo set oxexpired = 0 {$sFixed} where oxtype = :oxtype and
-                          oxobjectid = :oxobjectid and oxshopid = :oxshopid and oxlang = :oxlang ";
-                $sSql .= $sParams ? ' and oxparams = :oxparams ' : '';
-                $sSql .= ' limit 1';
-                return $this->executeQuery($sSql, [
-                    'oxtype' => $sType,
-                    'oxobjectid' => $sObjectId,
-                    'oxshopid' => $iShopId,
-                    'oxlang' => $iLang,
-                    'oxparams' => $sParams,
-                ]);
+                $s_sql = "update oxseo set oxexpired = 0 {$s_fixed} where oxtype = :oxtype and\n                          oxobjectid = :oxobjectid and oxshopid = :oxshopid and oxlang = :oxlang ";
+                $s_sql .= $s_params ? ' and oxparams = :oxparams ' : '';
+                $s_sql .= ' limit 1';
+                return $this->execute_query($s_sql, ['oxtype' => $s_type, 'oxobjectid' => $s_object_id, 'oxshopid' => $i_shop_id, 'oxlang' => $i_lang, 'oxparams' => $s_params]);
             }
-            if ($oRs->fields['oxexpired']) {
+            if ($o_rs->fields['oxexpired']) {
                 // copy to history
-                $this->copyToHistory($sObjectId, $iShopId, $iLang, $sType);
+                $this->copy_to_history($s_object_id, $i_shop_id, $i_lang, $s_type);
             }
         }
-
         // inserting new or updating
-        $sQ = "insert into oxseo
-                    (oxobjectid, oxident, oxshopid, oxlang, oxstdurl, oxseourl, oxtype, oxfixed, oxexpired, oxparams)
-                values
-                    (:oxobjectid, :oxident, :oxshopid, :oxlang, :oxstdurl, :oxseourl, :oxtype, :oxfixed, '0', :oxparams)
-                on duplicate key update
-                    oxobjectid = :oxobjectid, oxident = :oxident, oxstdurl = :oxstdurl, oxseourl = :oxseourl, oxfixed = :oxfixed, oxexpired = '0'";
-
-        return $this->executeQuery($sQ, [
-            'oxobjectid' => $sObjectId ?? '',
-            'oxident' => $sIdent,
-            'oxshopid' => $iShopId,
-            'oxlang' => $iLang,
-            'oxstdurl' => $sStdUrl,
-            'oxseourl' => $sSeoUrl,
-            'oxtype' => $sType,
-            'oxfixed' => (int) $blFixed,
-            'oxparams' => $sParams ?: '',
-        ]);
+        $s_q = "insert into oxseo\n                    (oxobjectid, oxident, oxshopid, oxlang, oxstdurl, oxseourl, oxtype, oxfixed, oxexpired, oxparams)\n                values\n                    (:oxobjectid, :oxident, :oxshopid, :oxlang, :oxstdurl, :oxseourl, :oxtype, :oxfixed, '0', :oxparams)\n                on duplicate key update\n                    oxobjectid = :oxobjectid, oxident = :oxident, oxstdurl = :oxstdurl, oxseourl = :oxseourl, oxfixed = :oxfixed, oxexpired = '0'";
+        return $this->execute_query($s_q, ['oxobjectid' => $s_object_id ?? '', 'oxident' => $s_ident, 'oxshopid' => $i_shop_id, 'oxlang' => $i_lang, 'oxstdurl' => $s_std_url, 'oxseourl' => $s_seo_url, 'oxtype' => $s_type, 'oxfixed' => (int) $bl_fixed, 'oxparams' => $s_params ?: '']);
     }
-
     /**
      * Runs query.
      * Returns false when the query fail, otherwise return true
@@ -793,20 +640,18 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    protected function executeQuery($query, $params = [])
+    protected function execute_query($query, $params = [])
     {
-        $dataBase = DatabaseProvider::getDb();
+        $data_base = Database_Provider::get_db();
         $success = true;
         try {
-            $dataBase->execute($query, $params);
-        } catch (\OxidEsales\Eshop\Core\Exception\StandardException $exception) {
-            Registry::getLogger()->error($exception->getMessage(), [$exception]);
+            $data_base->execute($query, $params);
+        } catch (\Oxid_Esales\Eshop\Core\Exception\Standard_Exception $exception) {
+            Registry::get_logger()->error($exception->get_message(), [$exception]);
             $success = false;
         }
-
         return $success;
     }
-
     /**
      * Removes shop path part and session id from given url
      *
@@ -817,47 +662,42 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function trimUrl($sUrl, $iLang = null)
+    protected function trim_url($s_url, $i_lang = null)
     {
-        $myConfig = Registry::getConfig();
-        $oStr = Str::getStr();
-        $sUrl = str_replace($myConfig->getShopUrl($iLang, false), '', $sUrl);
-        $sUrl = $oStr->preg_replace('/(\?|&(amp;)?)(force_)?(admin_)?sid=[a-z0-9\.]+&?(amp;)?/i', '\1', $sUrl);
-        $sUrl = $oStr->preg_replace('/(\?|&(amp;)?)shp=[0-9]+&?(amp;)?/i', '\1', $sUrl);
-        $sUrl = $oStr->preg_replace('/(\?|&(amp;)?)lang=[0-9]+&?(amp;)?/i', '\1', $sUrl);
-        $sUrl = $oStr->preg_replace('/(\?|&(amp;)?)cur=[0-9]+&?(amp;)?/i', '\1', $sUrl);
-        $sUrl = $oStr->preg_replace('/(\?|&(amp;)?)stoken=[a-z0-9]+&?(amp;)?/i', '\1', $sUrl);
-        $sUrl = $oStr->preg_replace('/(\?|&(amp;)?)&(amp;)?/i', '\1', $sUrl);
-        $sUrl = $oStr->preg_replace('/(\?|&(amp;)?)+$/i', '', $sUrl);
-        $sUrl = trim((string) $sUrl);
-
+        $my_config = Registry::get_config();
+        $o_str = Str::get_str();
+        $s_url = str_replace($my_config->get_shop_url($i_lang, false), '', $s_url);
+        $s_url = $o_str->preg_replace('/(\?|&(amp;)?)(force_)?(admin_)?sid=[a-z0-9\.]+&?(amp;)?/i', '\1', $s_url);
+        $s_url = $o_str->preg_replace('/(\?|&(amp;)?)shp=[0-9]+&?(amp;)?/i', '\1', $s_url);
+        $s_url = $o_str->preg_replace('/(\?|&(amp;)?)lang=[0-9]+&?(amp;)?/i', '\1', $s_url);
+        $s_url = $o_str->preg_replace('/(\?|&(amp;)?)cur=[0-9]+&?(amp;)?/i', '\1', $s_url);
+        $s_url = $o_str->preg_replace('/(\?|&(amp;)?)stoken=[a-z0-9]+&?(amp;)?/i', '\1', $s_url);
+        $s_url = $o_str->preg_replace('/(\?|&(amp;)?)&(amp;)?/i', '\1', $s_url);
+        $s_url = $o_str->preg_replace('/(\?|&(amp;)?)+$/i', '', $s_url);
+        $s_url = trim((string) $s_url);
         // max length <= $this->_iMaxUrlLength
-        $iLength = $this->getMaxUrlLength();
-        if ($oStr->strlen($sUrl) > $iLength) {
-            return $oStr->substr($sUrl, 0, $iLength);
+        $i_length = $this->get_max_url_length();
+        if ($o_str->strlen($s_url) > $i_length) {
+            return $o_str->substr($s_url, 0, $i_length);
         }
-
-        return $sUrl;
+        return $s_url;
     }
-
     /**
      * Returns maximum seo/dynamic url length
      *
      * @return int
      */
-    protected function getMaxUrlLength()
+    protected function get_max_url_length()
     {
-        if ($this->_iMaxUrlLength === null) {
+        if ($this->_i_max_url_length === null) {
             // max length <= 2048 / custom
-            $this->_iMaxUrlLength = Registry::getConfig()->getConfigParam('iMaxSeoUrlLength');
-            if (!$this->_iMaxUrlLength) {
-                $this->_iMaxUrlLength = 2048;
+            $this->_i_max_url_length = Registry::get_config()->get_config_param('iMaxSeoUrlLength');
+            if (!$this->_i_max_url_length) {
+                $this->_i_max_url_length = 2048;
             }
         }
-
-        return $this->_iMaxUrlLength;
+        return $this->_i_max_url_length;
     }
-
     /**
      * Replaces special chars in text
      *
@@ -867,74 +707,66 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function encodeString($sString, $blReplaceChars = true, $iLang = false)
+    public function encode_string($s_string, $bl_replace_chars = true, $i_lang = false)
     {
         // decoding entities
-        $sString = Str::getStr()->html_entity_decode($sString);
-
-        if ($blReplaceChars) {
-            if ($iLang === false || !is_numeric($iLang)) {
-                $iLang = Registry::getLang()->getEditLanguage();
+        $s_string = Str::get_str()->html_entity_decode($s_string);
+        if ($bl_replace_chars) {
+            if ($i_lang === false || !is_numeric($i_lang)) {
+                $i_lang = Registry::get_lang()->get_edit_language();
             }
-
-            if ($aReplaceChars = Registry::getLang()->getSeoReplaceChars($iLang)) {
-                $sString = str_replace(array_keys($aReplaceChars), array_values($aReplaceChars), $sString);
+            if ($a_replace_chars = Registry::get_lang()->get_seo_replace_chars($i_lang)) {
+                $s_string = str_replace(array_keys($a_replace_chars), array_values($a_replace_chars), $s_string);
             }
         }
-
-        return str_replace(['&amp;', '&quot;', '&#039;', '&lt;', '&gt;'], '', $sString);
+        return str_replace(['&amp;', '&quot;', '&#039;', '&lt;', '&gt;'], '', $s_string);
     }
-
     /**
      * Sets SEO separator
      *
      * @param string $sSeparator SEO seperator
      */
-    public function setSeparator($sSeparator = null): void
+    public function set_separator($s_separator = null): void
     {
-        self::$_sSeparator = $sSeparator;
-        if (!self::$_sSeparator) {
-            self::$_sSeparator = '-';
+        self::$_s_separator = $s_separator;
+        if (!self::$_s_separator) {
+            self::$_s_separator = '-';
         }
     }
-
     /**
      * Sets SEO prefix
      *
      * @param string $sPrefix SEO prefix
      */
-    public function setPrefix($sPrefix): void
+    public function set_prefix($s_prefix): void
     {
-        if ($sPrefix) {
-            self::$_sPrefix = $sPrefix;
+        if ($s_prefix) {
+            self::$_s_prefix = $s_prefix;
         } else {
-            self::$_sPrefix = 'oxid';
+            self::$_s_prefix = 'oxid';
         }
     }
-
     /**
      * sets seo id length
      *
      * @param string $iIdlength id length
      */
-    public function setIdLength($iIdlength = null): void
+    public function set_id_length($i_idlength = null): void
     {
-        if (isset($iIdlength)) {
-            $this->_iIdLength = $iIdlength;
+        if (isset($i_idlength)) {
+            $this->_i_id_length = $i_idlength;
         }
     }
-
     /**
      * Sets array of words which must be checked before building seo url
      * These words are appended by seo prefix if they are the initial uri segment
      *
      * @param array $aReservedWords reserved words
      */
-    public function setReservedWords($aReservedWords): void
+    public function set_reserved_words($a_reserved_words): void
     {
-        self::$_aReservedWords = array_merge(self::$_aReservedWords, $aReservedWords);
+        self::$_a_reserved_words = array_merge(self::$_a_reserved_words, $a_reserved_words);
     }
-
     /**
      * Marks object seo records as expired
      *
@@ -944,18 +776,16 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      * @param int    $iLang    active language (optiona;)
      * @param string $sParams  additional params
      */
-    public function markAsExpired($sId, $iShopId = null, $iExpStat = 1, $iLang = null, $sParams = null): void
+    public function mark_as_expired($s_id, $i_shop_id = null, $i_exp_stat = 1, $i_lang = null, $s_params = null): void
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sWhere = $sId ? 'where oxobjectid =  ' . $oDb->quote($sId) : '';
-        $sWhere .= isset($iShopId) ? ($sWhere ? ' and oxshopid = ' . $oDb->quote($iShopId) : 'where oxshopid = ' . $oDb->quote($iShopId)) : '';
-        $sWhere .= !is_null($iLang) ? ($sWhere ? " and oxlang = '{$iLang}'" : "where oxlang = '{$iLang}'") : '';
-        $sWhere .= $sParams ? ($sWhere ? " and {$sParams}" : "where {$sParams}") : '';
-
-        $sQ = "update oxseo set oxexpired = :oxexpired $sWhere";
-        $oDb->execute($sQ, ['oxexpired' => $iExpStat]);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_where = $s_id ? 'where oxobjectid =  ' . $o_db->quote($s_id) : '';
+        $s_where .= isset($i_shop_id) ? $s_where ? ' and oxshopid = ' . $o_db->quote($i_shop_id) : 'where oxshopid = ' . $o_db->quote($i_shop_id) : '';
+        $s_where .= !is_null($i_lang) ? $s_where ? " and oxlang = '{$i_lang}'" : "where oxlang = '{$i_lang}'" : '';
+        $s_where .= $s_params ? $s_where ? " and {$s_params}" : "where {$s_params}" : '';
+        $s_q = "update oxseo set oxexpired = :oxexpired {$s_where}";
+        $o_db->execute($s_q, ['oxexpired' => $i_exp_stat]);
     }
-
     /**
      * Loads if exists or prepares and saves new seo url for passed object
      *
@@ -969,27 +799,24 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getPageUri($oObject, $sType, $sStdUrl, $sSeoUrl, $sParams, $iLang = null, $blFixed = false)
+    protected function get_page_uri($o_object, $s_type, $s_std_url, $s_seo_url, $s_params, $i_lang = null, $bl_fixed = false)
     {
-        if (!isset($iLang)) {
-            $iLang = $oObject->getLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = $o_object->get_language();
         }
-        $iShopId = Registry::getConfig()->getShopId();
-
+        $i_shop_id = Registry::get_config()->get_shop_id();
         //load page link from DB
-        $sOldSeoUrl = $this->loadFromDb($sType, $oObject->getId(), $iLang, $iShopId, $sParams);
-        if (!$sOldSeoUrl) {
+        $s_old_seo_url = $this->load_from_db($s_type, $o_object->get_id(), $i_lang, $i_shop_id, $s_params);
+        if (!$s_old_seo_url) {
             // generating new..
-            $sSeoUrl = $this->processSeoUrl($sSeoUrl, $oObject->getId(), $iLang);
-            $this->saveToDb($sType, $oObject->getId(), $sStdUrl, $sSeoUrl, $iLang, $iShopId, (int) $blFixed, $sParams);
+            $s_seo_url = $this->process_seo_url($s_seo_url, $o_object->get_id(), $i_lang);
+            $this->save_to_db($s_type, $o_object->get_id(), $s_std_url, $s_seo_url, $i_lang, $i_shop_id, (int) $bl_fixed, $s_params);
         } else {
             // using old
-            $sSeoUrl = $sOldSeoUrl;
+            $s_seo_url = $s_old_seo_url;
         }
-
-        return $sSeoUrl;
+        return $s_seo_url;
     }
-
     /**
      * Generates static url object id
      *
@@ -998,11 +825,10 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function getStaticObjectId($iShopId, $sStdUrl)
+    protected function get_static_object_id($i_shop_id, $s_std_url)
     {
-        return md5(strtolower($iShopId . $this->trimUrl($sStdUrl)));
+        return md5(strtolower($i_shop_id . $this->trim_url($s_std_url)));
     }
-
     /**
      * Static url encoder
      *
@@ -1012,113 +838,85 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @throws Exception
      */
-    public function encodeStaticUrls($aStaticUrl, $iShopId, $iLang)
+    public function encode_static_urls($a_static_url, $i_shop_id, $i_lang)
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sValues = '';
-        $sOldObjectId = null;
-
+        $db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $s_values = '';
+        $s_old_object_id = null;
         // standard url
-        $sStdUrl = $this->trimUrl(trim((string) $aStaticUrl['oxseo__oxstdurl']));
-        $sObjectId = $aStaticUrl['oxseo__oxobjectid'];
-
-        if (!$sObjectId || $sObjectId == '-1') {
-            $sObjectId = $this->getStaticObjectId($iShopId, $sStdUrl);
+        $s_std_url = $this->trim_url(trim((string) $a_static_url['oxseo__oxstdurl']));
+        $s_object_id = $a_static_url['oxseo__oxobjectid'];
+        if (!$s_object_id || $s_object_id == '-1') {
+            $s_object_id = $this->get_static_object_id($i_shop_id, $s_std_url);
         } else {
             // marking entry as needs to move to history
-            $sOldObjectId = $sObjectId;
-
+            $s_old_object_id = $s_object_id;
             // if std url does not match old
-            if ($this->getStaticObjectId($iShopId, $sStdUrl) != $sObjectId) {
-                $sObjectId = $this->getStaticObjectId($iShopId, $sStdUrl);
+            if ($this->get_static_object_id($i_shop_id, $s_std_url) != $s_object_id) {
+                $s_object_id = $this->get_static_object_id($i_shop_id, $s_std_url);
             }
         }
-
-        foreach ($aStaticUrl['oxseo__oxseourl'] as $iLang => $sSeoUrl) {
-            $iLang = (int) $iLang;
-
+        foreach ($a_static_url['oxseo__oxseourl'] as $i_lang => $s_seo_url) {
+            $i_lang = (int) $i_lang;
             // generating seo url
-            $sSeoUrl = $this->trimUrl($sSeoUrl);
-            if ($sSeoUrl) {
-                $sSeoUrl = $this->processSeoUrl($sSeoUrl, $sObjectId, $iLang);
+            $s_seo_url = $this->trim_url($s_seo_url);
+            if ($s_seo_url) {
+                $s_seo_url = $this->process_seo_url($s_seo_url, $s_object_id, $i_lang);
             }
-
-            if ($sOldObjectId) {
+            if ($s_old_object_id) {
                 // Transaction picks master automatically (see ESDEV-3804 and ESDEV-3822).
-                $db->startTransaction();
+                $db->start_transaction();
                 try {
                     // move changed records to history
-                    $result = $db->getOne('select (:oxseourl like oxseourl) & (:oxstdurl like oxstdurl) from oxseo where oxobjectid = :oxobjectid and oxshopid = :oxshopid and oxlang = :oxlang', [
-                        'oxseourl' => $sSeoUrl,
-                        'oxstdurl' => $sStdUrl,
-                        'oxobjectid' => $sOldObjectId,
-                        'oxshopid' => $iShopId,
-                        'oxlang' => $iLang,
-                    ]);
+                    $result = $db->get_one('select (:oxseourl like oxseourl) & (:oxstdurl like oxstdurl) from oxseo where oxobjectid = :oxobjectid and oxshopid = :oxshopid and oxlang = :oxlang', ['oxseourl' => $s_seo_url, 'oxstdurl' => $s_std_url, 'oxobjectid' => $s_old_object_id, 'oxshopid' => $i_shop_id, 'oxlang' => $i_lang]);
                     if (!$result) {
-                        $this->copyToHistory($sOldObjectId, $iShopId, $iLang, 'static', $sObjectId);
+                        $this->copy_to_history($s_old_object_id, $i_shop_id, $i_lang, 'static', $s_object_id);
                     }
-
-                    $db->commitTransaction();
+                    $db->commit_transaction();
                 } catch (Exception $exception) {
-                    $db->rollbackTransaction();
-
+                    $db->rollback_transaction();
                     throw $exception;
                 }
             }
-            if (!$sSeoUrl) {
+            if (!$s_seo_url) {
                 continue;
             }
-            if (!$sStdUrl) {
+            if (!$s_std_url) {
                 continue;
             }
-
-            $sIdent = $this->getSeoIdent($sSeoUrl);
-
-            if ($sValues) {
-                $sValues .= ', ';
+            $s_ident = $this->get_seo_ident($s_seo_url);
+            if ($s_values) {
+                $s_values .= ', ';
             }
-
-            $sValues .= '( ' . $db->quote($sObjectId) . ', ' . $db->quote($sIdent) . ', ' . $db->quote($iShopId) . ", '{$iLang}', " . $db->quote($sStdUrl) . ', ' . $db->quote($sSeoUrl) . ", 'static' )";
+            $s_values .= '( ' . $db->quote($s_object_id) . ', ' . $db->quote($s_ident) . ', ' . $db->quote($i_shop_id) . ", '{$i_lang}', " . $db->quote($s_std_url) . ', ' . $db->quote($s_seo_url) . ", 'static' )";
         }
-
         // must delete old before insert/update
-        if ($sOldObjectId) {
-            $this->executeDatabaseQuery('delete from oxseo where oxobjectid in ( ' . $db->quote($sOldObjectId) . ', ' . $db->quote($sObjectId) . ' )');
+        if ($s_old_object_id) {
+            $this->execute_database_query('delete from oxseo where oxobjectid in ( ' . $db->quote($s_old_object_id) . ', ' . $db->quote($s_object_id) . ' )');
         }
-
         // (re)inserting
-        if ($sValues) {
-            $sql = "insert into oxseo ( oxobjectid, oxident, oxshopid, oxlang, oxstdurl, oxseourl, oxtype ) values {$sValues} ";
-            $this->executeDatabaseQuery($sql);
+        if ($s_values) {
+            $sql = "insert into oxseo ( oxobjectid, oxident, oxshopid, oxlang, oxstdurl, oxseourl, oxtype ) values {$s_values} ";
+            $this->execute_database_query($sql);
         }
-
-        return $sObjectId;
+        return $s_object_id;
     }
-
     /**
      * Method copies static urls from base shop to newly created
      *
      * @param int $iShopId new created shop id
      */
-    public function copyStaticUrls($iShopId): void
+    public function copy_static_urls($i_shop_id): void
     {
-        $iBaseShopId = Registry::getConfig()->getBaseShopId();
-        if ($iShopId != $iBaseShopId) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            foreach (array_keys(Registry::getLang()->getLanguageIds()) as $iLang) {
-                $sQ = "insert into oxseo ( oxobjectid, oxident, oxshopid, oxlang, oxstdurl, oxseourl, oxtype )
-                       select MD5( LOWER( CONCAT( :shopId, oxstdurl ) ) ), MD5( LOWER( oxseourl ) ),
-                       :shopId, oxlang, oxstdurl, oxseourl, oxtype from oxseo where oxshopid = :baseShopId and oxtype = 'static' and oxlang = :lang";
-                $oDb->execute($sQ, [
-                    'shopId' => $iShopId,
-                    'baseShopId' => $iBaseShopId,
-                    'lang' => $iLang,
-                ]);
+        $i_base_shop_id = Registry::get_config()->get_base_shop_id();
+        if ($i_shop_id != $i_base_shop_id) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            foreach (array_keys(Registry::get_lang()->get_language_ids()) as $i_lang) {
+                $s_q = "insert into oxseo ( oxobjectid, oxident, oxshopid, oxlang, oxstdurl, oxseourl, oxtype )\n                       select MD5( LOWER( CONCAT( :shopId, oxstdurl ) ) ), MD5( LOWER( oxseourl ) ),\n                       :shopId, oxlang, oxstdurl, oxseourl, oxtype from oxseo where oxshopid = :baseShopId and oxtype = 'static' and oxlang = :lang";
+                $o_db->execute($s_q, ['shopId' => $i_shop_id, 'baseShopId' => $i_base_shop_id, 'lang' => $i_lang]);
             }
         }
     }
-
     /**
      * Returns static url for passed standard link (if available)
      *
@@ -1128,29 +926,24 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getStaticUrl($sStdUrl, $iLang = null, $iShopId = null)
+    public function get_static_url($s_std_url, $i_lang = null, $i_shop_id = null)
     {
-        if (!isset($iShopId)) {
-            $iShopId = Registry::getConfig()->getShopId();
+        if (!isset($i_shop_id)) {
+            $i_shop_id = Registry::get_config()->get_shop_id();
         }
-        if (!isset($iLang)) {
-            $iLang = Registry::getLang()->getEditLanguage();
+        if (!isset($i_lang)) {
+            $i_lang = Registry::get_lang()->get_edit_language();
         }
-
-        if (isset($this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId])) {
-            return $this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId];
+        if (isset($this->_a_static_url_cache[$s_std_url][$i_lang][$i_shop_id])) {
+            return $this->_a_static_url_cache[$s_std_url][$i_lang][$i_shop_id];
         }
-
-        $sFullUrl = '';
-        if (($sSeoUrl = $this->getStaticUri($sStdUrl, $iShopId, $iLang))) {
-            $sFullUrl = $this->getFullUrl($sSeoUrl, $iLang);
+        $s_full_url = '';
+        if ($s_seo_url = $this->get_static_uri($s_std_url, $i_shop_id, $i_lang)) {
+            $s_full_url = $this->get_full_url($s_seo_url, $i_lang);
         }
-
-        $this->_aStaticUrlCache[$sStdUrl][$iLang][$iShopId] = $sFullUrl;
-
-        return $sFullUrl;
+        $this->_a_static_url_cache[$s_std_url][$i_lang][$i_shop_id] = $s_full_url;
+        return $s_full_url;
     }
-
     /**
      * Adds new seo entry to db
      *
@@ -1167,56 +960,41 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      * @param bool   $blExclude    exclude language prefix while building seo url
      * @param string $sAltObjectId alternative object id used while saving meta info (used to override object id when saving tags related info)
      */
-    public function addSeoEntry($sObjectId, $iShopId, $iLang, $sStdUrl, $sSeoUrl, $sType, $blFixed = 1, $sKeywords = '', $sDescription = '', $sParams = '', $blExclude = false, $sAltObjectId = null): void
+    public function add_seo_entry($s_object_id, $i_shop_id, $i_lang, $s_std_url, $s_seo_url, $s_type, $bl_fixed = 1, $s_keywords = '', $s_description = '', $s_params = '', $bl_exclude = false, $s_alt_object_id = null): void
     {
-        $sSeoUrl = $this->processSeoUrl($this->trimUrl($sSeoUrl ?: $this->getAltUri($sAltObjectId ?: $sObjectId, $iLang)), $sObjectId, $iLang, $blExclude);
-        if ($this->saveToDb($sType, $sObjectId, $sStdUrl, $sSeoUrl, $iLang, $iShopId, $blFixed, $sParams)) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-            $oStr = Str::getStr();
-            if ($sKeywords !== false) {
-                $sKeywords = $oStr->htmlspecialchars($this->encodeString($oStr->strip_tags($sKeywords), false, $iLang));
+        $s_seo_url = $this->process_seo_url($this->trim_url($s_seo_url ?: $this->get_alt_uri($s_alt_object_id ?: $s_object_id, $i_lang)), $s_object_id, $i_lang, $bl_exclude);
+        if ($this->save_to_db($s_type, $s_object_id, $s_std_url, $s_seo_url, $i_lang, $i_shop_id, $bl_fixed, $s_params)) {
+            $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+            $o_str = Str::get_str();
+            if ($s_keywords !== false) {
+                $s_keywords = $o_str->htmlspecialchars($this->encode_string($o_str->strip_tags($s_keywords), false, $i_lang));
             }
-
-            if ($sDescription !== false) {
-                $sDescription = $oStr->htmlspecialchars($oStr->strip_tags($sDescription));
+            if ($s_description !== false) {
+                $s_description = $o_str->htmlspecialchars($o_str->strip_tags($s_description));
             }
-
-            $sQ = 'insert into oxobject2seodata
+            $s_q = 'insert into oxobject2seodata
                        (oxobjectid, oxshopid, oxlang, oxkeywords, oxdescription)
                    values
                        (:oxobjectid, :oxshopid, :oxlang, :insertKeywords, :insertDescription)
                    on duplicate key update
                        oxkeywords = :updateKeywords, oxdescription = :updateDescription';
-
-            $objectId = $sAltObjectId ?: $sObjectId;
-            $insertKeywords = $sKeywords ?: '';
-            $insertDescription = $sDescription ?: '';
-            $updateKeywords = ($sKeywords || $sKeywords == '') ? $sKeywords : 'oxkeywords';
-            $updateDescription = ($sDescription || $sDescription == '') ? $sDescription : 'oxdescription';
-
-            $oDb->execute($sQ, [
-                'oxobjectid' => $objectId,
-                'oxshopid' => $iShopId,
-                'oxlang' => $iLang,
-                'insertKeywords' => $insertKeywords,
-                'insertDescription' => $insertDescription,
-                'updateKeywords' => $updateKeywords,
-                'updateDescription' => $updateDescription,
-            ]);
+            $object_id = $s_alt_object_id ?: $s_object_id;
+            $insert_keywords = $s_keywords ?: '';
+            $insert_description = $s_description ?: '';
+            $update_keywords = $s_keywords || $s_keywords == '' ? $s_keywords : 'oxkeywords';
+            $update_description = $s_description || $s_description == '' ? $s_description : 'oxdescription';
+            $o_db->execute($s_q, ['oxobjectid' => $object_id, 'oxshopid' => $i_shop_id, 'oxlang' => $i_lang, 'insertKeywords' => $insert_keywords, 'insertDescription' => $insert_description, 'updateKeywords' => $update_keywords, 'updateDescription' => $update_description]);
         }
     }
-
     /**
      * Returns alternative uri used while updating seo
      *
      * @param string $sObjectId object id
      * @param int    $iLang     language id
      */
-    protected function getAltUri($sObjectId, $iLang)
+    protected function get_alt_uri($s_object_id, $i_lang)
     {
     }
-
     /**
      * Remove a SEO entry from the database.
      *
@@ -1225,31 +1003,22 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      * @param int    $language The language of the object to delete.
      * @param string $type     The type of the object to delete.
      */
-    public function deleteSeoEntry($objectId, $shopId, $language, $type): void
+    public function delete_seo_entry($object_id, $shop_id, $language, $type): void
     {
         $query = 'delete from oxseo where oxobjectid = :oxobjectid and oxshopid = :oxshopid and oxlang = :oxlang and oxtype = :oxtype';
-
-        $this->executeDatabaseQuery($query, [
-            'oxobjectid' => $objectId,
-            'oxshopid' => $shopId,
-            'oxlang' => $language,
-            'oxtype' => $type,
-        ]);
+        $this->execute_database_query($query, ['oxobjectid' => $object_id, 'oxshopid' => $shop_id, 'oxlang' => $language, 'oxtype' => $type]);
     }
-
     /**
      * Execute a query on the database.
      *
      * @param string $query  The command to execute on the database.
      * @param array  $params Parameters used in prepare statement.
      */
-    protected function executeDatabaseQuery($query, $params = [])
+    protected function execute_database_query($query, $params = [])
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
+        $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
         $database->execute($query, $params);
     }
-
     /**
      * Returns meta information for preferred object
      *
@@ -1260,20 +1029,13 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getMetaData($sObjectId, $sMetaType, $iShopId = null, $iLang = null)
+    public function get_meta_data($s_object_id, $s_meta_type, $i_shop_id = null, $i_lang = null)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        $iShopId = (!isset($iShopId)) ? Registry::getConfig()->getShopId() : $iShopId;
-        $iLang = (!isset($iLang)) ? Registry::getLang()->getObjectTplLanguage() : ((int) $iLang);
-
-        return $oDb->getOne("SELECT {$sMetaType} FROM oxobject2seodata WHERE oxobjectid = :oxobjectid AND oxshopid = :oxshopid AND oxlang = :oxlang", [
-            'oxobjectid' => $sObjectId,
-            'oxshopid' => $iShopId,
-            'oxlang' => $iLang,
-        ]);
+        $o_db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $i_shop_id = !isset($i_shop_id) ? Registry::get_config()->get_shop_id() : $i_shop_id;
+        $i_lang = !isset($i_lang) ? Registry::get_lang()->get_object_tpl_language() : (int) $i_lang;
+        return $o_db->get_one("SELECT {$s_meta_type} FROM oxobject2seodata WHERE oxobjectid = :oxobjectid AND oxshopid = :oxshopid AND oxlang = :oxlang", ['oxobjectid' => $s_object_id, 'oxshopid' => $i_shop_id, 'oxlang' => $i_lang]);
     }
-
     /**
      * getDynamicUrl acts similar to static urls,
      * except, that dynamic url are not shown in admin
@@ -1287,15 +1049,13 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getDynamicUrl($sStdUrl, $sSeoUrl, $iLang)
+    public function get_dynamic_url($s_std_url, $s_seo_url, $i_lang)
     {
-        startProfile('getDynamicUrl');
-        $sDynUrl = $this->getFullUrl($this->getDynamicUri($sStdUrl, $sSeoUrl, $iLang), $iLang);
-        stopProfile('getDynamicUrl');
-
-        return $sDynUrl;
+        start_profile('getDynamicUrl');
+        $s_dyn_url = $this->get_full_url($this->get_dynamic_uri($s_std_url, $s_seo_url, $i_lang), $i_lang);
+        stop_profile('getDynamicUrl');
+        return $s_dyn_url;
     }
-
     /**
      * Searches for seo url in seo table. If not found - FALSE is returned
      *
@@ -1304,28 +1064,19 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string|false
      */
-    public function fetchSeoUrl($standardUrl, $languageId = null)
+    public function fetch_seo_url($standard_url, $language_id = null)
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $languageId = isset($languageId) ? ((int) $languageId) : Registry::getLang()->getBaseLanguage();
-
-        $shopId = Registry::getConfig()->getShopId();
-
-        $utilsUrl = Registry::getUtilsUrl();
-        $urlParameters = $utilsUrl->stringToParamsArray($standardUrl);
-        $noPageNrStandardUrl = $utilsUrl->cleanUrlParams($utilsUrl->cleanUrl($standardUrl, ['pgNr']));
-        $postfix = isset($urlParameters['pgNr']) ? 'pgNr=' . $urlParameters['pgNr'] : '';
-
+        $database = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $language_id = isset($language_id) ? (int) $language_id : Registry::get_lang()->get_base_language();
+        $shop_id = Registry::get_config()->get_shop_id();
+        $utils_url = Registry::get_utils_url();
+        $url_parameters = $utils_url->string_to_params_array($standard_url);
+        $no_page_nr_standard_url = $utils_url->clean_url_params($utils_url->clean_url($standard_url, ['pgNr']));
+        $postfix = isset($url_parameters['pgNr']) ? 'pgNr=' . $url_parameters['pgNr'] : '';
         $query = 'SELECT `oxseourl` FROM `oxseo` WHERE `oxstdurl` = :oxstdurl AND `oxlang` = :oxlang AND `oxshopid` = :oxshopid LIMIT 1';
-        $result = $database->getOne($query, [
-            'oxstdurl' => $noPageNrStandardUrl,
-            'oxlang' => $languageId,
-            'oxshopid' => $shopId,
-        ]);
-
-        return ((false !== $result) && !empty($postfix)) ? $utilsUrl->appendParamSeparator($result) . $postfix : $result;
+        $result = $database->get_one($query, ['oxstdurl' => $no_page_nr_standard_url, 'oxlang' => $language_id, 'oxshopid' => $shop_id]);
+        return false !== $result && !empty($postfix) ? $utils_url->append_param_separator($result) . $postfix : $result;
     }
-
     /**
      * Searches for special characters in a string and replaces them with the configured strings.
      *
@@ -1333,22 +1084,16 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function replaceSpecialChars($stringWithSpecialChars)
+    protected function replace_special_chars($string_with_special_chars)
     {
-        if (!is_string($stringWithSpecialChars)) {
+        if (!is_string($string_with_special_chars)) {
             return '';
         }
-        $oStr = Str::getStr();
-        $sQuotedPrefix = preg_quote(self::$_sSeparator . self::$_sPrefix, '/');
-        $sRegExp = '/[^A-Za-z0-9' . $sQuotedPrefix . '\/]+/';
-
-        return $oStr->preg_replace(
-            ["/\W*\/\W*/", $sRegExp],
-            ['/', self::$_sSeparator],
-            $stringWithSpecialChars
-        );
+        $o_str = Str::get_str();
+        $s_quoted_prefix = preg_quote(self::$_s_separator . self::$_s_prefix, '/');
+        $s_reg_exp = '/[^A-Za-z0-9' . $s_quoted_prefix . '\/]+/';
+        return $o_str->preg_replace(["/\\W*\\/\\W*/", $s_reg_exp], ['/', self::$_s_separator], $string_with_special_chars);
     }
-
     /**
      * Assemble full paginated url.
      *
@@ -1363,12 +1108,11 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    protected function assembleFullPageUrl($object, $type, $stdUrl, $seoUrl, $pageNumber, $parameters, $languageId, $isFixed)
+    protected function assemble_full_page_url($object, $type, $std_url, $seo_url, $page_number, $parameters, $language_id, $is_fixed)
     {
-        $postfix = (int) $pageNumber > 0 ? 'pgNr=' . (int) $pageNumber : '';
-        $urlPart = $this->getPageUri($object, $type, $stdUrl, $seoUrl, $parameters, $languageId, $isFixed);
-        $fullUrl = $this->getFullUrl($urlPart, $languageId);
-
-        return (!empty($postfix)) ? Registry::getUtilsUrl()->appendParamSeparator($fullUrl) . $postfix : $fullUrl;
+        $postfix = (int) $page_number > 0 ? 'pgNr=' . (int) $page_number : '';
+        $url_part = $this->get_page_uri($object, $type, $std_url, $seo_url, $parameters, $language_id, $is_fixed);
+        $full_url = $this->get_full_url($url_part, $language_id);
+        return !empty($postfix) ? Registry::get_utils_url()->append_param_separator($full_url) . $postfix : $full_url;
     }
 }

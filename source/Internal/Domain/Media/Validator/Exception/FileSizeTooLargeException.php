@@ -4,37 +4,30 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Exception;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\Exception;
-
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FileSizeLogic;
-
-class FileSizeTooLargeException extends MediaValidationException
+use Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\File_Size_Logic;
+class File_Size_Too_Large_Exception extends Media_Validation_Exception
 {
-    public function __construct(private readonly int $actualBytes, private readonly int $maxKb)
+    public function __construct(private readonly int $actual_bytes, private readonly int $max_kb)
     {
-        parent::__construct('File too large: ' . $actualBytes . ' bytes, max ' . $maxKb . ' KB');
+        parent::__construct('File too large: ' . $actual_bytes . ' bytes, max ' . $max_kb . ' KB');
     }
-
-    public function getActualBytes(): int
+    public function get_actual_bytes(): int
     {
-        return $this->actualBytes;
+        return $this->actual_bytes;
     }
-
-    public function getMaxKb(): int
+    public function get_max_kb(): int
     {
-        return $this->maxKb;
+        return $this->max_kb;
     }
-
-    public function getActualFormatted(): string
+    public function get_actual_formatted(): string
     {
-        return (new FileSizeLogic())->getFileSize($this->actualBytes);
+        return (new File_Size_Logic())->get_file_size($this->actual_bytes);
     }
-
-    public function getMaxFormatted(): string
+    public function get_max_formatted(): string
     {
-        return (new FileSizeLogic())->getFileSize($this->maxKb * 1024);
+        return (new File_Size_Logic())->get_file_size($this->max_kb * 1024);
     }
 }

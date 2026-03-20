@@ -4,14 +4,12 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception;
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Exception;
 
 /**
  * @internal
  */
-class ModuleSettingNotFountException extends \Exception
+class Module_Setting_Not_Fount_Exception extends \Exception
 {
 }

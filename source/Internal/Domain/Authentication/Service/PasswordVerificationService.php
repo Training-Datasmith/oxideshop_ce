@@ -4,28 +4,23 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service;
-
-use OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicyInterface;
-
-class PasswordVerificationService implements PasswordVerificationServiceInterface
+use Oxid_Esales\Eshop_Community\Internal\Utility\Authentication\Policy\Password_Policy_Interface;
+class Password_Verification_Service implements Password_Verification_Service_Interface
 {
-    public function __construct(private readonly PasswordPolicyInterface $passwordPolicy)
+    public function __construct(private readonly Password_Policy_Interface $password_policy)
     {
     }
-
     /**
      * Verify that a given password matches a given hash
      *
      *
      */
-    public function verifyPassword(string $password, string $passwordHash): bool
+    public function verify_password(string $password, string $password_hash): bool
     {
-        $this->passwordPolicy->enforcePasswordPolicy($password);
-
-        return password_verify($password, $passwordHash);
+        $this->password_policy->enforce_password_policy($password);
+        return password_verify($password, $password_hash);
     }
 }

@@ -4,43 +4,35 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataObject;
-
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Array_Collection;
 use Doctrine\Common\Collections\Collection;
-
-class ProductMediaRoleSet
+class Product_Media_Role_Set
 {
     private readonly Collection $roles;
-
-    public function __construct(ProductMediaRole ...$roles)
+    public function __construct(Product_Media_Role ...$roles)
     {
-        $this->roles = new ArrayCollection();
+        $this->roles = new Array_Collection();
         foreach ($roles as $r) {
             $this->roles->set($r->value(), $r);
         }
     }
-
-    public function getRoles(): Collection
+    public function get_roles(): Collection
     {
         return $this->roles;
     }
-
-    public function addRole(ProductMediaRole $role): void
+    public function add_role(Product_Media_Role $role): void
     {
         $this->roles->set($role->value(), $role);
     }
-
-    public function removeRole(ProductMediaRole $role): void
+    public function remove_role(Product_Media_Role $role): void
     {
         $this->roles->remove($role->value());
     }
-
-    public function has(ProductMediaRole $role): bool
+    public function has(Product_Media_Role $role): bool
     {
-        return $this->roles->containsKey($role->value());
+        return $this->roles->contains_key($role->value());
     }
 }

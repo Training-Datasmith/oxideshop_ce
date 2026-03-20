@@ -4,24 +4,19 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Object;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Media\DataObject;
-
-readonly class MediaPath implements \Stringable
+readonly class Media_Path implements \Stringable
 {
-    public function __construct(
-        private string $path
-    ) {
+    public function __construct(private string $path)
+    {
         $this->validate($path);
     }
-
     public function __toString(): string
     {
         return $this->path;
     }
-
     private function validate(string $path): void
     {
         if ($path === '') {

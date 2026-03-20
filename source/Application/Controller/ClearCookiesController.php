@@ -1,30 +1,26 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+namespace Oxid_Esales\Eshop_Community\Application\Controller;
 
-namespace OxidEsales\EshopCommunity\Application\Controller;
-
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AllCookiesRemovedEvent;
-
+use Oxid_Esales\Eshop\Core\Registry;
+use Oxid_Esales\Eshop_Community\Core\Di\Container_Facade;
+use Oxid_Esales\Eshop_Community\Internal\Transition\Shop_Events\All_Cookies_Removed_Event;
 /**
  * CMS - loads pages and displays it
  */
-class ClearCookiesController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class Clear_Cookies_Controller extends \Oxid_Esales\Eshop\Application\Controller\Frontend_Controller
 {
     /**
      * Current view template
      *
      * @var string
      */
-    protected $_sThisTemplate = 'page/info/clearcookies';
-
+    protected $_s_this_template = 'page/info/clearcookies';
     /**
      * Executes parent::render(), passes template variables to
      * template engine and generates content. Returns the name
@@ -35,46 +31,39 @@ class ClearCookiesController extends \OxidEsales\Eshop\Application\Controller\Fr
     public function render()
     {
         parent::render();
-
-        $this->removeCookies();
-
-        return $this->_sThisTemplate;
+        $this->remove_cookies();
+        return $this->_s_this_template;
     }
-
     /**
      * Clears all cookies
      */
-    protected function removeCookies()
+    protected function remove_cookies()
     {
-        $oUtilsServer = Registry::getUtilsServer();
+        $o_utils_server = Registry::get_utils_server();
         if (isset($_SERVER['HTTP_COOKIE'])) {
-            $aCookies = explode(';', (string) $_SERVER['HTTP_COOKIE']);
-            foreach ($aCookies as $sCookie) {
-                $sRawCookie = explode('=', $sCookie);
-                $oUtilsServer->setOxCookie(trim($sRawCookie[0]), '', time() - 10000, '/');
+            $a_cookies = explode(';', (string) $_SERVER['HTTP_COOKIE']);
+            foreach ($a_cookies as $s_cookie) {
+                $s_raw_cookie = explode('=', $s_cookie);
+                $o_utils_server->set_ox_cookie(trim($s_raw_cookie[0]), '', time() - 10000, '/');
             }
         }
-        $oUtilsServer->setOxCookie('language', '', time() - 10000, '/');
-        $oUtilsServer->setOxCookie('displayedCookiesNotification', '', time() - 10000, '/');
-
-        ContainerFacade::dispatch(new AllCookiesRemovedEvent());
+        $o_utils_server->set_ox_cookie('language', '', time() - 10000, '/');
+        $o_utils_server->set_ox_cookie('displayedCookiesNotification', '', time() - 10000, '/');
+        Container_Facade::dispatch(new All_Cookies_Removed_Event());
     }
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
      */
-    public function getBreadCrumb()
+    public function get_bread_crumb()
     {
-        $aPaths = [];
-        $aPath = [];
-
-        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
-        $aPath['title'] = Registry::getLang()->translateString('INFO_ABOUT_COOKIES', $iBaseLanguage, false);
-        $aPath['link'] = $this->getLink();
-        $aPaths[] = $aPath;
-
-        return $aPaths;
+        $a_paths = [];
+        $a_path = [];
+        $i_base_language = Registry::get_lang()->get_base_language();
+        $a_path['title'] = Registry::get_lang()->translate_string('INFO_ABOUT_COOKIES', $i_base_language, false);
+        $a_path['link'] = $this->get_link();
+        $a_paths[] = $a_path;
+        return $a_paths;
     }
 }

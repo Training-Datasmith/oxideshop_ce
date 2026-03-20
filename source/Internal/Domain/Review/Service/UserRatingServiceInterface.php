@@ -4,14 +4,11 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+declare (strict_types=1);
+namespace Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service;
 
-declare(strict_types=1);
-
-namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Service;
-
-use Doctrine\Common\Collections\ArrayCollection;
-
-interface UserRatingServiceInterface
+use Doctrine\Common\Collections\Array_Collection;
+interface User_Rating_Service_Interface
 {
     /**
      * Returns Ratings of User.
@@ -20,5 +17,5 @@ interface UserRatingServiceInterface
      *
      * @return ArrayCollection
      */
-    public function getRatings($userId);
+    public function get_ratings($user_id);
 }

@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\Exception;
+namespace Oxid_Esales\Eshop_Community\Core\Exception;
 
 /**
  * exceptions for missing components e.g.:
@@ -16,7 +14,7 @@ namespace OxidEsales\EshopCommunity\Core\Exception;
  * - missing template
  * - missing field in object
  */
-class SystemComponentException extends \OxidEsales\Eshop\Core\Exception\StandardException
+class System_Component_Exception extends \Oxid_Esales\Eshop\Core\Exception\Standard_Exception
 {
     /**
      * Exception type, currently old class name is used.
@@ -24,45 +22,40 @@ class SystemComponentException extends \OxidEsales\Eshop\Core\Exception\Standard
      * @var string
      */
     protected $type = 'oxSystemComponentException';
-
     /**
      * Component causing the exception.
      *
      * @var string
      */
-    private $_sComponent;
-
+    private $_s_component;
     /**
      * Sets the component name which caused the exception as a string.
      *
      * @param string $sComponent name of component
      */
-    public function setComponent($sComponent): void
+    public function set_component($s_component): void
     {
-        $this->_sComponent = $sComponent;
+        $this->_s_component = $s_component;
     }
-
     /**
      * Name of the component that caused the exception
      *
      * @return string
      */
-    public function getComponent()
+    public function get_component()
     {
-        return $this->_sComponent;
+        return $this->_s_component;
     }
-
     /**
      * Get string dump
      * Overrides oxException::getString()
      *
      * @return string
      */
-    public function getString()
+    public function get_string()
     {
-        return self::class . '-' . parent::getString() . ' Faulty component --> ' . $this->_sComponent;
+        return self::class . '-' . parent::get_string() . ' Faulty component --> ' . $this->_s_component;
     }
-
     /**
      * Creates an array of field name => field value of the object.
      * To make a easy conversion of exceptions to error messages possible.
@@ -71,11 +64,10 @@ class SystemComponentException extends \OxidEsales\Eshop\Core\Exception\Standard
      *
      * @return array
      */
-    public function getValues()
+    public function get_values()
     {
-        $aRes = parent::getValues();
-        $aRes['component'] = $this->getComponent();
-
-        return $aRes;
+        $a_res = parent::get_values();
+        $a_res['component'] = $this->get_component();
+        return $a_res;
     }
 }

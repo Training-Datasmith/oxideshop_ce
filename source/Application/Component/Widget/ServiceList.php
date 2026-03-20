@@ -1,24 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Application\Component\Widget;
+namespace Oxid_Esales\Eshop_Community\Application\Component\Widget;
 
 /**
  * List of shop services widget.
  * Forms service list.
  */
-class ServiceList extends \OxidEsales\Eshop\Application\Component\Widget\WidgetController
+class Service_List extends \Oxid_Esales\Eshop\Application\Component\Widget\Widget_Controller
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'widget/footer/services';
+    protected $_s_this_template = 'widget/footer/services';
 }

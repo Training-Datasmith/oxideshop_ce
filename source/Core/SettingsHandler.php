@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core;
+namespace Oxid_Esales\Eshop_Community\Core;
 
 /**
  * Settings handler class.
  */
-class SettingsHandler extends \OxidEsales\Eshop\Core\Base
+class Settings_Handler extends \Oxid_Esales\Eshop\Core\Base
 {
     /**
      * Module type.
@@ -21,8 +19,7 @@ class SettingsHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @var string
      */
-    protected $moduleType;
-
+    protected $module_type;
     /**
      * Sets the Module type
      *
@@ -30,13 +27,11 @@ class SettingsHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return self
      */
-    public function setModuleType($moduleType)
+    public function set_module_type($module_type)
     {
-        $this->moduleType = $moduleType;
-
+        $this->module_type = $module_type;
         return $this;
     }
-
     /**
      * Get settings and module id and starts import process.
      *
@@ -47,107 +42,82 @@ class SettingsHandler extends \OxidEsales\Eshop\Core\Base
      */
     public function run($module): void
     {
-        $moduleSettings = $module->getInfo('settings');
-        $isTheme = $this->isTheme($module->getId());
-        if (!$isTheme || ($isTheme && is_array($moduleSettings))) {
-            $this->addModuleSettings($moduleSettings, $module->getId());
+        $module_settings = $module->get_info('settings');
+        $is_theme = $this->is_theme($module->get_id());
+        if (!$is_theme || $is_theme && is_array($module_settings)) {
+            $this->add_module_settings($module_settings, $module->get_id());
         }
     }
-
     /**
      * Adds settings to database.
      *
      * @param array  $moduleSettings Module settings array
      * @param string $moduleId       Module id
      */
-    protected function addModuleSettings($moduleSettings, $moduleId)
+    protected function add_module_settings($module_settings, $module_id)
     {
-        $this->removeNotUsedSettings($moduleSettings, $moduleId);
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $shopId = $config->getShopId();
-        $moduleConfigs = $this->getModuleConfigs($moduleId);
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        if (is_array($moduleSettings)) {
-            foreach ($moduleSettings as $setting) {
-                $oxid = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUId();
-
-                $module = $this->getModuleConfigId($moduleId);
+        $this->remove_not_used_settings($module_settings, $module_id);
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $shop_id = $config->get_shop_id();
+        $module_configs = $this->get_module_configs($module_id);
+        $db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        if (is_array($module_settings)) {
+            foreach ($module_settings as $setting) {
+                $oxid = \Oxid_Esales\Eshop\Core\Registry::get_utils_object()->generate_u_id();
+                $module = $this->get_module_config_id($module_id);
                 $name = $setting['name'];
                 $type = $setting['type'];
-
-                if ($this->isTheme($moduleId)) {
-                    $value = array_key_exists($name, $moduleConfigs) ? $moduleConfigs[$name] : $setting['value'];
+                if ($this->is_theme($module_id)) {
+                    $value = array_key_exists($name, $module_configs) ? $module_configs[$name] : $setting['value'];
                 } else {
-                    $value = is_null($config->getConfigParam($name)) ? $setting['value'] : $config->getConfigParam($name);
+                    $value = is_null($config->get_config_param($name)) ? $setting['value'] : $config->get_config_param($name);
                 }
-
                 $group = $setting['group'];
-
                 $constraints = '';
                 if (isset($setting['constraints']) && $setting['constraints']) {
                     $constraints = $setting['constraints'];
                 } elseif (isset($setting['constrains']) && $setting['constrains']) {
                     $constraints = $setting['constrains'];
                 }
-
                 $position = 1;
                 if (isset($setting['position'])) {
                     $position = $setting['position'];
                 }
-
-                $config->saveShopConfVar($type, $name, $value, $shopId, $module);
-
-                $deleteSql = 'DELETE FROM `oxconfigdisplay` WHERE OXCFGMODULE = :oxcfgmodule AND OXCFGVARNAME = :oxcfgvarname';
-                $insertSql = 'INSERT INTO `oxconfigdisplay` (`OXID`, `OXCFGMODULE`, `OXCFGVARNAME`, `OXGROUPING`, `OXVARCONSTRAINT`, `OXPOS`) ' .
-                             'VALUES (:oxid, :oxcfgmodule, :oxcfgvarname, :oxgrouping, :oxvarconstraint, :oxpos)';
-
-                $db->execute($deleteSql, [
-                    'oxcfgmodule' => $module,
-                    'oxcfgvarname' => $name,
-                ]);
-                $db->execute($insertSql, [
-                    'oxid' => $oxid,
-                    'oxcfgmodule' => $module,
-                    'oxcfgvarname' => $name,
-                    'oxgrouping' => $group,
-                    'oxvarconstraint' => $constraints,
-                    'oxpos' => $position,
-                ]);
+                $config->save_shop_conf_var($type, $name, $value, $shop_id, $module);
+                $delete_sql = 'DELETE FROM `oxconfigdisplay` WHERE OXCFGMODULE = :oxcfgmodule AND OXCFGVARNAME = :oxcfgvarname';
+                $insert_sql = 'INSERT INTO `oxconfigdisplay` (`OXID`, `OXCFGMODULE`, `OXCFGVARNAME`, `OXGROUPING`, `OXVARCONSTRAINT`, `OXPOS`) ' . 'VALUES (:oxid, :oxcfgmodule, :oxcfgvarname, :oxgrouping, :oxvarconstraint, :oxpos)';
+                $db->execute($delete_sql, ['oxcfgmodule' => $module, 'oxcfgvarname' => $name]);
+                $db->execute($insert_sql, ['oxid' => $oxid, 'oxcfgmodule' => $module, 'oxcfgvarname' => $name, 'oxgrouping' => $group, 'oxvarconstraint' => $constraints, 'oxpos' => $position]);
             }
         }
     }
-
     /**
      * Check if module is theme.
      *
      * @param string $moduleId
      * @return bool
      */
-    protected function isTheme($moduleId)
+    protected function is_theme($module_id)
     {
-        $moduleConfigId = $this->getModuleConfigId($moduleId);
-        $themeTypeCondition = '@^' . Config::OXMODULE_THEME_PREFIX . '@i';
-        return (bool)preg_match($themeTypeCondition, $moduleConfigId);
+        $module_config_id = $this->get_module_config_id($module_id);
+        $theme_type_condition = '@^' . Config::OXMODULE_THEME_PREFIX . '@i';
+        return (bool) preg_match($theme_type_condition, $module_config_id);
     }
-
     /**
      * Removes configs which are removed from module metadata
      *
      * @param array  $moduleSettings Module settings
      * @param string $moduleId       Module id
      */
-    protected function removeNotUsedSettings($moduleSettings, $moduleId)
+    protected function remove_not_used_settings($module_settings, $module_id)
     {
-        $moduleConfigs = array_keys($this->getModuleConfigs($moduleId));
-        $moduleSettings = $this->parseModuleSettings($moduleSettings);
-
-        $configsToRemove = array_diff($moduleConfigs, $moduleSettings);
-        if (!empty($configsToRemove)) {
-            $this->removeModuleConfigs($moduleId, $configsToRemove);
+        $module_configs = array_keys($this->get_module_configs($module_id));
+        $module_settings = $this->parse_module_settings($module_settings);
+        $configs_to_remove = array_diff($module_configs, $module_settings);
+        if (!empty($configs_to_remove)) {
+            $this->remove_module_configs($module_id, $configs_to_remove);
         }
     }
-
     /**
      * Returns module configuration from database
      *
@@ -155,27 +125,20 @@ class SettingsHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array key=>value
      */
-    protected function getModuleConfigs($moduleId)
+    protected function get_module_configs($module_id)
     {
-        $db = DatabaseProvider::getDb();
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $shopId = $config->getShopId();
-        $module = $this->getModuleConfigId($moduleId);
-
-        $moduleConfigsQuery = 'SELECT oxvarname, oxvartype, oxvarvalue FROM oxconfig WHERE oxmodule = :oxmodule AND oxshopid = :oxshopid';
-        $dbConfigs = $db->getAll($moduleConfigsQuery, [
-            'oxmodule' => $module,
-            'oxshopid' => $shopId,
-        ]);
-
+        $db = Database_Provider::get_db();
+        $config = \Oxid_Esales\Eshop\Core\Registry::get_config();
+        $shop_id = $config->get_shop_id();
+        $module = $this->get_module_config_id($module_id);
+        $module_configs_query = 'SELECT oxvarname, oxvartype, oxvarvalue FROM oxconfig WHERE oxmodule = :oxmodule AND oxshopid = :oxshopid';
+        $db_configs = $db->get_all($module_configs_query, ['oxmodule' => $module, 'oxshopid' => $shop_id]);
         $result = [];
-        foreach ($dbConfigs as $oneModuleConfig) {
-            $result[$oneModuleConfig['oxvarname']] = $config->decodeValue($oneModuleConfig['oxvartype'], $oneModuleConfig['oxvarvalue']);
+        foreach ($db_configs as $one_module_config) {
+            $result[$one_module_config['oxvarname']] = $config->decode_value($one_module_config['oxvartype'], $one_module_config['oxvarvalue']);
         }
-
         return $result;
     }
-
     /**
      * Parses module config variable names to array from module settings
      *
@@ -183,50 +146,41 @@ class SettingsHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @return array
      */
-    protected function parseModuleSettings($moduleSettings)
+    protected function parse_module_settings($module_settings)
     {
         $settings = [];
-
-        if (is_array($moduleSettings)) {
-            foreach ($moduleSettings as $setting) {
+        if (is_array($module_settings)) {
+            foreach ($module_settings as $setting) {
                 $settings[] = $setting['name'];
             }
         }
-
         return $settings;
     }
-
     /**
      * Removes module configs from database
      *
      * @param string $moduleId        Module id
      * @param array  $configsToRemove Configs to remove
      */
-    protected function removeModuleConfigs($moduleId, $configsToRemove)
+    protected function remove_module_configs($module_id, $configs_to_remove)
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-
-        $quotedConfigsToRemove = array_map([$db, 'quote'], $configsToRemove);
-        $deleteSql = 'DELETE
+        $db = \Oxid_Esales\Eshop\Core\Database_Provider::get_db();
+        $quoted_configs_to_remove = array_map([$db, 'quote'], $configs_to_remove);
+        $delete_sql = 'DELETE
                        FROM `oxconfig`
                        WHERE oxmodule = :oxmodule AND
                              oxshopid = :oxshopid AND
-                             oxvarname IN (' . implode(', ', $quotedConfigsToRemove) . ')';
-
-        $db->execute($deleteSql, [
-            'oxmodule' => $this->getModuleConfigId($moduleId),
-            'oxshopid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId(),
-        ]);
+                             oxvarname IN (' . implode(', ', $quoted_configs_to_remove) . ')';
+        $db->execute($delete_sql, ['oxmodule' => $this->get_module_config_id($module_id), 'oxshopid' => \Oxid_Esales\Eshop\Core\Registry::get_config()->get_shop_id()]);
     }
-
     /**
      * Get config tables specific module id
      *
      * @param string $moduleId
      * @return string
      */
-    protected function getModuleConfigId($moduleId)
+    protected function get_module_config_id($module_id)
     {
-        return $this->moduleType . ':' . $moduleId;
+        return $this->module_type . ':' . $module_id;
     }
 }

@@ -1,25 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
-
-namespace OxidEsales\EshopCommunity\Core\GenericImport\ImportObject;
+namespace Oxid_Esales\Eshop_Community\Core\Generic_Import\Import_Object;
 
 /**
  * Import object for Order Articles.
  */
-class OrderArticle extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject
+class Order_Article extends \Oxid_Esales\Eshop\Core\Generic_Import\Import_Object\Import_Object
 {
     /** @var string Database table name. */
-    protected $tableName = 'oxorderarticles';
-
+    protected $table_name = 'oxorderarticles';
     /** @var string Shop object name. */
-    protected $shopObjectName = 'oxorderarticle';
-
+    protected $shop_object_name = 'oxorderarticle';
     /**
      * issued before saving an object. can modify aData for saving
      *
@@ -29,24 +25,21 @@ class OrderArticle extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\Imp
      *
      * @return array
      */
-    protected function preAssignObject($shopObject, $data, $allowCustomShopId)
+    protected function pre_assign_object($shop_object, $data, $allow_custom_shop_id)
     {
-        $data = parent::preAssignObject($shopObject, $data, $allowCustomShopId);
-
+        $data = parent::pre_assign_object($shop_object, $data, $allow_custom_shop_id);
         // check if data is not serialized
-        $persParamValues = @unserialize($data['OXPERSPARAM']);
-        if (!is_array($persParamValues)) {
+        $pers_param_values = @unserialize($data['OXPERSPARAM']);
+        if (!is_array($pers_param_values)) {
             // data is a string with | separation, prepare for oxid
-            $persParamValues = explode('|', (string) $data['OXPERSPARAM']);
-            $data['OXPERSPARAM'] = serialize($persParamValues);
+            $pers_param_values = explode('|', (string) $data['OXPERSPARAM']);
+            $data['OXPERSPARAM'] = serialize($pers_param_values);
         }
         if (array_key_exists('OXORDERSHOPID', $data)) {
-            $data['OXORDERSHOPID'] = $this->getOrderShopId($data['OXORDERSHOPID']);
+            $data['OXORDERSHOPID'] = $this->get_order_shop_id($data['OXORDERSHOPID']);
         }
-
         return $data;
     }
-
     /**
      * Returns formed order shop id, which should be set to data array.
      *
@@ -54,7 +47,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\Imp
      *
      * @return string
      */
-    protected function getOrderShopId($currentShopId)
+    protected function get_order_shop_id($current_shop_id)
     {
         return 1;
     }
