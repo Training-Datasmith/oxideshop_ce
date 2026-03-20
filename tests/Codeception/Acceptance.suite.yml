@@ -3,7 +3,7 @@ bootstrap: _bootstrap.php
 modules:
     enabled:
         - Asserts
-        - OxidEsales\EshopCommunity\Tests\Codeception\Support\Helper\Acceptance
+        - Oxid_Esales\Eshop_Community\Tests\Codeception\Support\Helper\Acceptance
         - WebDriver:
             url: '%SHOP_URL%'
             browser: '%BROWSER%'
@@ -16,7 +16,7 @@ modules:
                 chromeOptions:
                     prefs:
                         'credentials_enable_service': false
-        - OxidEsales\Codeception\Module\ShopSetup:
+        - Oxid_Esales\Codeception\Module\Shop_Setup:
             dump: '%DUMP_PATH%'
             fixtures: '%FIXTURES_PATH%'
             mysql_config: '%MYSQL_CONFIG_PATH%'
@@ -36,33 +36,33 @@ modules:
             populator: 'mysql --defaults-file=$mysql_config --default-character-set=utf8 $dbname < $dump'
             initial_queries:
                 - 'SET @@SESSION.sql_mode=""'
-        - OxidEsales\Codeception\Module\Oxideshop:
+        - Oxid_Esales\Codeception\Module\Oxideshop:
             screen_shot_url: '%SCREEN_SHOT_URL%'
             page_load_timeout: '%PAGE_LOAD_TIMEOUT%'
             depends:
               - WebDriver
               - Db
-        - OxidEsales\Codeception\Module\OxideshopAdmin:
+        - Oxid_Esales\Codeception\Module\Oxideshop_Admin:
               screen_shot_url: '%SCREEN_SHOT_URL%'
               depends:
                   - WebDriver
-        - OxidEsales\Codeception\Module\Database:
+        - Oxid_Esales\Codeception\Module\Database:
             depends: Db
-        - OxidEsales\Codeception\Module\Translation\TranslationsModule:
+        - Oxid_Esales\Codeception\Module\Translation\Translations_Module:
             shop_path: '%PROJECT_ROOT%/source'
             paths:
                 - 'Application/views/%THEME_ID%'
             paths_admin:
                 - 'Application/views/admin_twig'
-        - OxidEsales\Codeception\Module\OxideshopModules:
+        - Oxid_Esales\Codeception\Module\Oxideshop_Modules:
         - Mailpit:
             url: '%MAIL_HOST%'
             port: '%MAIL_WEB_PORT%'
-        - OxidEsales\Codeception\Module\Email:
+        - Oxid_Esales\Codeception\Module\Email:
               depends:
                   - Mailpit
               deleteEmailsAfterTest: false
-        - OxidEsales\Codeception\Module\ProjectConfiguration:
+        - Oxid_Esales\Codeception\Module\Project_Configuration:
               config_path: '%PROJECT_ROOT%/var/configuration'
               parameters: []
               services: []

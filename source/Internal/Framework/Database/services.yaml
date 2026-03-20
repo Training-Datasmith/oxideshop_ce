@@ -11,15 +11,15 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory
+  Oxid_Esales\Eshop_Community\Internal\Framework\Database\Query_Builder_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Database\Query_Builder_Factory
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionFactory
+  Oxid_Esales\Eshop_Community\Internal\Framework\Database\Connection_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Database\Connection_Factory
     arguments:
       $middlewares: !tagged doctrine.middleware
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionParameterProviderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionParameterProvider
+  Oxid_Esales\Eshop_Community\Internal\Framework\Database\Connection_Parameter_Provider_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Database\Connection_Parameter_Provider

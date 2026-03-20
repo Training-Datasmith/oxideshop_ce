@@ -6,6 +6,6 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Cache\ShopCacheCleanerInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Cache\ShopCacheFacade
+  Oxid_Esales\Eshop_Community\Internal\Framework\Cache\Shop_Cache_Cleaner_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Cache\Shop_Cache_Facade
     public: true

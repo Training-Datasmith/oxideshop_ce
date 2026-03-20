@@ -2,5 +2,5 @@ services:
     _defaults:
         autowire: true
 
-    OxidEsales\EshopCommunity\Internal\Setup\Language\LanguageInstallerInterface:
-        class: OxidEsales\EshopCommunity\Internal\Setup\Language\LanguageInstaller
+    Oxid_Esales\Eshop_Community\Internal\Setup\Language\Language_Installer_Interface:
+        class: Oxid_Esales\Eshop_Community\Internal\Setup\Language\Language_Installer

@@ -2,40 +2,40 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface:
-      class: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridge
+  Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Bridge_Interface:
+      class: Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Bridge
       arguments:
         $contactFormFactory: '@form.contact_form.contact_form_factory'
-        $contactFormMessageBuilder: '@OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormMessageBuilderInterface'
+        $contactFormMessageBuilder: '@Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Message_Builder_Interface'
         $contactFormConfiguration: '@form.contact_form.contact_form_configuration'
       public: true
 
   form.contact_form.contact_form_factory:
-      class: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormFactory
+      class: Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Factory
       arguments:
         $contactFormConfiguration: '@form.contact_form.contact_form_configuration'
         $contactFormEmailValidator: '@form.contact_form.contact_form_email_validator'
         $requiredFieldsValidator: '@common.form.required_fields_validator'
 
   form.contact_form.contact_form_configuration:
-      class: OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfiguration
+      class: Oxid_Esales\Eshop_Community\Internal\Framework\Form_Configuration\Form_Configuration
       factory: ['@form.contact_form.contact_form_configuration_factory', 'getFormConfiguration']
 
   form.contact_form.contact_form_email_validator:
-      class: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormEmailValidator
+      class: Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Email_Validator
       arguments:
-        - '@OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceInterface'
+        - '@Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service_Interface'
 
-  OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormMessageBuilderInterface:
-      class: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormMessageBuilder
+  Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Message_Builder_Interface:
+      class: Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Message_Builder
       arguments:
-        - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface'
+        - '@Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Shop_Adapter_Interface'
 
   form.contact_form.contact_form_configuration_factory:
-      class: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormConfigurationFactory
+      class: Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Configuration_Factory
       arguments:
         - '@form.contact_form.contact_form_fields_configuration_data_provider'
-        - '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
+        - '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface'
 
   form.contact_form.contact_form_fields_configuration_data_provider:
-      class: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormFieldsConfigurationDataProvider
+      class: Oxid_Esales\Eshop_Community\Internal\Domain\Contact\Form\Contact_Form_Fields_Configuration_Data_Provider

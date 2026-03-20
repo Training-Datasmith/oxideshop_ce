@@ -3,4 +3,4 @@ services:
     autowire: true
 
   common.form.required_fields_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Form\RequiredFieldsValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Form\Required_Fields_Validator

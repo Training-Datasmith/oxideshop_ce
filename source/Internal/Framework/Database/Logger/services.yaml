@@ -5,15 +5,15 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryLogFilterInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryLogFilter
+  Oxid_Esales\Eshop_Community\Internal\Framework\Database\Logger\Query_Log_Filter_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Database\Logger\Query_Log_Filter
     arguments:
       $skipLogTags: '@=service("OxidEsales\\EshopCommunity\\Internal\\Transition\\Utility\\ContextInterface").getSkipLogTags()'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryLogContextExtenderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryLogContextExtender
+  Oxid_Esales\Eshop_Community\Internal\Framework\Database\Logger\Query_Log_Context_Extender_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Database\Logger\Query_Log_Context_Extender
 
-  Psr\Log\NullLogger:
+  Psr\Log\Null_Logger:
     public: true
 
   Doctrine\DBAL\Logging\Middleware:
@@ -23,7 +23,7 @@ services:
       - { name: doctrine.middleware }
 
   database.monolog_logger_factory:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryLoggerFactory
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Database\Logger\Query_Logger_Factory
     arguments:
       $loggerName: 'OXID Admin Logger'
       $streamHandler: '@database.monolog.stream_handler'
@@ -33,13 +33,13 @@ services:
     factory: ['@database.monolog_logger_factory', 'create']
 
   database.monolog.stream_handler:
-    class: Monolog\Handler\StreamHandler
+    class: Monolog\Handler\Stream_Handler
     arguments:
       $stream: '@=service("OxidEsales\\EshopCommunity\\Internal\\Transition\\Utility\\ContextInterface").getAdminLogFilePath()'
-      $level: !php/const Psr\Log\LogLevel::DEBUG
+      $level: !php/const Psr\Log\Log_Level::DEBUG
     calls:
-      - setFormatter: ['@Monolog\Formatter\LineFormatter']
+      - setFormatter: ['@Monolog\Formatter\Line_Formatter']
 
-  Monolog\Formatter\LineFormatter:
+  Monolog\Formatter\Line_Formatter:
     calls:
       - includeStacktraces: []

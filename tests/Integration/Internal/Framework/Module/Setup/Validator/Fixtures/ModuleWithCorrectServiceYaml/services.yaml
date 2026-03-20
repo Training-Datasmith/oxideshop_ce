@@ -3,4 +3,4 @@ services:
     autowire: true
 
   some.key:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ServicesYamlValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Services_Yaml_Validator

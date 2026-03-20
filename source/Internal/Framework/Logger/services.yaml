@@ -2,8 +2,8 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\LoggerFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\MonologLoggerFactory
+  Oxid_Esales\Eshop_Community\Internal\Framework\Logger\Factory\Logger_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Logger\Factory\Monolog_Logger_Factory
     arguments:
       $loggerName: 'OXID Logger'
       $logFilePath: '@=service("OxidEsales\\EshopCommunity\\Internal\\Transition\\Utility\\ContextInterface").getLogFilePath()'
@@ -11,9 +11,9 @@ services:
 
   oxid_esales.monolog.logger:
     class: Monolog\Logger
-    factory: ['@OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\LoggerFactoryInterface', 'create']
+    factory: ['@Oxid_Esales\Eshop_Community\Internal\Framework\Logger\Factory\Logger_Factory_Interface', 'create']
 
-  Psr\Log\LoggerInterface:
+  Psr\Log\Logger_Interface:
     alias: 'oxid_esales.monolog.logger'
     public: true
 

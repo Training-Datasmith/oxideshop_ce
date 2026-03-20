@@ -41,30 +41,30 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProviderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Meta_Data_Provider_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Meta_Data_Provider
     arguments:
-      $context: '@OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface'
+      $context: '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataToModuleConfigurationDataMapperInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataMapper
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Data_Mapper\Meta_Data_To_Module_Configuration_Data_Mapper_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Data_Mapper\Meta_Data_Mapper
 
   oxid_esales.module.metadata.datamapper.metadatamapper:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataMapper
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Data_Mapper\Meta_Data_Mapper
     deprecated:
       package: 'oxid-esales/oxideshop-ce'
       version: '6.5.0'
       message: 'The "%service_id%" service is deprecated.'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataSchemaValidatorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataSchemaValidator
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Validator\Meta_Data_Schema_Validator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Validator\Meta_Data_Schema_Validator
     deprecated:
       package: 'oxid-esales/oxideshop-ce'
       version: '6.5.0'
       message: 'The "%service_id%" service is deprecated.'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataSchemataProviderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataSchemataProvider
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Meta_Data_Schemata_Provider_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Meta_Data_Schemata_Provider
     arguments:
       - '%oxid_esales.module.metadata.service.metadata_schemata%'
     deprecated:
@@ -72,28 +72,28 @@ services:
       version: '6.5.0'
       message: 'The "%service_id%" service is deprecated.'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataNormalizerInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataNormalizer
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Meta_Data_Normalizer_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Meta_Data_Normalizer
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataValidatorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataValidatorAggregate
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Validator\Meta_Data_Validator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Validator\Meta_Data_Validator_Aggregate
     arguments:
       - '@oxid_esales.module.meta_data.validator.module_id_validator'
       - '@oxid_esales.module.meta_data.validator.shop_module_setting_boolean_validator'
 
   oxid_esales.module.meta_data.validator.shop_module_setting_boolean_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\ModuleSettingBooleanValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Validator\Module_Setting_Boolean_Validator
 
   oxid_esales.module.meta_data.validator.module_id_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\ModuleIdValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Validator\Module_Id_Validator
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Converter\MetaDataConverterInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Converter\MetaDataConverterAggregate
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Converter\Meta_Data_Converter_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Converter\Meta_Data_Converter_Aggregate
     arguments:
       - '@oxid_esales.module.meta_data.converter.shop_module_settings_boolean_converter'
 
   oxid_esales.module.meta_data.converter.shop_module_settings_boolean_converter:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Converter\ModuleSettingsBooleanConverter
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Converter\Module_Settings_Boolean_Converter
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDao
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Module_Configuration_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Meta_Data\Dao\Module_Configuration_Dao

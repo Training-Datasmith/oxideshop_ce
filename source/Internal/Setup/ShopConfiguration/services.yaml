@@ -2,5 +2,5 @@ services:
     _defaults:
         autowire: true
 
-    OxidEsales\EshopCommunity\Internal\Setup\ShopConfiguration\ShopConfigurationUpdaterInterface:
-        class: OxidEsales\EshopCommunity\Internal\Setup\ShopConfiguration\ShopConfigurationUpdater
+    Oxid_Esales\Eshop_Community\Internal\Setup\Shop_Configuration\Shop_Configuration_Updater_Interface:
+        class: Oxid_Esales\Eshop_Community\Internal\Setup\Shop_Configuration\Shop_Configuration_Updater

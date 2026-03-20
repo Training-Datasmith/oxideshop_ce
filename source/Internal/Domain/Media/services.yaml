@@ -2,14 +2,14 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Media\Dao\MediaDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\Dao\MediaDao
+  Oxid_Esales\Eshop_Community\Internal\Domain\Media\Dao\Media_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Dao\Media_Dao
 
-  OxidEsales\EshopCommunity\Internal\Domain\Media\DataMapper\DataMapperInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\DataMapper\DataMapper
+  Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Mapper\Data_Mapper_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Data_Mapper\Data_Mapper
 
-  OxidEsales\EshopCommunity\Internal\Domain\Media\MediaUrlGeneratorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\MediaUrlGenerator
+  Oxid_Esales\Eshop_Community\Internal\Domain\Media\Media_Url_Generator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Media_Url_Generator
     public: true
     arguments:
       $alternativeImageUrl: '%oxid_esales.alternative_image_url%'

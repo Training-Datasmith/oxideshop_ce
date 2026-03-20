@@ -3,22 +3,22 @@ services:
     autowire: true
 
   oxid_esales.command.module_activate_command:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ModuleActivateCommand
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Command\Module_Activate_Command
     tags:
       - { name: 'console.command', command: 'oe:module:activate' }
   oxid_esales.command.module_deactivate_command:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ModuleDeactivateCommand
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Command\Module_Deactivate_Command
     tags:
       - { name: 'console.command', command: 'oe:module:deactivate' }
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ModuleInstallCommand:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Command\Module_Install_Command:
     tags:
       - { name: 'console.command', command: 'oe:module:install' }
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ModuleUninstallCommand:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Command\Module_Uninstall_Command:
     tags:
       - { name: 'console.command', command: 'oe:module:uninstall' }
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Command\InstallModuleAssetsCommand:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Command\Install_Module_Assets_Command:
     tags:
       - { name: 'console.command', command: 'oe:module:install-assets' }

@@ -2,6 +2,6 @@ services:
     _defaults:
         autowire: true
 
-    OxidEsales\EshopCommunity\Tests\Integration\Application\Controller\Admin\Fixtures\testModule\RendererInterface:
-        class: OxidEsales\EshopCommunity\Tests\Integration\Application\Controller\Admin\Fixtures\testModule\Renderer
+    Oxid_Esales\Eshop_Community\Tests\Integration\Application\Controller\Admin\Fixtures\testModule\Renderer_Interface:
+        class: Oxid_Esales\Eshop_Community\Tests\Integration\Application\Controller\Admin\Fixtures\testModule\Renderer
         public: true

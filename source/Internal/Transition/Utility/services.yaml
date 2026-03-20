@@ -2,8 +2,8 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface:
-    class: OxidEsales\EshopCommunity\Internal\Transition\Utility\Context
+  Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context
     public: true
     arguments:
       $shopId: '%oxid_esales.current_shop_id%'

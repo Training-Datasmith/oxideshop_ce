@@ -2,6 +2,6 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Api\HttpExceptionListener:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Api\Http_Exception_Listener:
     tags:
       - { name: kernel.event_subscriber }

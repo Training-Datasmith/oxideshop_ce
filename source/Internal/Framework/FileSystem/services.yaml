@@ -2,28 +2,28 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\FileSystem\ImageHandlerInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\FileSystem\MasterImageHandler
+  Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Image_Handler_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Master_Image_Handler
     arguments:
       - "@oxid_esales.symfony.file_system"
-      - '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
+      - '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface'
 
-  OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Bridge\MasterImageHandlerBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Bridge\MasterImageHandlerBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Bridge\Master_Image_Handler_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Bridge\Master_Image_Handler_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\FileSystem\FileGenerator\FileGeneratorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\FileSystem\FileGenerator\CsvFileGenerator
+  Oxid_Esales\Eshop_Community\Internal\Framework\File_System\File_Generator\File_Generator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\File_System\File_Generator\Csv_File_Generator
 
-  OxidEsales\EshopCommunity\Internal\Framework\FileSystem\FileGenerator\Bridge\FileGeneratorBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\FileSystem\FileGenerator\Bridge\CsvFileGeneratorBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\File_System\File_Generator\Bridge\File_Generator_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\File_System\File_Generator\Bridge\Csv_File_Generator_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Validator\FileValidatorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Validator\FileValidator
+  Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Validator\File_Validator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Validator\File_Validator
     arguments:
       - "@oxid_esales.symfony.mime_types"
 
-  OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Validator\FileValidatorBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\FileSystem\Validator\FileValidatorBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Validator\File_Validator_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\File_System\Validator\File_Validator_Bridge
     public: true

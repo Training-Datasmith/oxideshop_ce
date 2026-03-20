@@ -3,23 +3,23 @@ services:
     autowire: true
 
   oxid_esales.module.install.service.bootstrap_module_installer:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\BootstrapModuleInstaller
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Bootstrap_Module_Installer
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleFilesInstallerInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleFilesInstaller
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Module_Files_Installer_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Module_Files_Installer
     arguments:
       $fileSystemService: '@oxid_esales.symfony.file_system'
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstallerInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstaller
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Module_Configuration_Installer_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Module_Configuration_Installer
     arguments:
-      $context: '@OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface'
+      $context: '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface'
     public: true
 
   oxid_esales.module.install.service.installed_shop_project_configuration_generator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ProjectConfigurationGenerator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Project_Configuration_Generator
     arguments:
-      $context: '@OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface'
+      $context: '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface'
     public: true

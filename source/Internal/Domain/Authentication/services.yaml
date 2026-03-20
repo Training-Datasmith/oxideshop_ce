@@ -2,19 +2,19 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridge
+  Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Bridge\Password_Service_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Bridge\Password_Service_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\PasswordVerificationServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\PasswordVerificationService
+  Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Service\Password_Verification_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Service\Password_Verification_Service
 
-  OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicyInterface:
-    class: OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicy
+  Oxid_Esales\Eshop_Community\Internal\Utility\Authentication\Policy\Password_Policy_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Utility\Authentication\Policy\Password_Policy
 
-  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Generator\RandomTokenGeneratorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Generator\RandomTokenGenerator
+  Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Generator\Random_Token_Generator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Generator\Random_Token_Generator
 
-  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\RandomTokenGeneratorBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\RandomTokenGeneratorBridge
+  Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Bridge\Random_Token_Generator_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Authentication\Bridge\Random_Token_Generator_Bridge
     public: true

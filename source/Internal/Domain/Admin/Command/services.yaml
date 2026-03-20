@@ -2,7 +2,7 @@ services:
     _defaults:
         autowire: true
 
-    OxidEsales\EshopCommunity\Internal\Domain\Admin\Command\CreateUserCommand:
-        class: OxidEsales\EshopCommunity\Internal\Domain\Admin\Command\CreateUserCommand
+    Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Command\Create_User_Command:
+        class: Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Command\Create_User_Command
         tags:
             - { name: 'console.command', command: 'oe:admin:create-user' }

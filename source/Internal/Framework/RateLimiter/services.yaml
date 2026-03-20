@@ -9,23 +9,23 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\RateLimiter\ApiRateLimiterFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\RateLimiter\ApiRateLimiterFactory
+  Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter\Api_Rate_Limiter_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter\Api_Rate_Limiter_Factory
     arguments:
       $limit: '%oxid_esales.rate_limiter.limit%'
       $interval: '%oxid_esales.rate_limiter.interval%'
       $policy: '%oxid_esales.rate_limiter.policy%'
 
-  OxidEsales\EshopCommunity\Internal\Framework\RateLimiter\ClientIdentifierProviderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\RateLimiter\ClientIdentifierProvider
+  Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter\Client_Identifier_Provider_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter\Client_Identifier_Provider
 
-  OxidEsales\EshopCommunity\Internal\Framework\RateLimiter\ApiRateLimitListener:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter\Api_Rate_Limit_Listener:
     arguments:
       $enabled: '%oxid_esales.rate_limiter.enabled%'
       $excludedRoutes: '%oxid_esales.rate_limiter.excluded_routes%'
     tags:
       - { name: kernel.event_subscriber }
 
-  OxidEsales\EshopCommunity\Internal\Framework\RateLimiter\RateLimitHeadersListener:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Rate_Limiter\Rate_Limit_Headers_Listener:
     tags:
       - { name: kernel.event_subscriber }

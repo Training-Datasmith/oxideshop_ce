@@ -1,4 +1,4 @@
-namespace: OxidEsales\EshopCommunity\Tests\Codeception
+namespace: Oxid_Esales\Eshop_Community\Tests\Codeception
 support_namespace: Support
 params:
     - Codeception/Config/params.php
@@ -14,4 +14,4 @@ settings:
     log: true
 extensions:
     enabled:
-        - Codeception\Extension\RunFailed
+        - Codeception\Extension\Run_Failed

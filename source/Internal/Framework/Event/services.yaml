@@ -2,9 +2,9 @@ services:
   _defaults:
     autowire: true
 
-  Symfony\Component\EventDispatcher\EventDispatcherInterface:
-    class: Symfony\Component\EventDispatcher\EventDispatcher
+  Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface:
+    class: Symfony\Component\Event_Dispatcher\Event_Dispatcher
     public: true
 
   event_dispatcher:
-    alias: Symfony\Component\EventDispatcher\EventDispatcherInterface
+    alias: Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface

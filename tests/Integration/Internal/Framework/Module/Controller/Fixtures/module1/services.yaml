@@ -2,15 +2,15 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\ModuleControllerAsService:
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\Module_Controller_As_Service:
     tags:
       - { name: 'oxid.view_controller', controller_key: 'test_module_controller_as_service' }
     public: true
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\ModuleControllerDecorator:
-    decorates: OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\ModuleControllerAsService
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\Module_Controller_Decorator:
+    decorates: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\Module_Controller_As_Service
     arguments: [ '@.inner' ]
     public: true
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\ApiTestController:
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Controller\Fixtures\module1\src\Controller\Api_Test_Controller:
     public: true

@@ -2,11 +2,11 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\ProductRatingDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\ProductRatingDao
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao\Product_Rating_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao\Product_Rating_Dao
 
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\RatingDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\RatingDao
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao\Rating_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao\Rating_Dao
 
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\ReviewDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\ReviewDao
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao\Review_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Dao\Review_Dao

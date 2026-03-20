@@ -2,23 +2,23 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Bridge\Module_Activation_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Bridge\Module_Activation_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleDependencyResolverInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleDependencyResolver
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Dependency_Resolver_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Dependency_Resolver
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleActivationServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleActivationService
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Activation_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Activation_Service
     arguments:
       $deactivationDependencyValidator: '@oxid_esales.module.setup.validator.deactivation_dependency_validator'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleServicesImporterInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleServicesImporter
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Services_Importer_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Module_Services_Importer
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ModuleConfigurationValidatorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ModuleConfigurationValidatorAggregate
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Module_Configuration_Validator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Module_Configuration_Validator_Aggregate
     arguments:
       - '@oxid_esales.module.setup.validator.activation_dependency_validator'
       - '@oxid_esales.module.setup.validator.controllers_module_setting_validator'
@@ -27,35 +27,35 @@ services:
       - '@oxid_esales.module.setup.validator.services_yaml_validator'
 
   oxid_esales.module.setup.validator.controllers_module_setting_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ControllersValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Controllers_Validator
 
   oxid_esales.module.setup.validator.class_extensions_module_setting_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ClassExtensionsValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Class_Extensions_Validator
 
   oxid_esales.module.setup.validator.events_module_setting_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\EventsValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Events_Validator
 
   oxid_esales.module.setup.validator.activation_dependency_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ActivationDependencyValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Activation_Dependency_Validator
 
   oxid_esales.module.setup.validator.deactivation_dependency_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\DeactivationDependencyValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Deactivation_Dependency_Validator
 
   oxid_esales.module.setup.validator.services_yaml_validator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ServicesYamlValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Validator\Services_Yaml_Validator
     arguments:
-      - '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
+      - '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface'
 
   oxid_esales.module.setup.service.eventsubscriber.dispatch_legacy_events_subscriber:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\EventSubscriber\DispatchLegacyEventsSubscriber
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Event_Subscriber\Dispatch_Legacy_Events_Subscriber
     tags:
       - { name: kernel.event_subscriber }
 
   oxid_esales.module.setup.service.eventsubscriber.event_logging_subscriber:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\EventSubscriber\EventLoggingSubscriber
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Event_Subscriber\Event_Logging_Subscriber
     tags:
       - { name: kernel.event_subscriber }
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ActiveClassExtensionChainResolverInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ActiveClassExtensionChainResolver
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Active_Class_Extension_Chain_Resolver_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Setup\Service\Active_Class_Extension_Chain_Resolver
     public: true

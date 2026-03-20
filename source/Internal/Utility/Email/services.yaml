@@ -6,9 +6,9 @@ services:
         autowire: true
         public: false
 
-    OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceInterface:
-        class: OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorService
+    Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service_Interface:
+        class: Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service
 
-    OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceBridgeInterface:
-        class: OxidEsales\EshopCommunity\Internal\Utility\Email\EmailValidatorServiceBridge
+    Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service_Bridge_Interface:
+        class: Oxid_Esales\Eshop_Community\Internal\Utility\Email\Email_Validator_Service_Bridge
         public: true

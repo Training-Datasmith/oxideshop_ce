@@ -6,19 +6,19 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface:
-    class: OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapter
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Shop_Adapter_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Shop_Adapter
 
-  OxidEsales\EshopCommunity\Internal\Framework\Config\Dao\ShopConfigurationSettingDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Config\Dao\ShopConfigurationSettingDao
+  Oxid_Esales\Eshop_Community\Internal\Framework\Config\Dao\Shop_Configuration_Setting_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Config\Dao\Shop_Configuration_Setting_Dao
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Theme\Config\Dao\ThemeSettingDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Theme\Config\Dao\ThemeSettingDao
+  Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Config\Dao\Theme_Setting_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Config\Dao\Theme_Setting_Dao
 
-  OxidEsales\EshopCommunity\Internal\Framework\Config\Utility\ShopSettingEncoderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Config\Utility\ShopSettingEncoder
+  Oxid_Esales\Eshop_Community\Internal\Framework\Config\Utility\Shop_Setting_Encoder_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Config\Utility\Shop_Setting_Encoder
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\Email\EmailAdapterInterface:
-    class: OxidEsales\EshopCommunity\Internal\Transition\Adapter\Email\SymfonyMailerAdapter
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Email\Email_Adapter_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Email\Symfony_Mailer_Adapter
     public: true

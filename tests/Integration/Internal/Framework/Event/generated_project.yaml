@@ -1,41 +1,41 @@
 services:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface:
-    class: OxidEsales\EshopCommunity\Tests\Unit\Internal\ContextStub
+  Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface:
+    class: Oxid_Esales\Eshop_Community\Tests\Unit\Internal\Context_Stub
     autowire: true
     public: true
     arguments:
       $currentShopId: 1
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Event\TestEventSubscriber1:
-    class: OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Event\TestEventSubscriber
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Event\Test_Event_Subscriber1:
+    class: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Event\Test_Event_Subscriber
     public: true
     arguments:
       $stopPropagation: false
     calls:
       - [setActiveShops, [[1]]]
-      - [setContext, ['@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface']]
+      - [setContext, ['@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface']]
     tags:
       - { name: kernel.event_subscriber }
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Event\TestEventSubscriber2:
-    class: OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Event\TestEventSubscriber
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Event\Test_Event_Subscriber2:
+    class: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Event\Test_Event_Subscriber
     public: true
     arguments:
       $stopPropagation: true
     calls:
       - [setActiveShops, [[1, 2]]]
-      - [setContext, ['@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface']]
+      - [setContext, ['@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface']]
     tags:
       - { name: kernel.event_subscriber }
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Event\TestEventSubscriber3:
-    class: OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Event\TestEventSubscriber
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Event\Test_Event_Subscriber3:
+    class: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Event\Test_Event_Subscriber
     public: true
     arguments:
       $stopPropagation: false
     calls:
       - [setActiveShops, [[1, 2]]]
-      - [setContext, ['@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface']]
+      - [setContext, ['@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface']]
     tags:
       - { name: kernel.event_subscriber }

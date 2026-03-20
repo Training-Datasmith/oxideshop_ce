@@ -3,5 +3,5 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\EshopCommunity\Internal\Domain\Admin\Factory\AdminFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Admin\Factory\AdminFactory
+  Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Factory\Admin_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Admin\Factory\Admin_Factory

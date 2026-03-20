@@ -2,44 +2,44 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProvider
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Module_Configuration_Dao_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Module_Configuration_Dao_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Shop_Configuration_Dao_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Shop_Configuration_Dao_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Module_Setting_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Module_Setting_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentMisconfigurationEventSubscriber:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Dao\Shop_Environment_Misconfiguration_Event_Subscriber:
     tags:
       - { name: kernel.event_subscriber }
 
   oxid_esales.module.configuration.class_extensions_export_data_mapper:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration\ClassExtensionsExportDataMapper
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration\Class_Extensions_Export_Data_Mapper
 
   oxid_esales.module.configuration.controllers_export_data_mapper:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration\ControllersExportDataMapper
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration\Controllers_Export_Data_Mapper
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration\ModuleConfigurationExportDataMapperInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfigurationExportDataMapper
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration\Module_Configuration_Export_Data_Mapper_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration_Export_Data_Mapper
     arguments:
-      $moduleStateService: '@OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface'
-      $context: '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
+      $moduleStateService: '@Oxid_Esales\Eshop_Community\Internal\Framework\Module\State\Module_State_Service_Interface'
+      $context: '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface'
       $dataMappers:
         - '@oxid_esales.module.configuration.class_extensions_export_data_mapper'
         - '@oxid_esales.module.configuration.controllers_export_data_mapper'
 
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDataMapperBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDataMapperBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Module_Configuration_Data_Mapper_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Bridge\Module_Configuration_Data_Mapper_Bridge
     arguments:
-      - '@OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration\ModuleConfigurationExportDataMapperInterface'
+      - '@Oxid_Esales\Eshop_Community\Internal\Framework\Module\Configuration\Data_Mapper\Module_Configuration\Module_Configuration_Export_Data_Mapper_Interface'
     public: true
 

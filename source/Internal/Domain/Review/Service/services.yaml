@@ -2,15 +2,15 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserRatingServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserRatingService
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewService
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Service\ReviewAndRatingMergingServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Service\ReviewAndRatingMergingService
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewAndRatingServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewAndRatingService
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Service\RatingCalculatorServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Service\RatingCalculatorService
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Service\ProductRatingServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Service\ProductRatingService
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\User_Rating_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\User_Rating_Service
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\User_Review_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\User_Review_Service
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\Review_And_Rating_Merging_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\Review_And_Rating_Merging_Service
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\User_Review_And_Rating_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\User_Review_And_Rating_Service
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\Rating_Calculator_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\Rating_Calculator_Service
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\Product_Rating_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Service\Product_Rating_Service

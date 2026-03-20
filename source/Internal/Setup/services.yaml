@@ -11,7 +11,7 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Setup\ShopSetupCommand:
-    class: OxidEsales\EshopCommunity\Internal\Setup\ShopSetupCommand
+  Oxid_Esales\Eshop_Community\Internal\Setup\Shop_Setup_Command:
+    class: Oxid_Esales\Eshop_Community\Internal\Setup\Shop_Setup_Command
     tags:
       - { name: 'console.command', command: 'oe:setup:shop' }

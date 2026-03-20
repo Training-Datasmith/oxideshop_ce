@@ -2,5 +2,5 @@ services:
     _defaults:
         autowire: true
 
-    OxidEsales\EshopCommunity\Internal\Setup\Directory\DirectoryValidatorInterface:
-        class: OxidEsales\EshopCommunity\Internal\Setup\Directory\DirectoryValidator
+    Oxid_Esales\Eshop_Community\Internal\Setup\Directory\Directory_Validator_Interface:
+        class: Oxid_Esales\Eshop_Community\Internal\Setup\Directory\Directory_Validator

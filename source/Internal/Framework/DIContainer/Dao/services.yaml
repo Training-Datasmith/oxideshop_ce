@@ -2,12 +2,12 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ProjectYamlDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ContainerAwareProjectYamlDao
+  Oxid_Esales\Eshop_Community\Internal\Framework\DI_Container\Dao\Project_Yaml_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\DI_Container\Dao\Container_Aware_Project_Yaml_Dao
     arguments:
       Symfony\Component\Filesystem\Filesystem: '@oxid_esales.symfony.file_system'
-      $context: '@OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface'
+      $context: '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Basic_Context_Interface'
 
-  OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ParameterDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ParameterDao
+  Oxid_Esales\Eshop_Community\Internal\Framework\DI_Container\Dao\Parameter_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\DI_Container\Dao\Parameter_Dao
     public: true

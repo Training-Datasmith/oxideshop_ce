@@ -5,7 +5,7 @@ services:
     _defaults:
         autowire: true
 
-    OxidEsales\EshopCommunity\Internal\Container\Event\ConfigurationChangedEventSubscriber:
-        class: OxidEsales\EshopCommunity\Internal\Container\Event\ConfigurationChangedEventSubscriber
+    Oxid_Esales\Eshop_Community\Internal\Container\Event\Configuration_Changed_Event_Subscriber:
+        class: Oxid_Esales\Eshop_Community\Internal\Container\Event\Configuration_Changed_Event_Subscriber
         tags:
             - { name: kernel.event_subscriber }

@@ -28,6 +28,6 @@
         </include>
     </source>
     <php>
-        <env name="OXID_CONTAINER_PROVIDER" value="OxidEsales\EshopCommunity\Tests\TestContainerFactory" force="true"/>
+        <env name="OXID_CONTAINER_PROVIDER" value="Oxid_Esales\Eshop_Community\Tests\Test_Container_Factory" force="true"/>
     </php>
 </phpunit>

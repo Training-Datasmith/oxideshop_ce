@@ -2,8 +2,8 @@ services:
     _defaults:
         autowire: true
 
-    OxidEsales\EshopCommunity\Internal\Setup\Htaccess\HtaccessDaoFactoryInterface:
-        class: OxidEsales\EshopCommunity\Internal\Setup\Htaccess\HtaccessDaoFactory
+    Oxid_Esales\Eshop_Community\Internal\Setup\Htaccess\Htaccess_Dao_Factory_Interface:
+        class: Oxid_Esales\Eshop_Community\Internal\Setup\Htaccess\Htaccess_Dao_Factory
 
-    OxidEsales\EshopCommunity\Internal\Setup\Htaccess\HtaccessUpdaterInterface:
-        class: OxidEsales\EshopCommunity\Internal\Setup\Htaccess\HtaccessUpdater
+    Oxid_Esales\Eshop_Community\Internal\Setup\Htaccess\Htaccess_Updater_Interface:
+        class: Oxid_Esales\Eshop_Community\Internal\Setup\Htaccess\Htaccess_Updater

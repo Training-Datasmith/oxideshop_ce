@@ -3,13 +3,13 @@ services:
     autowire: true
 
   oxid_esales.module.install.service.launched_shop_project_configuration_generator:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ProjectConfigurationGenerator
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Project_Configuration_Generator
     arguments:
-      $context: '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
+      $context: '@Oxid_Esales\Eshop_Community\Internal\Transition\Utility\Context_Interface'
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleInstallerInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleInstaller
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Module_Installer_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Install\Service\Module_Installer
     arguments:
       - '@oxid_esales.module.install.service.bootstrap_module_installer'
     public: true

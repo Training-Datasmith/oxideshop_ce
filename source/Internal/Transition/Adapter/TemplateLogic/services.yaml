@@ -2,44 +2,44 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\ContentFactory:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Content_Factory:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\SeoUrlLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Seo_Url_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\AddUrlParametersLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Add_Url_Parameters_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IncludeDynamicLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Include_Dynamic_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IfContentLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\If_Content_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatPriceLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Format_Price_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\ScriptLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Script_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatDateLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Format_Date_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TranslateFilterLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Translate_Filter_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TranslateFunctionLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Translate_Function_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatTimeLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Format_Time_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FileSizeLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\File_Size_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\StyleLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Style_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TruncateLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Truncate_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TranslateSalutationLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Translate_Salutation_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatCurrencyLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Format_Currency_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\WordwrapLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Wordwrap_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IncludeWidgetLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Include_Widget_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\SmartWordwrapLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Smart_Wordwrap_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\InputHelpLogic:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Input_Help_Logic:
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\InsertNewBasketItemLogicTwig:
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Template_Logic\Insert_New_Basket_Item_Logic_Twig:

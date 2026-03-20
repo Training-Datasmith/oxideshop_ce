@@ -3,5 +3,5 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\EshopCommunity\Internal\Utility\Url\UrlParserInterface:
-    class: OxidEsales\EshopCommunity\Internal\Utility\Url\UrlParser
+  Oxid_Esales\Eshop_Community\Internal\Utility\Url\Url_Parser_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Utility\Url\Url_Parser

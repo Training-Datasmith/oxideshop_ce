@@ -5,30 +5,30 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizerConfigFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizerConfigFactory
+  Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer_Config_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer_Config_Factory
 
   oxid_esales.html_sanitizer.config:
-    class: Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig
-    factory: ['@OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizerConfigFactoryInterface', 'create']
+    class: Symfony\Component\Html_Sanitizer\Html_Sanitizer_Config
+    factory: ['@Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer_Config_Factory_Interface', 'create']
 
-  Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface:
-    class: Symfony\Component\HtmlSanitizer\HtmlSanitizer
+  Symfony\Component\Html_Sanitizer\Html_Sanitizer_Interface:
+    class: Symfony\Component\Html_Sanitizer\Html_Sanitizer
     arguments:
       - '@oxid_esales.html_sanitizer.config'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizer:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer:
     arguments:
-      - '@Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface'
+      - '@Symfony\Component\Html_Sanitizer\Html_Sanitizer_Interface'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Html\AllowAllHtmlSanitizer:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Html\Allow_All_Html_Sanitizer:
 
-  OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizerFactory:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer_Factory:
     arguments:
       - '%oxid_esales.html_sanitizer_enabled%'
-      - '@OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizer'
-      - '@OxidEsales\EshopCommunity\Internal\Framework\Html\AllowAllHtmlSanitizer'
+      - '@Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer'
+      - '@Oxid_Esales\Eshop_Community\Internal\Framework\Html\Allow_All_Html_Sanitizer'
 
-  OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizerInterface:
-    factory: [ '@OxidEsales\EshopCommunity\Internal\Framework\Html\HtmlSanitizerFactory', 'create' ]
+  Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer_Interface:
+    factory: [ '@Oxid_Esales\Eshop_Community\Internal\Framework\Html\Html_Sanitizer_Factory', 'create' ]
     public: true

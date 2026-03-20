@@ -10,12 +10,12 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Bridge\Admin_Theme_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Bridge\Admin_Theme_Bridge
     arguments:
       - '%oxid_esales.theme.admin.name%'
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Theme\Command\ThemeActivateCommand:
+  Oxid_Esales\Eshop_Community\Internal\Framework\Theme\Command\Theme_Activate_Command:
     tags:
       - { name: 'console.command', command: 'oe:theme:activate' }

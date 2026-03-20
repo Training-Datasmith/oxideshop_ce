@@ -2,9 +2,9 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ProductRatingDataMapperInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ProductRatingDataMapper
-  OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\RatingDataMapperInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\RatingDataMapper
-  OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ReviewDataMapperInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ReviewDataMapper
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper\Product_Rating_Data_Mapper_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper\Product_Rating_Data_Mapper
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper\Rating_Data_Mapper_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper\Rating_Data_Mapper
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper\Review_Data_Mapper_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Data_Mapper\Review_Data_Mapper

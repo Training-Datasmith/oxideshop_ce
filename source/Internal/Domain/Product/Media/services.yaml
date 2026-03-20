@@ -2,48 +2,48 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Dao\ProductMediaDaoInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Dao\ProductMediaDao
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Dao\Product_Media_Dao_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Dao\Product_Media_Dao
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Factory\ProductMediaFactoryInterface:
-      class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Factory\ProductMediaFactory
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Factory\Product_Media_Factory_Interface:
+      class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Factory\Product_Media_Factory
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaService
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_Service
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaViewServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaViewService
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_View_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_View_Service
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductVariantMediaServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductVariantMediaService
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Variant_Media_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Variant_Media_Service
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaUploadProcessorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaUploadProcessor
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_Upload_Processor_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_Upload_Processor
     arguments:
-      $mediaConstraintValidator: '@OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Validator\ProductMediaValidator'
+      $mediaConstraintValidator: '@Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Validator\Product_Media_Validator'
       $mediaUploader: '@oxid_esales.product.media.media_uploader'
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaPathResolverInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Service\ProductMediaPathResolver
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_Path_Resolver_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Service\Product_Media_Path_Resolver
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataMapper\DataMapperInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Product\Media\DataMapper\DataMapper
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Mapper\Data_Mapper_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Data_Mapper\Data_Mapper
 
   oxid_esales.product.media.media_uploader:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\MediaUploader
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Media_Uploader
 
   oxid_esales.product.media.constraint_validator.upload_validity:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\UploadValidityConstraintValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Upload_Validity_Constraint_Validator
     tags:
       - { name: oxid.product_media.constraint_validator }
 
   oxid_esales.product.media.constraint_validator.size:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\FileSizeConstraintValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\File_Size_Constraint_Validator
     arguments:
       $minSizeKb: '%oxid_esales.product.media.file.min_size_kb%'
       $maxSizeKb: '%oxid_esales.product.media.file.max_size_kb%'
@@ -51,7 +51,7 @@ services:
       - { name: oxid.product_media.constraint_validator }
 
   oxid_esales.product.media.constraint_validator.mime_type:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\MimeTypeConstraintValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\Mime_Type_Constraint_Validator
     arguments:
       $baseTypePrefix: 'image/'
       $mimeTypeGuesser: "@oxid_esales.symfony.mime_types"
@@ -59,12 +59,12 @@ services:
       - { name: oxid.product_media.constraint_validator }
 
   oxid_esales.product.media.constraint_validator.file_extension:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Media\Validator\FileExtensionConstraintValidator
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Media\Validator\File_Extension_Constraint_Validator
     arguments:
       $mimeTypeGuesser: "@oxid_esales.symfony.mime_types"
     tags:
       - { name: oxid.product_media.constraint_validator }
 
-  OxidEsales\EshopCommunity\Internal\Domain\Product\Media\Validator\ProductMediaValidator:
+  Oxid_Esales\Eshop_Community\Internal\Domain\Product\Media\Validator\Product_Media_Validator:
     arguments:
       $validators: !tagged_iterator oxid.product_media.constraint_validator

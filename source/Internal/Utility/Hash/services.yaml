@@ -9,8 +9,8 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\PasswordHashServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Utility\Hash\Service\BcryptPasswordHashService
+  Oxid_Esales\Eshop_Community\Internal\Utility\Hash\Service\Password_Hash_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Utility\Hash\Service\Bcrypt_Password_Hash_Service
     arguments:
-      - '@OxidEsales\EshopCommunity\Internal\Utility\Authentication\Policy\PasswordPolicyInterface'
+      - '@Oxid_Esales\Eshop_Community\Internal\Utility\Authentication\Policy\Password_Policy_Interface'
       - '%oxid_esales.utility.hash.service.password_hash.bcrypt.cost%'

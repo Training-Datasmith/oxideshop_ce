@@ -1,6 +1,6 @@
 services:
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Component\Internal\ServiceDecorator:
-    decorates: OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\DIContainer\Fixtures\Ce\Internal\ServiceInterface
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\DI_Container\Fixtures\Component\Internal\Service_Decorator:
+    decorates: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\DI_Container\Fixtures\Ce\Internal\Service_Interface
     arguments:
       $decorated: '@.inner'
       $namespace: component

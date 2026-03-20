@@ -5,18 +5,18 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Mailing\Factory\TransportFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Mailing\Factory\TransportFactory
+  Oxid_Esales\Eshop_Community\Internal\Framework\Mailing\Factory\Transport_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Mailing\Factory\Transport_Factory
     arguments:
       $dsn: '%oxid_esales.mailing.dsn%'
 
-  Symfony\Component\Mailer\Transport\TransportInterface:
-    factory: ['@OxidEsales\EshopCommunity\Internal\Framework\Mailing\Factory\TransportFactoryInterface', 'create']
+  Symfony\Component\Mailer\Transport\Transport_Interface:
+    factory: ['@Oxid_Esales\Eshop_Community\Internal\Framework\Mailing\Factory\Transport_Factory_Interface', 'create']
 
-  Symfony\Component\Mailer\MailerInterface:
+  Symfony\Component\Mailer\Mailer_Interface:
     class: Symfony\Component\Mailer\Mailer
     arguments:
-      $transport: '@Symfony\Component\Mailer\Transport\TransportInterface'
+      $transport: '@Symfony\Component\Mailer\Transport\Transport_Interface'
       $bus: null
-      $dispatcher: '@Symfony\Component\EventDispatcher\EventDispatcherInterface'
+      $dispatcher: '@Symfony\Component\Event_Dispatcher\Event_Dispatcher_Interface'
     public: true

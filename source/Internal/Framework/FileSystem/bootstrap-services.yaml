@@ -3,15 +3,15 @@ services:
     autowire: true
 
   oxid_esales.common.storage.flock_store_lock_factory:
-    class: Symfony\Component\Lock\LockFactory
+    class: Symfony\Component\Lock\Lock_Factory
     arguments:
       - '@oxid_esales.common.storage.flock_store'
 
   oxid_esales.common.storage.flock_store:
-    class: Symfony\Component\Lock\Store\FlockStore
+    class: Symfony\Component\Lock\Store\Flock_Store
 
   oxid_esales.common.file_locator:
-    class: Symfony\Component\Config\FileLocator
+    class: Symfony\Component\Config\File_Locator
 
   oxid_esales.symfony.file_system:
     class: Symfony\Component\Filesystem\Filesystem
@@ -21,10 +21,10 @@ services:
     alias: oxid_esales.symfony.file_system
 
   oxid_esales.symfony.mime_types:
-    class: Symfony\Component\Mime\MimeTypes
+    class: Symfony\Component\Mime\Mime_Types
 
-  OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Storage\YamlFileStorageFactory
+  Oxid_Esales\Eshop_Community\Internal\Framework\Storage\File_Storage_Factory_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Storage\Yaml_File_Storage_Factory
     arguments:
       - '@oxid_esales.common.file_locator'
       - '@oxid_esales.common.storage.flock_store_lock_factory'

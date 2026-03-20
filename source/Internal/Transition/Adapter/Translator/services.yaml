@@ -3,10 +3,10 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\Eshop\Core\Language:
-    factory: ['OxidEsales\Eshop\Core\Registry', 'getLang']
+  Oxid_Esales\Eshop\Core\Language:
+    factory: ['Oxid_Esales\Eshop\Core\Registry', 'getLang']
 
-  OxidEsales\EshopCommunity\Internal\Transition\Adapter\Translator\TranslatorInterface:
-    class: OxidEsales\EshopCommunity\Internal\Transition\Adapter\Translator\LegacyTemplateTranslator
+  Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Translator\Translator_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Translator\Legacy_Template_Translator
     arguments:
-      - '@OxidEsales\Eshop\Core\Language'
+      - '@Oxid_Esales\Eshop\Core\Language'

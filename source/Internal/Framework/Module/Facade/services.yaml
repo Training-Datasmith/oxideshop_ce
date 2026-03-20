@@ -3,16 +3,16 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderBridge
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Bridge
     public: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProviderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ActiveModulesDataProvider
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Active_Modules_Data_Provider
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModulesDataProviderInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModulesDataProvider
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Modules_Data_Provider_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Modules_Data_Provider
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingService
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Module_Setting_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\Facade\Module_Setting_Service
     public: true

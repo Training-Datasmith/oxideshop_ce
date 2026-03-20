@@ -1,10 +1,10 @@
 services:
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\TestEventSubscriber:
-    class: OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\TestEventSubscriber
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Test_Data\Test_Module\Test_Event_Subscriber:
+    class: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Test_Data\Test_Module\Test_Event_Subscriber
     tags:
       - { name: kernel.event_subscriber }
 
-  OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\SomeModuleService:
-    class: OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\SomeModuleService
+  Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Test_Data\Test_Module\Some_Module_Service:
+    class: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Framework\Module\Test_Data\Test_Module\Some_Module_Service
     public: true

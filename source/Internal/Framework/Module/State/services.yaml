@@ -2,6 +2,6 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface:
-    class: OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateService
+  Oxid_Esales\Eshop_Community\Internal\Framework\Module\State\Module_State_Service_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Framework\Module\State\Module_State_Service
     public: true

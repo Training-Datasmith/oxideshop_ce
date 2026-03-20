@@ -1,4 +1,4 @@
 services:
   some_test_service:
-    class: OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\SomeService
+    class: Oxid_Esales\Eshop_Community\Tests\Integration\Internal\Container\Fixtures\Some_Service
     public: true

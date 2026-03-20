@@ -3,5 +3,5 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface:
-    class: OxidEsales\EshopCommunity\Internal\Transition\Adapter\Session\SessionAdapter
+  Oxid_Esales\Eshop_Community\Internal\Framework\Session\Session_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Transition\Adapter\Session\Session_Adapter

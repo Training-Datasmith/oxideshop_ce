@@ -2,15 +2,15 @@ services:
   _defaults:
     autowire: true
 
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewBridge
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Review_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Review_Bridge
     public: true
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserRatingBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserRatingBridge
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Rating_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Rating_Bridge
     public: true
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridge
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\Product_Rating_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\Product_Rating_Bridge
     public: true
-  OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridge
+  Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Review_And_Rating_Bridge_Interface:
+    class: Oxid_Esales\Eshop_Community\Internal\Domain\Review\Bridge\User_Review_And_Rating_Bridge
     public: true
