@@ -11,6 +11,7 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Mailing\Adapte
 
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\Email\SymfonyMailerAdapter;
+use PHPMailer\PHPMailer\PHPMailer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
@@ -18,10 +19,11 @@ class SymfonyMailerAdapterTest extends TestCase
 {
     public function testConvertBasicEmail(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->setSubject('Test Subject');
-        $legacyEmail->setBody('<p>Test Body</p>');
-        $legacyEmail->setAltBody('Test Body');
+        $legacyEmail = $this->createBasicEmail([
+            'subject' => 'Test Subject',
+            'body' => '<p>Test Body</p>',
+            'altBody' => 'Test Body',
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -33,8 +35,12 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithMultipleRecipients(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->setRecipient('second@example.com', 'Second User');
+        $legacyEmail = $this->createBasicEmail([
+            'recipients' => [
+                ['test@example.com', 'Test User'],
+                ['second@example.com', 'Second User'],
+            ],
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -60,8 +66,9 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithReplyTo(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->setReplyTo('reply@example.com', 'Reply User');
+        $legacyEmail = $this->createBasicEmail([
+            'replyTo' => [['reply@example.com', 'Reply User']],
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -74,9 +81,10 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithCcAndBcc(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->addCC('cc@example.com', 'CC User');
-        $legacyEmail->addBCC('bcc@example.com', 'BCC User');
+        $legacyEmail = $this->createBasicEmail([
+            'cc' => [['cc@example.com', 'CC User']],
+            'bcc' => [['bcc@example.com', 'BCC User']],
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -95,9 +103,10 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertPlainTextEmail(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->isHTML(false);
-        $legacyEmail->setBody('Plain text body');
+        $legacyEmail = $this->createBasicEmail([
+            'contentType' => PHPMailer::CONTENT_TYPE_PLAINTEXT,
+            'body' => 'Plain text body',
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -108,10 +117,10 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertHtmlEmailWithAltBody(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->isHTML(true);
-        $legacyEmail->setBody('<p>HTML body</p>');
-        $legacyEmail->setAltBody('Plain text alternative');
+        $legacyEmail = $this->createBasicEmail([
+            'body' => '<p>HTML body</p>',
+            'altBody' => 'Plain text alternative',
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -122,8 +131,11 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithStringAttachment(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->addStringAttachment('string content', 'file.txt', 'base64', 'text/plain');
+        $legacyEmail = $this->createBasicEmail([
+            'attachments' => [
+                ['string content', 'file.txt', 'file.txt', 'base64', 'text/plain', true, 'attachment', null],
+            ],
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -134,8 +146,9 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithCustomHeaders(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->addCustomHeader('X-Custom-Header', 'CustomValue');
+        $legacyEmail = $this->createBasicEmail([
+            'customHeaders' => [['X-Custom-Header', 'CustomValue']],
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -148,8 +161,9 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithPriority(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->Priority = 1;
+        $legacyEmail = $this->createBasicEmail([
+            'priority' => 1,
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -159,8 +173,9 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithLowPriority(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->Priority = 5;
+        $legacyEmail = $this->createBasicEmail([
+            'priority' => 5,
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -170,8 +185,9 @@ class SymfonyMailerAdapterTest extends TestCase
 
     public function testConvertWithSender(): void
     {
-        $legacyEmail = $this->createBasicEmail();
-        $legacyEmail->Sender = 'bounce@example.com';
+        $legacyEmail = $this->createBasicEmail([
+            'sender' => 'bounce@example.com',
+        ]);
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -186,31 +202,13 @@ class SymfonyMailerAdapterTest extends TestCase
         $cid = 'abc123def456';
         $body = '<p>Image: <img src="cid:' . $cid . '"></p>';
 
-        $legacyEmail = $this->createStub(Email::class);
-        $legacyEmail->method('getRecipient')->willReturn([['test@example.com', 'Test']]);
-        $legacyEmail->method('getFrom')->willReturn('from@example.com');
-        $legacyEmail->method('getFromName')->willReturn('From Name');
-        $legacyEmail->method('getSubject')->willReturn('Test Subject');
-        $legacyEmail->method('getBody')->willReturn($body);
-        $legacyEmail->method('getAltBody')->willReturn('');
-        $legacyEmail->method('getCharset')->willReturn('UTF-8');
-        $legacyEmail->method('getReplyTo')->willReturn([]);
-        $legacyEmail->method('getCc')->willReturn([]);
-        $legacyEmail->method('getBcc')->willReturn([]);
-        $legacyEmail->method('getCustomHeaders')->willReturn([]);
-        $legacyEmail->method('getAttachments')->willReturn([
-            [
-                0 => 'image data',
-                1 => 'image.png',
-                2 => 'image.png',
-                3 => 'base64',
-                4 => 'image/png',
-                5 => true,
-                6 => 'inline',
-                7 => $cid,
+        $legacyEmail = $this->createBasicEmail([
+            'subject' => 'Test Subject',
+            'body' => $body,
+            'attachments' => [
+                ['image data', 'image.png', 'image.png', 'base64', 'image/png', true, 'inline', $cid],
             ],
         ]);
-        $legacyEmail->ContentType = 'text/html';
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -226,31 +224,13 @@ class SymfonyMailerAdapterTest extends TestCase
         $cid = 'abc123@example.com';
         $body = '<p>Image: <img src="cid:' . $cid . '"></p>';
 
-        $legacyEmail = $this->createStub(Email::class);
-        $legacyEmail->method('getRecipient')->willReturn([['test@example.com', 'Test']]);
-        $legacyEmail->method('getFrom')->willReturn('from@example.com');
-        $legacyEmail->method('getFromName')->willReturn('From Name');
-        $legacyEmail->method('getSubject')->willReturn('Test Subject');
-        $legacyEmail->method('getBody')->willReturn($body);
-        $legacyEmail->method('getAltBody')->willReturn('');
-        $legacyEmail->method('getCharset')->willReturn('UTF-8');
-        $legacyEmail->method('getReplyTo')->willReturn([]);
-        $legacyEmail->method('getCc')->willReturn([]);
-        $legacyEmail->method('getBcc')->willReturn([]);
-        $legacyEmail->method('getCustomHeaders')->willReturn([]);
-        $legacyEmail->method('getAttachments')->willReturn([
-            [
-                0 => 'image data',
-                1 => 'image.png',
-                2 => 'image.png',
-                3 => 'base64',
-                4 => 'image/png',
-                5 => true,
-                6 => 'inline',
-                7 => $cid,
+        $legacyEmail = $this->createBasicEmail([
+            'subject' => 'Test Subject',
+            'body' => $body,
+            'attachments' => [
+                ['image data', 'image.png', 'image.png', 'base64', 'image/png', true, 'inline', $cid],
             ],
         ]);
-        $legacyEmail->ContentType = 'text/html';
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -267,41 +247,13 @@ class SymfonyMailerAdapterTest extends TestCase
         $cid2 = 'image2@domain.com';
         $body = '<p><img src="cid:' . $cid1 . '"><img src="cid:' . $cid2 . '"></p>';
 
-        $legacyEmail = $this->createStub(Email::class);
-        $legacyEmail->method('getRecipient')->willReturn([['test@example.com', 'Test']]);
-        $legacyEmail->method('getFrom')->willReturn('from@example.com');
-        $legacyEmail->method('getFromName')->willReturn('From Name');
-        $legacyEmail->method('getSubject')->willReturn('Test');
-        $legacyEmail->method('getBody')->willReturn($body);
-        $legacyEmail->method('getAltBody')->willReturn('');
-        $legacyEmail->method('getCharset')->willReturn('UTF-8');
-        $legacyEmail->method('getReplyTo')->willReturn([]);
-        $legacyEmail->method('getCc')->willReturn([]);
-        $legacyEmail->method('getBcc')->willReturn([]);
-        $legacyEmail->method('getCustomHeaders')->willReturn([]);
-        $legacyEmail->method('getAttachments')->willReturn([
-            [
-                0 => 'image1 data',
-                1 => 'image1.png',
-                2 => 'image1.png',
-                3 => 'base64',
-                4 => 'image/png',
-                5 => true,
-                6 => 'inline',
-                7 => $cid1,
-            ],
-            [
-                0 => 'image2 data',
-                1 => 'image2.png',
-                2 => 'image2.png',
-                3 => 'base64',
-                4 => 'image/png',
-                5 => true,
-                6 => 'inline',
-                7 => $cid2,
+        $legacyEmail = $this->createBasicEmail([
+            'body' => $body,
+            'attachments' => [
+                ['image1 data', 'image1.png', 'image1.png', 'base64', 'image/png', true, 'inline', $cid1],
+                ['image2 data', 'image2.png', 'image2.png', 'base64', 'image/png', true, 'inline', $cid2],
             ],
         ]);
-        $legacyEmail->ContentType = 'text/html';
 
         $adapter = new SymfonyMailerAdapter();
         $symfonyEmail = $adapter->convertToSymfonyEmail($legacyEmail);
@@ -313,13 +265,67 @@ class SymfonyMailerAdapterTest extends TestCase
         $this->assertStringNotContainsString('cid:' . $cid2 . '@generated', $htmlBody);
     }
 
-    private function createBasicEmail(): Email
+    /**
+     * @param array{
+     *     recipients?: list<array{0: string, 1?: string}>,
+     *     from?: string,
+     *     fromName?: string,
+     *     subject?: string,
+     *     body?: string,
+     *     altBody?: string,
+     *     charset?: string,
+     *     contentType?: string,
+     *     replyTo?: list<array{0: string, 1?: string}>,
+     *     cc?: list<array{0: string, 1?: string}>,
+     *     bcc?: list<array{0: string, 1?: string}>,
+     *     customHeaders?: list<array{0: string, 1: string}>,
+     *     attachments?: list<array<int, mixed>>,
+     *     priority?: int,
+     *     sender?: string
+     * } $config
+     */
+    private function createBasicEmail(array $config = []): Email
     {
-        $legacyEmail = new Email();
-        $legacyEmail->setRecipient('test@example.com', 'Test User');
-        $legacyEmail->setFrom('sender@example.com', 'Sender Name');
-        $legacyEmail->setSubject('Test');
-        $legacyEmail->setBody('Body');
+        $config = array_merge([
+            'recipients' => [['test@example.com', 'Test User']],
+            'from' => 'sender@example.com',
+            'fromName' => 'Sender Name',
+            'subject' => 'Test',
+            'body' => 'Body',
+            'altBody' => '',
+            'charset' => 'UTF-8',
+            'contentType' => PHPMailer::CONTENT_TYPE_TEXT_HTML,
+            'replyTo' => [],
+            'cc' => [],
+            'bcc' => [],
+            'customHeaders' => [],
+            'attachments' => [],
+            'priority' => null,
+            'sender' => null,
+        ], $config);
+
+        $legacyEmail = $this->createStub(Email::class);
+        $legacyEmail->method('getRecipient')->willReturn($config['recipients']);
+        $legacyEmail->method('getFrom')->willReturn($config['from']);
+        $legacyEmail->method('getFromName')->willReturn($config['fromName']);
+        $legacyEmail->method('getSubject')->willReturn($config['subject']);
+        $legacyEmail->method('getBody')->willReturn($config['body']);
+        $legacyEmail->method('getAltBody')->willReturn($config['altBody']);
+        $legacyEmail->method('getCharset')->willReturn($config['charset']);
+        $legacyEmail->method('getReplyTo')->willReturn($config['replyTo']);
+        $legacyEmail->method('getCc')->willReturn($config['cc']);
+        $legacyEmail->method('getBcc')->willReturn($config['bcc']);
+        $legacyEmail->method('getCustomHeaders')->willReturn($config['customHeaders']);
+        $legacyEmail->method('getAttachments')->willReturn($config['attachments']);
+        $legacyEmail->ContentType = $config['contentType'];
+
+        if ($config['priority'] !== null) {
+            $legacyEmail->Priority = $config['priority'];
+        }
+
+        if ($config['sender'] !== null) {
+            $legacyEmail->Sender = $config['sender'];
+        }
 
         return $legacyEmail;
     }

@@ -26,4 +26,15 @@ require_once Path::join(OX_BASE_PATH, 'overridablefunctions.php');
 
 (new DotenvLoader(INSTALLATION_ROOT_PATH))->loadEnvironmentVariables();
 
+$buildDirectory = getenv('OXID_BUILD_DIRECTORY') ?: '';
+if ($buildDirectory === '' || !is_dir($buildDirectory) || !is_writable($buildDirectory)) {
+    $buildDirectory = Path::join(INSTALLATION_ROOT_PATH, 'var', 'cache') . DIRECTORY_SEPARATOR;
+    putenv('OXID_BUILD_DIRECTORY=' . $buildDirectory);
+    $_ENV['OXID_BUILD_DIRECTORY'] = $buildDirectory;
+    $_SERVER['OXID_BUILD_DIRECTORY'] = $buildDirectory;
+}
+if (!is_dir($buildDirectory)) {
+    mkdir($buildDirectory, 0777, true);
+}
+
 date_default_timezone_set(getenv('OXID_DEFAULT_TIMEZONE') ?: 'Europe/Berlin');
