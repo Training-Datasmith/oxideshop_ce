@@ -1,0 +1,4 @@
+{
+  "start": "sudo service docker start",
+  "install": "composer install --no-interaction"
+}

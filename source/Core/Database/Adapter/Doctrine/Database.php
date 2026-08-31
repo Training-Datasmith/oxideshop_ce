@@ -255,7 +255,7 @@ class Database implements DatabaseInterface
         return $queries[0];
     }
 
-    public function selectLimit(string $query, $rowCount = -1, $offset = 0, $parameters = [])
+    public function selectLimit($query, $rowCount = -1, $offset = 0, $parameters = [])
     {
         /**
          * Parameter validation.
