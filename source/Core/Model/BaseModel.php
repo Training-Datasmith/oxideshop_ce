@@ -1301,7 +1301,7 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
             && isset($this->$longFieldName->fldtype)
             && $this->$longFieldName->fldtype == 'double'
         ) {
-            $fieldValue = str_replace(',', '.', $fieldValue);
+            $fieldValue = str_replace(',', '.', (string) $fieldValue);
         }
 
         // isset is REQUIRED here not to use getter

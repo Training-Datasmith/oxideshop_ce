@@ -254,7 +254,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     ): array {
         return array_slice(
             $reviewAndRatingList,
-            $offset,
+            (int) $offset,
             $itemsCount,
             true
         );

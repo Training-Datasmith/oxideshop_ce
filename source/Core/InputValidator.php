@@ -66,7 +66,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      */
     public function validateBasketAmount($amount)
     {
-        $amount = str_replace(',', '.', $amount);
+        $amount = str_replace(',', '.', (string) $amount);
 
         if (!is_numeric($amount) || $amount < 0) {
             /**
@@ -78,7 +78,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
         }
 
         if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blAllowUnevenAmounts')) {
-            return round($amount);
+            return round((float) $amount);
         }
 
         //negative amounts are not allowed
@@ -462,12 +462,12 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
 
         $validationResult = true;
 
-        if (!$stringHelper->preg_match("/^\d{5,8}$/", $debitInfo['lsblz'])) {
+        if (!$stringHelper->preg_match("/^\d{5,8}$/", (string) $debitInfo['lsblz'])) {
             // Bank code is invalid
             $validationResult = self::INVALID_BANK_CODE;
         }
 
-        if (true === $validationResult && !$stringHelper->preg_match("/^\d{10,12}$/", $debitInfo['lsktonr'])) {
+        if (true === $validationResult && !$stringHelper->preg_match("/^\d{10,12}$/", (string) $debitInfo['lsktonr'])) {
             // Account number is invalid
             return self::INVALID_ACCOUNT_NUMBER;
         }

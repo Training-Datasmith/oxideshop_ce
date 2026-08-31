@@ -1061,7 +1061,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
         return str_replace(
             $this->getOutDir(),
             $this->getOutUrl($ssl, $admin, $nativeImg),
-            $this->getDir($file, $dir, $admin, $lang, $shop, $theme)
+            (string) $this->getDir($file, $dir, $admin, $lang, $shop, $theme)
         );
     }
 

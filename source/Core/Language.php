@@ -528,7 +528,7 @@ class Language extends \OxidEsales\Eshop\Core\Base
         }
         $sValue = Registry::getUtils()->fRound($dValue, $oActCur);
 
-        return number_format($sValue, $oActCur->decimal, $oActCur->dec, $oActCur->thousand);
+        return number_format($sValue, (int) $oActCur->decimal, $oActCur->dec, $oActCur->thousand);
     }
 
     /**
@@ -619,8 +619,10 @@ class Language extends \OxidEsales\Eshop\Core\Base
         $this->_iTplLanguageId = isset($iLang) ? (int) $iLang : $this->getBaseLanguage();
         if ($this->isAdmin()) {
             $aLanguages = $this->getAdminTplLanguageArray();
-            if (!isset($aLanguages[$this->_iTplLanguageId])) {
+            if (!empty($aLanguages) && !isset($aLanguages[$this->_iTplLanguageId])) {
                 $this->_iTplLanguageId = key($aLanguages);
+            } elseif (empty($aLanguages)) {
+                $this->_iTplLanguageId = $this->validateLanguage($this->_iTplLanguageId);
             }
         }
 
@@ -935,8 +937,8 @@ class Language extends \OxidEsales\Eshop\Core\Base
             $config = Registry::getConfig();
 
             $mapFile = '';
-            $theme = $this->getRealThemeName($config->getConfigParam('sTheme'), $isAdmin);
-            $customTheme = $this->getRealThemeName($config->getConfigParam('sCustomTheme'), $isAdmin);
+            $theme = (string) ($this->getRealThemeName($config->getConfigParam('sTheme'), $isAdmin) ?? '');
+            $customTheme = (string) ($this->getRealThemeName($config->getConfigParam('sCustomTheme'), $isAdmin) ?? '');
 
             $languageAbbr = Registry::getLang()->getLanguageAbbr($language);
             $possibleMapFileLocations = array_merge(

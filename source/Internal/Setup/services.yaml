@@ -15,3 +15,8 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Setup\ShopSetupCommand
     tags:
       - { name: 'console.command', command: 'oe:setup:shop' }
+
+  OxidEsales\EshopCommunity\Internal\Setup\DatabaseResetCommand:
+    class: OxidEsales\EshopCommunity\Internal\Setup\DatabaseResetCommand
+    tags:
+      - { name: 'console.command', command: 'oe:database:reset' }

@@ -23,9 +23,9 @@ final class CurlSpy extends Curl
         return 200;
     }
 
-    public function execute(): bool
+    public function execute(): string
     {
-        return true;
+        return '';
     }
 
     public function setQuery($query): void

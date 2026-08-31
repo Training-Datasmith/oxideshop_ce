@@ -83,7 +83,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         $blSecure = $blSecure || Registry::getConfig()->isSsl();
         return setcookie(
             $sName,
-            $sValue,
+            (string) $sValue,
             ['expires' => $iExpire, 'path' => $this->getCookiePath($sPath), 'domain' => $this->getCookieDomain($sDomain), 'secure' => $blSecure, 'httponly' => $blHttpOnly, 'samesite' => 'Lax']
         );
     }

@@ -340,8 +340,8 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
         $iTime = time();
 
         // If date is not set will add day before and day after to check if voucher valid today.
-        $iTomorrow = mktime(0, 0, 0, date('m'), date('d') + 1, date('Y'));
-        $iYesterday = mktime(0, 0, 0, date('m'), date('d') - 1, date('Y'));
+        $iTomorrow = mktime(0, 0, 0, (int) date('m'), (int) date('d') + 1, (int) date('Y'));
+        $iYesterday = mktime(0, 0, 0, (int) date('m'), (int) date('d') - 1, (int) date('Y'));
 
         // Checks if beginning date is set, if not set $iFrom to yesterday so it will be valid.
         $iFrom = ((int) $oSeries->oxvoucherseries__oxbegindate->value) ?

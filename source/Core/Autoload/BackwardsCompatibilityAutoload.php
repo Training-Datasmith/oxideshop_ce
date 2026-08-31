@@ -18,6 +18,20 @@ namespace OxidEsales\EshopCommunity\Core\Autoload;
 class BackwardsCompatibilityAutoload
 {
     /**
+     * Register backwards-compatible aliases for unified classes that are already loaded.
+     *
+     * PHP 8.4 does not autoload parent class names in is_subclass_of(), so aliases must exist
+     * before legacy class names are used in inheritance checks.
+     */
+    public static function registerAliasesForLoadedClasses(): void
+    {
+        foreach (static::getBackwardsCompatibilityClassMap() as $alias => $unifiedClass) {
+            if (class_exists($unifiedClass, false) && !class_exists($alias, false)) {
+                class_alias($unifiedClass, $alias);
+            }
+        }
+    }
+    /**
      * Autoload method.
      *
      * @param string $class Name of the class to be loaded
@@ -36,8 +50,12 @@ class BackwardsCompatibilityAutoload
 
         $unifiedNamespaceClassName = static::getUnifiedNamespaceClassForBcAlias($class);
         if (!empty($unifiedNamespaceClassName)) {
-            static::forceBackwardsCompatiblityClassLoading($unifiedNamespaceClassName);
+            static::forceBackwardsCompatiblityClassLoading($unifiedNamespaceClassName, $class);
+
+            return class_exists($class, false);
         }
+
+        return false;
     }
 
     /**
@@ -61,9 +79,15 @@ class BackwardsCompatibilityAutoload
      *
      * @param string $class Name of the class to load
      */
-    private static function forceBackwardsCompatiblityClassLoading($class): void
+    private static function forceBackwardsCompatiblityClassLoading(string $class, string $bcAlias): void
     {
-        class_exists($class);
+        if (!class_exists($class, false)) {
+            class_exists($class);
+        }
+
+        if (!class_exists($bcAlias, false)) {
+            class_alias($class, $bcAlias);
+        }
     }
 
     /**

@@ -576,7 +576,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $parametersToAdd
      */
-    private function removeNotSetParameters($parametersToAdd): string
+    private function removeNotSetParameters($parametersToAdd): array|string
     {
         if (is_array($parametersToAdd) && !empty($parametersToAdd)) {
             foreach ($parametersToAdd as $key => $value) {
@@ -586,7 +586,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
             }
         }
 
-        return $parametersToAdd;
+        return $parametersToAdd ?? '';
     }
 
     /**

@@ -39,7 +39,7 @@ namespace {
                     // extracting GD version from php
                     $info = gd_info();
                     if (isset($info['GD Version'])) {
-                        $version = version_compare(preg_replace("/[^0-9\.]/", '', $info['GD Version']), 1, '>') ? 2 : 1;
+                        $version = version_compare(preg_replace("/[^0-9\.]/", '', $info['GD Version']), '1', '>') ? 2 : 1;
                     }
                 }
             }
@@ -808,7 +808,7 @@ namespace OxidEsales\EshopCommunity\Core {
          */
         protected function validateFileExist($filePath): bool
         {
-            return file_exists($filePath);
+            return is_string($filePath) && $filePath !== '' && file_exists($filePath);
         }
 
         /**

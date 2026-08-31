@@ -330,6 +330,12 @@ class Email extends PHPMailer
         if ($this->isSymfonyMailerEnabled()) {
             try {
                 $symfonyEmail = ContainerFacade::get(EmailAdapterInterface::class)->convertToSymfonyEmail($this);
+                if (!$symfonyEmail->getHtmlBody() && !$symfonyEmail->getTextBody()) {
+                    $body = $this->getBody();
+                    if ($body) {
+                        $symfonyEmail->text($body);
+                    }
+                }
                 ContainerFacade::get(MailerInterface::class)->send($symfonyEmail);
 
                 return true;

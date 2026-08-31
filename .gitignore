@@ -34,3 +34,5 @@
 
 # Template files
 /source/Application/views/*
+!/source/Application/views/admin_twig/
+!/source/Application/views/admin_twig/menu.xml

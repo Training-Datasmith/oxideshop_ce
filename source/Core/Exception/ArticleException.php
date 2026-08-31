@@ -81,7 +81,7 @@ class ArticleException extends \OxidEsales\Eshop\Core\Exception\StandardExceptio
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString() . ' Faulty Article --> ' . $this->_sArticleNr . "\n";
     }
@@ -91,7 +91,7 @@ class ArticleException extends \OxidEsales\Eshop\Core\Exception\StandardExceptio
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         $aRes = parent::getValues();
         $aRes['articleNr'] = $this->getArticleNr();

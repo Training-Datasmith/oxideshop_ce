@@ -604,6 +604,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function convertVat($sVat)
     {
+        $sVat = (string) $sVat;
         if (strpos($sVat, '.') < strpos($sVat, ',')) {
             $sVat = str_replace(['.', ','], ['', '.'], $sVat);
         } else {

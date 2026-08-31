@@ -139,7 +139,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * found articles. Article list is stored at search::_aArticleList
      * array.
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -167,7 +167,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
             $this->_aArticleList = null;
             $this->_blEmptySearch = true;
 
-            return false;
+            return;
         }
 
         // config allows to search in Manufacturers ?

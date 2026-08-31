@@ -4873,9 +4873,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
         $blEnterNetPrice = Registry::getConfig()->getConfigParam('blEnterNetPrice');
         if ($blCalculationModeNetto && !$blEnterNetPrice) {
-            $dPrice = round(Price::brutto2Netto($dPrice, $dVat), $oCurrency->decimal);
+            $dPrice = round(Price::brutto2Netto($dPrice, $dVat), (int) $oCurrency->decimal);
         } elseif (!$blCalculationModeNetto && $blEnterNetPrice) {
-            $dPrice = round(Price::netto2Brutto($dPrice, $dVat), $oCurrency->decimal);
+            $dPrice = round(Price::netto2Brutto($dPrice, $dVat), (int) $oCurrency->decimal);
         }
 
         return $dPrice;

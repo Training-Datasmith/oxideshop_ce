@@ -85,7 +85,7 @@ class ConnectionException extends \OxidEsales\Eshop\Core\Exception\StandardExcep
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString() . ' Connection Adress --> ' . $this->_sAddress . "\n" . 'Connection Error --> ' . $this->_sConnectionError;
     }
@@ -95,7 +95,7 @@ class ConnectionException extends \OxidEsales\Eshop\Core\Exception\StandardExcep
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         $aRes = parent::getValues();
         $aRes['adress'] = $this->getAdress();

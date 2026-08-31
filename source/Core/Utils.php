@@ -179,6 +179,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function string2Float($sValue)
     {
+        $sValue = (string) $sValue;
         $fRet = str_replace(' ', '', $sValue);
         $iCommaPos = strpos($fRet, ',');
         $iDotPos = strpos($fRet, '.');
@@ -235,7 +236,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
             $robots = ContainerFacade::getParameter('oxid_esales.search_engine_list');
             $robots = \is_array($robots) ? $robots : [];
 
-            $userAgent = $userAgent ?: strtolower(getenv('HTTP_USER_AGENT'));
+            $userAgent = $userAgent ?: strtolower((string) (getenv('HTTP_USER_AGENT') ?: ''));
             foreach ($robots as $robot) {
                 if (str_contains($userAgent, (string) $robot)) {
                     $isSearchEngine = true;
@@ -298,7 +299,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         //cached currency precision, this saves about 1% of execution time
         if (is_null($this->_iCurPrecision)) {
             $currency = $currency ?: Registry::getConfig()->getActShopCurrencyObject();
-            $this->_iCurPrecision = $currency->decimal;
+            $this->_iCurPrecision = (int) $currency->decimal;
         }
         $roundedValue = round((float)$value, $this->_iCurPrecision);
         stopProfile('fround');
@@ -851,9 +852,9 @@ class Utils extends \OxidEsales\Eshop\Core\Base
 
         $blEnterNetPrice = Registry::getConfig()->getConfigParam('blEnterNetPrice');
         if ($blCalculationModeNetto && !$blEnterNetPrice) {
-            $dPrice = round(\OxidEsales\Eshop\Core\Price::brutto2Netto($dPrice, $dVat), $oCurrency->decimal);
+            $dPrice = round(\OxidEsales\Eshop\Core\Price::brutto2Netto($dPrice, $dVat), (int) $oCurrency->decimal);
         } elseif (!$blCalculationModeNetto && $blEnterNetPrice) {
-            $dPrice = round(\OxidEsales\Eshop\Core\Price::netto2Brutto($dPrice, $dVat), $oCurrency->decimal);
+            $dPrice = round(\OxidEsales\Eshop\Core\Price::netto2Brutto($dPrice, $dVat), (int) $oCurrency->decimal);
         }
 
         return $dPrice;

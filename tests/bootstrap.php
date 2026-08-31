@@ -37,4 +37,6 @@ if (!is_dir($buildDirectory)) {
     mkdir($buildDirectory, 0777, true);
 }
 
+ini_set('sendmail_path', Path::join(INSTALLATION_ROOT_PATH, 'tests/fixtures/fake-sendmail.sh') . ' -t');
+
 date_default_timezone_set(getenv('OXID_DEFAULT_TIMEZONE') ?: 'Europe/Berlin');

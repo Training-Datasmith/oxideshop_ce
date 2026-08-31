@@ -57,7 +57,7 @@ class ObjectException extends \OxidEsales\Eshop\Core\Exception\StandardException
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString() . ' Faulty Object --> ' . $this->_oObject::class . "\n";
     }

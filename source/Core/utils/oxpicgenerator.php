@@ -51,6 +51,11 @@ if (!function_exists('calcImageSize')) {
      */
     function calcImageSize($iDesiredWidth, $iDesiredHeight, $iPrefWidth, $iPrefHeight): array
     {
+        $iDesiredWidth = (int) $iDesiredWidth;
+        $iDesiredHeight = (int) $iDesiredHeight;
+        $iPrefWidth = (int) $iPrefWidth;
+        $iPrefHeight = (int) $iPrefHeight;
+
         // #1837/1177M - do not resize smaller pictures
         if ($iDesiredWidth < $iPrefWidth || $iDesiredHeight < $iPrefHeight) {
             if ($iPrefWidth >= $iPrefHeight * ((float) ($iDesiredWidth / $iDesiredHeight))) {
@@ -65,7 +70,7 @@ if (!function_exists('calcImageSize')) {
             $iNewHeight = $iPrefHeight;
         }
 
-        return [$iNewWidth, $iNewHeight];
+        return [(int) $iNewWidth, (int) $iNewHeight];
     }
 }
 
@@ -207,6 +212,8 @@ if (!function_exists('resizeJpeg')) {
         $aResult = checkSizeAndCopy($sSrc, $sTarget, $iWidth, $iHeight, $aImageInfo[0], $aImageInfo[1]);
         if (is_array($aResult)) {
             [$iNewWidth, $iNewHeight] = $aResult;
+            $iNewWidth = (int) $iNewWidth;
+            $iNewHeight = (int) $iNewHeight;
             if ($hDestinationImage === null) {
                 $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
             }
@@ -222,7 +229,7 @@ if (!function_exists('resizeJpeg')) {
                     $iGdVer
                 )
             ) {
-                imagejpeg($hDestinationImage, $sTarget, $iDefQuality);
+                imagejpeg($hDestinationImage, $sTarget, (int) $iDefQuality);
             }
         }
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OX>
+    <OXMENU id="NAVIGATION_ESHOPADMIN">
+        <MAINMENU id="mxmainmenu">
+            <SUBMENU id="mxcoresett" cl="shop"/>
+            <SUBMENU id="mxdemolink1" cl="shop_main" disableForDemoShop="1"/>
+            <SUBMENU id="mxdemolink2" cl="shop_config" disableForDemoShop="1"/>
+            <SUBMENU id="mxdemolink3" cl="shop_license" disableForDemoShop="1"/>
+            <SUBMENU id="mxdemolink4" cl="shop_system" disableForDemoShop="1"/>
+        </MAINMENU>
+    </OXMENU>
+</OX>

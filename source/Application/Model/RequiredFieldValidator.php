@@ -27,7 +27,7 @@ class RequiredFieldValidator
         if (is_array($sFieldValue)) {
             $blValid = $this->validateFieldValueArray($sFieldValue);
         } else {
-            if (!trim($sFieldValue ?? '')) {
+            if (!trim((string) ($sFieldValue ?? ''))) {
                 $blValid = false;
             }
         }

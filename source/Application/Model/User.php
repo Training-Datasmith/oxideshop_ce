@@ -2539,7 +2539,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string  $id        Id of the item to be deleted
      * @param string  $className Model class to be used
      */
-    private function deleteItemById($id, string $className): void
+    private function deleteItemById($id, $key, string $className): void
     {
         /** @var \OxidEsales\Eshop\Core\Model\BaseModel $modelObject */
         $modelObject = oxNew($className);
@@ -2645,7 +2645,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
             ->hash($password);
     }
 
-    private function verifyHash(string $password, string $hash): string
+    private function verifyHash(string $password, string $hash): bool
     {
         return ContainerFacade::get(PasswordServiceBridgeInterface::class)
             ->verifyPassword($password, $hash);

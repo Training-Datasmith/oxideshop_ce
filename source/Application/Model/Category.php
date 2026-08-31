@@ -224,14 +224,14 @@ class Category extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implement
      *
      * @param mixed $dbRecord database record array
      */
-    public function assign($dbRecord)
+    public function assign($dbRecord): void
     {
         $this->_iNrOfArticles = null;
 
         //clear seo urls
         $this->_aSeoUrls = [];
 
-        return parent::assign($dbRecord);
+        parent::assign($dbRecord);
     }
 
     /**

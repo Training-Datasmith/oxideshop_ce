@@ -71,7 +71,7 @@ abstract class BaseRegistrator
      */
     protected function getFileModificationTime($file)
     {
-        if (file_exists($file)) {
+        if (is_string($file) && $file !== '' && file_exists($file)) {
             return filemtime($file);
         }
 
@@ -89,9 +89,9 @@ abstract class BaseRegistrator
     {
         $config = Registry::getConfig();
         return str_replace(
-            rtrim((string) $config->getCurrentShopUrl(false), '/'),
+            rtrim((string) ($config->getCurrentShopUrl(false) ?: ''), '/'),
             rtrim((string) ContainerFacade::getParameter('oxid_esales.shop_source_directory'), '/'),
-            $url
+            (string) $url
         );
     }
 }

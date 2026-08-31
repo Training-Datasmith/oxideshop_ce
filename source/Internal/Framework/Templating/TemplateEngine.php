@@ -60,6 +60,8 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function exists(string $name): bool
     {
-        return true;
+        $path = \OxidEsales\Eshop\Core\Registry::getConfig()->getTemplatePath($name, false);
+
+        return is_string($path) && $path !== '' && file_exists($path);
     }
 }

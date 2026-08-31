@@ -79,7 +79,7 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString() . ' Remaining Amount --> ' . $this->_iRemainingAmount;
     }
@@ -92,7 +92,7 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         $aRes = parent::getValues();
         $aRes['remainingAmount'] = $this->getRemainingAmount();

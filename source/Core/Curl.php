@@ -378,7 +378,7 @@ class Curl
      */
     protected function executeCurl(): string
     {
-        return curl_exec($this->getResource());
+        return (string) (curl_exec($this->getResource()) ?: '');
     }
 
     /**

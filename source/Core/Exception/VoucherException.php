@@ -52,7 +52,7 @@ class VoucherException extends \OxidEsales\Eshop\Core\Exception\StandardExceptio
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString() . ' Faulty Voucher Nr --> ' . $this->_sVoucherNr;
     }
@@ -65,7 +65,7 @@ class VoucherException extends \OxidEsales\Eshop\Core\Exception\StandardExceptio
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         $aRes = parent::getValues();
         $aRes['voucherNr'] = $this->getVoucherNr();

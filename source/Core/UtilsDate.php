@@ -239,12 +239,12 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
             //$sSQLTimeStampPattern = "/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/";
             if ($oStr->preg_match($sSQLTimeStampPattern, $oObject->value, $aMatches)) {
                 $iTimestamp = mktime(
-                    $aMatches[4], //h
-                    $aMatches[5], //m
-                    $aMatches[6], //s
-                    $aMatches[2], //M
-                    $aMatches[3], //d
-                    $aMatches[1]
+                    (int) $aMatches[4], //h
+                    (int) $aMatches[5], //m
+                    (int) $aMatches[6], //s
+                    (int) $aMatches[2], //M
+                    (int) $aMatches[3], //d
+                    (int) $aMatches[1]
                 ); //y
                 if (!$iTimestamp) {
                     $iTimestamp = '0';
@@ -467,9 +467,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
             0,
             0,
             0,
-            $aDateMatches[$aDFields[0]],
-            $aDateMatches[$aDFields[1]],
-            $aDateMatches[$aDFields[2]]
+            (int) $aDateMatches[$aDFields[0]],
+            (int) $aDateMatches[$aDFields[1]],
+            (int) $aDateMatches[$aDFields[2]]
         );
 
         if ($oObject instanceof \OxidEsales\Eshop\Core\Field) {
@@ -545,7 +545,7 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     public function formatDBTimestamp($iTimestamp)
     {
-        return date('Y-m-d H:i:s', $iTimestamp);
+        return date('Y-m-d H:i:s', (int) $iTimestamp);
     }
 
     /**
@@ -591,7 +591,7 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
             $iHour = $aHourToCheck[0];
             $iMinutes = $aHourToCheck[1];
             $iSecond = $aHourToCheck[2];
-            $oDate->setTime($iHour, $iMinutes, $iSecond);
+            $oDate->setTime((int) $iHour, (int) $iMinutes, (int) $iSecond);
         }
 
         return $this->shiftServerTime($oDate->getTimestamp());
@@ -694,9 +694,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
     protected function processDate($aTime, $aDate, $blGerman, $sFormat)
     {
         if ($blGerman) {
-            return date($sFormat, mktime($aTime[0], $aTime[1], $aTime[2], $aDate[1], $aDate[0], $aDate[2]));
+            return date($sFormat, mktime((int) $aTime[0], (int) $aTime[1], (int) $aTime[2], (int) $aDate[1], (int) $aDate[0], (int) $aDate[2]));
         }
 
-        return date($sFormat, mktime($aTime[0], $aTime[1], $aTime[2], $aDate[1], $aDate[2], $aDate[0]));
+        return date($sFormat, mktime((int) $aTime[0], (int) $aTime[1], (int) $aTime[2], (int) $aDate[1], (int) $aDate[2], (int) $aDate[0]));
     }
 }

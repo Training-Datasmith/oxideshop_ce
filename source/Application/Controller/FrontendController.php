@@ -450,7 +450,7 @@ class FrontendController extends BaseController
      *
      * @return array
      */
-    protected function getComponentNames()
+    public function getComponentNames()
     {
         if (self::$_aCollectedComponentNames === null) {
             self::$_aCollectedComponentNames = array_merge($this->_aComponentNames, $this->_aUserComponentNames);
@@ -475,7 +475,7 @@ class FrontendController extends BaseController
      * redirects to it. If no alternative path was found - 404 header is emitted
      * and page is rendered
      */
-    protected function processRequest()
+    public function processRequest()
     {
         $utils = Registry::getUtils();
         $requestUrl = Registry::get(Request::class)->getRequestUrl();

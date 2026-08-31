@@ -122,7 +122,7 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
     private function setUtilsSpy(): void
     {
         $utils = new class () extends Utils {
-            public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302)
+            public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302): void
             {
                 $aArgs = func_get_args();
                 throw new Exception($aArgs[0]);
@@ -135,7 +135,7 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
     private function getFrontendSeoLoggingSpy(): FrontendController
     {
         return new class () extends FrontendController {
-            public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302)
+            public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302): void
             {
                 $aArgs = func_get_args();
                 throw new Exception($aArgs[0]);
@@ -156,7 +156,7 @@ final class FrontendSearchEngineTest extends IntegrationTestCase
     private function getFrontendNoIndexSpy(): FrontendController
     {
         return new class () extends FrontendController {
-            public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302)
+            public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302): void
             {
                 $aArgs = func_get_args();
                 throw new Exception($aArgs[0]);

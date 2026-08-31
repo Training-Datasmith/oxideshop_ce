@@ -40,9 +40,9 @@ class Review extends BaseModel
      *
      * @return bool
      */
-    public function assign($dbRecord)
+    public function assign($dbRecord): void
     {
-        $blRet = parent::assign($dbRecord);
+        parent::assign($dbRecord);
 
         if (isset($this->oxreviews__oxuserid) && $this->oxreviews__oxuserid->value) {
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
@@ -55,8 +55,6 @@ class Review extends BaseModel
 
             $this->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($firstName);
         }
-
-        return $blRet;
     }
 
     /**

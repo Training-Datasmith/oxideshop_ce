@@ -190,7 +190,7 @@ class SepaIBANValidator
      */
     protected function isIBANChecksumValid($sIBAN): bool
     {
-        return (int) bcmod($sIBAN, self::IBAN_ALGORITHM_MOD_VALUE) === 1;
+        return (int) bcmod($sIBAN, (string) self::IBAN_ALGORITHM_MOD_VALUE) === 1;
     }
 
     /**
@@ -244,6 +244,6 @@ class SepaIBANValidator
      */
     protected function isCodeLengthValueValid($iLength): bool
     {
-        return is_numeric($iLength) && (int) preg_match("/\./", $iLength) !== 1;
+        return is_numeric($iLength) && (int) preg_match("/\./", (string) $iLength) !== 1;
     }
 }

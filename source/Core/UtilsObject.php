@@ -11,6 +11,7 @@ namespace OxidEsales\EshopCommunity\Core;
 
 use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\Eshop\Core\Module\ModuleChainsGenerator;
+use OxidEsales\EshopCommunity\Core\Autoload\BackwardsCompatibilityAutoload;
 
 /**
  * Object Factory implementation (oxNew() method is implemented in this class).
@@ -176,6 +177,8 @@ class UtilsObject
         if (isset($cacheKey) && $shouldUseCache && $object instanceof \OxidEsales\Eshop\Core\Model\BaseModel) {
             static::$_aInstanceCache[$cacheKey] = clone $object;
         }
+
+        BackwardsCompatibilityAutoload::registerAliasesForLoadedClasses();
 
         return $object;
     }

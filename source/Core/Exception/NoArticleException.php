@@ -27,7 +27,7 @@ class NoArticleException extends \OxidEsales\Eshop\Core\Exception\ArticleExcepti
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString();
     }

@@ -28,7 +28,7 @@ interface BaseDaoInterface
      *
      * @param string $id An id of the entity to delete.
      */
-    public function delete($id);
+    public function delete(string $id): void;
 
     /**
      * Updates or insert the given entity.

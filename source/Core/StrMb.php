@@ -134,7 +134,7 @@ class StrMb
      */
     public function htmlentities($sString, $iQuotStyle = ENT_QUOTES): string
     {
-        return htmlentities($sString, $iQuotStyle, $this->_sEncoding);
+        return htmlentities((string) $sString, $iQuotStyle, $this->_sEncoding);
     }
 
     // @codingStandardsIgnoreStart
@@ -185,7 +185,9 @@ class StrMb
             $aPattern = $aPattern . 'u';
         }
 
-        return preg_replace($aPattern, (string) $sString, $sSubject, $iLimit, $iCount);
+        $replacement = is_array($sString) ? $sString : (string) $sString;
+
+        return preg_replace($aPattern, $replacement, $sSubject, $iLimit, $iCount);
     }
 
     /**

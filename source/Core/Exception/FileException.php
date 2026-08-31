@@ -83,7 +83,7 @@ class FileException extends \OxidEsales\Eshop\Core\Exception\StandardException
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString() . ' Faulty File --> ' . $this->_sErrFileName . "\n" . 'Error Code --> ' . $this->_sFileError;
     }
@@ -93,7 +93,7 @@ class FileException extends \OxidEsales\Eshop\Core\Exception\StandardException
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         $aRes = parent::getValues();
         $aRes['fileName'] = $this->getFileName();

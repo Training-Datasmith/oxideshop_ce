@@ -209,7 +209,7 @@ class NavigationTree extends Base
      *
      * @param DOMDocument $dom document to check group
      */
-    protected function checkDemoShopDenials($dom)
+    public function checkDemoShopDenials($dom)
     {
         if (!\OxidEsales\Eshop\Core\Registry::getConfig()->isDemoShop()) {
             // nothing to check for non demo shop
@@ -263,7 +263,7 @@ class NavigationTree extends Base
      * @param object $domDocTo    node to append child
      * @param string $queryStart  node query
      */
-    protected function mergeNodes($domElemTo, $domElemFrom, $xPathTo, $domDocTo, $queryStart)
+    public function mergeNodes($domElemTo, $domElemFrom, $xPathTo, $domDocTo, $queryStart)
     {
         foreach ($domElemFrom->childNodes as $fromNode) {
             if ($fromNode->nodeType === XML_ELEMENT_NODE) {
@@ -611,8 +611,14 @@ class NavigationTree extends Base
     protected function getTemplateLanguageCode()
     {
         $language = \OxidEsales\Eshop\Core\Registry::getLang();
+        $languageArray = $language->getLanguageArray();
+        $tplLanguage = $language->getTplLanguage();
 
-        return $language->getLanguageArray()[$language->getTplLanguage()]->abbr;
+        if (!isset($languageArray[$tplLanguage]) || $languageArray[$tplLanguage] === null) {
+            $tplLanguage = $language->getBaseLanguage();
+        }
+
+        return $languageArray[$tplLanguage]->abbr ?? '';
     }
 
     /**

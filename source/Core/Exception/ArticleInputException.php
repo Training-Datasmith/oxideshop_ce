@@ -27,7 +27,7 @@ class ArticleInputException extends \OxidEsales\Eshop\Core\Exception\ArticleExce
      *
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return self::class . '-' . parent::getString();
     }
