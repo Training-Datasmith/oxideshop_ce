@@ -29,7 +29,7 @@ class FormField implements FormFieldInterface
     /**
      * @var bool
      */
-    private $isRequired;
+    private $isRequired = false;
 
     /**
      * @return string
